@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Creador de preguntas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Creador de preguntas</span>
+    <span class="status" role="status">Preguntas de esta sesión</span>
+  </header>
+  <div class="cols">
+    <!-- ============ Editor ============ -->
+    <section class="card" aria-labelledby="ed-title">
+      <div class="card-head">
+        <h1 id="ed-title">Nueva pregunta</h1>
+        <span class="tagline" id="ed-mode"></span>
+      </div>
+
+      <div class="tema-row">
+        <div class="field">
+          <label for="f-tema">Tema</label>
+          <input id="f-tema" type="number" min="0" step="1" inputmode="numeric" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-preg">Pregunta</label>
+        <textarea id="f-preg" rows="3" autocomplete="off"></textarea>
+      </div>
+
+      <fieldset>
+        <legend>Opciones</legend>
+        <div id="f-opts"></div>
+        <div class="row">
+          <button class="btn small" type="button" id="btn-add-opt">+ Añadir opción</button>
+          <span class="hint">Pulsa Enter para pasar a la siguiente opción.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend id="lg-correct">Respuesta correcta</legend>
+        <div class="pills" id="f-correct" role="radiogroup" aria-labelledby="lg-correct"></div>
+        <p class="hint" style="margin-top:8px">Por defecto es la A: escribe primero la correcta y luego las incorrectas. En el test se barajan. Puedes elegir otra con las flechas o haciendo clic en la letra.</p>
+      </fieldset>
+
+      <div class="field">
+        <label for="f-expl">Explicación <span class="opt-tag">(opcional, se muestra al fallar)</span></label>
+        <textarea id="f-expl" rows="3" autocomplete="off"></textarea>
+      </div>
+
+      <div class="err" id="f-error" role="alert" hidden></div>
+
+      <div class="row">
+        <button class="btn primary" type="button" id="btn-save"></button>
+        <button class="btn" type="button" id="btn-cancel" hidden>Cancelar edición</button>
+        <button class="btn" type="button" id="btn-clear">Limpiar</button>
+        <span class="flash" id="flash" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <!-- ============ Lista y exportación ============ -->
+    <div class="stack">
+      <section class="card" aria-labelledby="list-title">
+        <div class="list-head">
+          <h2 id="list-title">Preguntas <span class="mono" id="count" style="font-size:15px;color:var(--ink-2)"></span></h2>
+          <select id="f-filtro" aria-label="Filtrar por tema"></select>
+        </div>
+        <p class="empty" id="empty">Todavía no hay preguntas. Crea la primera a la izquierda.</p>
+        <ul class="items" id="list"></ul>
+        <div class="row">
+          <button class="btn small danger" type="button" id="btn-wipe">Vaciar lista</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="exp-title">
+        <h2 id="exp-title">Exportar</h2>
+        <div class="field">
+          <label for="f-name">Nombre del archivo</label>
+          <input id="f-name" type="text" value="preguntas_nuevas.json" autocomplete="off" spellcheck="false">
+        </div>
+        <p class="hint">Al guardar, selecciona la carpeta <span class="mono">preguntas</span> que está en el mismo directorio desde el que ejecutaste <span class="mono">python -m http.server 8000</span>. Si el archivo ya existe, se sobrescribirá.</p>
+        <div class="row">
+          <button class="btn primary" type="button" id="btn-export">Guardar en preguntas</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="js/app.js" defer></script>
+</body>
+</html>
