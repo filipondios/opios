@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test infinito</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Test infinito</span>
+    <span class="status" id="status" data-state="busy" role="status">Cargando preguntas…</span>
+  </header>
+
+  <div id="note" class="note" hidden></div>
+
+  <!-- ============ PANTALLA: preparar ============ -->
+  <main id="screen-setup" class="stack">
+    <p id="loading" class="lede">Cargando preguntas desde <code>preguntas/</code>…</p>
+
+    <section id="empty" class="stack" hidden>
+      <p class="lede">No hay preguntas disponibles. Comprueba que <code>preguntas/</code> contiene archivos JSON y que el servidor permite ver el listado del directorio.</p>
+    </section>
+
+    <section id="ready" class="stack" hidden>
+      <h1>Elige los temas</h1>
+      <p class="sum" id="sum"></p>
+      <div class="grid" id="grid" role="group" aria-label="Temas"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="b-ok"></i>Dominadas</span>
+        <span><i class="b-mid"></i>En aprendizaje</span>
+        <span><i class="l-new"></i>Nuevas</span>
+      </div>
+      <div class="row">
+        <button class="btn primary" type="button" id="btn-start">Empezar <kbd>Enter</kbd></button>
+        <button class="btn" type="button" id="btn-all">Todos</button>
+        <button class="btn" type="button" id="btn-none">Ninguno</button>
+      </div>
+      <div class="row">
+        <button class="btn danger" type="button" id="btn-clear-prog">Reiniciar progreso</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PANTALLA: test ============ -->
+  <main id="screen-quiz" class="stack" hidden>
+    <div class="qbar">
+      <div class="tags"><span class="tag" id="q-tema"></span><span class="tag" id="q-kind"></span></div>
+      <div class="score"><span id="q-score"></span><span id="q-left"></span></div>
+    </div>
+    <article class="qcard">
+      <h2 class="qtext" id="q-text"></h2>
+      <div class="opts" id="q-opts" role="radiogroup" aria-labelledby="q-text"></div>
+      <div class="fb" id="q-fb" hidden>
+        <p class="verdict" id="q-verdict"></p>
+        <p class="expl" id="q-expl"></p>
+      </div>
+    </article>
+    <div class="row">
+      <button class="btn primary" type="button" id="btn-main"></button>
+      <button class="btn" type="button" id="btn-exit">Salir <kbd>Esc</kbd></button>
+    </div>
+    <p class="keys">
+      <span><kbd>↑</kbd><kbd>↓</kbd> elegir</span>
+      <span><kbd>A</kbd>–<kbd>D</kbd> o <kbd>1</kbd>–<kbd>4</kbd> saltar a una opción</span>
+      <span><kbd>Enter</kbd> confirmar y continuar</span>
+    </p>
+    <div class="sr" id="sr" aria-live="polite"></div>
+  </main>
+</div>
+
+<script src="js/app.js" defer></script>
+
+</body>
+</html>

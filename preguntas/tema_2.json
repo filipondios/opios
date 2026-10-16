@@ -1,0 +1,702 @@
+[
+  {
+    "tema": 2,
+    "pregunta": "Los miembros del Tribunal Constitucional serán",
+    "respuestas": ["Independientes e inamovibles y no están sujetos a responsabilidad", "Independientes e inamovibles en el ejercicio de su mandato", "Independientes, inviolables e inamovibles y no están sujetos a responsabiildad", "Independientes, inviolables e inamovibles en el ejercicio de su mandato"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Comisiones de investigación sobre asuntos de interés público pueden ser nombradas por",
+    "respuestas": ["Únicamente por el Congreso", "Únicamente por el Senado", "El Congreso, el Senado y, en su caso, ambas Cámaras conjuntamente", "Únicamente por el Congreso y el Senado de manera independiente"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras funcionan",
+    "respuestas": ["En Pleno, en Comisiones y en Reuniones", "En Comisiones y en Subcomisiones", "En Pleno", "En Pleno y por Comisiones"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál de las siguientes no es correcta en relación con las causas de inelegibilidad e incompatibilidad de los Diputados y de los Senadores?",
+    "respuestas": ["Componentes del Tribunal Constitucional", "Miembros de las Juntas Electorales", "Altos cargos de la Administración del Estado que determine la ley, incluyendo a los miembros del Gobierno", "Magistrados, Jueces y Fiscales en activo"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Dónde se determinará las causas de inelegibilidad e incompatibilidad de los Diputados y Senadores según la Constitución?",
+    "respuestas": ["En la ley electoral", "En la convocatoria de las elecciones", "En el Reglamento de las Cortes Generales", "En la Ley de Incompatibilidades delos miembros de las Cámaras"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuándo termina el mandato de los Senadores?",
+    "respuestas": ["Cuatro años después de su elección o el día de la convocatoria de la nueva Cámara", "Cinco años después de su elección o el día de la convocatoria de la nueva Cámara", "Cuatro años después de su elección o el día de la disolución de la Cámara", "Cinco años después de su elección o el día de la disolución de la Cámara"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Los Senadores se elegirán",
+    "respuestas": ["Por sufragio nacional, libre, igual, directo o indirecto y secreto, en los términos que establece la ley", "Por sufragio nacional, libre, igual, directo y secreto, en los términos que señale una ley orgánica", "Por sufragio universal, libre, igual, directo o indirecto y secreto, en los términos que establece la ley", "Por sufragio universal, libre, igual, directo y secreto, en los términos que señale una ley orgánica"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Defensor del Pueblo será elegido por un período de",
+    "respuestas": ["4 años", "5 años", "6 años", "3 años"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cómo se regulará el funcionamiento del Tribunal Constitucional según el artículo 165 de la Constitución?",
+    "respuestas": ["Mediante una ley orgánica", "Mediante Decreto-Ley", "Mediante su Reglamento de Régimen Interior", "Mediante una ley ordinaria"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos Adjuntos tiene el Defensor del Pueblo?",
+    "respuestas": ["Cuatro", "Tres", "Seis", "Dos"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Defensor del Pueblo será elegido por",
+    "respuestas": ["El Congreso", "El Rey", "Las Cortes Generales", "El Gobierno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál de las siguientes no es una función de las Diputaciones Permanentes de las Cámaras?",
+    "respuestas": ["En caso de que las Cámaras hubieran sido disueltas o hubiese expirado el mandato, debatir y aprobar un Decreto Ley", "Solicitar que las Cámaras se reúnan en sesión extraordinaria", "Velar por los poderes de las Cámaras cuando éstas se encuentre reunidas", "En caso de expiración del mandato de las Cámaras, autorizar la declaración del Estado de Excepción"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Defensor del Pueblo deberá tomar posesión de su cargo ante",
+    "respuestas": ["Las Mesas de ambas Cámaras, independientemente", "Las Mesas de ambas Cámaras, reunidas conjuntamente", "El Rey", "El Gobierno"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál es la Cámara de representación territorial?",
+    "respuestas": ["El Senado, el Congreso y el Defensor del Pueblo", "El Senado", "El Congreso", "El Senado y el Congreso"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el artículo 161.2 de la Constitución, ¿quién podrá impugnar ante el Tribunal Constitucional las disposiciones y resoluciones adoptadas por los órganos de las Comunidades Autónomas?",
+    "respuestas": ["El Defensor del Pueblo", "El Tribunal Superior de Justicia de la Comunidad Autónoma", "El Gobierno", "El Rey"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Quién nombra a los miembros del Tribunal Constitucional?",
+    "respuestas": ["El Congreso", "El Congreso y el Senado", "El Senado", "El Rey"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El primer período de sesiones de las Cámaras corresponde de",
+    "respuestas": ["Julio a Diciembre", "Septiembre a Diciembre", "Enero a Junio", "Febrero a Junio"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Presidente del Tribunal Constitucional será nombrado por un período de",
+    "respuestas": ["Dos años, a propuesta del Tribunal en Pleno", "Nueve años, a propuesta del Tribunal en Pleno", "Tres años, a propuesta del Tribunal en Pleno", "Cuatro años, a propuesta del Tribunal en Pleno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál de las siguientes islas o agrupaciones elegirán tres Senadores?",
+    "respuestas": ["Gran Canaria, Mallorca y Tenerife", "Gran Canaria, Mallorca y Menorca", "Gran Canaria, Mallorca, Menorca y Tenerife", "Gran Canaria, Tenerife y Fuerteventura"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Pronunciarse sobre la convalidación o derogación de los decretos leyes dictados por el Gobierno, está atribuido a",
+    "respuestas": ["Específicamente al Congreso de los Diputados", "Al Congreso y Senado", "Al Senado", "Al Defensor del Pueblo"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Para ratificar o levantar una disposición o resolución adoptada por los órganos de las Comunidades Autónomas e impugnada por el Gobierno, el Tribunal Constitucional dispone del plazo",
+    "respuestas": ["No superior a 30 días", "No superior a un año", "No superior a tres meses", "No superior a cinco meses"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántas Salas hay en el Tribunal Constitucional?",
+    "respuestas": ["Cuatro", "Dos", "Seis", "Tres"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por las Cámaras?",
+    "respuestas": ["Seis", "Dos", "Ocho", "Cuatro"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Entre las funciones de las Diputaciones Permanentes se encuentra",
+    "respuestas": ["Velar por los poderes de las Cámaras durante toda la legislatura", "Velar por los poderes de las Cámaras incluso cuando éstas estén reunidas", "Velar por los poderes de la respectiva Diputación Permanente cuando éstas no estén reunidas", "Velar por los poderes de las Cámaras cuando éstas no estén reunidas"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las sentencias del Tribunal Constitucional",
+    "respuestas": ["Se publicarán en el boletín oficial del Estado con los votos particulares, si los Magistrados que los hayan realizado lo solicitan", "Se publicarán en el boletín oficial del Estado con los votos particulares, si los hubiere", "Se publicarán en el boletín oficial del Estado y en el boletín oficial del Tribunal Constitucional con los votos particulares, si los hubiere", "Se publicarán en el boletín oficial del Estado sin los votos particulares, aunque los hubiere"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La atribución de la declaración del estado de sitio y autorización de la declaración del estado de excepción y de la prórroga del estado de alarma declarado por el Gobierno corresponde a",
+    "respuestas": ["El Senado", "El Congreso de los Diputados", "El Senado y el Defensor del Pueblo", "El Senado y el Congreso de los Diputados"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En el caso de incomparecencia a requerimiento de las Cámaras",
+    "respuestas": ["Los Reglamentos de las Cámaras regularán las sanciones que puedan imponerse", "La ley regulará las sanciones que puedan imponerse", "Los Presidentes de las Cámaras regularán las sanciones que puedan imponerse", "Los jueces regularán las sanciones que puedan imponerse"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Respecto las Comisiones de investigación",
+    "respuestas": ["Sus conclusiones tomarán la forma de resoluciones judiciales", "Sus conclusiones no afectarán a las resoluciones judiciales", "Sus conclusiones afectarán a las resoluciones judiciales", "Sus conclusiones deberán vincular a las resoluciones judiciales"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras pueden recibir peticiones individuales y colectivas",
+    "respuestas": ["Las Cámaras no pueden recibir peticiones colectivas", "Siempre por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas", "Oralmente o por escrito, siendo posible la presentación directa por manifestaciones ciudadanas", "Oralmente o por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "A tenor del Reglamente del Congreso, el Orden del Día de las sesiones del Pleno será fijado por",
+    "respuestas": ["Por la mesa del Congreso", "El Presidente, de acuerdo con la Junta de Portavoces", "Por la Junta de Portavoces", "Únicamente por el Presidente"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Presidente de la Sala Segunda es",
+    "respuestas": ["El Vicepresidente del Tribunal", "El Defensor del Pueblo", "El Presidente del Tribunal", "El Presidente del Gobierno"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En las elecciones al Senado,",
+    "respuestas": ["En las provincias insulares, cada isla o agrupación de ellas, con Cabildo o Consejo Insular, constituirá una circunscripción a efectos de elección de Senadores", "Los territorios insulares constituirán una circunscripción a efectos de eleccion de Senadores", "En las provincias insulares, cada isla o agrupación de ellas, con Cabildo o Consejo Insular, constituirá una circunscripción a efectos de elección de Senadores, eligiendo cada una a tres Senadores", "En las provincias insulares, cada isla constituirá una circunscripción a efectos de elección de Senadores"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Senado es elegido por",
+    "respuestas": ["5 años", "6 años", "3 años", "4 años"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Cada Sala está compuesta por",
+    "respuestas": ["Cuatro Magistrados cada una", "Seis Magistrados cada una", "Doce Magistrados cada una", "Ocho Magistrados cada una"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Comunidades Autónomas designarán",
+    "respuestas": ["Un Senador y dos más por cada millón de habitantes de su territorio", "Dos Senadores y dos más por cada millón de habitantes de su territorio", "Un Senador y otro más por cada millón de habitantes de su territorio", "Dos Senadores y otro más por cada millón de habitantes de su territorio"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En las elecciones al Congreso, dicha elección se verificará",
+    "respuestas": ["En cada circunscripción atendiendo a criterios de representación proporcional", "En cada Comunidad Autónoma atendiendo a criterios de representación cualificada", "En cada Comunidad Autónoma atendiendo a criterios de representación proporcional", "En cada circunscripción atendiendo a criterios de representación cualificada"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cortes Generales representan",
+    "respuestas": ["Al Congreso de los Diputados y al Senado", "Al pueblo español", "Al Rey", "Al Defensor del Pueblo"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En los casos de muerte, renuncia y expiración del plazo del mandato del Defensor del Pueblo, la vacante en el cargo se declarará por",
+    "respuestas": ["Tres quintas partes de los componentes de cada Cámara", "Tres cuartas partes de los componentes de cada Cámara", "El Presidente del Congreso", "Dos tercios de los componentes de cada Cámara"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuándo termina el mandato de los Diputados?",
+    "respuestas": ["6 años después de su elección o el día de la disolución de la Cámara", "4 años después de su elección o el día de la disolución de la Cámara", "4 años después de su elección o el día de la convocatoria de la nueva Cámara", "6 años después de su elección o el día de la convocatoria de la nueva Cámara"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según la Constitución, los miembros del Tribunal Constitucional tendrán las incompatibilidades propias de",
+    "respuestas": ["Los miembros del Gobierno", "Los altos cargos de la Administración General del Estado", "El Presidente del Gobierno", "Los miembros del poder judicial"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Tribunal Constitucional es competente para conocer",
+    "respuestas": ["De los conflictos de competencia entre Comunidades Autónomas", "De los conflictos de competencia en los que esté implicado el Estado", "De los conflictos de competencia entre Provincias", "De los conflictos de competencia entre el Estado y las Comunidades Autónomas o de los de éstas entre sí"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Respecto las Comisiones de investigación (2)",
+    "respuestas": ["Sus conclusiones serán vinculantes para los Tribunales", "Sus conclusiones no serán vinculantes para los Tribunales", "Sus conclusiones deberán ser tenidas en cuenta por los Tribunales", "Sus conclusiones tomarán la forma de resoluciones judiciales"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Diputaciones Permanentes de las Cámaras estarán compuestas por",
+    "respuestas": ["Un mínimo de 21 miembros", "Un mínimo de 23 miembros", "Un máximo de 23 miembros", "Un máximo de 21 miembros"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Tribunal Constitucional es competente para conocer (2)",
+    "respuestas": ["Del recurso de inconstitucionalidad contra leyes y disposiciones normativas con fuerza de ley", "Del recurso de amparo contra leyes y disposiciones normativas con fuerza de ley", "Del recurso de amparo por violación de los derechos y libertades del Título I de la Constitución", "Del recurso de amparo y de inconstitucionalidad contra la violación de los derechos y libertades del Título I de la Constitución"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La ley reguladora de la Institución del Defensor del Pueblo es",
+    "respuestas": ["Ley Orgánica 2/1980", "Ley Orgánica 3/1981", "Ley Orgánica 2/1981", "Ley Orgánica 3/1980"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras se reunirán en sesión conjunta",
+    "respuestas": ["Para nombrar a los miembros del Tribunal Constitucional", "Para aprobar las Leyes Orgánicas", "Para ejercer las competencias no legislativas que el Título II atribuye expresamente a las Cortes Generales", "Para ejercer las competencias legislativas que el Título II atribuye expresamente a las Cortes Generales"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Quiénes son electores y elegibles al Congreso de los Diputados?",
+    "respuestas": ["Todos los españoles que estén en pleno uso de sus derechos administrativos", "Todas las personas que estén en pleno uso de sus derechos políticos", "Todas las personas que estén en pleno uso de sus derechos administrativos", "Todos los españoles que estén en pleno uso de sus derechos políticos"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Vacante el cargo, se iniciará el procedimiento para el nombramiento de un nuevo Defensor del Pueblo en plazo",
+    "respuestas": ["No superior a quince días", "No superior a tres meses", "No superior a un año", "No superior a un mes"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras podrán reunirse en sesiones extraordinarias a petición",
+    "respuestas": ["Del Gobierno, de la Diputación Permanente, de sus respectivos Presidentes o de la mayoría absoluta de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de la mayoría absoluta de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de 3/5 partes de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de la mayoría simple de los miembros de cualquiera de las Cámaras"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "A tenor del Reglamento del Senado, el Orden del Día de las sesiones del Pleno se fijan por",
+    "respuestas": ["Por su Mesa, de acuerdo con la Junta de Portavoces", "El Presidente, de acuerdo con la Junta de Portavoces", "El Presidente, de acuerdo con la Mesa y oída la Junta de Portavoces", "Por su Mesa, de acuerdo con el Presidente"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En caso de expirado el mandato o en caso de disolución de las Cámaras ¿hasta cuándo seguirán ejerciendo sus funciones las Diputaciones Permanentes?",
+    "respuestas": ["Hasta cumplir los 4 años de legislatura", "Hasta la constitución del nuevo Gobierno", "Hasta la celebración de las nuevas elecciones", "Hasta la constitución de las nuevas Cortes Generales"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras podrán delegar la aprobación de proyectos y proposiciones de ley en",
+    "respuestas": ["Las Comisiones Legislativas Permanentes y No Permanentes", "No pueden delegar la aprobación de proyectos y proposiciones de ley en las Comisiones", "Las Comisiones Legislativas Permanentes", "Cualquier Comisión"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Presidente del Tribunal Constitucional será nombrado por",
+    "respuestas": ["La Junta de Portavoces", "Las Cortes Generales", "El Rey", "El Presidente del Gobierno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Diputaciones Permanentes de las Cámaras estarán presididas por",
+    "respuestas": ["Un miembro del Gobierno", "El Presidente de la Cámara respectiva", "El Diputado o Senador que sea elegido por la respectiva Diputación Permanente", "Uno de los miembros, mediante elección, de la Mesa de la Cámara respectiva"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las conclusiones de las Comisiones de investigación no serán vinculantes para los Tribunales, ni afectarán a las resoluciones judiciales",
+    "respuestas": ["Sin perjuicio de que el resultado de la investigación sea comunicado al Ministro de Justicia para el ejercicio, en todo caso, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministerio Fiscal para el ejercicio, en todo caso, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministerio Fiscal para el ejercicio, cuando proceda, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministro de Justicia para el ejercicio, cuando proceda, de las acciones oportunas"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál es la circunscripción electoral en las elecciones al Congreso?",
+    "respuestas": ["Las Comunidades Autónomas", "Los municipios", "La Provincia", "El Estado"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras pueden recibir peticiones",
+    "respuestas": ["Exclusivamente individuales", "Exclusivamente colectivas", "Individuales, colectivas y mixtas", "Individuales y colectivas"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos Senadores se elegirán en cada provincia?",
+    "respuestas": ["Tres", "Dos", "Cuatro", "Uno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Los miembros del Tribunal Constitucional serán designados por un período de",
+    "respuestas": ["Seis años y se renovarán por terceras partes cada dos", "Seis años y se renovarán por mitades cada tres", "Ocho años y se renovarán por cuartas partes cada dos", "Nueve años y se renovarán por terceras partes cada tres"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Defensor del Pueblo debe dar cuenta de la gestión realizada a",
+    "respuestas": ["Las Cortes Generales, mensualmente", "Las Cortes Generales, semestralmente", "Las Cortes Generales, anualmente", "Las Cortes Generales, trimestralmente"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuándo será convocado el Congreso de los Diputados?",
+    "respuestas": ["Entre los 30 y 60 días siguientes a la celebración de las elecciones", "Dentro de los 25 días siguientes a la celebración de las elecciones", "Dentro de los 45 días siguientes a la celebración de las elecciones", "Dentro de los 30 días siguientes a la celebración de las elecciones"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos miembros componen el Tribunal Constitucional?",
+    "respuestas": ["Diez incluido el Presidente", "Diez", "Doce", "Veinte incluido el Presidente"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuándo tendrán lugar las elecciones al Congreso de los Diputados?",
+    "respuestas": ["En el plazo de 25 días desde la terminación del mandato", "En el plazo de 60 días desde la terminación del mandato", "Entre los 30 y 60 días desde la terminación del mandato", "Entre los 30 y 45 días desde la terminación del mandato"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Los Diputados y Senadores percibirán una asignación que será fijada por",
+    "respuestas": ["El Congreso de los Diputados", "El Senado, el Congreso y el Defensor del Pueblo", "El Rey", "Las respectivas Cámaras"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las sesiones extraordinarias de las Cámaras",
+    "respuestas": ["Podrán convocarse sobre un orden del día determinado, con la única excepción de las sesiones secretas", "Deberán convocarse sobre un orden del día determinado, con la única excepción de las sesiones secretas", "Podrán convocarse sobre un orden del día determinado", "Deberán convocarse sobre un orden del día determinado"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos el Gobierno?",
+    "respuestas": ["Ocho", "Seis", "Dos", "Cuatro"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las poblaciones de Ceuta y Melilla estarán representadas por",
+    "respuestas": ["2 diputados cada una", "1 diputado cada una", "3 diputados entre las dos", "1 diputado entre las dos"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Qué mayoría será necesario para las propuestas de los miembros del Tribunal Constitucional que corresponden al Congreso y al Senado?",
+    "respuestas": ["Dos tercios para el Congreso y dos tercios para el Senado", "Dos tercios para el Congreso y tres quintos para el Senado", "Tres quintos para el Congreso y tres quintos para el Senado", "Tres quintos para el Congreso y dos tercios para el Senado"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las sesiones conjuntas de las Cámaras, según el artículo 74, serán presididas por",
+    "respuestas": ["El Presidente del Congreso", "El Rey", "El Senado", "El Defensor del Pueblo"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por el Senado?",
+    "respuestas": ["Dos", "Ocho", "Cuatro", "Seis"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La Constitución Española dedica al Defensor del Pueblo el artículo",
+    "respuestas": ["54", "55", "56", "53"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Diputaciones Permanentes de las Cámaras representarán",
+    "respuestas": ["A los ciudadanos", "A los grupos parlamentarios, sin importar su proporción numérica", "A los grupos parlamentarios, en igualdad numérica", "A los grupos parlamentarios, en proporción a su importancia numérica"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Entre las atribuciones de las Cortes Generales se encuentra",
+    "respuestas": ["La aprobación, modificación o derogación de Real Decreto", "La aprobación, modificación o derogación de la Ley Electoral", "La aprobación, modificación o derogación de la Constitución", "La aprobación, modificación o derogación de leyes orgánicas"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Qué recurso cabe contra las sentencias del Tribunal Constitucional?",
+    "respuestas": ["Recurso de alzada", "Recurso de súplica", "Recurso de casación", "Ninguno"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Congreso se compone de un mínimo de",
+    "respuestas": ["300 diputados", "400 diputados", "250 diputados", "350 diputados"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Tribunal Constitucional tiene jurisdicción en",
+    "respuestas": ["En la Comunidad Autónoma que corresponda", "Todo el territorio peninsular", "Todo el territorio español", "En la Provincia que corresponda"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cortes Generales están formadas por",
+    "respuestas": ["El Senado y el Defensor del Pueblo", "El Congreso de los Diputados y el Senado", "El Congreso de los Diputados y el Defensor del Pueblo", "El Congreso de los Diputados, el Senado y el Defensor del Pueblo"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cortes Generales son",
+    "respuestas": ["Impenetrables", "Inviolables", "Incuestionables", "Inmutables"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿En qué Título de la Constitución Española se recoge el Tribunal Constitucional?",
+    "respuestas": ["Título VII", "Título IX", "Título VIII", "Título X"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Congreso es elegido por",
+    "respuestas": ["6 años", "5 años", "4 años", "3 años"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por el Congreso?",
+    "respuestas": ["Ocho", "Seis", "Dos", "Cuatro"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En caso de que las Cámaras deleguen en las Comisiones Legislativas Permanentes la aprobación de proyectos o proposiciones de ley",
+    "respuestas": ["El Pleno no podrá recabar en cualquier momento el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación", "El Pleno podrá recabar en cualquier momento el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación", "Las Cámaras no pueden delegar la aprobación de proyectos o proposiciones de ley", "El Pleno no podrá recabar el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación, excepto cuando esta delegación se haya realizado a una Comisión Legislativa No Permanente"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La atribución de otorgar la confianza al candidato a la Presidencia del Gobierno corresponde a",
+    "respuestas": ["El Congreso de los Diputados y Senado", "El Senado", "El Congreso de los Diputados", "El Defensor del Pueblo"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "A tenor del Reglamento del Congreso, el Orden del Día de las sesiones de las Comisiones del Congreso se establece por",
+    "respuestas": ["Por el Presidente de la Cámara", "Únicamente por la mesa del Congreso", "Su respectiva Mesa, de acuerdo con el Presidente de la Cámara", "Por la Junta de Portavoces"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Respecto al derecho de sufragio de los españoles que se encuentren fuera del territorio español a las elecciones",
+    "respuestas": ["La ley recomendará y el Estado facilitará su ejercicio", "La Constitución reconocerá y el Estado facilitará su ejercicio", "La ley reconocerá y el Estado facilitará su ejercicio", "La Constitución reconocerá y el Estado obligará a su ejercicio"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Congreso se compone de un máximo de",
+    "respuestas": ["400 diputados", "300 diputados", "350 diputados", "450 diputados"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las poblaciones de Ceuta y Melilla elegirán",
+    "respuestas": ["Dos Senadores cada una", "Un Senador entre las dos", "Dos Senadores entre las dos", "Un Senador cada una"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Para ser miembro del Tribunal Constitucional es necesario ser Jurista de reconocida competencia con",
+    "respuestas": ["Más de 20 años de ejercicio profesional", "Más de 5 años de ejercicio profesional", "Más de 10 años de ejercicio profesional", "Más de 15 años de ejercicio profesional"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En las Cámaras habrá una Diputación Permanente",
+    "respuestas": ["Para cada una de las Cámaras", "Conjunta", "Secreta", "Conjunta y Secreta"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El segundo período de sesiones de las Cámaras corresponde de",
+    "respuestas": ["Julio a Diciembre", "Septiembre a Diciembre", "Febrero a Junio", "Enero a Junio"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Las Cámaras se reunirán anualmente en",
+    "respuestas": ["Dos periodos de sesiones", "Tres periodos de sesiones", "Seis periodos de sesiones", "Cuatro periodos de sesiones"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Quién elegirá a los Senadores designados por las Comunidades Autónomas?",
+    "respuestas": ["La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan los Estatutos", "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan la ley", "La Asamblea legislativa exclusivamente, de acuerdo con lo que establezca la ley", "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan una ley ordinaria"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cómo se distribuirá el número total de Diputados?",
+    "respuestas": ["Conforme se recoge en el artículo 67 de la Constitución", "Mediante una ley", "Conforme se recoge en el artículo 66 de la Constitución", "Mediante un acuerdo"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "El Presidente de la Sala Primera es",
+    "respuestas": ["El Vicepresidente del Tribunal", "El Defensor del Pueblo", "El Presidente del Tribunal", "El Presidente del Gobierno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Los acuerdos de las Salas requerirán la presencia de",
+    "respuestas": ["Tres cuartos de los miembros", "Tres quintos de los miembros", "La mitad de los miembros", "Dos tercios de los miembros"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "En relación con las peticiones que reciban las Cámaras",
+    "respuestas": ["Deben remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, siempre que las Cámaras lo exijan", "Deben remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, en todo caso", "Pueden remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, siempre que las Cámaras lo exijan", "Pueden remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, en todo caso"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "A requerimiento de las Cámaras",
+    "respuestas": ["No será obligatorio comparecer, a excepción de una resolución judicial", "Será obligatorio comparecer con asistencia de un Letrado", "Será recomendable comparecer", "Será obligatorio comparecer"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, designarán un Senador y otro más por cada millón de habitantes, de acuerdo con lo que establezcan los Estatutos",
+    "respuestas": ["Que asegurarán, de manera proporcional, la adecuada representación territorial", "Que asegurarán, de manera recomendada, la adecuada representación territorial", "Que asegurarán, en todo caso, la adecuada representación territorial", "Que asegurarán, en todo caso, la adecuada representación proporcional"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según la Constitución Española, las sentencias del Tribunal Constitucional tienen el valor de cosa juzgada a partir",
+    "respuestas": ["De la fecha que se indique en cada sentencia", "Del día siguiente a su publicación en el BOE", "Del mismo día de su publicación en el BOE", "De los quince días siguientes a su publicación en el BOE"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Los Diputados serán elegidos",
+    "respuestas": ["Por sufragio nacional, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio nacional, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  }
+]

@@ -1,0 +1,688 @@
+[
+  {
+    "tema": 1,
+    "pregunta": "El Rey puede declarar la guerra y hacer la paz",
+    "respuestas": ["Previa autorización del Congreso", "Previa autorización de las Cortes Generales", "Cuando crea oportuno", "Previa autorización del Senado"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto del derecho al trabajo, en ningún caso puede hacerse discriminación por razón de",
+    "respuestas": ["Religión", "Sexo, raza y religión", "Raza", "Sexo"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los colores de las franjas de la bandera de España son",
+    "respuestas": ["Roja, amarilla y amarilla", "Roja, amarilla y roja", "Amarilla, roja y amarilla", "Amarilla, roja y azul"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El reconocimiento, el respeto y la protección de los principios reconocidos en el Capítulo 3º (Título I) de la Constitución informará",
+    "respuestas": ["La legislación positiva y la actuación de los poderes públicos", "La práctica judicial y la actuación de los poderes públicos", "La legislación positiva, la práctica judicial y la actuación de los poderes públicos", "La legislación positiva y la práctica judicial"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Las penas privativas de libertad y las medidas de seguridad estarán orientadas hacia",
+    "respuestas": ["La reeducación, resocialización y reinserción social", "La resocialización y reinserción social", "La reeducación y resocialización", "La reeducación y reinserción social"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Quedan excluidos de la extradición los delitos",
+    "respuestas": ["Penales", "Políticos", "Sentenciados", "Civiles"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Todos los españoles tendrán el derecho de petición",
+    "respuestas": ["Individual y colectiva, por escrito", "Individual, por escrito o verbalmente", "Individual o colectiva, por escrito o verbalmente", "Individual, por escrito"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El estatuto de los trabajadores se regulará",
+    "respuestas": ["Por ley", "Por Decreto-Ley", "Por Real Decreto", "Por ley orgánica"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "En la bandera de España, la franja amarilla",
+    "respuestas": ["Es la mitad de ancha que las rojas", "Es de igual anchura que las rojas", "Es de doble anchura que las rojas", "Es de triple anchura que las rojas"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Mediante ley podrán regularse los deberes de los ciudadanos en los casos de",
+    "respuestas": ["Grave riesgo, catástrofe o calamidad pública", "Grave riesgo o siniestro", "Grave riesgo o catástrofe", "Grave riesgo, siniestro o catástrofe"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La Constitución, ¿prohíbe los Tribunales de honor?",
+    "respuestas": ["Sí, en el ámbito de la Administración civil", "No, en ningún ámbito", "Sí, en todos los ámbitos", "Sí, en el ámbito de la Administración civil y de las organizaciones profesionales"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los españoles son iguales",
+    "respuestas": ["Ante el Rey", "Ante la Constitución", "Ante el Gobierno", "Ante la ley"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "En el ejercicio de sus derechos e intereses legítimos, todas las personas tienen derecho a obtener la tutela efectiva de",
+    "respuestas": ["Los jueces, magistrados, juzgados y tribunales", "Los tribunales", "Los jueces", "Los jueces y tribunales"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La detención preventiva no podrá durar más",
+    "respuestas": ["Del tiempo estrictamente necesario para la realización de las averiguaciones tendentes al esclarecimiento de los hechos", "De 24 horas", "De 12 horas", "De 48 horas"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los atentados contra el patrimonio de los pueblos de España se sancionará mediante",
+    "respuestas": ["Multas", "La ley penal", "Sanciones", "Una ley especial"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según la Constitución, ¿podrá estableceser un servicio civil?",
+    "respuestas": ["Sí, para el cumplimiento de fines de interés general", "No", "Sí, para el cumplimiento de fines colectivos", "No, porque el servicio será militar"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Cualquier ciudadano podrá recabar la tutela de las libertades y derechos reconocidos en el artículo 14 y la sección primera del Capítulo segundo del Titulo 1 de la Constitución",
+    "respuestas": ["Ante los Tribunales ordinarios", "Ante el Defensor del Pueblo", "Ante los tribunales penales", "Ante el Ministerio Fiscal"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La inhabilitación del Rey se reconoce por",
+    "respuestas": ["El Congreso", "El Gobierno", "Las Cortes Generales", "Tres Poderes constitucionales"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El régimen de Seguridad Social garantizará unas prestaciones sociales suficientes ante situaciones de necesidad, especialmente en caso de",
+    "respuestas": ["Contingencia protegible", "Desempleo", "Enfermedad", "Necesidad"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "A efectos de extradición, los actos de terrorismo",
+    "respuestas": ["Tienen un tratamiento específico", "Se equiparan a delitos políticos", "Se equiparan a delitos contra la humanidad", "No se consideran como delitos políticos"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos regularán la utilización del suelo de acuerdo con el interés general para impedir",
+    "respuestas": ["El urbanismo salvaje", "El enriquecimiento injusto", "La especulación", "La construcción ilegal"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Para garantizar el cumplimiento de las leyes, los poderes públicos",
+    "respuestas": ["Inspeccionarán, coordinarán y homologarán el sistema educativo", "Inspeccionarán y coordinarán el sistema educativo", "Homologarán y coordinarán el sistema educativo", "Inspeccionarán y homologarán el sistema educativo"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Prohíbe la Constitución algún tipo de asociaciones?",
+    "respuestas": ["No", "Si, las secretas", "Si, las de carácter paramilitar y las secretas", "Si, las de carácter paramilitar"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos promoverán la ciencia y la investigación científica y técnica en beneficio",
+    "respuestas": ["De la innovación tecnológica", "Del interés general", "Del progreso", "Del desarrollo nacional"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La riqueza de las distintas modalidades lingüísticas de España es",
+    "respuestas": ["Un bien cultural", "Un patrimonio cultural", "Un patrimonio histórico y cultural", "Un bien protegible"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Las asociaciones deberán inscribirse en un registro?",
+    "respuestas": ["Si, a los solos efectos de control", "No", "Si, a efectos de publicidad y control", "Si, a los solos efectos de publicidad"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La estructura interna y funcionamiento de las organizaciones profesionales deberán ser",
+    "respuestas": ["Orgánicos", "Públicos", "Democráticos", "Flexibles"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El Rey es proclamado ante",
+    "respuestas": ["El Gobierno", "El Senado", "Las Cortes Generales", "El Congreso"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los españoles tienen derecho a",
+    "respuestas": ["Elegir libremente su residencia y a circular por el territorio nacional", "A circular por el territorio nacional y extranjero", "A elegir libremente su residencia y a circular por el territorio nacional y extranjero", "A elegir libremente su residencia"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La ley regulará las organizaciones profesionales que contribuyan a la defensa de los intereses económicos",
+    "respuestas": ["Nacionales", "Sociales", "Generales", "Propios"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La estructura interna y el funcionamiento de los Colegios profesionales deberán ser",
+    "respuestas": ["Flexibles", "Públicos", "Orgánicos", "Democráticos"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Se reconoce el derecho de fundación",
+    "respuestas": ["Para fines de interés general", "Para fines de interés social", "Para fines educativos", "Para fines de interés social y educativos"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos aseguran la protección integral de las madres, cualesquiera que sea",
+    "respuestas": ["Su situación económica", "Su situación social", "Su situación económica y social", "Su estado civil"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La creación de partidos políticos y el ejercicio de su actividad son",
+    "respuestas": ["Libres", "Generales", "Plurales", "Voluntarios"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "A los individuos y las comunidades se les garantiza",
+    "respuestas": ["La libertad ideológica y religiosa", "La libertad ideológica y de culto", "La libertad ideológica, religiosa y de culto", "La libertad religiosa y de culto"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "En el ámbito económico, los poderes públicos realizarán una política orientada",
+    "respuestas": ["Al libre mercado", "A un incremento del P.I.B", "A la disminución del desempleo", "Al pleno empleo"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La soberanía nacional reside",
+    "respuestas": ["En el Rey", "En las Cortes Generales", "En el pueblo español", "En la nación"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Se podrán prohibir las reuniones y manifestaciones que se celebren en lugares de tránsito público?",
+    "respuestas": ["Únicamente cuando existan razones fundadas de alteración del orden público, con peligro para personas o bienes", "No, nunca", "Únicamente cuando existan razones fundadas de alteración del orden público, con peligro para personas", "Únicamente cuando existan razones fundadas de alteración del orden público"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Reconoce la Constitución el derecho a la propiedad privada?",
+    "respuestas": ["No", "Sí, y a la herencia", "Sí, y a la herencia y legados", "Sí, y a la comunal"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La Constitución reconoce y garantiza el derecho a la autonomía",
+    "respuestas": ["De las Comunidades Autónomas que la integran", "De las nacionalidades que la integran", "De las nacionalidades y regiones que la integran", "De las regiones que la integran"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los representantes de los ciudadanos para participar en los asuntos públicos",
+    "respuestas": ["Serán libremente elegidos por sufragio censitario", "Serán libremente elegidos en elecciones frecuentes por sufragio censitario", "Serán libremente elegidos por sufragio universal", "Serán libremente elegidos en elecciones periódicas por sufragio universal"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La ley garantizará el derecho a la negociación colectiva laboral",
+    "respuestas": ["Entre los trabajadores y empresarios", "Entre trabajadores y organizaciones sindicales", "Entre los representantes de los trabajadores y empresarios", "Entre organizaciones sindicales y empresariales"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Todos los españoles tienen derecho a disfrutar de una vivienda",
+    "respuestas": ["Digna y suficiente", "Adecuada y económica", "Digna y adecuada", "Digna y económica"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Una persona detenida, ¿puede ser obligada a declarar?",
+    "respuestas": ["No, salvo si su abogado está presente", "No", "Si", "Sí, en presencia de su abogado"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Entre las funciones constitucionales del Rey se encuentra la de",
+    "respuestas": ["Sancionar y promulgar las leyes aprobadas por las Cortes Generales", "Sancionar las leyes de las Comunidades Autónomas", "Sancionar y promulgar las leyes aprobadas por el Congreso", "Promulgar las leyes de las Comunidades Autónomas"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Nadie puede ser privado de su libertad",
+    "respuestas": ["Salvo con la observancia de lo establecido en el artículo 17 de la Constitución", "Salvo con la observancia de lo establecido en el artículo 17 de la Constitución y en los casos y forma previstos en la ley", "Salvo en los casos y forma previstos en la ley", "Nunca"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto al ocio, los poderes públicos facilitarán",
+    "respuestas": ["Su adecuada distribución", "Su adecuado disfrute", "Su adecuada utilización", "Su adecuada promoción"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La Constitución garantiza",
+    "respuestas": ["El derecho a la intimidad personal y familiar", "El derecho al honor, a la intimidad personal y familiar y a la propia imagen", "El derecho al honor y a la intimidad personal y familiar", "El derecho al honor y a la propia imagen"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Las penas privativas de libertad y las medidas de seguridad, ¿podrán consistir en trabajos forzados?",
+    "respuestas": ["No", "Sí, si no exceden de un año", "Sí, totalmente", "Sí, para casos de terrorismo"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Se reconoce la libertad de empresa en el marco de",
+    "respuestas": ["La economía capitalista", "La econocmía occidental", "La economía de mercado", "La productividad nacional"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La enseñanza básica es",
+    "respuestas": ["Obligatoria y gratuita", "Optativa y gratuita", "Obligatoria, gratuita e integral", "Obligatoria e integral"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Nadie podrá ser privado de sus bienes y derechos sino por causa justificada de",
+    "respuestas": ["Necesiad o interés social", "Utilidad pública o interés social", "Utilidad pública o necesidad", "Utilidad pública, necesidad o interés social"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El condenado a pena de prisión que estuviera cumpliendo la misma gozará de los derechos constitucionales fundamentales, a excepción de los que se vean expresamente limitados por",
+    "respuestas": ["El sentido de la pena y la ley penitenciaria", "El contenido del fallo condenatorio y el sentido de la pena", "El contenido del fallo condenatorio, el sentido de la pena y la ley penitenciaria", "El contenido del fallo condenatorio y la duración de la pena"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La libertad de expresión podrá realizarse mediante",
+    "respuestas": ["La palabra y el escrito", "La palabra, el escrito o cualquier otro medio de reproducción", "El escrito", "La palabra"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿En qué se fundamente la Constitución Española?",
+    "respuestas": ["En un Estado social de Derecho", "En un Estado social y democrático de Derecho", "En un Estado territorial y democrático de Derecho", "En un Estado democrático de Derecho"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto de la protección de la familia, los hijos son iguales ante la ley con independencia de",
+    "respuestas": ["Su raza", "Su edad", "Su nacimiento", "Su filiación"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La institución del Defensor del Pueblo se regulará",
+    "respuestas": ["Mediante una ley orgánica", "Mediante una ley ordinaria", "Mediante un Real Decreto", "Mediante un Decreto-Ley"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La nacionalidad española se adquiere, se conserva y se pierde de acuerdo con lo establecido por",
+    "respuestas": ["La Constitución", "Los Tratados Internacionales", "Los Derechos Humanos", "La ley"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Queda abolida la pena de muerte en la Constitución?",
+    "respuestas": ["Sí, totalmente", "Sí, salvo lo que puedan disponer las leyes penales militares para tiempos de guerra", "Sí, salvo lo que pueda disponer una ley orgánica para tiempos de guerra", "No"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos garantizarán la conservación y promoverán el enriquecimiento del patrimonio",
+    "respuestas": ["Histórico, cultural y folclórico de los pueblos de España", "Histórico, cultural y artístico de los pueblos de España", "Cultural y Folclórico de los pueblos de España", "Histórico y cultural de los pueblos de España"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Salvo resolución judicial, se garantiza el secreto de las comunicaciones y, en especial, de las",
+    "respuestas": ["Postales, telegráficas, telefónicas y electrónicas", "Postales, telefónicas y electrónicas", "Postales, telegráficas y electrónicas", "Postales, telegráficas y telefónicas"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Nadie puede ser condenado o sancionado por acciones u omisiones que en el momento de producirse no constituyan",
+    "respuestas": ["Delito, falta o infracción judicial", "Delito o infracción judicial", "Delito, falta o infracción administrativa", "Delito o falta"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La más alta representación del Estado español en las relaciones internacionales es asumida por",
+    "respuestas": ["El Rey", "El Defensor del Pueblo", "El Presidente del Gobierno", "El Presidente del Congreso"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La forma política del Estado español es",
+    "respuestas": ["La República", "La Monarquía parlamentaria", "La Monarquía hereditaria", "La democracia parlamentaria"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Las Fuerzas Armadas no tienen como misión",
+    "respuestas": ["Defender la integridad territorial de España", "Garantizar la soberanía e independencia de España", "Garantizar la neutralidad de España", "Defender el ordenamiento constitucional de España"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Un detenido deberá ser puesto en libertad o a disposición de la autoridad judicial en el plazo máximo de",
+    "respuestas": ["72 horas", "12 horas", "48 horas", "24 horas"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Cualquier ciudadano podrá recabar la tutela de las libertades y derechos reconocidos en el artículo 14 y la sección primera del Capítulo segundo del Titulo 1 de la Constitución mediante un procedimiento basado en los principios de",
+    "respuestas": ["Preferencia y ejecutividad", "Preferencia y sumariedad", "Precedencia y ejecutividad", "Celeridad y equidad"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto el Estado, el Rey es símbolo de su",
+    "respuestas": ["Unidad e integridad", "Unidad y soberanía", "Integridad y soberanía", "Unidad y permanencia"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos garantizan el derecho que asiste a los padres para que sus hijos reciban la formación",
+    "respuestas": ["Integral que esté de acuerdo con sus propios ideales", "Religiosa y moral que esté de acuerdo con sus propias convicciones", "Religiosa que esté de acuerdo con sus propias convicciones", "Religiosa y moral que esté de acuerdo con sus propios ideales"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Para cumplir su comentido, el Defensor del Pueblo podrá supervisas la actividad",
+    "respuestas": ["Del Poder Judicial", "De las Cortes Generales", "Del Gobierno", "De la Administración"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los españoles, ¿tienen el derecho de defender a España?",
+    "respuestas": ["No", "Sí, si han cumplido o están cumpliendo el servicio militar", "Sí, y también el deber", "Sí, si son mayores de 18 años"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Las asociaciones podrán ser disueltas o suspendidas en sus actividades?",
+    "respuestas": ["No", "Si, en virtud de resolución administrativa", "Si, en virtud de resolución judicial o administrativa", "Si, en virtud de resolución judicial"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Todos los españoles tienen",
+    "respuestas": ["El derecho a la ocupación plena", "El deber de trabajar", "El derecho y deber de trabajar", "El derecho al trabajo"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los ciudadanos tienen derecho a acceder en condiciones de igualdad",
+    "respuestas": ["A las funciones y empleos públicos", "A las funciones públicas", "A las funciones y cargos públicos", "A los cargos y empleos públicos"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Reconoce la Constitución el derecho a la educación?",
+    "respuestas": ["Sí, y también la libertad de enseñanza", "No", "Sí, pero no la libertad de enseñanza", "Sí, y también el deber de enseñanza"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La mayoría de edad de los españoles es",
+    "respuestas": ["A la edad que fije una ley orgánica", "A los dieciséis años", "A los veintiun años", "A los dieciocho años"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Nadie podrá ser obligado a declarar",
+    "respuestas": ["Sobre su ideología", "Sobre su religión y creencias", "Sobre su ideología, religión y creencias", "Sobre su ideología y su religión"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según la Constitución, la Ley podrá limitar o exceptuar el ejercicio del derecho de sindicación",
+    "respuestas": ["A las Fuerzas Armadas o Institutos armados", "A los funcionarios públicos", "A las Fuerzas o Institutos armados y los demás cuerpos sometidos a disciplina militar", "A las Fuerzas Armadas y funcionarios públicos"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto los condumidores y usuarios, los poderes públicos protegerán mediante procedimientos eficaces",
+    "respuestas": ["La seguridad, la salud y los legítimos intereses económicos de los mismos", "La seguridad y los legítimos intereses económicos de los mismos", "La seguridad de los mismos", "La seguridad y la salud de los mismos"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El procedimiento para producir la inmediata puesta a disposición judicial de toda persona detenida ilegalmente se denomina",
+    "respuestas": ["De legalidad penal", "De \"habeas corpus\"", "corpus", "De interdicción"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La libertad de cátedra",
+    "respuestas": ["Es una obligación", "Es un derecho", "Es un deber", "No está contemplada en la Constitución"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Se reconoce y protege el derecho a la producción y creación",
+    "respuestas": ["Científica y técnica", "Literaria y artística", "Literaria, artística, científica y técnica", "Literaria, artística y técnica"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El Jefe del Estado es",
+    "respuestas": ["El Defensor del Pueblo", "El Presidente del Congreso", "El Rey", "El Presidente del Gobierno"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos promoverán las condiciones para la participación libre y eficaz de la juventud en el desarrollo",
+    "respuestas": ["Político, social y económico", "Político, social, económico y cultural", "Político, social y cultural", "Social, económico y cultural"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El derecho a adoptar medidas de conflicto colectivo se reconoce a favor de",
+    "respuestas": ["La autoridad laboral", "Los trabajadores", "Los empresarios", "Los trabajadores y empresarios"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Quiénes intervendrán en el control y gestión de todos los centros sostenidos por la Administración con fondos públicos?",
+    "respuestas": ["Los profesores, los padres y, en su caso, los alumnos", "Los profesores", "Los profesores y los padres", "Los profesores y, en su caso, los alumnos"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "El hombre y la mujer tienen derecho a contraer matrimonio",
+    "respuestas": ["Con plena igualdad económica y social", "En cualquier momento", "Con plena igualdad social", "Con plena igualdad jurídica"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Si se agotan todas las líneas llamadas a la sucesión en la Corona de España, se",
+    "respuestas": ["Establece una Dictadura", "Proclama la República", "Proveerá a la sucesión en la Corona por las Cortes Generales", "Nombran Regentes"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el artículo 1.1 de  la Constitución, el Estado es",
+    "respuestas": ["Apolítico", "Federal", "Social", "Aconfesional"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos promoverán el bienestar de la tercera edad mediante un sistema de servicios sociales que atenderán sus problemas específicos de",
+    "respuestas": ["Salud y vivienda", "Salud, vivienda, cultura y ocio", "Cultura y ocio", "Salud, vivienda y cultura"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Se garantiza la asistencia de abogado al detenido",
+    "respuestas": ["En las diligencias judiciales, exclusivamente", "En las diligencias policiales, exclusivamente", "En las diligencias policiales y judiciales", "En las diligencias policiales, judiciales y administrativas"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Quién designa al Defensor del Pueblo?",
+    "respuestas": ["Las Cortes Generales", "El Congreso", "El Senado", "El Gobierno"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La capital del Estado español es",
+    "respuestas": ["La Comunidad Autónoma de Madrid", "El municipio de Madrid", "La villa de Madrid", "Aquella en la que resida el Rey"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los poderes públicos garantizarán la suficiencia económica a los ciudadanos durante la tercera edad mediante pensiones",
+    "respuestas": ["Suficientes y periódicamente actualizadas", "Adecuadas y suficientes", "Adecuadas, suficientes y periódicamente actualizadas", "Adecuadas y periódicamente actualizadas"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Respecto de la familia, los poderes públicos asegurarán su protección",
+    "respuestas": ["Social, económica y administrativa", "Económica, jurídica y administrativa", "Social, económica y jurídica", "Social, jurídica y administrativa"],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Los partidos políticos expresan",
+    "respuestas": ["El pluralismo político", "El pluralismo social", "La democracia alternativa", "La alternancia en el poder"],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Toda persona detenida debe ser informada de forma inmediata y de modo que le sea comprensible",
+    "respuestas": ["De las razones de su detención", "De sus derechos, y, de las razones y duración de su detención", "De sus derechos", "De sus derechos y de las razones de su detención"],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La Constitución, ¿reconoce el derecho a la huelga de los trabajadores?",
+    "respuestas": ["Sí, para la defensa de sus salarios", "Sí, para la defensa de sus intereses", "No, lo encomienta una ley", "Sí, para la defensa de sus contratos"],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  }
+]
