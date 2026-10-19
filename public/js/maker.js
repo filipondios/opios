@@ -1,9 +1,9 @@
-/* Lógica del creador de preguntas: edición, sesión y exportación. */
+/* Creador de preguntas (cliente): edita directamente la base de datos a través de /api/preguntas. */
 (() => {
 "use strict";
 
 const LETRAS = "ABCDEFGH";
-const MAX_OPC = 8, MIN_OPC = 2, OPC_INICIALES = 4;
+const MAX_OPC = 8, MIN_OPC = 2, OPC_INICIALES = 4, PAGINA = 50;
 const $ = (s) => document.querySelector(s);
 function h(tag, props, ...kids){
   const e = document.createElement(tag);
@@ -16,15 +16,26 @@ function h(tag, props, ...kids){
   for (const c of kids.flat()) if (c != null) e.append(c);
   return e;
 }
-const clave = (t) => t.replace(/\s+/g, " ").trim();
 const msg = (e) => (e && e.message) ? e.message : String(e);
 
+/* ---------- API ---------- */
+class ErrorHttp extends Error { constructor(status, datos){ super(datos.error || "El servidor respondió " + status + "."); this.status = status; this.datos = datos; } }
+async function api(url, metodo, cuerpo){
+  const opc = { method: metodo || "GET" };
+  if (cuerpo !== undefined){ opc.headers = { "Content-Type": "application/json" }; opc.body = JSON.stringify(cuerpo); }
+  const r = await fetch(url, opc);
+  if (r.status === 204) return null;
+  let datos = {}; try { datos = await r.json(); } catch (e) {}
+  if (!r.ok) throw new ErrorHttp(r.status, datos);
+  return datos;
+}
+
 /* ---------- Estado ---------- */
-let items = [];         // { tema, pregunta, respuestas[], c, explicacion }
+let items = [];         // página(s) cargadas: { id, tema, pregunta, respuestas[], correcta, explicacion }
+let total = 0;          // total de preguntas que cumplen el filtro
 let draft = nuevoBorrador("");
-let editando = null;    // índice en items, o null
-let dirHandle = null;
-const soportaCarpeta = typeof window.showDirectoryPicker === "function";
+let editando = null;    // id de la pregunta que se edita, o null
+let envio = 0;          // descarta respuestas de listados antiguos
 
 function nuevoBorrador(tema){ return { tema, pregunta: "", opciones: Array(OPC_INICIALES).fill(""), c: 0, expl: "" }; }
 
@@ -42,6 +53,7 @@ function mostrarError(texto, accion){
   e.hidden = false;
 }
 function ocultarError(){ $("#f-error").hidden = true; }
+function setStatus(kind, text){ const s = $("#status"); s.dataset.state = kind; s.textContent = text; }
 
 /* ---------- Editor ---------- */
 function pintarEditor(){
@@ -51,7 +63,7 @@ function pintarEditor(){
   pintarOpciones();
   const ed = editando !== null;
   $("#ed-title").textContent = ed ? "Editar pregunta" : "Nueva pregunta";
-  $("#ed-mode").textContent = ed ? "Editando la nº " + (editando + 1) : "";
+  $("#ed-mode").textContent = ed ? "Editando la nº " + editando : "";
   $("#btn-save").replaceChildren(ed ? "Guardar cambios " : "Añadir pregunta ", h("kbd", { text: "Ctrl+Enter" }));
   $("#btn-cancel").hidden = !ed;
   ocultarError();
@@ -111,30 +123,36 @@ function validarBorrador(){
   const respuestas = llenas.map((k) => draft.opciones[k].trim());
   const vistas = new Set();
   for (const r of respuestas){ const kk = r.toLowerCase(); if (vistas.has(kk)) return { msg: "Hay dos opciones iguales: «" + r + "».", foco: "#o-" + llenas[respuestas.indexOf(r)] }; vistas.add(kk); }
-  return { q: { tema, pregunta, respuestas, c: llenas.indexOf(draft.c), explicacion: draft.expl.trim() } };
+  return { q: { tema, pregunta, respuestas, correcta: llenas.indexOf(draft.c), explicacion: draft.expl.trim() } };
 }
-function guardarPregunta(){
+function cuerpoDe(q){ return { tema: q.tema, pregunta: q.pregunta, respuestas: q.respuestas, correcta: q.correcta, explicacion: q.explicacion }; }
+
+async function guardarPregunta(){
   const r = validarBorrador();
   if (r.msg){ mostrarError(r.msg); const f = $(r.foco); if (f) f.focus(); return; }
-  const q = r.q, k = clave(q.pregunta);
-  const dup = items.findIndex((x, i) => i !== editando && clave(x.pregunta) === k);
-  if (dup >= 0){
-    mostrarError("Ya hay una pregunta con este mismo enunciado (nº " + (dup + 1) + ", tema " + items[dup].tema + ").", { texto: "Reemplazarla", fn: () => aplicar(q, dup) });
-    return;
+  try {
+    await persistir(r.q, editando);
+  } catch (e) {
+    if (e.status === 409 && e.datos.existente){
+      const ex = e.datos.existente;
+      mostrarError(e.message, { texto: "Reemplazarla", fn: () => persistir(r.q, ex.id, true).catch((e2) => mostrarError(msg(e2))) });
+    } else mostrarError(msg(e));
   }
-  aplicar(q, editando);
 }
-function aplicar(q, indice){
-  const edicion = indice !== null && indice !== undefined;
-  if (edicion){
-    items[indice] = q;
-    if (editando !== null && editando !== indice) items.splice(editando, 1);
-  } else items.push(q);
-  const n = items.length;
+/* Crea (id null) o actualiza una pregunta. Con `reemplazo`, la pregunta que se estaba editando se borra (queda fusionada). */
+async function persistir(q, id, reemplazo){
+  const edicion = id !== null;
+  setStatus("busy", "Guardando…");
+  try {
+    await (edicion ? api("/api/preguntas/" + id, "PUT", cuerpoDe(q)) : api("/api/preguntas", "POST", cuerpoDe(q)));
+    if (reemplazo && editando !== null && editando !== id) await api("/api/preguntas/" + editando, "DELETE");
+  } catch (e) { setStatus("warn", "No se pudo guardar"); throw e; }
+  setStatus("ok", "Guardado en la base de datos");
   editando = null;
   draft = nuevoBorrador(String(q.tema));
-  pintarEditor(); pintarLista();
-  flash((edicion ? "Cambios guardados" : "Pregunta añadida") + " · " + n + " en total");
+  pintarEditor();
+  await recargar();
+  flash((edicion ? "Cambios guardados" : "Pregunta añadida") + " · " + total + " en la lista");
   $("#f-preg").focus();
 }
 function limpiar(){
@@ -142,31 +160,53 @@ function limpiar(){
   pintarEditor(); pintarLista(); $("#f-preg").focus();
 }
 
-/* ---------- Lista ---------- */
-function pintarFiltro(){
+/* ---------- Lista (paginada desde el servidor) ---------- */
+async function cargarTemas(){
   const sel = $("#f-filtro"), actual = sel.value;
-  const temas = [...new Set(items.map((q) => q.tema))].sort((a, b) => a - b);
-  sel.replaceChildren(h("option", { value: "", text: "Todos los temas" }), ...temas.map((t) => h("option", { value: String(t), text: "Tema " + t })));
-  sel.value = temas.map(String).includes(actual) ? actual : "";
+  const temas = await api("/api/temas");
+  const suma = temas.reduce((s, t) => s + t.total, 0);
+  sel.replaceChildren(h("option", { value: "", text: "Todos los temas (" + suma + ")" }),
+    ...temas.map((t) => h("option", { value: String(t.tema), text: "Tema " + t.tema + " (" + t.total + ")" })));
+  sel.value = temas.some((t) => String(t.tema) === actual) ? actual : "";
+}
+function parametros(desde){
+  const p = new URLSearchParams({ limite: String(PAGINA), desde: String(desde) });
+  if ($("#f-filtro").value !== "") p.set("tema", $("#f-filtro").value);
+  const q = $("#f-buscar").value.trim(); if (q) p.set("q", q);
+  return p;
+}
+/* Vuelve a pedir la lista desde el principio, conservando tantas filas como ya había cargadas. */
+async function recargar(){
+  const mio = ++envio;
+  try {
+    await cargarTemas();
+    const d = await api("/api/preguntas?" + parametros(0));
+    if (mio !== envio) return;
+    items = d.items; total = d.total;
+    pintarLista();
+  } catch (e) { setStatus("warn", "No se pudo cargar la lista: " + msg(e)); }
+}
+async function masPreguntas(){
+  const mio = ++envio;
+  try {
+    const d = await api("/api/preguntas?" + parametros(items.length));
+    if (mio !== envio) return;
+    items = items.concat(d.items); total = d.total;
+    pintarLista();
+  } catch (e) { setStatus("warn", "No se pudo cargar la lista: " + msg(e)); }
 }
 function pintarLista(){
-  pintarFiltro();
-  const filtro = $("#f-filtro").value;
-  const temas = new Set(items.map((q) => q.tema)).size;
-  $("#count").textContent = items.length ? "· " + items.length + (items.length === 1 ? " pregunta" : " preguntas") + " en " + temas + (temas === 1 ? " tema" : " temas") : "";
+  $("#count").textContent = total ? "· " + total + (total === 1 ? " pregunta" : " preguntas") : "";
   $("#empty").hidden = items.length > 0;
-  $("#f-filtro").hidden = items.length === 0;
-  const idx = items.map((_, i) => i).filter((i) => filtro === "" || String(items[i].tema) === filtro).reverse();
-  $("#list").replaceChildren(...idx.map((i) => {
-    const q = items[i];
-    return h("li", { class: "item" + (i === editando ? " editing" : "") },
+  $("#btn-more").hidden = items.length >= total;
+  $("#list").replaceChildren(...items.map((q) =>
+    h("li", { class: "item" + (q.id === editando ? " editing" : "") },
       h("div", { class: "imain" }, h("span", { class: "itag", text: "T" + q.tema }), h("span", { class: "itext", text: q.pregunta })),
-      h("div", { class: "imeta", text: "nº " + (i + 1) + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.c] }),
+      h("div", { class: "imeta", text: "nº " + q.id + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.correcta] }),
       h("div", { class: "iact" },
-        h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => editar(i) }),
-        h("button", { class: "btn small", type: "button", text: "Duplicar", onclick: () => duplicar(i) }),
-        confirmable("Borrar", () => borrar(i))));
-  }));
+        h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => editar(q) }),
+        h("button", { class: "btn small", type: "button", text: "Duplicar", onclick: () => duplicar(q) }),
+        confirmable("Borrar", () => borrar(q.id))))));
 }
 function confirmable(texto, fn){
   const b = h("button", { class: "btn small danger", type: "button", text: texto });
@@ -180,73 +220,23 @@ function confirmable(texto, fn){
   return b;
 }
 function cargarEnBorrador(q){
-  draft = { tema: String(q.tema), pregunta: q.pregunta, opciones: q.respuestas.slice(), c: q.c, expl: q.explicacion };
+  draft = { tema: String(q.tema), pregunta: q.pregunta, opciones: q.respuestas.slice(), c: q.correcta, expl: q.explicacion };
 }
-function editar(i){
-  editando = i; cargarEnBorrador(items[i]);
+function editar(q){
+  editando = q.id; cargarEnBorrador(q);
   pintarEditor(); pintarLista();
   $("#f-preg").focus(); $("#ed-title").scrollIntoView({ block: "start", behavior: "smooth" });
 }
-function duplicar(i){
-  editando = null; cargarEnBorrador(items[i]);
-  pintarEditor(); $("#f-preg").focus();
+function duplicar(q){
+  editando = null; cargarEnBorrador(q);
+  pintarEditor(); pintarLista(); $("#f-preg").focus();
   flash("Copia cargada: cambia el enunciado y añádela.");
 }
-function borrar(i){
-  items.splice(i, 1);
-  if (editando === i) { editando = null; draft = nuevoBorrador(draft.tema); pintarEditor(); }
-  else if (editando !== null && editando > i) editando--;
-  pintarLista();
-}
-
-/* ---------- Exportar ---------- */
-function serializar(arr){
-  const orden = arr.map((q, i) => [q, i]).sort((a, b) => a[0].tema - b[0].tema || a[1] - b[1]).map((x) => x[0]);
-  const trozos = orden.map((q) => [
-    "  {",
-    '    "tema": ' + q.tema + ",",
-    '    "pregunta": ' + JSON.stringify(q.pregunta) + ",",
-    '    "respuestas": [' + q.respuestas.map((r) => JSON.stringify(r)).join(", ") + "],",
-    '    "respuesta_correcta": "' + LETRAS[q.c].toLowerCase() + '",',
-    '    "explicacion": ' + JSON.stringify(q.explicacion),
-    "  }"].join("\n"));
-  return "[\n" + trozos.join(",\n") + "\n]\n";
-}
-function nombreArchivo(){
-  let n = $("#f-name").value.trim().replace(/[\\/:*?"<>|]/g, "_");
-  if (!n) n = "preguntas_nuevas";
-  if (!/\.json$/i.test(n)) n += ".json";
-  $("#f-name").value = n;
-  return n;
-}
-async function guardarEnCarpeta(){
-  if (!items.length){ flash("No hay preguntas que exportar.", "warn"); return; }
-  if (!soportaCarpeta){ flash("Este navegador no permite guardar directamente en la carpeta preguntas. Usa Chrome o Edge.", "warn"); return; }
-  try {
-    if (!dirHandle){
-      dirHandle = await window.showDirectoryPicker({ id: "preguntas-servidor", mode: "readwrite" });
-      if (dirHandle.name.toLocaleLowerCase() !== "preguntas"){
-        dirHandle = null;
-        flash("Selecciona la carpeta «preguntas» junto a la página.", "warn");
-        return;
-      }
-    }
-    const permiso = { mode: "readwrite" };
-    if (await dirHandle.queryPermission(permiso) !== "granted" &&
-        await dirHandle.requestPermission(permiso) !== "granted"){
-      dirHandle = null;
-      flash("Sin permiso para escribir en la carpeta «preguntas».", "warn");
-      return;
-    }
-    const nombre = nombreArchivo();
-    const fh = await dirHandle.getFileHandle(nombre, { create: true });
-    const w = await fh.createWritable();
-    await w.write(serializar(items)); await w.close();
-    flash("Guardado «" + nombre + "» en «preguntas» (" + items.length + " preguntas).");
-  } catch (e) {
-    if (e && e.name === "AbortError") return;
-    flash("No se pudo guardar: " + msg(e), "warn");
-  }
+async function borrar(id){
+  try { await api("/api/preguntas/" + id, "DELETE"); }
+  catch (e) { flash("No se pudo borrar: " + msg(e), "warn"); return; }
+  if (editando === id){ editando = null; draft = nuevoBorrador(draft.tema); pintarEditor(); }
+  await recargar();
 }
 
 /* ---------- Eventos ---------- */
@@ -254,28 +244,21 @@ $("#f-tema").addEventListener("input", (e) => { draft.tema = e.target.value; });
 $("#f-tema").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.ctrlKey && !e.metaKey){ e.preventDefault(); $("#f-preg").focus(); } });
 $("#f-preg").addEventListener("input", (e) => { draft.pregunta = e.target.value; });
 $("#f-expl").addEventListener("input", (e) => { draft.expl = e.target.value; });
-$("#f-filtro").addEventListener("change", pintarLista);
+$("#f-filtro").addEventListener("change", recargar);
+let tBuscar = null;
+$("#f-buscar").addEventListener("input", () => { clearTimeout(tBuscar); tBuscar = setTimeout(recargar, 250); });
+$("#btn-more").addEventListener("click", masPreguntas);
 $("#btn-add-opt").addEventListener("click", anadirOpcion);
 $("#btn-save").addEventListener("click", guardarPregunta);
 $("#btn-cancel").addEventListener("click", limpiar);
 $("#btn-clear").addEventListener("click", limpiar);
-$("#btn-export").addEventListener("click", guardarEnCarpeta);
-(function(){
-  const b = $("#btn-wipe"); let t = null; const txt = b.textContent;
-  b.addEventListener("click", () => {
-    if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent = "¿Seguro? Pulsa otra vez"; t = setTimeout(() => { b.classList.remove("armed"); b.textContent = txt; }, 3500); return; }
-    clearTimeout(t); b.classList.remove("armed"); b.textContent = txt;
-    items = []; editando = null; draft = nuevoBorrador(draft.tema); pintarEditor(); pintarLista();
-    flash("Lista vaciada.");
-  });
-})();
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !e.repeat){ e.preventDefault(); guardarPregunta(); }
 });
+
 /* ---------- Arranque ---------- */
-(async function(){
-  pintarEditor(); pintarLista();
-  $("#f-preg").focus();
-})();
+pintarEditor();
+recargar();
+$("#f-preg").focus();
 
 })();
