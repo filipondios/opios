@@ -2,7 +2,7 @@
   "name": "opios",
   "private": true,
   "type": "module",
-  "description": "Test de preguntas tipo test por temas con repaso espaciado.",
+  "description": "Test infinito: preguntas tipo test por temas con repaso espaciado (Bun + SQLite).",
   "scripts": {
     "start": "bun server.js",
     "dev": "bun --watch server.js",

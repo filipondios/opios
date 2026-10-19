@@ -40,3 +40,12 @@ preguntas/         JSON semilla
 ## API
 
 `GET /api/test?temas=1,2` · `POST|DELETE /api/progreso` · `GET|POST /api/preguntas` · `GET|PUT|DELETE /api/preguntas/:id` · `GET /api/temas` · `GET /api/exportar`
+
+## Despliegue en Render (Docker)
+
+1. Crea un **Web Service** con entorno Docker apuntando al repo (o usa `render.yaml` como Blueprint).
+2. Define `AUTH_USER` y `AUTH_PASS`: sin ellos cualquiera con la URL puede editar o borrar preguntas.
+3. Añade un **disco persistente** montado en `/data` (plan de pago). Sin disco, la DB se reinicia con cada despliegue: se vuelven a importar los JSON de `preguntas/`, pero se pierde el progreso y las preguntas añadidas desde el creador.
+4. Health check path: `/healthz`. Render inyecta `PORT`; la imagen ya escucha en `0.0.0.0`.
+
+Local con Docker: `docker build -t opios . && docker run -p 10000:10000 -v opios-data:/data opios`

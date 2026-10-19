@@ -5,12 +5,6 @@ import { DB_PATH } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import { claveDe } from "./validar.js";
 
-/* ------------------------------------------------------------------
-   Esquema. Cada JSON de pregunta se descompone en:
-     preguntas (enunciado, explicación, tema)  1 ── N  opciones (texto, posición, ¿correcta?)
-   y el progreso del repaso espaciado vive en `progreso`, una fila por pregunta
-   (antes: id -> [caja, vence, aciertos, fallos] en localStorage).
-   ------------------------------------------------------------------ */
 const MIGRACIONES = [
   /* v1 */ `
   CREATE TABLE temas (
