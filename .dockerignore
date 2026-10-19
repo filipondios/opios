@@ -1,4 +1,8 @@
 .git
 .gitignore
-Dockerfile
+node_modules
+data
+test
 README.md
+Dockerfile
+.dockerignore

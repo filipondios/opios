@@ -151,3 +151,20 @@ describe("páginas y estáticos", () => {
     expect((await pet("/nada.js")).status).toBe(404);
   });
 });
+
+describe("autenticación opcional y healthz", () => {
+  const basic = (u, c) => ({ Authorization: "Basic " + btoa(u + ":" + c) });
+  test("con auth: 401 sin credenciales, 200 con ellas, /healthz libre", async () => {
+    const protegida = crearApp(repo, { auth: { usuario: "ana", clave: "se:creto" } });
+    const get = (ruta, headers = {}) => protegida(new Request("http://localhost" + ruta, { headers }));
+    expect((await get("/")).status).toBe(401);
+    expect((await get("/api/temas")).status).toBe(401);
+    expect((await get("/", basic("ana", "mal"))).status).toBe(401);
+    expect((await get("/", basic("ana", "se:creto"))).status).toBe(200);
+    expect((await get("/healthz")).status).toBe(200);
+  });
+  test("sin auth todo es accesible", async () => {
+    expect((await pet("/healthz")).status).toBe(200);
+    expect((await pet("/")).status).toBe(200);
+  });
+});

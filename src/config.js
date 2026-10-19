@@ -5,12 +5,15 @@ export const PUBLIC_DIR = join(ROOT, "public");
 export const DIR_PREGUNTAS = join(ROOT, "preguntas");
 
 export const PORT = Number(process.env.PORT ?? 8000);
-// Solo accesible desde esta máquina. Usa HOST=0.0.0.0 para abrirlo a la red local.
+// Solo accesible desde esta máquina.
 export const HOST = process.env.HOST ?? "127.0.0.1";
+// Si se definen ambas, la app pide usuario y contraseña (HTTP Basic). Imprescindible si se publica en internet.
+export const AUTH = process.env.AUTH_USER && process.env.AUTH_PASS
+  ? { usuario: process.env.AUTH_USER, clave: process.env.AUTH_PASS } : null;
 export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
 
 /* Reglas compartidas */
 export const MIN_OPC = 2;
 export const MAX_OPC = 8;
-export const CAJA_MAX = 6;       // cajas 0..6 del repaso espaciado (ver INTERVALOS_DIAS en public/js/test.js)
-export const CAJA_DOMINADA = 4;  // desde esta caja una pregunta cuenta como dominada
+export const CAJA_MAX = 6;
+export const CAJA_DOMINADA = 4;
