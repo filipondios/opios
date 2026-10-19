@@ -218,3 +218,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Bun / Node
+node_modules/
+bun.lock
+
+# Base de datos local (se genera sola al arrancar)
+data/*.db
+data/*.db-shm
+data/*.db-wal

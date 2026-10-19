@@ -1,21 +1,13 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>Creador de preguntas</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
-<link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-<div class="wrap">
-  <header class="top">
-    <span class="brand">Creador de preguntas</span>
-    <span class="status" role="status">Preguntas de esta sesión</span>
-  </header>
+import { html } from "./html.js";
+import { layout } from "./layout.js";
+
+export function opcionesFiltro(temas, total) {
+  return html`<option value="">Todos los temas (${total})</option>${temas.map((t) => html`<option value="${t.tema}">Tema ${t.tema} (${t.total})</option>`)}`;
+}
+
+export function paginaMaker({ temas }) {
+  const total = temas.reduce((s, t) => s + t.total, 0);
+  const cuerpo = html`
   <div class="cols">
     <!-- ============ Editor ============ -->
     <section class="card" aria-labelledby="ed-title">
@@ -48,7 +40,7 @@
       <fieldset>
         <legend id="lg-correct">Respuesta correcta</legend>
         <div class="pills" id="f-correct" role="radiogroup" aria-labelledby="lg-correct"></div>
-        <p class="hint" style="margin-top:8px">Por defecto es la A: escribe primero la correcta y luego las incorrectas. En el test se barajan. Puedes elegir otra con las flechas o haciendo clic en la letra.</p>
+        <p class="hint mt">Por defecto es la A: escribe primero la correcta y luego las incorrectas. En el test se barajan. Puedes elegir otra con las flechas o haciendo clic en la letra.</p>
       </fieldset>
 
       <div class="field">
@@ -66,34 +58,41 @@
       </div>
     </section>
 
-    <!-- ============ Lista y exportación ============ -->
+    <!-- ============ Lista ============ -->
     <div class="stack">
       <section class="card" aria-labelledby="list-title">
         <div class="list-head">
           <h2 id="list-title">Preguntas <span class="mono" id="count" style="font-size:15px;color:var(--ink-2)"></span></h2>
-          <select id="f-filtro" aria-label="Filtrar por tema"></select>
+          <div class="filters">
+            <input id="f-buscar" type="search" placeholder="Buscar en el enunciado" aria-label="Buscar en el enunciado" autocomplete="off">
+            <select id="f-filtro" aria-label="Filtrar por tema">${opcionesFiltro(temas, total)}</select>
+          </div>
         </div>
-        <p class="empty" id="empty">Todavía no hay preguntas. Crea la primera a la izquierda.</p>
+        <p class="empty" id="empty" hidden>No hay preguntas con ese filtro.</p>
         <ul class="items" id="list"></ul>
         <div class="row">
-          <button class="btn small danger" type="button" id="btn-wipe">Vaciar lista</button>
+          <button class="btn small" type="button" id="btn-more" hidden>Mostrar más</button>
         </div>
       </section>
 
       <section class="card" aria-labelledby="exp-title">
-        <h2 id="exp-title">Exportar</h2>
-        <div class="field">
-          <label for="f-name">Nombre del archivo</label>
-          <input id="f-name" type="text" value="preguntas_nuevas.json" autocomplete="off" spellcheck="false">
-        </div>
-        <p class="hint">Al guardar, selecciona la carpeta <span class="mono">preguntas</span> que está en el mismo directorio desde el que ejecutaste <span class="mono">python -m http.server 8000</span>. Si el archivo ya existe, se sobrescribirá.</p>
+        <h2 id="exp-title">Copia de seguridad</h2>
+        <p class="hint">Las preguntas se guardan directamente en la base de datos (<span class="mono">data/opios.db</span>). Si quieres una copia en el formato JSON de siempre, puedes descargarla aquí.</p>
         <div class="row">
-          <button class="btn primary" type="button" id="btn-export">Guardar en preguntas</button>
+          <a class="btn" href="/api/exportar" download="preguntas.json">Descargar preguntas (JSON)</a>
         </div>
       </section>
     </div>
-  </div>
-</div>
-<script src="js/app.js" defer></script>
-</body>
-</html>
+  </div>`;
+
+  return layout({
+    titulo: "Creador de preguntas",
+    marca: "Creador de preguntas",
+    enlace: { href: "/", texto: "Hacer test" },
+    estado: "Guardado en la base de datos",
+    ancho: true,
+    css: ["maker.css"],
+    js: ["maker.js"],
+    cuerpo,
+  });
+}
