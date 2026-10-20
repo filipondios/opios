@@ -1,0 +1,72 @@
+[
+  {
+    "tema": 1,
+    "pregunta": "En relación a los derechos y deberes de los ciudadanos, el artículo 30 de la Constitución Española indica que:",
+    "respuestas": ["Mediante ley podrán ser de obligado cumplimiento los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante Real Decreto podrán ser de obligado cumplimiento los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante ley podrán eliminarse los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante ley podrán regularse los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el artículo 62 de la Constitución Española, ¿a quién corresponde expedir los decretos acordados en el Consejo de Ministros?",
+    "respuestas": ["Al Rey.", "Al Presidente del Gobierno.", "Al titular del Ministerio de la Presidencia.", "Al Presidente de la Mesa del Congreso."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Indique cuál es el Título de la Constitución Española relativo a la Organización Territorial del Estado:",
+    "respuestas": ["Título IV.", "Título VI.", "Título VIII.", "Título X."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "De acuerdo con el artículo 64 de la Constitución Española de 1978 (en adelante CE), los actos del Rey, excepto la propuesta y el nombramiento del Presidente del Gobierno, y la disolución de las Cámaras prevista en el artículo 99, serán refrendados por:",
+    "respuestas": ["Los Presidentes del Congreso y el Senado.", "Los Ministros o los Secretarios de Estado en función de la materia.", "El Presidente del Gobierno y, en su caso, por los Presidentes del Congreso y el Senado.", "El Presidente del Gobierno y, en su caso, por los Ministros competentes."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "La suspensión de los derechos y libertades se encuentra regulada en la CE en:",
+    "respuestas": ["En el Capítulo III del Título I.", "En sus artículos 52 y 53.", "En el artículo 58.", "En el Capítulo V del Título I."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "¿Cuál de los siguientes derechos recogidos en el Capítulo Segundo del Título I de la Constitución Española NO forma parte de los Derechos Fundamentales y Libertades Públicas (Artículos 15 a 29)?",
+    "respuestas": ["Derecho a sindicarse libremente.", "Derecho a la propiedad privada.", "Derecho a la producción y creación literaria, artística, científica y técnica.", "Derecho a elegir libremente su residencia."],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el Título I, Capítulo Cuarto, “De las garantías de las libertades y derechos fundamentales” de la Constitución Española de 1978, señale la opción correcta:",
+    "respuestas": ["Los derechos y libertades reconocidos no vinculan a todas las Administraciones Públicas.", "Sólo por ley orgánica podrá regularse el ejercicio de tales derechos y libertades.", "Una ley orgánica regulará la institución del Defensor del Pueblo.", "El reconocimiento, el respeto y la protección de los principios reconocidos en el Capítulo tercero, informará la judicialización positiva, la práctica legislativa y la actuación de los poderes públicos."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Señale la respuesta INCORRECTA de acuerdo con el Título II, artículo 62 de la Constitución Española de 1978. Corresponde al Rey:",
+    "respuestas": ["Convocar a referéndum en los casos previstos en la Constitución, previa autorización de las Cortes Generales.", "Convocar y disolver las Cortes Generales y convocar elecciones en los términos previstos en la Constitución.", "Proponer el candidato a Presidente de Gobierno y, en su caso, nombrarlo, así como poner fin a sus funciones en los términos previstos en la Constitución.", "Nombrar y separar a los miembros del Gobierno, a propuesta de su Presidente."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "En la Constitución Española de 1978, en relación con la sucesión al trono se prefiere siempre:",
+    "respuestas": ["En la misma línea, el grado más lejano al más próximo.", "En el mismo grado, la línea anterior a las posteriores.", "En la misma línea, el grado más próximo al más remoto.", "En el mismo grado, la línea posterior a las anteriores."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 1,
+    "pregunta": "Indique cuál de los siguientes principios se garantiza en el artículo 9 de la Constitución Española de 1978:",
+    "respuestas": ["La retroactividad de disposiciones sancionadoras no favorables o restrictivas de derechos individuales.", "La retroactividad de disposiciones sancionadoras favorables.", "La interdicción de la arbitrariedad de los poderes públicos.", "La irretroactividad de disposiciones sancionadoras favorables o restrictivas de derechos colectivos."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  }
+]
