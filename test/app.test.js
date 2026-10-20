@@ -135,6 +135,8 @@ describe("páginas y estáticos", () => {
     expect(html).toContain('href="/maker"'); expect(html).toContain("/js/test.js");
     const m = await (await pet("/maker")).text();
     expect(m).toContain('href="/"'); expect(m).toContain("Hacer test"); expect(m).toContain("/js/maker.js");
+    const t = await (await pet("/temario")).text();
+    expect(t).toContain("/js/temario.js"); expect(t).toContain("Nuevo bloque");
     expect((await pet("/fragmentos/temas")).status).toBe(200);
   });
   test("las plantillas escapan HTML", async () => {
@@ -145,10 +147,93 @@ describe("páginas y estáticos", () => {
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/js/test.js", "/js/maker.js"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/js/test.js", "/js/maker.js", "/js/temario.js"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);
+  });
+});
+
+describe("temario por bloques", () => {
+  beforeEach(async () => { await importarDirectorio(repo, DIR_PREGUNTAS); });
+
+  test("la primera importación crea el bloque 1 con los temas numerados", async () => {
+    const t = await (await pet("/api/temario")).json();
+    const b1 = t.find((b) => b.id === 1);
+    expect(b1.nombre).toBe("Bloque 1");
+    expect(b1.temas.map((x) => x.numero)).toEqual([1, 2]);
+  });
+
+  test("crear bloques y temas, con validaciones", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    expect(b).toMatchObject({ id: 2, nombre: "Bloque 2", orden: 1 });
+    expect((await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).status).toBe(409);
+    expect((await pet("/api/bloques", "POST", { nombre: " " })).status).toBe(400);
+
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 1, nombre: "Hardware" })).json();
+    expect(t).toMatchObject({ bloque: 2, numero: 1, nombre: "Hardware", preguntas: 0 });
+    expect((await pet("/api/temas", "POST", { bloque: b.id, numero: 1 })).status).toBe(409);
+    expect((await pet("/api/temas", "POST", { bloque: 999, numero: 2 })).status).toBe(404);
+    expect((await pet("/api/temas", "POST", { bloque: b.id, numero: -1 })).status).toBe(400);
+  });
+
+  test("renombrar, reordenar y borrar bloques; borrar temas", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    expect((await (await pet("/api/bloques/" + b.id, "PUT", { nombre: "Bloque II" })).json()).nombre).toBe("Bloque II");
+    expect((await pet("/api/bloques/reordenar", "POST", { ids: [b.id, 1] })).status).toBe(200);
+    expect((await (await pet("/api/temario")).json()).map((x) => x.nombre)).toEqual(["Bloque II", "Bloque 1"]);
+
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 1 })).json();
+    expect((await pet("/api/bloques/" + b.id, "DELETE")).status).toBe(409);
+    expect((await pet("/api/temas/" + t.id, "DELETE")).status).toBe(204);
+    expect((await pet("/api/bloques/" + b.id, "DELETE")).status).toBe(204);
+    expect((await pet("/api/bloques/reordenar", "POST", { ids: [999] })).status).toBe(400);
+  });
+
+  test("las preguntas heredan el bloque y el número de tema", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 3, nombre: "Redes" })).json();
+    const p = await (await pet("/api/preguntas", "POST", nueva({ tema: t.id }))).json();
+    expect(p).toMatchObject({ tema: t.id, tema_numero: 3, bloque: 2, bloque_nombre: "Bloque 2" });
+    const d = await (await pet("/api/test?temas=" + t.id)).json();
+    expect(d.preguntas[0]).toMatchObject({ tema_numero: 3, bloque_nombre: "Bloque 2" });
+    expect((await (await pet("/api/temas")).json()).find((x) => x.tema === t.id).total).toBe(1);
+  });
+
+  test("la portada agrupa los temas por bloque y el creador los ofrece en optgroups", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 1, nombre: "Hardware" })).json();
+    await pet("/api/preguntas", "POST", nueva({ tema: t.id, pregunta: "¿Qué es la memoria RAM?" }));
+    const home = await (await pet("/")).text();
+    expect(home).toContain("bloque-head");
+    expect(home).toContain("sel-bloque");
+    expect(home).toContain("Bloque 2");
+    const maker = await (await pet("/maker")).text();
+    expect(maker).toContain("<optgroup");
+    expect(maker).toContain("Hardware");
+  });
+
+  test("las etiquetas largas se recortan en los desplegables", async () => {
+    const largo = "Un nombre de tema extraordinariamente largo que no cabe en el desplegable";
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    await pet("/api/temas", "POST", { bloque: b.id, numero: 1, nombre: largo });
+    const maker = await (await pet("/maker")).text();
+    expect(maker).toContain("...");
+    expect(maker).not.toContain(largo);
+  });
+
+  test("exportar y reimportar conserva los bloques", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 1, nombre: "Hardware" })).json();
+    await pet("/api/preguntas", "POST", nueva({ tema: t.id, pregunta: "¿Cuál de estos es un periférico de entrada?" }));
+    const txt = await (await pet("/api/exportar")).text();
+    const otra = abrirDb(":memory:");
+    const dir = (await import("node:os")).tmpdir() + "/opios-test-bloques-" + Date.now();
+    await Bun.write(dir + "/x.json", txt);
+    const r = await importarDirectorio(otra, dir);
+    expect(r.errores).toEqual([]);
+    expect(otra.temario().find((x) => x.nombre === "Bloque 2").temas[0]).toMatchObject({ numero: 1, preguntas: 1 });
+    expect(otra.todas().find((p) => p.bloque_nombre === "Bloque 2")).toMatchObject({ tema_numero: 1 });
   });
 });
 

@@ -198,6 +198,16 @@ $("#grid").addEventListener("click", (e) => {
   c.setAttribute("aria-checked", String(seleccion.has(t)));
   actualizarResumen(); guardarSeleccion();
 });
+/* Selecciona (o deselecciona) todos los temas de un bloque. */
+$("#grid").addEventListener("click", (e) => {
+  const b = e.target.closest(".sel-bloque"); if (!b) return;
+  const cs = [...b.closest(".bloque").querySelectorAll(".chip")];
+  const temas = cs.map((c) => Number(c.dataset.tema));
+  const todos = temas.every((t) => seleccion.has(t));
+  for (const t of temas) { if (todos) seleccion.delete(t); else seleccion.add(t); }
+  cs.forEach((c) => c.setAttribute("aria-checked", String(seleccion.has(Number(c.dataset.tema)))));
+  actualizarResumen(); guardarSeleccion();
+});
 
 /* ---------- Borrados con doble pulsación ---------- */
 function conConfirmacion(btn, texto, accion){
@@ -233,7 +243,10 @@ async function empezar(){
   try {
     await guardarProgreso();
     const d = await (await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","))).json();
-    bank = d.preguntas.map((q) => ({ i: q.id, t: q.tema, p: q.pregunta, o: q.respuestas, c: q.correcta, e: q.explicacion }));
+    bank = d.preguntas.map((q) => ({
+      i: q.id, t: q.tema, tn: q.tema_numero ?? q.tema, bn: q.bloque_nombre ?? "",
+      p: q.pregunta, o: q.respuestas, c: q.correcta, e: q.explicacion,
+    }));
     progress = d.progreso;
     if (!bank.length) throw new Error("Los temas elegidos no tienen preguntas.");
   } catch (e) {
@@ -252,7 +265,7 @@ function preguntar(){
   const [q, tipo] = sesion.siguiente();
   const orden = barajar(q.o.map((_, k) => k));
   cur = { q, tipo, orden, sel: 0, corr: orden.indexOf(q.c), fase: "elegir" };
-  $("#q-tema").textContent = "Tema " + q.t;
+  $("#q-tema").textContent = (q.bn ? q.bn + " · " : "") + "Tema " + q.tn;
   const kind = $("#q-kind"); kind.textContent = tipo; kind.dataset.kind = tipo;
   $("#q-text").textContent = q.p;
   $("#q-opts").replaceChildren(...orden.map((oi, k) =>

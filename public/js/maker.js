@@ -3,7 +3,7 @@
 "use strict";
 
 const LETRAS = "ABCDEFGH";
-const MAX_OPC = 8, MIN_OPC = 2, OPC_INICIALES = 4, PAGINA = 50;
+const MAX_OPC = 8, MIN_OPC = 2, OPC_INICIALES = 4, PAGINA = 50, MAX_ETIQUETA = 60;
 const $ = (s) => document.querySelector(s);
 function h(tag, props, ...kids){
   const e = document.createElement(tag);
@@ -36,8 +36,13 @@ let total = 0;          // total de preguntas que cumplen el filtro
 let draft = nuevoBorrador("");
 let editando = null;    // id de la pregunta que se edita, o null
 let envio = 0;          // descarta respuestas de listados antiguos
+let temario = [];       // bloques con sus temas, tal y como llega de /api/temario
+let etiquetas = new Map(); // id de tema -> { bloque, numero, nombre }
 
 function nuevoBorrador(tema){ return { tema, pregunta: "", opciones: Array(OPC_INICIALES).fill(""), c: 0, expl: "" }; }
+/* Recorta las etiquetas largas para que los desplegables no se alarguen de más. */
+const recortar = (s, max = MAX_ETIQUETA) => (s.length > max ? s.slice(0, max - 3).trimEnd() + "..." : s);
+const textoOpcion = (t) => "Tema " + (t.numero ?? t.id) + (t.nombre ? " — " + t.nombre : "");
 
 /* ---------- Mensajes ---------- */
 let tFlash = null;
@@ -57,7 +62,10 @@ function setStatus(kind, text){ const s = $("#status"); s.dataset.state = kind; 
 
 /* ---------- Editor ---------- */
 function pintarEditor(){
-  $("#f-tema").value = draft.tema;
+  const sel = $("#f-tema"), valor = String(draft.tema ?? "");
+  if ([...sel.options].some((o) => o.value === valor)) sel.value = valor;
+  else if (sel.options.length){ sel.selectedIndex = 0; draft.tema = sel.value; }
+  else draft.tema = "";
   $("#f-preg").value = draft.pregunta;
   $("#f-expl").value = draft.expl;
   pintarOpciones();
@@ -110,8 +118,11 @@ function quitarOpcion(k){
 
 /* ---------- Validar y guardar una pregunta ---------- */
 function validarBorrador(){
-  const tema = Number(draft.tema);
-  if (String(draft.tema).trim() === "" || !Number.isInteger(tema) || tema < 0) return { msg: "El tema debe ser un número entero (0 o más).", foco: "#f-tema" };
+  const sel = $("#f-tema");
+  const tema = Number(sel.value);
+  if (!sel.value || !Number.isInteger(tema) || tema < 0)
+    return { msg: "Elige un tema. Si todavía no existe, créalo en Organizar temario.", foco: "#f-tema" };
+  draft.tema = String(tema);
   const pregunta = draft.pregunta.trim();
   if (!pregunta) return { msg: "Escribe la pregunta.", foco: "#f-preg" };
   const llenas = []; draft.opciones.forEach((t, k) => { if (t.trim()) llenas.push(k); });
@@ -161,13 +172,42 @@ function limpiar(){
 }
 
 /* ---------- Lista (paginada desde el servidor) ---------- */
+/* Opciones del selector de tema, agrupadas por bloque. */
+function opcionesSelect(seleccionado){
+  if (!temario.some((b) => b.temas.length)) return [h("option", { value: "", text: "No hay temas todavía" })];
+  const partes = [];
+  for (const b of temario){
+    if (!b.temas.length) continue;
+    const g = h("optgroup", { label: recortar(b.nombre) });
+    for (const t of b.temas){
+      g.append(h("option", { value: String(t.id), text: recortar(textoOpcion(t) + (t.preguntas === 0 ? " (sin preguntas)" : "")) }));
+    }
+    partes.push(g);
+  }
+  return partes;
+}
 async function cargarTemas(){
-  const sel = $("#f-filtro"), actual = sel.value;
-  const temas = await api("/api/temas");
-  const suma = temas.reduce((s, t) => s + t.total, 0);
-  sel.replaceChildren(h("option", { value: "", text: "Todos los temas (" + suma + ")" }),
-    ...temas.map((t) => h("option", { value: String(t.tema), text: "Tema " + t.tema + " (" + t.total + ")" })));
-  sel.value = temas.some((t) => String(t.tema) === actual) ? actual : "";
+  const filtro = $("#f-filtro"), filtroActual = filtro.value;
+  const selTema = $("#f-tema"), temaActual = draft.tema || selTema.value;
+  temario = await api("/api/temario");
+  etiquetas = new Map();
+  for (const b of temario) for (const t of b.temas) etiquetas.set(t.id, { bloque: b.nombre, numero: t.numero, nombre: t.nombre });
+
+  const suma = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
+  filtro.replaceChildren(h("option", { value: "", text: "Todos los temas (" + suma + ")" }),
+    ...temario.filter((b) => b.temas.length).map((b) => {
+      const g = h("optgroup", { label: recortar(b.nombre) });
+      g.append(...b.temas.map((t) => h("option", { value: String(t.id), text: recortar(textoOpcion(t) + " (" + t.preguntas + ")") })));
+      return g;
+    }));
+  filtro.value = temario.some((b) => b.temas.some((t) => String(t.id) === filtroActual)) ? filtroActual : "";
+
+  const ids = new Set(temario.flatMap((b) => b.temas).map((t) => String(t.id)));
+  let elegido = String(temaActual ?? "");
+  if (!ids.has(elegido)) elegido = temario.flatMap((b) => b.temas)[0] ? String(temario.flatMap((b) => b.temas)[0].id) : "";
+  draft.tema = elegido;
+  selTema.replaceChildren(...opcionesSelect(elegido));
+  selTema.value = elegido;
 }
 function parametros(desde){
   const p = new URLSearchParams({ limite: String(PAGINA), desde: String(desde) });
@@ -199,14 +239,18 @@ function pintarLista(){
   $("#count").textContent = total ? "· " + total + (total === 1 ? " pregunta" : " preguntas") : "";
   $("#empty").hidden = items.length > 0;
   $("#btn-more").hidden = items.length >= total;
-  $("#list").replaceChildren(...items.map((q) =>
-    h("li", { class: "item" + (q.id === editando ? " editing" : "") },
-      h("div", { class: "imain" }, h("span", { class: "itag", text: "T" + q.tema }), h("span", { class: "itext", text: q.pregunta })),
-      h("div", { class: "imeta", text: "nº " + q.id + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.correcta] }),
+  $("#list").replaceChildren(...items.map((q) => {
+    const et = etiquetas.get(q.tema);
+    return h("li", { class: "item" + (q.id === editando ? " editing" : "") },
+      h("div", { class: "imain" },
+        h("span", { class: "itag", text: "T" + (et?.numero ?? q.tema), title: et?.bloque ?? "" }),
+        h("span", { class: "itext", text: q.pregunta })),
+      h("div", { class: "imeta", text: "nº " + q.id + (et ? " · " + et.bloque : "") + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.correcta] }),
       h("div", { class: "iact" },
         h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => editar(q) }),
         h("button", { class: "btn small", type: "button", text: "Duplicar", onclick: () => duplicar(q) }),
-        confirmable("Borrar", () => borrar(q.id))))));
+        confirmable("Borrar", () => borrar(q.id))));
+  }));
 }
 function confirmable(texto, fn){
   const b = h("button", { class: "btn small danger", type: "button", text: texto });
@@ -240,8 +284,7 @@ async function borrar(id){
 }
 
 /* ---------- Eventos ---------- */
-$("#f-tema").addEventListener("input", (e) => { draft.tema = e.target.value; });
-$("#f-tema").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.ctrlKey && !e.metaKey){ e.preventDefault(); $("#f-preg").focus(); } });
+$("#f-tema").addEventListener("change", (e) => { draft.tema = e.target.value; });
 $("#f-preg").addEventListener("input", (e) => { draft.pregunta = e.target.value; });
 $("#f-expl").addEventListener("input", (e) => { draft.expl = e.target.value; });
 $("#f-filtro").addEventListener("change", recargar);
