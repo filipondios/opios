@@ -1,5 +1,5 @@
 import { ErrorApi } from "./errores.js";
-import { MIN_OPC, MAX_OPC, CAJA_MAX } from "./config.js";
+import { MIN_OPC, MAX_OPC, CAJA_MAX, MAX_BLOQUE, MAX_TEMA_NOMBRE } from "./config.js";
 
 const LETRAS = "abcdefgh";
 const MAX_TEMA = 9999, MAX_ENUNCIADO = 2000, MAX_OPCION = 1000, MAX_EXPLICACION = 4000;
@@ -41,7 +41,17 @@ export function validarPregunta(b, { estricto = true } = {}) {
     throw mal("La respuesta correcta no corresponde a ninguna opción.");
   const explicacion = texto(b.explicacion);
   if (explicacion.length > MAX_EXPLICACION) throw mal("La explicación es demasiado larga.");
-  return { tema, pregunta, respuestas, correcta, explicacion };
+
+  /* Metadatos opcionales del temario (los usa la importación/exportación por bloques). */
+  let bloque = null, temaNumero = null;
+  if (b.bloque != null && String(b.bloque).trim() !== "") {
+    bloque = texto(b.bloque);
+    if (bloque.length > MAX_BLOQUE) throw mal("El nombre del bloque es demasiado largo.");
+    temaNumero = Number(b.tema_numero ?? b.tema);
+    if (!Number.isInteger(temaNumero) || temaNumero < 0 || temaNumero > MAX_TEMA)
+      throw mal("El número de tema no es válido.");
+  }
+  return { tema, bloque, tema_numero: temaNumero, pregunta, respuestas, correcta, explicacion };
 }
 
 /** Convierte una pregunta del formato JSON antiguo (`respuesta_correcta` = letra) al formato interno. */
@@ -58,7 +68,32 @@ export function desdeJsonAntiguo(p) {
       if (correcta < 0) throw mal("'respuesta_correcta' debe ser una letra (a, b, c...) que corresponda a una opción");
     }
   }
-  return validarPregunta({ tema: p.tema, pregunta: p.pregunta, respuestas: p.respuestas, correcta, explicacion: p.explicacion }, { estricto: false });
+  return validarPregunta({
+    tema: p.tema, bloque: p.bloque, tema_numero: p.tema_numero,
+    pregunta: p.pregunta, respuestas: p.respuestas, correcta, explicacion: p.explicacion,
+  }, { estricto: false });
+}
+
+/** Valida el nombre de un bloque del temario. */
+export function validarBloque(b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) throw mal("El cuerpo debe ser un objeto.");
+  const nombre = texto(b.nombre);
+  if (!nombre) throw mal("Falta el nombre del bloque.");
+  if (nombre.length > MAX_BLOQUE) throw mal("El nombre del bloque es demasiado largo.");
+  return { nombre };
+}
+
+/** Valida un tema del temario: { bloque, numero, nombre }. */
+export function validarTema(b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) throw mal("El cuerpo debe ser un objeto.");
+  const bloque = Number(b.bloque);
+  if (!Number.isInteger(bloque) || bloque <= 0) throw mal("Elige un bloque válido.");
+  const numero = Number(b.numero);
+  if (!Number.isInteger(numero) || numero < 0 || numero > MAX_TEMA)
+    throw mal("El número de tema debe ser un entero entre 0 y " + MAX_TEMA + ".");
+  const nombre = texto(b.nombre);
+  if (nombre.length > MAX_TEMA_NOMBRE) throw mal("El nombre del tema es demasiado largo.");
+  return { bloque, numero, nombre };
 }
 
 /** Valida una entrada de progreso enviada por el test. */

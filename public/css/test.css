@@ -1,6 +1,11 @@
 /* Página del test: selección de temas y preguntas. */
 
 /* Selección de temas */
+.bloque{display:flex;flex-direction:column;gap:10px;min-width:0}
+.bloque-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.bloque-head h2{font:500 20px/1.2 var(--f-read)}
+.bloque-head span{font:500 12px var(--f-mono);color:var(--ink-2)}
+.chip-name{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sum{font-size:14px;color:var(--ink-2)}
 .sum b{color:var(--ink);font-weight:600;font-family:var(--f-mono)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
@@ -27,7 +32,7 @@
 /* Test */
 .qbar{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap}
 .tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.tag{font:500 12px var(--f-mono);padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.tag{font:500 12px var(--f-mono);padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);max-width:100%;overflow-wrap:anywhere}
 .tag[data-kind="Reintento"]{border-color:var(--bad);color:var(--bad)}
 .tag[data-kind="Repaso"]{border-color:var(--accent);color:var(--accent)}
 .score{font:500 12px var(--f-mono);color:var(--ink-2);display:flex;gap:14px;flex-wrap:wrap}

@@ -17,3 +17,7 @@ export const MIN_OPC = 2;
 export const MAX_OPC = 8;
 export const CAJA_MAX = 6;
 export const CAJA_DOMINADA = 4;
+export const MAX_BLOQUE = 120;
+export const MAX_TEMA_NOMBRE = 200;
+/* Longitud máxima de las etiquetas de los desplegables (se recortan con "..."). */
+export const MAX_ETIQUETA = 60;

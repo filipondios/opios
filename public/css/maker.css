@@ -16,10 +16,11 @@ input[type=text],input[type=search],input[type=number],textarea,select{
   padding:9px 11px;width:100%;min-width:0;
 }
 input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+select{text-overflow:ellipsis}
 textarea{resize:vertical;line-height:1.5}
 #f-preg{font:400 18px/1.5 var(--f-read);min-height:96px}
-.tema-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
-.tema-row .field{width:110px}
+.tema-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.tema-row .field{flex:1;min-width:220px;max-width:480px}
 
 .orow{display:flex;gap:10px;align-items:center;margin-bottom:8px}
 .bub{
@@ -51,7 +52,7 @@ textarea{resize:vertical;line-height:1.5}
 /* Lista */
 .list-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
-.filters select{width:auto}
+.filters select{width:auto;max-width:min(360px,100%);text-overflow:ellipsis}
 .filters input{width:170px}
 .items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:min(60vh,560px);overflow-y:auto}
 .item{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--paper)}

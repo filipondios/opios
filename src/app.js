@@ -3,11 +3,12 @@ import { timingSafeEqual } from "node:crypto";
 import { PUBLIC_DIR, CAJA_DOMINADA } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import { hoyIso } from "./fechas.js";
-import { validarPregunta, validarProgreso } from "./validar.js";
+import { validarPregunta, validarProgreso, validarBloque, validarTema } from "./validar.js";
 import { serializarJson } from "./exportar.js";
 import { aTexto } from "./views/html.js";
 import { paginaHome, temasGrid } from "./views/home.js";
 import { paginaMaker } from "./views/maker.js";
+import { paginaTemario } from "./views/temario.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
 const pagina = (r) => new Response(aTexto(r), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
@@ -28,6 +29,15 @@ function entero(v, { min = 0, max = Number.MAX_SAFE_INTEGER } = {}) {
   return Number.isInteger(n) && n >= min && n <= max ? n : NaN;
 }
 
+/** Lista de ids que envía el cliente para reordenar (bloques, por ejemplo). */
+function idsDe(cuerpo) {
+  if (!cuerpo || !Array.isArray(cuerpo.ids) || cuerpo.ids.length > 5000)
+    throw new ErrorApi(400, "Se esperaba un objeto con una lista de ids.");
+  if (cuerpo.ids.some((id) => !Number.isInteger(id) || id <= 0))
+    throw new ErrorApi(400, "La lista contiene identificadores no válidos.");
+  return cuerpo.ids;
+}
+
 function igual(a, b) {
   const x = Buffer.from(a), y = Buffer.from(b);
   return x.length === y.length && timingSafeEqual(x, y);
@@ -45,6 +55,47 @@ export function crearApp(repo, { auth = null } = {}) {
 
     if (ruta === "/api/temas" && m === "GET") {
       return json(estadisticas().map(({ tema, total }) => ({ tema, total })));
+    }
+
+    /* --- Temario: bloques y temas --- */
+    if (ruta === "/api/temario" && m === "GET") return json(repo.temario());
+
+    if (ruta === "/api/bloques" && m === "POST")
+      return json(repo.crearBloque(validarBloque(await cuerpoJson(req))), 201);
+
+    if (ruta === "/api/bloques/reordenar" && m === "POST") {
+      repo.reordenarBloques(idsDe(await cuerpoJson(req)));
+      return json({ ok: true });
+    }
+
+    const mbloque = ruta.match(/^\/api\/bloques\/(\d+)$/);
+    if (mbloque) {
+      const id = Number(mbloque[1]);
+      if (m === "PUT") {
+        const b = repo.actualizarBloque(id, validarBloque(await cuerpoJson(req)));
+        if (!b) throw new ErrorApi(404, "El bloque no existe.");
+        return json(b);
+      }
+      if (m === "DELETE") {
+        if (!repo.borrarBloque(id)) throw new ErrorApi(404, "El bloque no existe.");
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    if (ruta === "/api/temas" && m === "POST") return json(repo.crearTema(validarTema(await cuerpoJson(req))), 201);
+
+    const mtema = ruta.match(/^\/api\/temas\/(\d+)$/);
+    if (mtema) {
+      const id = Number(mtema[1]);
+      if (m === "PUT") {
+        const t = repo.actualizarTema(id, validarTema(await cuerpoJson(req)));
+        if (!t) throw new ErrorApi(404, "El tema no existe.");
+        return json(t);
+      }
+      if (m === "DELETE") {
+        if (!repo.borrarTema(id)) throw new ErrorApi(404, "El tema no existe.");
+        return new Response(null, { status: 204 });
+      }
     }
 
     if (ruta === "/api/test" && m === "GET") {
@@ -126,7 +177,8 @@ export function crearApp(repo, { auth = null } = {}) {
       if (ruta.startsWith("/api/")) return await api(req, url, ruta);
       if (req.method === "GET" || req.method === "HEAD") {
         if (ruta === "/") return pagina(paginaHome({ temas: estadisticas() }));
-        if (ruta === "/maker") return pagina(paginaMaker({ temas: estadisticas() }));
+        if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
+        if (ruta === "/temario") return pagina(paginaTemario());
         if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas()));
         return await estatico(ruta);
       }

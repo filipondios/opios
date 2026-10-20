@@ -2,20 +2,44 @@ import { html } from "./html.js";
 import { layout } from "./layout.js";
 
 /** Una ficha por tema, con barra de progreso. Los data-* los usa el cliente para el resumen. */
+function chip(t) {
+  const pct = (n) => (n / t.total * 100).toFixed(2);
+  const numero = t.tema_numero ?? t.tema;
+  return html`<button class="chip" type="button" role="checkbox" aria-checked="false"
+      data-tema="${t.tema}" data-total="${t.total}" data-nuevas="${t.nuevas}" data-repaso="${t.repaso}"
+      ${t.tema_nombre ? html`title="${t.tema_nombre}"` : ""}>
+    <span class="chip-top"><span class="chip-label">Tema</span><span class="chip-num">${numero}</span></span>
+    ${t.tema_nombre ? html`<span class="chip-name">${t.tema_nombre}</span>` : ""}
+    <span class="chip-meta">${t.total} ${t.total === 1 ? "pregunta" : "preguntas"}</span>
+    <span class="bar" aria-hidden="true">
+      <i class="b-ok" style="width:${pct(t.dominadas)}%"></i><i class="b-mid" style="width:${pct(t.aprendiendo)}%"></i><i class="b-new" style="width:${pct(t.nuevas)}%"></i>
+    </span>
+    <span class="chip-due">${t.repaso ? `${t.repaso} por repasar hoy` : "Sin repasos hoy"}</span>
+  </button>`;
+}
+
+/** Rejilla de temas agrupada por bloques del temario. */
 export function temasGrid(temas) {
-  return html`${temas.map((t) => {
-    const pct = (n) => (n / t.total * 100).toFixed(2);
-    return html`<button class="chip" type="button" role="checkbox" aria-checked="false"
-        data-tema="${t.tema}" data-total="${t.total}" data-nuevas="${t.nuevas}" data-repaso="${t.repaso}"
-        ${t.nombre ? html`title="${t.nombre}"` : ""}>
-      <span class="chip-top"><span class="chip-label">Tema</span><span class="chip-num">${t.tema}</span></span>
-      <span class="chip-meta">${t.total} ${t.total === 1 ? "pregunta" : "preguntas"}</span>
-      <span class="bar" aria-hidden="true">
-        <i class="b-ok" style="width:${pct(t.dominadas)}%"></i><i class="b-mid" style="width:${pct(t.aprendiendo)}%"></i><i class="b-new" style="width:${pct(t.nuevas)}%"></i>
-      </span>
-      <span class="chip-due">${t.repaso ? `${t.repaso} por repasar hoy` : "Sin repasos hoy"}</span>
-    </button>`;
-  })}`;
+  const bloques = [];
+  const porBloque = new Map();
+  for (const t of temas) {
+    const clave = t.bloque ?? "sin";
+    if (!porBloque.has(clave)) {
+      const g = { id: t.bloque ?? null, nombre: t.bloque_nombre || "Sin bloque", temas: [] };
+      porBloque.set(clave, g);
+      bloques.push(g);
+    }
+    porBloque.get(clave).temas.push(t);
+  }
+  return html`${bloques.map((b) => html`
+    <section class="bloque" data-bloque="${b.id ?? ""}">
+      <div class="bloque-head">
+        <h2>${b.nombre}</h2>
+        <span>${b.temas.length} ${b.temas.length === 1 ? "tema" : "temas"} · ${b.temas.reduce((s, t) => s + t.total, 0)} preguntas</span>
+        <button class="btn small sel-bloque" type="button" data-bloque="${b.id ?? ""}">Todo el bloque</button>
+      </div>
+      <div class="grid">${b.temas.map(chip)}</div>
+    </section>`)}`;
 }
 
 export function paginaHome({ temas }) {
@@ -29,12 +53,12 @@ export function paginaHome({ temas }) {
     <section id="empty" class="stack">
       <h1>Todavía no hay preguntas</h1>
       <p class="lede">La base de datos está vacía. Añade preguntas desde el creador o copia archivos JSON en <code>preguntas/</code> y ejecuta <code>bun run seed</code>.</p>
-      <div class="row"><a class="btn primary" href="/maker">Añadir preguntas</a></div>
+      <div class="row"><a class="btn primary" href="/maker">Añadir preguntas</a><a class="btn" href="/temario">Organizar temario</a></div>
     </section>` : html`
     <section id="ready" class="stack">
       <h1>Elige los temas</h1>
       <p class="sum" id="sum"></p>
-      <div class="grid" id="grid" role="group" aria-label="Temas">${temasGrid(temas)}</div>
+      <div class="stack" id="grid" role="group" aria-label="Temas">${temasGrid(temas)}</div>
       <div class="legend" aria-hidden="true">
         <span><i class="b-ok"></i>Dominadas</span>
         <span><i class="b-mid"></i>En aprendizaje</span>
@@ -45,6 +69,7 @@ export function paginaHome({ temas }) {
         <button class="btn" type="button" id="btn-all">Todos</button>
         <button class="btn" type="button" id="btn-none">Ninguno</button>
         <span class="spacer"></span>
+        <a class="btn" href="/temario">Organizar temario</a>
         <a class="btn" href="/maker">Añadir preguntas</a>
       </div>
       <div class="row">

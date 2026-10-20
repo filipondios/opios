@@ -1,12 +1,27 @@
 import { html } from "./html.js";
 import { layout } from "./layout.js";
+import { MAX_ETIQUETA } from "../config.js";
 
-export function opcionesFiltro(temas, total) {
-  return html`<option value="">Todos los temas (${total})</option>${temas.map((t) => html`<option value="${t.tema}">Tema ${t.tema} (${t.total})</option>`)}`;
+/** Recorta una etiqueta larga para que los desplegables no ocupen toda la pantalla. */
+const recortar = (s, max = MAX_ETIQUETA) => (s.length > max ? s.slice(0, max - 3).trimEnd() + "..." : s);
+const etiquetaTema = (t) => `Tema ${t.numero ?? t.id}${t.nombre ? ` — ${t.nombre}` : ""}`;
+const tituloBloque = (b) => recortar(b.nombre);
+
+/** Opciones del filtro de la lista, agrupadas por bloque. */
+export function opcionesFiltro(temario, total) {
+  return html`<option value="">Todos los temas (${total})</option>${temario.filter((b) => b.temas.length).map((b) => html`
+    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}">${recortar(etiquetaTema(t) + ` (${t.preguntas})`)}</option>`)}</optgroup>`)}`;
 }
 
-export function paginaMaker({ temas }) {
-  const total = temas.reduce((s, t) => s + t.total, 0);
+/** Opciones del selector de tema del editor, agrupadas por bloque. */
+export function opcionesTema(temario, seleccionado = "") {
+  if (!temario.some((b) => b.temas.length)) return html`<option value="">No hay temas todavía</option>`;
+  return html`${temario.filter((b) => b.temas.length).map((b) => html`
+    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}"${String(t.id) === String(seleccionado) ? " selected" : ""}>${recortar(etiquetaTema(t) + (t.preguntas === 0 ? " (sin preguntas)" : ""))}</option>`)}</optgroup>`)}`;
+}
+
+export function paginaMaker({ temario }) {
+  const total = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
   const cuerpo = html`
   <div class="cols">
     <!-- ============ Editor ============ -->
@@ -19,8 +34,9 @@ export function paginaMaker({ temas }) {
       <div class="tema-row">
         <div class="field">
           <label for="f-tema">Tema</label>
-          <input id="f-tema" type="number" min="0" step="1" inputmode="numeric" autocomplete="off">
+          <select id="f-tema" autocomplete="off">${opcionesTema(temario)}</select>
         </div>
+        <a class="btn small" href="/temario">Organizar temario</a>
       </div>
 
       <div class="field">
@@ -65,7 +81,7 @@ export function paginaMaker({ temas }) {
           <h2 id="list-title">Preguntas <span class="mono" id="count" style="font-size:15px;color:var(--ink-2)"></span></h2>
           <div class="filters">
             <input id="f-buscar" type="search" placeholder="Buscar en el enunciado" aria-label="Buscar en el enunciado" autocomplete="off">
-            <select id="f-filtro" aria-label="Filtrar por tema">${opcionesFiltro(temas, total)}</select>
+            <select id="f-filtro" aria-label="Filtrar por tema">${opcionesFiltro(temario, total)}</select>
           </div>
         </div>
         <p class="empty" id="empty" hidden>No hay preguntas con ese filtro.</p>

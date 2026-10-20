@@ -3,8 +3,10 @@ import { html } from "./html.js";
 /**
  * Plantilla base de todas las páginas.
  * `enlace` es el botón de cabecera hacia la otra página: { href, texto }.
+ * `enlaces` permite varios botones; si se indica, tiene prioridad sobre `enlace`.
  */
-export function layout({ titulo, marca, enlace, estado, ancho = false, css = [], js = [], cuerpo }) {
+export function layout({ titulo, marca, enlace, enlaces, estado, ancho = false, css = [], js = [], cuerpo }) {
+  const botones = enlaces ?? (enlace ? [enlace] : []);
   return html`<!doctype html>
 <html lang="es">
 <head>
@@ -23,7 +25,7 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
   <header class="top">
     <span class="brand">${marca}</span>
     <div class="top-right">
-      <a class="btn small" href="${enlace.href}">${enlace.texto}</a>
+      ${botones.map((b) => html`<a class="btn small" href="${b.href}">${b.texto}</a>`)}
       <span class="status" id="status" data-state="ok" role="status">${estado}</span>
     </div>
   </header>
