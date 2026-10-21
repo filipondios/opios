@@ -17,10 +17,10 @@ describe("importación de los JSON existentes", () => {
   test("importa todo, es idempotente y conserva la respuesta correcta", async () => {
     const r1 = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r1.errores).toEqual([]);
-    expect(r1.nuevas).toBe(198);
+    expect(r1.nuevas).toBe(430);
     const r2 = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r2.nuevas).toBe(0);
-    expect(r2.duplicadas).toBe(198);
+    expect(r2.duplicadas).toBe(430);
     const orig = (await Bun.file(DIR_PREGUNTAS + "/tema_1.json").json())[0];
     const p = repo.listar({ tema: 1, texto: orig.pregunta }).items[0];
     expect(p.respuestas).toEqual(orig.respuestas);
@@ -86,7 +86,7 @@ describe("test y progreso", () => {
 
   test("/api/test devuelve preguntas del tema y su progreso", async () => {
     const d = await (await pet("/api/test?temas=2")).json();
-    expect(d.preguntas.length).toBe(100);
+    expect(d.preguntas.length).toBe(215);
     expect(d.preguntas.every((q) => q.tema === 2 && q.respuestas.length >= 2 && q.correcta < q.respuestas.length)).toBe(true);
     expect(d.progreso).toEqual({});
     expect((await pet("/api/test")).status).toBe(400);
@@ -103,8 +103,8 @@ describe("test y progreso", () => {
     expect(d.progreso[a.id]).toEqual([5, "2999-01-01", 3, 0]);
     expect(d.progreso[b.id]).toEqual([1, "2999-01-01", 1, 1]);
     const t1 = repo.estadisticasTemas(hoyIso(), 4).find((t) => t.tema === 1);
-    expect(t1).toMatchObject({ total: 98, nuevas: 96, dominadas: 1, aprendiendo: 1, repaso: 0 });
-    expect(await (await pet("/")).text()).toContain("96");
+    expect(t1).toMatchObject({ total: 215, nuevas: 213, dominadas: 1, aprendiendo: 1, repaso: 0 });
+    expect(await (await pet("/")).text()).toContain("213");
     await pet("/api/progreso", "DELETE");
     expect((await (await pet("/api/test?temas=1")).json()).progreso).toEqual({});
   });
