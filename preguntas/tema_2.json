@@ -4,1504 +4,1504 @@
     "pregunta": "Los miembros del Tribunal Constitucional serán",
     "respuestas": ["Independientes e inamovibles y no están sujetos a responsabilidad", "Independientes e inamovibles en el ejercicio de su mandato", "Independientes, inviolables e inamovibles y no están sujetos a responsabiildad", "Independientes, inviolables e inamovibles en el ejercicio de su mandato"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 159.5 CE declara a los miembros del Tribunal Constitucional independientes e inamovibles en el ejercicio de su mandato. No les atribuye inviolabilidad ni una exención general de responsabilidad, por lo que las demás fórmulas amplían indebidamente su estatuto."
   },
   {
     "tema": 2,
     "pregunta": "Las Comisiones de investigación sobre asuntos de interés público pueden ser nombradas por",
     "respuestas": ["Únicamente por el Congreso", "Únicamente por el Senado", "El Congreso, el Senado y, en su caso, ambas Cámaras conjuntamente", "Únicamente por el Congreso y el Senado de manera independiente"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 76.1 CE permite nombrar Comisiones de investigación al Congreso, al Senado y, en su caso, a ambas Cámaras conjuntamente. No están reservadas a una sola Cámara ni se excluye la creación conjunta."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras funcionan",
     "respuestas": ["En Pleno, en Comisiones y en Reuniones", "En Comisiones y en Subcomisiones", "En Pleno", "En Pleno y por Comisiones"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 75.1 CE establece que las Cámaras funcionan en Pleno y por Comisiones. Las reuniones, subcomisiones o el funcionamiento exclusivo en Pleno no son la fórmula constitucional."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál de las siguientes no es correcta en relación con las causas de inelegibilidad e incompatibilidad de los Diputados y de los Senadores?",
     "respuestas": ["Componentes del Tribunal Constitucional", "Miembros de las Juntas Electorales", "Altos cargos de la Administración del Estado que determine la ley, incluyendo a los miembros del Gobierno", "Magistrados, Jueces y Fiscales en activo"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 70.1 CE incluye como causa de inelegibilidad a los altos cargos de la Administración que determine la ley, pero exceptúa expresamente a los miembros del Gobierno. Las demás opciones corresponden a causas sí previstas: Tribunal Constitucional, Juntas Electorales y jueces, magistrados y fiscales en activo."
   },
   {
     "tema": 2,
     "pregunta": "¿Dónde se determinará las causas de inelegibilidad e incompatibilidad de los Diputados y Senadores según la Constitución?",
     "respuestas": ["En la ley electoral", "En la convocatoria de las elecciones", "En el Reglamento de las Cortes Generales", "En la Ley de Incompatibilidades delos miembros de las Cámaras"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 70.1 CE remite a la ley electoral la determinación de las causas de inelegibilidad e incompatibilidad de Diputados y Senadores. No se fijan en la convocatoria, en el Reglamento de las Cámaras ni en una ley específica de incompatibilidades."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuándo termina el mandato de los Senadores?",
     "respuestas": ["Cuatro años después de su elección o el día de la convocatoria de la nueva Cámara", "Cinco años después de su elección o el día de la convocatoria de la nueva Cámara", "Cuatro años después de su elección o el día de la disolución de la Cámara", "Cinco años después de su elección o el día de la disolución de la Cámara"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 69.6 CE fija el mandato de los Senadores en cuatro años y lo hace terminar con la disolución de la Cámara, no con la convocatoria de la nueva. Las demás opciones alargan el mandato o cambian el hecho extintivo."
   },
   {
     "tema": 2,
     "pregunta": "Los Senadores se elegirán",
     "respuestas": ["Por sufragio nacional, libre, igual, directo o indirecto y secreto, en los términos que establece la ley", "Por sufragio nacional, libre, igual, directo y secreto, en los términos que señale una ley orgánica", "Por sufragio universal, libre, igual, directo o indirecto y secreto, en los términos que establece la ley", "Por sufragio universal, libre, igual, directo y secreto, en los términos que señale una ley orgánica"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 69.2 CE exige sufragio universal, libre, igual, directo y secreto y remite a una ley orgánica. No admite sufragio indirecto ni se remite a una ley ordinaria."
   },
   {
     "tema": 2,
     "pregunta": "El Defensor del Pueblo será elegido por un período de",
     "respuestas": ["4 años", "5 años", "6 años", "3 años"],
-    "respuesta_correcta": "a",
-    "explicacion": ""
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 2.1 de la Ley Orgánica 3/1981 establece que el Defensor del Pueblo es elegido por las Cortes Generales para un período de cinco años. Los plazos de tres, cuatro o seis años no coinciden con esa norma."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se regulará el funcionamiento del Tribunal Constitucional según el artículo 165 de la Constitución?",
     "respuestas": ["Mediante una ley orgánica", "Mediante Decreto-Ley", "Mediante su Reglamento de Régimen Interior", "Mediante una ley ordinaria"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 165 CE remite a una ley orgánica el funcionamiento del Tribunal Constitucional, el estatuto de sus miembros, el procedimiento y las condiciones para el ejercicio de las acciones. No basta un decreto-ley, un reglamento interno o una ley ordinaria."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos Adjuntos tiene el Defensor del Pueblo?",
     "respuestas": ["Cuatro", "Tres", "Seis", "Dos"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 8.1 de la Ley Orgánica 3/1981 dispone que el Defensor del Pueblo estará auxiliado por un Adjunto Primero y un Adjunto Segundo, es decir, dos Adjuntos. Las demás cifras no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "El Defensor del Pueblo será elegido por",
     "respuestas": ["El Congreso", "El Rey", "Las Cortes Generales", "El Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE y el artículo 2.1 de la Ley Orgánica 3/1981 atribuyen a las Cortes Generales la elección del Defensor del Pueblo. No lo eligen el Congreso, el Rey o el Gobierno por separado."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál de las siguientes no es una función de las Diputaciones Permanentes de las Cámaras?",
     "respuestas": ["En caso de que las Cámaras hubieran sido disueltas o hubiese expirado el mandato, debatir y aprobar un Decreto Ley", "Solicitar que las Cámaras se reúnan en sesión extraordinaria", "Velar por los poderes de las Cámaras cuando éstas se encuentre reunidas", "En caso de expiración del mandato de las Cámaras, autorizar la declaración del Estado de Excepción"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 78.2 CE atribuye a las Diputaciones Permanentes velar por los poderes de las Cámaras cuando éstas no estén reunidas. La opción que sitúa esa función durante las reuniones es la incorrecta; las demás describen actuaciones que la Diputación Permanente puede asumir en los supuestos de disolución o expiración del mandato."
   },
   {
     "tema": 2,
     "pregunta": "El Defensor del Pueblo deberá tomar posesión de su cargo ante",
     "respuestas": ["Las Mesas de ambas Cámaras, independientemente", "Las Mesas de ambas Cámaras, reunidas conjuntamente", "El Rey", "El Gobierno"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 4.2 de la Ley Orgánica 3/1981 exige que el Defensor del Pueblo tome posesión ante las Mesas de ambas Cámaras reunidas conjuntamente. No lo hace ante cada Mesa por separado, ante el Rey o ante el Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál es la Cámara de representación territorial?",
     "respuestas": ["El Senado, el Congreso y el Defensor del Pueblo", "El Senado", "El Congreso", "El Senado y el Congreso"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 69.1 CE define el Senado como la Cámara de representación territorial. El Congreso representa al pueblo español y el Defensor del Pueblo no es una Cámara."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 161.2 de la Constitución, ¿quién podrá impugnar ante el Tribunal Constitucional las disposiciones y resoluciones adoptadas por los órganos de las Comunidades Autónomas?",
     "respuestas": ["El Defensor del Pueblo", "El Tribunal Superior de Justicia de la Comunidad Autónoma", "El Gobierno", "El Rey"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 161.2 CE atribuye al Gobierno la impugnación ante el Tribunal Constitucional de disposiciones y resoluciones de los órganos de las Comunidades Autónomas. No corresponde al Defensor del Pueblo, al Tribunal Superior de Justicia o al Rey."
   },
   {
     "tema": 2,
     "pregunta": "¿Quién nombra a los miembros del Tribunal Constitucional?",
     "respuestas": ["El Congreso", "El Congreso y el Senado", "El Senado", "El Rey"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE dispone que los doce miembros del Tribunal Constitucional son nombrados por el Rey, a propuesta de los órganos que enumera. No los nombran directamente el Congreso, el Senado o ambos."
   },
   {
     "tema": 2,
     "pregunta": "El primer período de sesiones de las Cámaras corresponde de",
     "respuestas": ["Julio a Diciembre", "Septiembre a Diciembre", "Enero a Junio", "Febrero a Junio"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 73.1 CE fija el primer periodo ordinario de sesiones de septiembre a diciembre y el segundo de febrero a junio. Las demás fechas no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "El Presidente del Tribunal Constitucional será nombrado por un período de",
     "respuestas": ["Dos años, a propuesta del Tribunal en Pleno", "Nueve años, a propuesta del Tribunal en Pleno", "Tres años, a propuesta del Tribunal en Pleno", "Cuatro años, a propuesta del Tribunal en Pleno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 9.3 de la Ley Orgánica del Tribunal Constitucional establece que el Presidente se nombra por tres años a propuesta del Tribunal en Pleno. Los períodos de dos, cuatro o nueve años no corresponden a ese cargo."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál de las siguientes islas o agrupaciones elegirán tres Senadores?",
     "respuestas": ["Gran Canaria, Mallorca y Tenerife", "Gran Canaria, Mallorca y Menorca", "Gran Canaria, Mallorca, Menorca y Tenerife", "Gran Canaria, Tenerife y Fuerteventura"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 69.3 CE asigna tres Senadores a las islas mayores —Gran Canaria, Mallorca y Tenerife— y uno a las demás islas o agrupaciones. Las opciones que incluyen Menorca o Fuerteventura entre las de tres Senadores son incorrectas."
   },
   {
     "tema": 2,
     "pregunta": "Pronunciarse sobre la convalidación o derogación de los decretos leyes dictados por el Gobierno, está atribuido a",
     "respuestas": ["Específicamente al Congreso de los Diputados", "Al Congreso y Senado", "Al Senado", "Al Defensor del Pueblo"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 86.2 CE atribuye al Congreso de los Diputados el debate y votación de totalidad de los decretos-leyes, así como su convalidación o derogación. No corresponde al Senado, a ambas Cámaras o al Defensor del Pueblo."
   },
   {
     "tema": 2,
     "pregunta": "Para ratificar o levantar una disposición o resolución adoptada por los órganos de las Comunidades Autónomas e impugnada por el Gobierno, el Tribunal Constitucional dispone del plazo",
     "respuestas": ["No superior a 30 días", "No superior a un año", "No superior a tres meses", "No superior a cinco meses"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 161.2 CE concede al Tribunal Constitucional un plazo no superior a cinco meses para ratificar o levantar la suspensión de la disposición o resolución autonómica impugnada. Los demás plazos son incorrectos."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántas Salas hay en el Tribunal Constitucional?",
     "respuestas": ["Cuatro", "Dos", "Seis", "Tres"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 7.1 de la Ley Orgánica del Tribunal Constitucional organiza el Tribunal en dos Salas. No tiene tres, cuatro o seis Salas."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por las Cámaras?",
     "respuestas": ["Seis", "Dos", "Ocho", "Cuatro"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE atribuye cuatro miembros al Congreso y cuatro al Senado, de modo que las Cámaras proponen ocho de los doce. Las demás cifras no suman esa distribución."
   },
   {
     "tema": 2,
     "pregunta": "Entre las funciones de las Diputaciones Permanentes se encuentra",
     "respuestas": ["Velar por los poderes de las Cámaras durante toda la legislatura", "Velar por los poderes de las Cámaras incluso cuando éstas estén reunidas", "Velar por los poderes de la respectiva Diputación Permanente cuando éstas no estén reunidas", "Velar por los poderes de las Cámaras cuando éstas no estén reunidas"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 78.2 CE encomienda a la Diputación Permanente velar por los poderes de las Cámaras cuando éstas no estén reunidas. Las demás opciones amplían esa función a toda la legislatura, a los periodos de reunión o a la propia Diputación."
   },
   {
     "tema": 2,
     "pregunta": "Las sentencias del Tribunal Constitucional",
     "respuestas": ["Se publicarán en el boletín oficial del Estado con los votos particulares, si los Magistrados que los hayan realizado lo solicitan", "Se publicarán en el boletín oficial del Estado con los votos particulares, si los hubiere", "Se publicarán en el boletín oficial del Estado y en el boletín oficial del Tribunal Constitucional con los votos particulares, si los hubiere", "Se publicarán en el boletín oficial del Estado sin los votos particulares, aunque los hubiere"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 164.1 CE ordena publicar las sentencias del Tribunal Constitucional en el BOE con los votos particulares, si los hubiere. No exige solicitud de los magistrados ni una publicación adicional, y no permite ocultar los votos."
   },
   {
     "tema": 2,
     "pregunta": "La atribución de la declaración del estado de sitio y autorización de la declaración del estado de excepción y de la prórroga del estado de alarma declarado por el Gobierno corresponde a",
     "respuestas": ["El Senado", "El Congreso de los Diputados", "El Senado y el Defensor del Pueblo", "El Senado y el Congreso de los Diputados"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 116 CE atribuye al Congreso de los Diputados la declaración del estado de sitio, la autorización del estado de excepción y la prórroga del estado de alarma. El Senado no ejerce esas funciones."
   },
   {
     "tema": 2,
     "pregunta": "En el caso de incomparecencia a requerimiento de las Cámaras",
     "respuestas": ["Los Reglamentos de las Cámaras regularán las sanciones que puedan imponerse", "La ley regulará las sanciones que puedan imponerse", "Los Presidentes de las Cámaras regularán las sanciones que puedan imponerse", "Los jueces regularán las sanciones que puedan imponerse"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 76.2 CE establece que será obligatorio comparecer a requerimiento de las Cámaras y que la ley regulará las sanciones por incumplimiento. No remite la materia a los Reglamentos, a los Presidentes o a los jueces."
   },
   {
     "tema": 2,
     "pregunta": "Respecto las Comisiones de investigación",
     "respuestas": ["Sus conclusiones tomarán la forma de resoluciones judiciales", "Sus conclusiones no afectarán a las resoluciones judiciales", "Sus conclusiones afectarán a las resoluciones judiciales", "Sus conclusiones deberán vincular a las resoluciones judiciales"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 76.1 CE dispone que las conclusiones de las Comisiones de investigación no serán vinculantes para los Tribunales ni afectarán a las resoluciones judiciales. No adoptan forma de resolución judicial ni pueden condicionarlas."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras pueden recibir peticiones individuales y colectivas",
     "respuestas": ["Las Cámaras no pueden recibir peticiones colectivas", "Siempre por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas", "Oralmente o por escrito, siendo posible la presentación directa por manifestaciones ciudadanas", "Oralmente o por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 77.1 CE permite recibir peticiones individuales y colectivas, siempre por escrito, y prohíbe su presentación directa mediante manifestaciones ciudadanas. No admite la forma oral ni la presentación directa."
   },
   {
     "tema": 2,
     "pregunta": "A tenor del Reglamente del Congreso, el Orden del Día de las sesiones del Pleno será fijado por",
     "respuestas": ["Por la mesa del Congreso", "El Presidente, de acuerdo con la Junta de Portavoces", "Por la Junta de Portavoces", "Únicamente por el Presidente"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El Reglamento del Congreso atribuye al Presidente la fijación del orden del día de las sesiones del Pleno, de acuerdo con la Junta de Portavoces. No corresponde a la Mesa, a la Junta sola o al Presidente sin acuerdo."
   },
   {
     "tema": 2,
     "pregunta": "El Presidente de la Sala Segunda es",
     "respuestas": ["El Vicepresidente del Tribunal", "El Defensor del Pueblo", "El Presidente del Tribunal", "El Presidente del Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 7.2 de la Ley Orgánica del Tribunal Constitucional dispone que el Presidente preside la Sala Primera y el Vicepresidente la Sala Segunda. No la presiden el Defensor del Pueblo, el Presidente del Tribunal o el Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "En las elecciones al Senado,",
     "respuestas": ["En las provincias insulares, cada isla o agrupación de ellas, con Cabildo o Consejo Insular, constituirá una circunscripción a efectos de elección de Senadores", "Los territorios insulares constituirán una circunscripción a efectos de eleccion de Senadores", "En las provincias insulares, cada isla o agrupación de ellas, con Cabildo o Consejo Insular, constituirá una circunscripción a efectos de elección de Senadores, eligiendo cada una a tres Senadores", "En las provincias insulares, cada isla constituirá una circunscripción a efectos de elección de Senadores"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 69.3 CE convierte cada isla o agrupación con Cabildo o Consejo Insular en circunscripción, pero solo las islas mayores eligen tres Senadores. Por eso es incorrecto afirmar que todas eligen tres o que la circunscripción es todo el territorio insular."
   },
   {
     "tema": 2,
     "pregunta": "El Senado es elegido por",
     "respuestas": ["5 años", "6 años", "3 años", "4 años"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 69.6 CE fija en cuatro años el mandato del Senado. Los plazos de tres, cinco o seis años no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Cada Sala está compuesta por",
     "respuestas": ["Cuatro Magistrados cada una", "Seis Magistrados cada una", "Doce Magistrados cada una", "Ocho Magistrados cada una"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 7.1 de la Ley Orgánica del Tribunal Constitucional compone cada Sala con seis Magistrados. Las demás cifras no coinciden con esa composición."
   },
   {
     "tema": 2,
     "pregunta": "Las Comunidades Autónomas designarán",
     "respuestas": ["Un Senador y dos más por cada millón de habitantes de su territorio", "Dos Senadores y dos más por cada millón de habitantes de su territorio", "Un Senador y otro más por cada millón de habitantes de su territorio", "Dos Senadores y otro más por cada millón de habitantes de su territorio"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 69.5 CE atribuye a cada Comunidad Autónoma un Senador y otro más por cada millón de habitantes de su territorio. Las demás fórmulas añaden un Senador inicial o duplican esa base."
   },
   {
     "tema": 2,
     "pregunta": "En las elecciones al Congreso, dicha elección se verificará",
     "respuestas": ["En cada circunscripción atendiendo a criterios de representación proporcional", "En cada Comunidad Autónoma atendiendo a criterios de representación cualificada", "En cada Comunidad Autónoma atendiendo a criterios de representación proporcional", "En cada circunscripción atendiendo a criterios de representación cualificada"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 68.3 CE ordena verificar la elección en cada circunscripción atendiendo a criterios de representación proporcional. No se hace por Comunidad Autónoma ni con representación cualificada."
   },
   {
     "tema": 2,
     "pregunta": "Las Cortes Generales representan",
     "respuestas": ["Al Congreso de los Diputados y al Senado", "Al pueblo español", "Al Rey", "Al Defensor del Pueblo"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 66.1 CE declara que las Cortes Generales representan al pueblo español y están formadas por el Congreso y el Senado. No representan a las Cámaras, al Rey o al Defensor del Pueblo."
   },
   {
     "tema": 2,
     "pregunta": "En los casos de muerte, renuncia y expiración del plazo del mandato del Defensor del Pueblo, la vacante en el cargo se declarará por",
     "respuestas": ["Tres quintas partes de los componentes de cada Cámara", "Tres cuartas partes de los componentes de cada Cámara", "El Presidente del Congreso", "Dos tercios de los componentes de cada Cámara"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 5.2 de la Ley Orgánica 3/1981 atribuye al Presidente del Congreso declarar la vacante en los casos de muerte, renuncia y expiración del mandato. No se exige una mayoría cualificada de las Cámaras para esa declaración."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuándo termina el mandato de los Diputados?",
     "respuestas": ["6 años después de su elección o el día de la disolución de la Cámara", "4 años después de su elección o el día de la disolución de la Cámara", "4 años después de su elección o el día de la convocatoria de la nueva Cámara", "6 años después de su elección o el día de la convocatoria de la nueva Cámara"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.4 CE fija el mandato de los Diputados en cuatro años y lo hace terminar con la disolución de la Cámara, no con la convocatoria de la nueva. Las demás opciones alargan el plazo o cambian el hecho extintivo."
   },
   {
     "tema": 2,
     "pregunta": "Según la Constitución, los miembros del Tribunal Constitucional tendrán las incompatibilidades propias de",
     "respuestas": ["Los miembros del Gobierno", "Los altos cargos de la Administración General del Estado", "El Presidente del Gobierno", "Los miembros del poder judicial"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 159.4 CE remite, en lo demás, a las incompatibilidades de los miembros del poder judicial. No les aplica las del Gobierno, los altos cargos o el Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "El Tribunal Constitucional es competente para conocer",
     "respuestas": ["De los conflictos de competencia entre Comunidades Autónomas", "De los conflictos de competencia en los que esté implicado el Estado", "De los conflictos de competencia entre Provincias", "De los conflictos de competencia entre el Estado y las Comunidades Autónomas o de los de éstas entre sí"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 161.1.c CE atribuye al Tribunal Constitucional los conflictos de competencia entre el Estado y las Comunidades Autónomas o los de éstas entre sí. No los conflictos entre provincias ni solo los que impliquen al Estado."
   },
   {
     "tema": 2,
     "pregunta": "Respecto las Comisiones de investigación (2)",
     "respuestas": ["Sus conclusiones serán vinculantes para los Tribunales", "Sus conclusiones no serán vinculantes para los Tribunales", "Sus conclusiones deberán ser tenidas en cuenta por los Tribunales", "Sus conclusiones tomarán la forma de resoluciones judiciales"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 76.1 CE declara que las conclusiones de las Comisiones de investigación no serán vinculantes para los Tribunales. No deben ser tenidas en cuenta ni adoptan forma de resolución judicial."
   },
   {
     "tema": 2,
     "pregunta": "Las Diputaciones Permanentes de las Cámaras estarán compuestas por",
     "respuestas": ["Un mínimo de 21 miembros", "Un mínimo de 23 miembros", "Un máximo de 23 miembros", "Un máximo de 21 miembros"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 78.1 CE exige que cada Diputación Permanente tenga un mínimo de veintiún miembros. No fija un mínimo de veintitrés ni un máximo de veintiuno o veintitrés."
   },
   {
     "tema": 2,
     "pregunta": "El Tribunal Constitucional es competente para conocer (2)",
     "respuestas": ["Del recurso de inconstitucionalidad contra leyes y disposiciones normativas con fuerza de ley", "Del recurso de amparo contra leyes y disposiciones normativas con fuerza de ley", "Del recurso de amparo por violación de los derechos y libertades del Título I de la Constitución", "Del recurso de amparo y de inconstitucionalidad contra la violación de los derechos y libertades del Título I de la Constitución"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 161.1.a CE atribuye al Tribunal Constitucional el recurso de inconstitucionalidad contra leyes y disposiciones normativas con fuerza de ley. El amparo no se dirige genéricamente contra leyes ni alcanza todos los derechos del Título I."
   },
   {
     "tema": 2,
     "pregunta": "La ley reguladora de la Institución del Defensor del Pueblo es",
     "respuestas": ["Ley Orgánica 2/1980", "Ley Orgánica 3/1981", "Ley Orgánica 2/1981", "Ley Orgánica 3/1980"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "La institución del Defensor del Pueblo se regula por la Ley Orgánica 3/1981, de 6 de abril. Las otras combinaciones de número y año no corresponden a esa norma."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras se reunirán en sesión conjunta",
     "respuestas": ["Para nombrar a los miembros del Tribunal Constitucional", "Para aprobar las Leyes Orgánicas", "Para ejercer las competencias no legislativas que el Título II atribuye expresamente a las Cortes Generales", "Para ejercer las competencias legislativas que el Título II atribuye expresamente a las Cortes Generales"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 74.1 CE reserva las sesiones conjuntas al ejercicio de competencias no legislativas que el Título II atribuye expresamente a las Cortes Generales. No se usan para nombrar al Tribunal Constitucional o aprobar leyes orgánicas, ni para competencias legislativas."
   },
   {
     "tema": 2,
     "pregunta": "¿Quiénes son electores y elegibles al Congreso de los Diputados?",
     "respuestas": ["Todos los españoles que estén en pleno uso de sus derechos administrativos", "Todas las personas que estén en pleno uso de sus derechos políticos", "Todas las personas que estén en pleno uso de sus derechos administrativos", "Todos los españoles que estén en pleno uso de sus derechos políticos"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 68.5 CE declara electores y elegibles a todos los españoles que estén en pleno uso de sus derechos políticos. No se refiere a derechos administrativos ni alcanza a todas las personas."
   },
   {
     "tema": 2,
     "pregunta": "Vacante el cargo, se iniciará el procedimiento para el nombramiento de un nuevo Defensor del Pueblo en plazo",
     "respuestas": ["No superior a quince días", "No superior a tres meses", "No superior a un año", "No superior a un mes"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 5.3 de la Ley Orgánica 3/1981 ordena iniciar el procedimiento para nombrar nuevo Defensor en plazo no superior a un mes desde la vacante. Los demás plazos son incorrectos."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras podrán reunirse en sesiones extraordinarias a petición",
     "respuestas": ["Del Gobierno, de la Diputación Permanente, de sus respectivos Presidentes o de la mayoría absoluta de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de la mayoría absoluta de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de 3/5 partes de los miembros de cualquiera de las Cámaras", "Del Gobierno, de la Diputación Permanente o de la mayoría simple de los miembros de cualquiera de las Cámaras"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 73.2 CE permite solicitar sesiones extraordinarias al Gobierno, a la Diputación Permanente o a la mayoría absoluta de los miembros de cualquiera de las Cámaras. No incluye a los Presidentes ni se conforma con la mayoría simple o los tres quintos."
   },
   {
     "tema": 2,
     "pregunta": "A tenor del Reglamento del Senado, el Orden del Día de las sesiones del Pleno se fijan por",
     "respuestas": ["Por su Mesa, de acuerdo con la Junta de Portavoces", "El Presidente, de acuerdo con la Junta de Portavoces", "El Presidente, de acuerdo con la Mesa y oída la Junta de Portavoces", "Por su Mesa, de acuerdo con el Presidente"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El Reglamento del Senado atribuye al Presidente fijar el orden del día del Pleno, de acuerdo con la Mesa y oída la Junta de Portavoces. No lo fijan la Mesa sola, la Junta sola o el Presidente sin esos trámites."
   },
   {
     "tema": 2,
     "pregunta": "En caso de expirado el mandato o en caso de disolución de las Cámaras ¿hasta cuándo seguirán ejerciendo sus funciones las Diputaciones Permanentes?",
     "respuestas": ["Hasta cumplir los 4 años de legislatura", "Hasta la constitución del nuevo Gobierno", "Hasta la celebración de las nuevas elecciones", "Hasta la constitución de las nuevas Cortes Generales"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 78.3 CE prorroga las Diputaciones Permanentes hasta la constitución de las nuevas Cortes Generales. No hasta las elecciones, el nuevo Gobierno o el fin de la legislatura."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras podrán delegar la aprobación de proyectos y proposiciones de ley en",
     "respuestas": ["Las Comisiones Legislativas Permanentes y No Permanentes", "No pueden delegar la aprobación de proyectos y proposiciones de ley en las Comisiones", "Las Comisiones Legislativas Permanentes", "Cualquier Comisión"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 75.2 CE permite delegar la aprobación de proyectos y proposiciones de ley en las Comisiones Legislativas Permanentes. No en las no permanentes, en cualquier Comisión o en el Pleno."
   },
   {
     "tema": 2,
     "pregunta": "El Presidente del Tribunal Constitucional será nombrado por",
     "respuestas": ["La Junta de Portavoces", "Las Cortes Generales", "El Rey", "El Presidente del Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE y el artículo 9.3 de la Ley Orgánica del Tribunal Constitucional disponen que el Presidente del Tribunal es nombrado por el Rey, a propuesta del Pleno. No lo nombran la Junta de Portavoces, las Cortes o el Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Las Diputaciones Permanentes de las Cámaras estarán presididas por",
     "respuestas": ["Un miembro del Gobierno", "El Presidente de la Cámara respectiva", "El Diputado o Senador que sea elegido por la respectiva Diputación Permanente", "Uno de los miembros, mediante elección, de la Mesa de la Cámara respectiva"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 78.2 CE dispone que las Diputaciones Permanentes estén presididas por el Presidente de la Cámara respectiva. No por un miembro del Gobierno, un diputado elegido o un miembro de la Mesa."
   },
   {
     "tema": 2,
     "pregunta": "Las conclusiones de las Comisiones de investigación no serán vinculantes para los Tribunales, ni afectarán a las resoluciones judiciales",
     "respuestas": ["Sin perjuicio de que el resultado de la investigación sea comunicado al Ministro de Justicia para el ejercicio, en todo caso, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministerio Fiscal para el ejercicio, en todo caso, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministerio Fiscal para el ejercicio, cuando proceda, de las acciones oportunas", "Sin perjuicio de que el resultado de la investigación sea comunicado al Ministro de Justicia para el ejercicio, cuando proceda, de las acciones oportunas"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 76.1 CE precisa que las conclusiones no vinculan a los Tribunales, sin perjuicio de comunicar el resultado al Ministerio Fiscal para ejercer, cuando proceda, las acciones oportunas. No se remite al Ministro de Justicia ni se actúa en todo caso."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál es la circunscripción electoral en las elecciones al Congreso?",
     "respuestas": ["Las Comunidades Autónomas", "Los municipios", "La Provincia", "El Estado"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 68.2 CE establece la provincia como circunscripción electoral para el Congreso. No son los municipios, las Comunidades Autónomas o todo el Estado."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras pueden recibir peticiones",
     "respuestas": ["Exclusivamente individuales", "Exclusivamente colectivas", "Individuales, colectivas y mixtas", "Individuales y colectivas"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 77.1 CE permite a las Cámaras recibir peticiones individuales y colectivas. No las limita a una sola modalidad ni crea una categoría de peticiones mixtas."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos Senadores se elegirán en cada provincia?",
     "respuestas": ["Tres", "Dos", "Cuatro", "Uno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 69.2 CE elige cuatro Senadores en cada provincia. Las cifras de uno, dos o tres no corresponden a la regla general."
   },
   {
     "tema": 2,
     "pregunta": "Los miembros del Tribunal Constitucional serán designados por un período de",
     "respuestas": ["Seis años y se renovarán por terceras partes cada dos", "Seis años y se renovarán por mitades cada tres", "Ocho años y se renovarán por cuartas partes cada dos", "Nueve años y se renovarán por terceras partes cada tres"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 159.2 CE fija un mandato de nueve años y una renovación por terceras partes cada tres años. Las demás combinaciones de duración y renovación son incorrectas."
   },
   {
     "tema": 2,
     "pregunta": "El Defensor del Pueblo debe dar cuenta de la gestión realizada a",
     "respuestas": ["Las Cortes Generales, mensualmente", "Las Cortes Generales, semestralmente", "Las Cortes Generales, anualmente", "Las Cortes Generales, trimestralmente"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE y el artículo 32.1 de la Ley Orgánica 3/1981 obligan al Defensor del Pueblo a dar cuenta anualmente a las Cortes Generales. No mensual, semestral o trimestralmente."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuándo será convocado el Congreso de los Diputados?",
     "respuestas": ["Entre los 30 y 60 días siguientes a la celebración de las elecciones", "Dentro de los 25 días siguientes a la celebración de las elecciones", "Dentro de los 45 días siguientes a la celebración de las elecciones", "Dentro de los 30 días siguientes a la celebración de las elecciones"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.6 CE exige convocar el Congreso electo dentro de los veinticinco días siguientes a la celebración de las elecciones. Los plazos de 30, 45 o 60 días son incorrectos."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos miembros componen el Tribunal Constitucional?",
     "respuestas": ["Diez incluido el Presidente", "Diez", "Doce", "Veinte incluido el Presidente"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE compone el Tribunal Constitucional con doce miembros. No tiene diez o veinte, ni con o sin el Presidente."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuándo tendrán lugar las elecciones al Congreso de los Diputados?",
     "respuestas": ["En el plazo de 25 días desde la terminación del mandato", "En el plazo de 60 días desde la terminación del mandato", "Entre los 30 y 60 días desde la terminación del mandato", "Entre los 30 y 45 días desde la terminación del mandato"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 68.6 CE fija las elecciones entre los treinta y sesenta días desde la terminación del mandato. Los plazos de 25, 45 o 60 días como límite único no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "Los Diputados y Senadores percibirán una asignación que será fijada por",
     "respuestas": ["El Congreso de los Diputados", "El Senado, el Congreso y el Defensor del Pueblo", "El Rey", "Las respectivas Cámaras"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 71.4 CE dispone que los Diputados y Senadores perciban una asignación fijada por las respectivas Cámaras. No la fija el Congreso para ambos, el Rey o una institución ajena."
   },
   {
     "tema": 2,
     "pregunta": "Las sesiones extraordinarias de las Cámaras",
     "respuestas": ["Podrán convocarse sobre un orden del día determinado, con la única excepción de las sesiones secretas", "Deberán convocarse sobre un orden del día determinado, con la única excepción de las sesiones secretas", "Podrán convocarse sobre un orden del día determinado", "Deberán convocarse sobre un orden del día determinado"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 73.3 CE exige que las sesiones extraordinarias se convoquen sobre un orden del día determinado y se clausuren cuando se agote. No pueden convocarse sin ese orden ni con la excepción de las sesiones secretas."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos el Gobierno?",
     "respuestas": ["Ocho", "Seis", "Dos", "Cuatro"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE atribuye al Gobierno la propuesta de dos miembros del Tribunal Constitucional. Las cifras de cuatro, seis u ocho corresponden a otros proponentes o al total."
   },
   {
     "tema": 2,
     "pregunta": "Las poblaciones de Ceuta y Melilla estarán representadas por",
     "respuestas": ["2 diputados cada una", "1 diputado cada una", "3 diputados entre las dos", "1 diputado entre las dos"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.2 CE representa a Ceuta y Melilla con un Diputado cada una. No con dos cada una, tres entre ambas o uno entre las dos."
   },
   {
     "tema": 2,
     "pregunta": "¿Qué mayoría será necesario para las propuestas de los miembros del Tribunal Constitucional que corresponden al Congreso y al Senado?",
     "respuestas": ["Dos tercios para el Congreso y dos tercios para el Senado", "Dos tercios para el Congreso y tres quintos para el Senado", "Tres quintos para el Congreso y tres quintos para el Senado", "Tres quintos para el Congreso y dos tercios para el Senado"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE exige mayoría de tres quintos en el Congreso y en el Senado para proponer sus miembros del Tribunal Constitucional. No dos tercios en una u otra Cámara."
   },
   {
     "tema": 2,
     "pregunta": "Las sesiones conjuntas de las Cámaras, según el artículo 74, serán presididas por",
     "respuestas": ["El Presidente del Congreso", "El Rey", "El Senado", "El Defensor del Pueblo"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 74.1 CE dispone que las sesiones conjuntas de las Cámaras sean presididas por el Presidente del Congreso. No por el Rey, el Senado o el Defensor del Pueblo."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por el Senado?",
     "respuestas": ["Dos", "Ocho", "Cuatro", "Seis"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE atribuye al Senado la propuesta de cuatro miembros del Tribunal Constitucional. Las demás cifras no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "La Constitución Española dedica al Defensor del Pueblo el artículo",
     "respuestas": ["54", "55", "56", "53"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE regula la institución del Defensor del Pueblo. Los artículos 53, 55 y 56 regulan las garantías, la suspensión de derechos y la Corona."
   },
   {
     "tema": 2,
     "pregunta": "Las Diputaciones Permanentes de las Cámaras representarán",
     "respuestas": ["A los ciudadanos", "A los grupos parlamentarios, sin importar su proporción numérica", "A los grupos parlamentarios, en igualdad numérica", "A los grupos parlamentarios, en proporción a su importancia numérica"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 78.1 CE exige que la Diputación Permanente represente a los grupos parlamentarios en proporción a su importancia numérica. No en igualdad, sin atender a su proporción o a los ciudadanos directamente."
   },
   {
     "tema": 2,
     "pregunta": "Entre las atribuciones de las Cortes Generales se encuentra",
     "respuestas": ["La aprobación, modificación o derogación de Real Decreto", "La aprobación, modificación o derogación de la Ley Electoral", "La aprobación, modificación o derogación de la Constitución", "La aprobación, modificación o derogación de leyes orgánicas"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 66.2 CE atribuye a las Cortes Generales la potestad legislativa, que comprende aprobar, modificar o derogar leyes orgánicas. La Ley Electoral es una ley orgánica concreta, no la categoría general de la atribución; un real decreto corresponde al Gobierno y la Constitución tiene su propio procedimiento de reforma."
   },
   {
     "tema": 2,
     "pregunta": "¿Qué recurso cabe contra las sentencias del Tribunal Constitucional?",
     "respuestas": ["Recurso de alzada", "Recurso de súplica", "Recurso de casación", "Ninguno"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 164.1 CE dispone que contra las sentencias del Tribunal Constitucional no cabe recurso alguno. No proceden alzada, súplica o casación."
   },
   {
     "tema": 2,
     "pregunta": "El Congreso se compone de un mínimo de",
     "respuestas": ["300 diputados", "400 diputados", "250 diputados", "350 diputados"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 68.1 CE fija un mínimo de 300 Diputados y un máximo de 400. Las cifras de 250, 350 o 400 como mínimo no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "El Tribunal Constitucional tiene jurisdicción en",
     "respuestas": ["En la Comunidad Autónoma que corresponda", "Todo el territorio peninsular", "Todo el territorio español", "En la Provincia que corresponda"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El Tribunal Constitucional extiende su jurisdicción a todo el territorio español. No se limita a una Comunidad Autónoma, a la península o a una provincia."
   },
   {
     "tema": 2,
     "pregunta": "Las Cortes Generales están formadas por",
     "respuestas": ["El Senado y el Defensor del Pueblo", "El Congreso de los Diputados y el Senado", "El Congreso de los Diputados y el Defensor del Pueblo", "El Congreso de los Diputados, el Senado y el Defensor del Pueblo"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 66.1 CE forma las Cortes Generales con el Congreso de los Diputados y el Senado. El Defensor del Pueblo no forma parte de ellas."
   },
   {
     "tema": 2,
     "pregunta": "Las Cortes Generales son",
     "respuestas": ["Impenetrables", "Inviolables", "Incuestionables", "Inmutables"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 66.3 CE declara inviolables las Cortes Generales. No las califica de impenetrables, incuestionables o inmutables."
   },
   {
     "tema": 2,
     "pregunta": "¿En qué Título de la Constitución Española se recoge el Tribunal Constitucional?",
     "respuestas": ["Título VII", "Título IX", "Título VIII", "Título X"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El Tribunal Constitucional se regula en el Título IX CE (artículos 159 a 165). Los Títulos VII, VIII y X regulan otras materias."
   },
   {
     "tema": 2,
     "pregunta": "El Congreso es elegido por",
     "respuestas": ["6 años", "5 años", "4 años", "3 años"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 68.4 CE fija en cuatro años el mandato del Congreso. Los plazos de tres, cinco o seis años no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos miembros del Tribunal Constitucional son propuestos por el Congreso?",
     "respuestas": ["Ocho", "Seis", "Dos", "Cuatro"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE atribuye al Congreso la propuesta de cuatro miembros del Tribunal Constitucional. Las demás cifras corresponden a otros proponentes o al total."
   },
   {
     "tema": 2,
     "pregunta": "En caso de que las Cámaras deleguen en las Comisiones Legislativas Permanentes la aprobación de proyectos o proposiciones de ley",
     "respuestas": ["El Pleno no podrá recabar en cualquier momento el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación", "El Pleno podrá recabar en cualquier momento el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación", "Las Cámaras no pueden delegar la aprobación de proyectos o proposiciones de ley", "El Pleno no podrá recabar el debate y votación de cualquier proyecto o proposición de ley que haya sido objeto de esta delegación, excepto cuando esta delegación se haya realizado a una Comisión Legislativa No Permanente"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 75.2 CE permite que el Pleno recabe en cualquier momento el debate y votación de un proyecto o proposición delegado a una Comisión Legislativa Permanente. No se lo impide la delegación ni se limita a Comisiones no permanentes."
   },
   {
     "tema": 2,
     "pregunta": "La atribución de otorgar la confianza al candidato a la Presidencia del Gobierno corresponde a",
     "respuestas": ["El Congreso de los Diputados y Senado", "El Senado", "El Congreso de los Diputados", "El Defensor del Pueblo"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 99 CE atribuye al Congreso de los Diputados otorgar o negar la confianza al candidato a la Presidencia del Gobierno. No corresponde al Senado, a ambas Cámaras o al Defensor del Pueblo."
   },
   {
     "tema": 2,
     "pregunta": "A tenor del Reglamento del Congreso, el Orden del Día de las sesiones de las Comisiones del Congreso se establece por",
     "respuestas": ["Por el Presidente de la Cámara", "Únicamente por la mesa del Congreso", "Su respectiva Mesa, de acuerdo con el Presidente de la Cámara", "Por la Junta de Portavoces"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El Reglamento del Congreso atribuye a la Mesa de cada Comisión fijar su orden del día, de acuerdo con el Presidente de la Cámara. No lo fijan el Presidente solo, la Mesa del Congreso o la Junta de Portavoces."
   },
   {
     "tema": 2,
     "pregunta": "Respecto al derecho de sufragio de los españoles que se encuentren fuera del territorio español a las elecciones",
     "respuestas": ["La ley recomendará y el Estado facilitará su ejercicio", "La Constitución reconocerá y el Estado facilitará su ejercicio", "La ley reconocerá y el Estado facilitará su ejercicio", "La Constitución reconocerá y el Estado obligará a su ejercicio"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 68.5 CE dispone que la ley reconocerá y el Estado facilitará el ejercicio del sufragio a los españoles fuera del territorio. No lo reconoce directamente la Constitución ni se obliga a ejercerlo."
   },
   {
     "tema": 2,
     "pregunta": "El Congreso se compone de un máximo de",
     "respuestas": ["400 diputados", "300 diputados", "350 diputados", "450 diputados"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 68.1 CE fija un máximo de 400 Diputados. Las cifras de 300, 350 o 450 no corresponden a ese máximo."
   },
   {
     "tema": 2,
     "pregunta": "Las poblaciones de Ceuta y Melilla elegirán",
     "respuestas": ["Dos Senadores cada una", "Un Senador entre las dos", "Dos Senadores entre las dos", "Un Senador cada una"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 69.4 CE elige dos Senadores en Ceuta y dos en Melilla. No uno entre ambas, dos entre ambas o uno cada una."
   },
   {
     "tema": 2,
     "pregunta": "Para ser miembro del Tribunal Constitucional es necesario ser Jurista de reconocida competencia con",
     "respuestas": ["Más de 20 años de ejercicio profesional", "Más de 5 años de ejercicio profesional", "Más de 10 años de ejercicio profesional", "Más de 15 años de ejercicio profesional"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE exige ser jurista de reconocida competencia con más de quince años de ejercicio profesional. Los plazos de cinco, diez o veinte años no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "En las Cámaras habrá una Diputación Permanente",
     "respuestas": ["Para cada una de las Cámaras", "Conjunta", "Secreta", "Conjunta y Secreta"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 78.1 CE crea una Diputación Permanente en cada Cámara. No es conjunta, secreta o conjunta y secreta."
   },
   {
     "tema": 2,
     "pregunta": "El segundo período de sesiones de las Cámaras corresponde de",
     "respuestas": ["Julio a Diciembre", "Septiembre a Diciembre", "Febrero a Junio", "Enero a Junio"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 73.1 CE fija el segundo periodo ordinario de febrero a junio. Las demás fechas no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Las Cámaras se reunirán anualmente en",
     "respuestas": ["Dos periodos de sesiones", "Tres periodos de sesiones", "Seis periodos de sesiones", "Cuatro periodos de sesiones"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 73.1 CE establece dos periodos ordinarios de sesiones al año. No son tres, cuatro o seis."
   },
   {
     "tema": 2,
     "pregunta": "¿Quién elegirá a los Senadores designados por las Comunidades Autónomas?",
     "respuestas": ["La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan los Estatutos", "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan la ley", "La Asamblea legislativa exclusivamente, de acuerdo con lo que establezca la ley", "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, de acuerdo con lo que establezcan una ley ordinaria"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 69.5 CE atribuye la designación a la Asamblea Legislativa o, en su defecto, al órgano colegiado superior de la Comunidad, conforme a los Estatutos. No remite a la ley, a una ley ordinaria o exclusivamente a la Asamblea."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se distribuirá el número total de Diputados?",
     "respuestas": ["Conforme se recoge en el artículo 67 de la Constitución", "Mediante una ley", "Conforme se recoge en el artículo 66 de la Constitución", "Mediante un acuerdo"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.2 CE ordena que una ley distribuya el número total de Diputados. No se hace directamente por los artículos 66 o 67 ni por un simple acuerdo."
   },
   {
     "tema": 2,
     "pregunta": "El Presidente de la Sala Primera es",
     "respuestas": ["El Vicepresidente del Tribunal", "El Defensor del Pueblo", "El Presidente del Tribunal", "El Presidente del Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 7.2 de la Ley Orgánica del Tribunal Constitucional dispone que el Presidente preside la Sala Primera y el Vicepresidente la Sala Segunda. No la presiden el Defensor del Pueblo o el Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Los acuerdos de las Salas requerirán la presencia de",
     "respuestas": ["Tres cuartos de los miembros", "Tres quintos de los miembros", "La mitad de los miembros", "Dos tercios de los miembros"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 14 de la Ley Orgánica del Tribunal Constitucional exige la presencia de dos tercios de los miembros para adoptar acuerdos en las Salas. No basta la mitad, los tres quintos o los tres cuartos."
   },
   {
     "tema": 2,
     "pregunta": "En relación con las peticiones que reciban las Cámaras",
     "respuestas": ["Deben remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, siempre que las Cámaras lo exijan", "Deben remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, en todo caso", "Pueden remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, siempre que las Cámaras lo exijan", "Pueden remitirlas al Gobierno, y este está obligado a explicarse sobre su contenido, en todo caso"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 77.2 CE permite a las Cámaras remitir peticiones al Gobierno, que está obligado a explicarse sobre su contenido siempre que las Cámaras lo exijan. No es una remisión obligatoria ni una explicación en todo caso."
   },
   {
     "tema": 2,
     "pregunta": "A requerimiento de las Cámaras",
     "respuestas": ["No será obligatorio comparecer, a excepción de una resolución judicial", "Será obligatorio comparecer con asistencia de un Letrado", "Será recomendable comparecer", "Será obligatorio comparecer"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 76.2 CE declara obligatorio comparecer a requerimiento de las Cámaras. No exige resolución judicial, letrado o una simple recomendación."
   },
   {
     "tema": 2,
     "pregunta": "La Asamblea Legislativa o, en su defecto, el órgano colegiado superior de la Comunidad Autónoma, designarán un Senador y otro más por cada millón de habitantes, de acuerdo con lo que establezcan los Estatutos",
     "respuestas": ["Que asegurarán, de manera proporcional, la adecuada representación territorial", "Que asegurarán, de manera recomendada, la adecuada representación territorial", "Que asegurarán, en todo caso, la adecuada representación territorial", "Que asegurarán, en todo caso, la adecuada representación proporcional"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 69.5 CE exige que los Estatutos aseguren en todo caso la adecuada representación proporcional. No una representación territorial, recomendada o simplemente proporcional y territorial a la vez."
   },
   {
     "tema": 2,
     "pregunta": "Según la Constitución Española, las sentencias del Tribunal Constitucional tienen el valor de cosa juzgada a partir",
     "respuestas": ["De la fecha que se indique en cada sentencia", "Del día siguiente a su publicación en el BOE", "Del mismo día de su publicación en el BOE", "De los quince días siguientes a su publicación en el BOE"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 164.1 CE atribuye valor de cosa juzgada a las sentencias del Tribunal Constitucional desde el día siguiente a su publicación en el BOE. No desde el mismo día, desde una fecha fijada en la sentencia o tras quince días."
   },
   {
     "tema": 2,
     "pregunta": "Los Diputados serán elegidos",
     "respuestas": ["Por sufragio nacional, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio nacional, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.1 CE exige sufragio universal, libre, igual, directo y secreto para elegir a los Diputados y remite su regulación a la ley. No admite sufragio indirecto ni un sufragio nacional distinto del universal."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 159 de la Constitución Española, el Tribunal Constitucional se compone de:",
     "respuestas": ["Doce miembros nombrados por el Rey; de ellos, tres serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Doce miembros nombrados por el Rey; de ellos, cuatro serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Dieciséis miembros nombrados por el Rey; de ellos, cuatro serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Dieciséis miembros nombrados por el Rey; de ellos, tres serán a propuesta del Congreso por mayoría de tres quintos de sus miembros."],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 159.1 CE compone el Tribunal con doce miembros y atribuye cuatro al Congreso, elegidos por mayoría de tres quintos. Las opciones con dieciséis miembros o tres propuestos por el Congreso no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 68 de la Constitución Española, indique de cuántos diputados se compone el Congreso:",
     "respuestas": ["De un mínimo de 250 y de un máximo de 350.", "De un mínimo de 300 y de un máximo de 400.", "De un mínimo de 300 y de un máximo de 350.", "De un mínimo de 350 y de un máximo de 400."],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 68.1 CE fija el Congreso entre 300 y 400 Diputados. Los demás intervalos no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según se expone en el artículo 113 de la Constitución Española, la moción de censura deberá ser propuesta por:",
     "respuestas": ["Al menos la décima parte de los Diputados.", "Al menos un veinte por ciento de los Diputados.", "Al menos la décima parte de cada una de las Cámaras.", "Al menos 20 Diputados y 20 Senadores."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 113.2 CE exige que la moción de censura sea propuesta por al menos la décima parte de los Diputados. No por un veinte por ciento, por cada Cámara o por una mezcla de Diputados y Senadores."
   },
   {
     "tema": 2,
     "pregunta": "Según lo establecido en el artículo 82 de la Constitución Española, cuando se trate de refundir varios textos legales en uno solo, la delegación legislativa de las Cortes Generales en el Gobierno deberá otorgarse mediante:",
     "respuestas": ["Una Ley de Bases.", "Una Ley Orgánica.", "Una Ley Ordinaria.", "Un Decreto Legislativo."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 82.2 CE exige una ley ordinaria cuando la delegación tenga por objeto refundir varios textos legales en uno solo. La ley de bases se reserva a los textos articulados, y no se acude a una ley orgánica o a un decreto legislativo para otorgar la delegación."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 68 de la CE, ¿cuál es la circunscripción electoral en nuestro sistema electoral?",
     "respuestas": ["La provincia.", "El municipio.", "La Comunidad Autónoma.", "Distrito Municipal."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 68.2 CE establece la provincia como circunscripción electoral. No el municipio, la Comunidad Autónoma o el distrito municipal."
   },
   {
     "tema": 2,
     "pregunta": "De acuerdo con el artículo 78 de la CE, expirado el mandato de las Cortes Generales o en caso de disolución de las mismas, las Diputaciones Permanentes seguirán ejerciendo sus funciones hasta:",
     "respuestas": ["La celebración de las elecciones.", "La proclamación de los resultados electorales definitivos.", "La elección de los nuevos presidentes de cada una de las Cámaras de las Cortes Generales.", "La constitución de las nuevas Cortes Generales."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 78.3 CE prorroga las Diputaciones Permanentes hasta la constitución de las nuevas Cortes Generales. No hasta las elecciones, los resultados o la elección de los presidentes de las Cámaras."
   },
   {
     "tema": 2,
     "pregunta": "La CE regula la institución del Defensor del Pueblo como:",
     "respuestas": ["Alto comisionado del Congreso de los Diputados.", "Alto comisionado de las Cortes Generales.", "Alto comisionado del Poder judicial.", "Alto comisionado del Gobierno de la nación."],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE define al Defensor del Pueblo como alto comisionado de las Cortes Generales. No del Congreso, del Poder Judicial o del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "¿Quién puede ser elegido Defensor del Pueblo, según la Ley Orgánica 3/1981, de 6 de abril?",
     "respuestas": ["Cualquier Magistrado elegido por las Cortes Generales.", "Cualquier Senador elegido por las Cortes Generales.", "Cualquier persona que se encuentre en el pleno disfrute de sus derechos civiles.", "Cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos civiles y políticos."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 3 de la Ley Orgánica 3/1981 exige ser español, mayor de edad y estar en pleno disfrute de los derechos civiles y políticos. No basta con ser magistrado o senador ni con los solos derechos civiles."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 71 de la Constitución Española de 1978, ¿quién es el competente en las causas contra Diputados y Senadores?",
     "respuestas": ["Sala de lo Penal del Tribunal Constitucional.", "Sala de lo Contencioso Administrativo del Tribunal Supremo.", "Sala de lo Penal del Tribunal Supremo.", "Sala de lo Civil del Tribunal Supremo."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 71.3 CE atribuye a la Sala de lo Penal del Tribunal Supremo la competencia en las causas contra Diputados y Senadores. No corresponde al Tribunal Constitucional, a la Sala de lo Contencioso o a la Sala de lo Civil."
   },
   {
     "tema": 2,
     "pregunta": "Según el Título III \"De las Cortes Generales\" de la Constitución Española de 1978, las Cámaras podrán:",
     "respuestas": ["Recibir peticiones individuales y colectivas, siempre por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas.", "Delegar en las Comisiones Legislativas Permanentes la aprobación de proyectos o proposiciones de ley relativas a los Presupuestos Generales del Estado.", "Reunirse en sesión extraordinaria a petición de la mayoría simple de los miembros de cualquiera de las Cámaras.", "Nombrar conjuntamente Comisiones de Investigación sobre asuntos de interés público. Sus conclusiones serán vinculantes para los Tribunales."],
     "respuesta_correcta": "a",
-    "explicacion": "La opción B es la única correcta porque reproduce literalmente el artículo 77.1 de la Constitución Española, el cual exige que las peticiones a las Cámaras sean siempre por escrito y prohíbe expresamente su presentación directa mediante manifestaciones.\nPor el contrario, la opción A es falsa porque el artículo 75.3 excluye a los Presupuestos Generales del Estado de la delegación en Comisiones Legislativas Permanentes.\nLa opción C falla porque el artículo 76.1 establece que las conclusiones de las Comisiones de Investigación no serán vinculantes para los Tribunales.\nFinalmente, la opción D es errónea porque el artículo 73.2 requiere la petición de la mayoría absoluta de los miembros de la Cámara para celebrar sesiones extraordinarias, no simple."
+    "explicacion": "El artículo 77.1 CE permite recibir peticiones individuales y colectivas siempre por escrito y prohíbe su presentación directa mediante manifestaciones. Las demás opciones son incorrectas: no se pueden delegar los Presupuestos, las sesiones extraordinarias exigen mayoría absoluta y las conclusiones de investigación no vinculan a los Tribunales."
   },
   {
     "tema": 2,
     "pregunta": "Según lo establecido en el artículo 159 de la Constitución Española de 1978, los miembros del Tribunal Constitucional serán designados por períodos de:",
     "respuestas": ["9 años y se renovarán por terceras partes cada 3.", "9 años y se renovarán por terceras partes cada 2.", "6 años y se renovarán por terceras partes cada 3.", "6 años y se renovarán por terceras partes cada 2."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 159.2 CE fija un mandato de nueve años y una renovación por terceras partes cada tres años. Las demás combinaciones de duración y renovación no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "La Constitución Española de 1978 en su artículo 113 establece que:",
     "respuestas": ["El Congreso de los Diputados puede exigir la responsabilidad jurídica del Gobierno mediante la adopción por mayoría absoluta de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad política del Gobierno mediante la adopción por mayoría simple de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad civil del Gobierno mediante la adopción por mayoría absoluta de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad política del Gobierno mediante la adopción por mayoría absoluta de la moción de censura."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 113.1 CE permite al Congreso exigir la responsabilidad política del Gobierno mediante la moción de censura, que se adopta por mayoría absoluta. No se exige responsabilidad jurídica o civil ni basta la mayoría simple."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuál de las siguientes afirmaciones sobre la Diputación Permanente es correcta, según el artículo 78 de la Constitución Española de 1978?",
     "respuestas": ["Cada Cámara contará con una Diputación Permanente de al menos quince miembros, elegidos por sufragio directo de entre los parlamentarios de cada grupo.", "La Diputación Permanente del Congreso será presidida por el Presidente del Senado, y la del Senado por el Presidente del Congreso.", "En cada Cámara habrá una Diputación Permanente compuesta de un mínimo de veintiún miembros, que representarán a los grupos parlamentarios en proporción a su importancia numérica.", "La Diputación Permanente solo puede ejercer sus funciones durante los períodos entre sesiones ordinarias, quedando suspendidas en caso de disolución de las Cámaras."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 78.1 CE exige una Diputación Permanente de al menos veintiún miembros que representen a los grupos parlamentarios en proporción a su importancia numérica. No se elige por sufragio directo, no la presiden los presidentes de la otra Cámara y no queda suspendida con la disolución."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuáles son las funciones que el artículo 66 de la Constitución Española de 1978 atribuye directamente a las Cortes Generales?",
     "respuestas": ["Ejercer la potestad legislativa del Estado, aprobar los Presupuestos y controlar la acción del Gobierno.", "Elegir al Presidente del Gobierno, aprobar los Presupuestos y ratificar los tratados internacionales.", "Dictar decretos-leyes, aprobar los Presupuestos y controlar la acción del Gobierno.", "Ejercer la potestad legislativa del Estado, nombrar al Defensor del Pueblo y elegir a los magistrados del Tribunal Supremo."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 66.2 CE atribuye a las Cortes Generales la potestad legislativa, la aprobación de los Presupuestos y el control de la acción del Gobierno. No les atribuye directamente elegir al Presidente, dictar decretos-leyes o nombrar magistrados del Tribunal Supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según establece el artículo 99 de la Constitución Española de 1978 que regula el proceso de investidura del Presidente del Gobierno, ¿qué mayoría se exige en la primera votación?",
     "respuestas": ["Mayoría simple del Congreso de los Diputados.", "Mayoría absoluta del Congreso de los Diputados.", "Mayoría absoluta del Senado.", "Mayoría de dos tercios del Congreso de los Diputados."],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 99.3 CE exige mayoría absoluta del Congreso en la primera votación de investidura. La mayoría simple se aplica en la segunda, no en la primera; el Senado y los dos tercios no intervienen en esa votación."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se denomina el Título III de la Constitución Española?",
     "respuestas": ["De las Cortes Generales", "De las relaciones entre el Gobierno y las Cortes Generales", "Del Gobierno y la Administración", "De la Corona"],
     "respuesta_correcta": "a",
-    "explicacion": "El Título III (artículos 66 a 96) se titula «De las Cortes Generales»."
+    "explicacion": "El Título III CE se titula «De las Cortes Generales» y comprende los artículos 66 a 96. Los demás títulos regulan otras materias."
   },
   {
     "tema": 2,
     "pregunta": "¿Qué artículos de la Constitución comprende el Título III?",
     "respuestas": ["Del 56 al 65", "Del 66 al 80", "Del 66 al 96", "Del 97 al 107"],
     "respuesta_correcta": "c",
-    "explicacion": "El Título III «De las Cortes Generales» comprende los artículos 66 a 96."
+    "explicacion": "El Título III CE comprende los artículos 66 a 96. Los tramos 56-65, 66-80 y 97-107 corresponden a la Corona, al primer capítulo y al Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "¿Cuántos capítulos integran el Título III de la Constitución?",
     "respuestas": ["Tres", "Cinco", "Cuatro", "Dos"],
     "respuesta_correcta": "a",
-    "explicacion": "El Título III se divide en tres capítulos: I, II y III."
+    "explicacion": "El Título III CE se divide en tres capítulos: I (De las Cámaras), II (De la elaboración de las leyes) y III (De los tratados internacionales). No tiene dos, cuatro o cinco."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se titula el Capítulo I del Título III?",
     "respuestas": ["De las Cámaras", "De la elaboración de las leyes", "De los tratados internacionales", "De las Cortes Generales"],
     "respuesta_correcta": "a",
-    "explicacion": "El Capítulo I del Título III se titula «De las Cámaras» (artículos 66 a 80)."
+    "explicacion": "El Capítulo I del Título III se titula «De las Cámaras» (artículos 66 a 80). Las demás denominaciones corresponden a otros capítulos o títulos."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se titula el Capítulo II del Título III?",
     "respuestas": ["Del Gobierno y la Administración", "De la elaboración de las leyes", "De los tratados internacionales", "De las Cámaras"],
     "respuesta_correcta": "b",
-    "explicacion": "El Capítulo II del Título III se titula «De la elaboración de las leyes» (artículos 81 a 92)."
+    "explicacion": "El Capítulo II del Título III se titula «De la elaboración de las leyes» (artículos 81 a 92). No es el Gobierno ni los tratados."
   },
   {
     "tema": 2,
     "pregunta": "¿Cómo se titula el Capítulo III del Título III?",
     "respuestas": ["De las Cámaras", "De las relaciones internacionales", "De la elaboración de las leyes", "De los tratados internacionales"],
     "respuesta_correcta": "d",
-    "explicacion": "El Capítulo III del Título III se titula «De los tratados internacionales» (artículos 93 a 96)."
+    "explicacion": "El Capítulo III del Título III se titula «De los tratados internacionales» (artículos 93 a 96). Las demás opciones corresponden a otros capítulos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 67.1 de la Constitución, ¿con qué acta no se puede acumular el acta de una Asamblea de Comunidad Autónoma?",
     "respuestas": ["Con la de concejal", "Con la de Diputado al Congreso", "Con la de Senador", "Con la de Diputado al Parlamento Europeo"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 67.1 CE prohíbe acumular el acta de una Asamblea de Comunidad Autónoma con la de Diputado al Congreso."
+    "explicacion": "El artículo 67.1 CE prohíbe acumular el acta de una Asamblea de Comunidad Autónoma con la de Diputado al Congreso. No la prohíbe con la de concejal, Senador o Diputado al Parlamento Europeo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 67.2 de la Constitución, los miembros de las Cortes Generales:",
     "respuestas": ["Estarán ligados por mandato imperativo", "No estarán ligados por mandato imperativo", "Representarán únicamente a su circunscripción", "Deberán seguir las instrucciones de su grupo parlamentario"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 67.2 CE establece que los miembros de las Cortes Generales no estarán ligados por mandato imperativo."
+    "explicacion": "El artículo 67.2 CE establece que los miembros de las Cortes Generales no estarán ligados por mandato imperativo. No representan solo a su circunscripción ni deben seguir instrucciones de su grupo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 68.2 de la Constitución, la ley distribuirá el número total de Diputados asignando:",
     "respuestas": ["Una representación proporcional al número de municipios de cada provincia", "Una representación mínima inicial a cada circunscripción y distribuyendo los demás en proporción a la población", "Una representación igual a cada provincia, con independencia de la población", "Una representación mínima de dos Diputados por provincia y el resto a partes iguales"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 68.2 CE ordena asignar una representación mínima inicial a cada circunscripción y distribuir el resto en proporción a la población."
+    "explicacion": "El artículo 68.2 CE ordena asignar una representación mínima inicial a cada circunscripción y distribuir los demás Diputados en proporción a la población. No se atiende al número de municipios ni se reparte por igual."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 69.2 de la Constitución, los Senadores de cada provincia se eligen por:",
     "respuestas": ["Los concejales de los municipios de la provincia", "Las Asambleas Legislativas de las Comunidades Autónomas", "Todos los españoles residentes en la provincia", "Los votantes de cada una de ellas"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 69.2 CE dispone que los Senadores se eligen por los votantes de cada provincia."
+    "explicacion": "El artículo 69.2 CE elige a los Senadores por los votantes de cada provincia. No por los concejales, las Asambleas Legislativas o todos los residentes sin derecho de sufragio."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 69.3 de la Constitución, ¿cuál de las siguientes islas elige un solo Senador?",
     "respuestas": ["Mallorca", "Tenerife", "Menorca", "Gran Canaria"],
     "respuesta_correcta": "c",
-    "explicacion": "Menorca elige un Senador; Mallorca, Tenerife y Gran Canaria eligen tres Senadores cada una."
+    "explicacion": "El artículo 69.3 CE asigna un Senador a Menorca; Mallorca, Tenerife y Gran Canaria eligen tres cada una. Por eso Menorca es la única de las citadas con un solo Senador."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 70.1 de la Constitución, ¿cuál de los siguientes colectivos está incluido en las causas de inelegibilidad e incompatibilidad de los Diputados y Senadores?",
     "respuestas": ["Los profesores universitarios", "Los funcionarios públicos jubilados", "Los miembros del Gobierno", "Los militares profesionales y miembros de las Fuerzas y Cuerpos de Seguridad y Policía en activo"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 70.1.e) CE incluye a los militares profesionales y miembros de las Fuerzas y Cuerpos de Seguridad y Policía en activo; los miembros del Gobierno están expresamente excluidos."
+    "explicacion": "El artículo 70.1.e CE incluye a los militares profesionales y a los miembros de las Fuerzas y Cuerpos de Seguridad y Policía en activo. Los profesores universitarios y los funcionarios jubilados no figuran, y los miembros del Gobierno están expresamente exceptuados."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 70.2 de la Constitución, la validez de las actas y credenciales de los miembros de ambas Cámaras está sometida a:",
     "respuestas": ["Control del Presidente de la Cámara respectiva", "Control de la Junta Electoral Central", "Control judicial, en los términos que establezca la ley electoral", "Control del Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 70.2 CE somete la validez de las actas y credenciales al control judicial, en los términos de la ley electoral."
+    "explicacion": "El artículo 70.2 CE somete la validez de las actas y credenciales al control judicial, en los términos de la ley electoral. No al Presidente de la Cámara, a la Junta Electoral Central o al Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 71.1 de la Constitución, los Diputados y Senadores gozan de inviolabilidad por:",
     "respuestas": ["Los actos realizados en el ejercicio de sus funciones", "Las votaciones que realicen en las Cámaras", "Las opiniones manifestadas en el ejercicio de sus funciones", "Los delitos cometidos en cualquier momento"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 71.1 CE reconoce la inviolabilidad por las opiniones manifestadas en el ejercicio de las funciones parlamentarias."
+    "explicacion": "El artículo 71.1 CE protege con inviolabilidad las opiniones manifestadas en el ejercicio de las funciones parlamentarias. No cubre los votos, los delitos cometidos en cualquier momento o los actos ajenos a la función."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 71.2 de la Constitución, durante el período de su mandato los Diputados y Senadores sólo podrán ser detenidos en caso de:",
     "respuestas": ["Flagrante delito", "Delito grave", "Delito cometido en el ejercicio de sus funciones", "Delito doloso"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 71.2 CE permite la detención de Diputados y Senadores únicamente en caso de flagrante delito."
+    "explicacion": "El artículo 71.2 CE permite detener a Diputados y Senadores durante su mandato solo en caso de flagrante delito. No basta un delito grave, doloso o cometido en el ejercicio de funciones."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 71.2 de la Constitución, para inculpar o procesar a un Diputado o Senador se requiere:",
     "respuestas": ["La autorización del Ministerio Fiscal", "La autorización del Presidente del Gobierno", "La autorización del Tribunal Supremo", "La previa autorización de la Cámara respectiva"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 71.2 CE exige la previa autorización de la Cámara respectiva para inculpar o procesar a un Diputado o Senador."
+    "explicacion": "El artículo 71.2 CE exige la previa autorización de la Cámara respectiva para inculpar o procesar a un Diputado o Senador. No la concede el Ministerio Fiscal, el Presidente del Gobierno o el Tribunal Supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 72.1 de la Constitución, los Reglamentos de las Cámaras y su reforma serán sometidos a una votación final sobre su totalidad que requerirá:",
     "respuestas": ["La mayoría simple", "La mayoría absoluta", "La mayoría de dos tercios", "Los tres quintos"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 72.1 CE exige mayoría absoluta en la votación final sobre la totalidad de los Reglamentos y su reforma."
+    "explicacion": "El artículo 72.1 CE exige mayoría absoluta en la votación final sobre la totalidad de los Reglamentos de las Cámaras y su reforma. No basta la mayoría simple ni se exigen dos tercios o tres quintos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 72.2 de la Constitución, las sesiones conjuntas de las Cámaras se regirán por:",
     "respuestas": ["El Reglamento del Congreso de los Diputados", "El Reglamento del Senado", "Un Reglamento de las Cortes Generales aprobado por mayoría absoluta de cada Cámara", "Un acuerdo conjunto de las Mesas de ambas Cámaras"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 72.2 CE remite las sesiones conjuntas a un Reglamento de las Cortes Generales aprobado por mayoría absoluta de cada Cámara."
+    "explicacion": "El artículo 72.2 CE remite las sesiones conjuntas a un Reglamento de las Cortes Generales aprobado por mayoría absoluta de cada Cámara. No se aplican los Reglamentos del Congreso o del Senado ni un simple acuerdo de las Mesas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 72.3 de la Constitución, los Presidentes de las Cámaras ejercen en nombre de las mismas:",
     "respuestas": ["La representación del Estado en el exterior", "La potestad legislativa en caso de urgencia", "El mando supremo de las Fuerzas Armadas", "Todos los poderes administrativos y facultades de policía en el interior de sus respectivas sedes"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 72.3 CE atribuye a los Presidentes de las Cámaras los poderes administrativos y facultades de policía en el interior de sus sedes."
+    "explicacion": "El artículo 72.3 CE atribuye a los Presidentes de las Cámaras los poderes administrativos y facultades de policía en el interior de sus sedes. No la representación exterior, la potestad legislativa de urgencia o el mando supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 74.2 de la Constitución, las decisiones de las Cortes Generales previstas en los artículos 94.1, 145.2 y 158.2 se adoptan por:",
     "respuestas": ["Mayoría simple del Senado", "Mayoría de tres quintos de cada Cámara", "Mayoría absoluta del Congreso", "Mayoría de cada una de las Cámaras"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 74.2 CE exige la mayoría de cada una de las Cámaras para esas decisiones."
+    "explicacion": "El artículo 74.2 CE exige la mayoría de cada una de las Cámaras para las decisiones de los artículos 94.1, 145.2 y 158.2. No la mayoría simple del Senado, los tres quintos o la mayoría absoluta del Congreso."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 74.2 de la Constitución, si no hay acuerdo entre Senado y Congreso en las decisiones de los artículos 94.1, 145.2 y 158.2, se intentará obtener mediante:",
     "respuestas": ["Una votación conjunta de ambas Cámaras", "Una Comisión Mixta presidida por el Rey", "Una Comisión Mixta compuesta de igual número de Diputados y Senadores", "Una Comisión de expertos nombrada por el Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 74.2 CE prevé una Comisión Mixta paritaria de Diputados y Senadores para superar el desacuerdo."
+    "explicacion": "El artículo 74.2 CE prevé una Comisión Mixta compuesta de igual número de Diputados y Senadores para superar el desacuerdo. No una votación conjunta, una comisión presidida por el Rey o una comisión de expertos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 74.2 de la Constitución, si la Comisión Mixta no logra un texto aprobado por ambas Cámaras, decide:",
     "respuestas": ["El Congreso por mayoría absoluta", "El Rey", "El Congreso por mayoría simple", "El Senado por mayoría absoluta"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 74.2 CE atribuye la decisión final al Congreso por mayoría absoluta."
+    "explicacion": "El artículo 74.2 CE atribuye la decisión final al Congreso por mayoría absoluta si la Comisión Mixta no logra un texto aprobado por ambas Cámaras. No decide el Rey, el Senado o el Congreso por mayoría simple."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 75.3 de la Constitución, quedan exceptuados de la delegación en Comisiones Legislativas Permanentes:",
     "respuestas": ["Ninguna materia: la delegación es siempre posible", "Solo la reforma constitucional y los Presupuestos Generales del Estado", "La reforma constitucional, las cuestiones internacionales, las leyes orgánicas y de bases y los Presupuestos Generales del Estado", "Solo las leyes orgánicas y los tratados internacionales"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 75.3 CE excluye de la delegación la reforma constitucional, las cuestiones internacionales, las leyes orgánicas y de bases y los Presupuestos Generales del Estado."
+    "explicacion": "El artículo 75.3 CE excluye de la delegación en Comisiones Legislativas Permanentes la reforma constitucional, las cuestiones internacionales, las leyes orgánicas y de bases y los Presupuestos Generales del Estado. Las demás opciones omiten materias o amplían indebidamente la delegación."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 78.2 de la Constitución, ¿en qué casos las Diputaciones Permanentes asumen las facultades que correspondan a las Cámaras de acuerdo con los artículos 86 y 116?",
     "respuestas": ["Cuando las Cámaras estén reunidas en período ordinario de sesiones", "Cuando el Gobierno declare el estado de alarma", "Cuando las Cámaras hubieren sido disueltas o hubiere expirado su mandato", "Cuando lo solicite la mayoría absoluta del Senado"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 78.2 CE permite a las Diputaciones Permanentes asumir esas facultades si las Cámaras han sido disueltas o ha expirado su mandato."
+    "explicacion": "El artículo 78.2 CE permite a las Diputaciones Permanentes asumir las facultades de los artículos 86 y 116 cuando las Cámaras han sido disueltas o ha expirado su mandato. No cuando están reunidas, solo por estado de alarma o a petición del Senado."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 78.4 de la Constitución, reunida la Cámara correspondiente, la Diputación Permanente:",
     "respuestas": ["Se disolverá automáticamente", "Dará cuenta de los asuntos tratados y de sus decisiones", "Será sustituida por una Comisión Mixta", "Continuará ejerciendo sus funciones hasta las siguientes elecciones"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 78.4 CE obliga a la Diputación Permanente a dar cuenta de los asuntos tratados y de sus decisiones."
+    "explicacion": "El artículo 78.4 CE obliga a la Diputación Permanente a dar cuenta de los asuntos tratados y de sus decisiones cuando se reúne la Cámara. No se disuelve automáticamente, no la sustituye una Comisión Mixta y no prolonga sus funciones hasta las siguientes elecciones."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 79.1 de la Constitución, para adoptar acuerdos las Cámaras deben estar reunidas reglamentariamente y con asistencia de:",
     "respuestas": ["La mayoría de sus miembros", "La mayoría absoluta de sus miembros", "Al menos veintiún miembros", "Dos tercios de sus miembros"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 79.1 CE exige la asistencia de la mayoría de los miembros de la Cámara."
+    "explicacion": "El artículo 79.1 CE exige que las Cámaras estén reunidas reglamentariamente y con asistencia de la mayoría de sus miembros para adoptar acuerdos. No la mayoría absoluta, veintiún miembros o dos tercios."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 79.3 de la Constitución, el voto de Senadores y Diputados es:",
     "respuestas": ["Secreto y delegable", "Personal e indelegable", "Público y delegable", "Personal y delegable"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 79.3 CE califica el voto de los parlamentarios como personal e indelegable."
+    "explicacion": "El artículo 79.3 CE califica el voto de Diputados y Senadores como personal e indelegable. No es secreto, público o delegable."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 80 de la Constitución, las sesiones plenarias de las Cámaras serán:",
     "respuestas": ["Públicas solo para los medios de comunicación acreditados", "Siempre secretas", "Secretas cuando lo solicite el Gobierno", "Públicas, salvo acuerdo en contrario de cada Cámara, adoptado por mayoría absoluta o con arreglo al Reglamento"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 80 CE establece la publicidad de las sesiones plenarias, salvo acuerdo en contrario de cada Cámara."
+    "explicacion": "El artículo 80 CE establece que las sesiones plenarias son públicas, salvo acuerdo en contrario de cada Cámara adoptado por mayoría absoluta o conforme al Reglamento. No son secretas por defecto ni solo para medios acreditados."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 81.1 de la Constitución, son leyes orgánicas:",
     "respuestas": ["Las leyes de bases y los Decretos Legislativos", "Las relativas al desarrollo de los derechos fundamentales y de las libertades públicas, las que aprueben los Estatutos de Autonomía y el régimen electoral general y las demás previstas en la Constitución", "Solo las que aprueben los Estatutos de Autonomía", "Todas las leyes que apruebe el Congreso por mayoría absoluta"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 81.1 CE define el ámbito material de las leyes orgánicas."
+    "explicacion": "El artículo 81.1 CE reserva a ley orgánica el desarrollo de los derechos fundamentales y libertades públicas, los Estatutos de Autonomía, el régimen electoral general y las demás materias previstas en la Constitución. No son leyes orgánicas las de bases, los decretos legislativos o todas las leyes aprobadas por mayoría absoluta."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 81.2 de la Constitución, la aprobación, modificación o derogación de las leyes orgánicas exigirá:",
     "respuestas": ["Mayoría simple del Congreso", "Mayoría absoluta del Congreso, en una votación final sobre el conjunto del proyecto", "Mayoría absoluta de cada Cámara", "Mayoría de tres quintos del Congreso"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 81.2 CE exige mayoría absoluta del Congreso en una votación final sobre el conjunto del proyecto."
+    "explicacion": "El artículo 81.2 CE exige mayoría absoluta del Congreso en una votación final sobre el conjunto del proyecto para aprobar, modificar o derogar leyes orgánicas. No basta la mayoría simple, la mayoría de cada Cámara o los tres quintos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 82.2 de la Constitución, cuando el objeto de la delegación legislativa sea la formación de textos articulados, deberá otorgarse mediante:",
     "respuestas": ["Una ley ordinaria", "Una ley orgánica", "Un Decreto-ley", "Una ley de bases"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 82.2 CE exige una ley de bases para la formación de textos articulados."
+    "explicacion": "El artículo 82.2 CE exige una ley de bases cuando la delegación tenga por objeto la formación de textos articulados. No una ley ordinaria, orgánica o un decreto-ley."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 82.3 de la Constitución, la delegación legislativa:",
     "respuestas": ["Podrá subdelegarse en los Ministros", "Podrá tener duración indefinida si las Cortes no dicen lo contrario", "Podrá otorgarse de forma implícita si el Gobierno lo solicita", "Deberá otorgarse al Gobierno de forma expresa, para materia concreta y con fijación de plazo, y no podrá ser implícita, por tiempo indeterminado ni subdelegable"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 82.3 CE prohíbe la delegación implícita, por tiempo indeterminado y la subdelegación."
+    "explicacion": "El artículo 82.3 CE exige que la delegación se otorgue al Gobierno de forma expresa, para materia concreta y con plazo, y prohíbe que sea implícita, por tiempo indeterminado o subdelegable. Las demás opciones contradicen alguno de esos requisitos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 83 de la Constitución, las leyes de bases no podrán:",
     "respuestas": ["Delegar en el Gobierno la potestad de dictar normas con rango de ley", "Delimitar el objeto y alcance de la delegación", "Fijar un plazo para el ejercicio de la delegación", "Autorizar la modificación de la propia ley de bases ni facultar para dictar normas con carácter retroactivo"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 83 CE prohíbe a las leyes de bases autorizar su propia modificación o habilitar normas retroactivas."
+    "explicacion": "El artículo 83 CE prohíbe que las leyes de bases autoricen la modificación de la propia ley de bases o faculten para dictar normas con carácter retroactivo. Delimitar el objeto y fijar plazo son, en cambio, requisitos de la delegación."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 85 de la Constitución, las disposiciones del Gobierno que contengan legislación delegada recibirán el título de:",
     "respuestas": ["Reglamentos", "Leyes de bases", "Decretos Legislativos", "Decretos-leyes"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 85 CE denomina Decretos Legislativos a las disposiciones del Gobierno que contienen legislación delegada."
+    "explicacion": "El artículo 85 CE denomina Decretos Legislativos a las disposiciones del Gobierno que contienen legislación delegada. No se llaman reglamentos, leyes de bases o decretos-leyes."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 86.1 de la Constitución, los Decretos-leyes no podrán afectar:",
     "respuestas": ["A los Presupuestos Generales del Estado", "A la organización de los Ministerios", "Al ordenamiento de las instituciones básicas del Estado, a los derechos, deberes y libertades del Título I, al régimen de las Comunidades Autónomas ni al Derecho electoral general", "A las relaciones internacionales"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 86.1 CE excluye expresamente esas materias del Decreto-ley."
+    "explicacion": "El artículo 86.1 CE prohíbe que los decretos-leyes afecten al ordenamiento de las instituciones básicas del Estado, a los derechos, deberes y libertades del Título I, al régimen de las Comunidades Autónomas y al Derecho electoral general. Las demás opciones no recogen esa lista."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 86.2 de la Constitución, los Decretos-leyes deberán ser sometidos a debate y votación de totalidad al Congreso en el plazo de:",
     "respuestas": ["Quince días", "Sesenta días", "Treinta días siguientes a su promulgación", "Veinte días"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 86.2 CE fija el plazo de treinta días para el debate y votación de totalidad en el Congreso."
+    "explicacion": "El artículo 86.2 CE exige someter los decretos-leyes a debate y votación de totalidad en el Congreso dentro de los treinta días siguientes a su promulgación. Los plazos de quince, veinte o sesenta días no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 87.2 de la Constitución, las Asambleas de las Comunidades Autónomas podrán remitir a la Mesa del Congreso una proposición de ley, delegando ante dicha Cámara:",
     "respuestas": ["Un máximo de diez miembros", "Un máximo de tres miembros de la Asamblea encargados de su defensa", "Un máximo de dos miembros", "Un máximo de cinco miembros"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 87.2 CE permite delegar un máximo de tres miembros de la Asamblea para defender la proposición."
+    "explicacion": "El artículo 87.2 CE permite que las Asambleas de las Comunidades Autónomas deleguen un máximo de tres miembros para defender su proposición de ley ante el Congreso. Las demás cifras no coinciden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 87.3 de la Constitución, la iniciativa popular para presentar proposiciones de ley exige:",
     "respuestas": ["No menos de 100.000 firmas", "No menos de 1.000.000 de firmas", "No menos de 50.000 firmas", "No menos de 500.000 firmas acreditadas"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 87.3 CE exige no menos de 500.000 firmas acreditadas para la iniciativa popular."
+    "explicacion": "El artículo 87.3 CE exige no menos de 500.000 firmas acreditadas para la iniciativa popular. Las cifras de 50.000, 100.000 o un millón no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 87.3 de la Constitución, la iniciativa popular no procede en:",
     "respuestas": ["Materias de política social", "Materias de educación y sanidad", "Materias de defensa de los consumidores", "Materias propias de ley orgánica, tributarias o de carácter internacional, ni en lo relativo a la prerrogativa de gracia"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 87.3 CE excluye la iniciativa popular en esas materias."
+    "explicacion": "El artículo 87.3 CE excluye la iniciativa popular en materias propias de ley orgánica, tributarias o de carácter internacional y en lo relativo a la prerrogativa de gracia. Las materias social, educativa, sanitaria o de consumo no están excluidas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 88 de la Constitución, los proyectos de ley serán aprobados por:",
     "respuestas": ["El Congreso de los Diputados", "El Senado", "El Gobierno en Pleno", "El Consejo de Ministros, que los someterá al Congreso"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 88 CE atribuye al Consejo de Ministros la aprobación de los proyectos de ley y su remisión al Congreso."
+    "explicacion": "El artículo 88 CE atribuye al Consejo de Ministros la aprobación de los proyectos de ley y su remisión al Congreso. No los aprueban el Congreso, el Senado o el Gobierno en Pleno como órgano distinto."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 90.2 de la Constitución, el Senado dispone para oponer su veto o introducir enmiendas a un proyecto de ley de:",
     "respuestas": ["Tres meses desde la recepción del texto", "Un mes desde la recepción del texto", "Veinte días desde la recepción del texto", "Dos meses desde la recepción del texto"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 90.2 CE concede al Senado un plazo de dos meses."
+    "explicacion": "El artículo 90.2 CE concede al Senado dos meses desde la recepción del texto para oponer su veto o introducir enmiendas. Los plazos de un mes, veinte días o tres meses no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 90.2 de la Constitución, el veto del Senado deberá ser aprobado por:",
     "respuestas": ["Dos tercios", "Mayoría absoluta", "Mayoría simple", "Tres quintos"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 90.2 CE exige mayoría absoluta para que el Senado apruebe su veto."
+    "explicacion": "El artículo 90.2 CE exige mayoría absoluta para que el Senado apruebe su veto. No bastan los dos tercios, la mayoría simple o los tres quintos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 91 de la Constitución, el Rey sancionará las leyes aprobadas por las Cortes Generales en el plazo de:",
     "respuestas": ["Diez días", "Treinta días", "Veinte días", "Quince días"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 91 CE fija en quince días el plazo para la sanción real."
+    "explicacion": "El artículo 91 CE fija en quince días el plazo para que el Rey sancione las leyes aprobadas por las Cortes Generales. Los plazos de diez, veinte o treinta días son incorrectos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 92.2 de la Constitución, el referéndum consultivo será convocado por:",
     "respuestas": ["El Rey, mediante propuesta del Presidente del Gobierno, previamente autorizada por el Congreso", "El Presidente del Gobierno, con autorización del Senado", "El Rey, a propuesta de las Cortes Generales", "El Congreso de los Diputados, por mayoría absoluta"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 92.2 CE exige la propuesta del Presidente del Gobierno y la previa autorización del Congreso."
+    "explicacion": "El artículo 92.2 CE dispone que el referéndum consultivo sea convocado por el Rey, a propuesta del Presidente del Gobierno y previa autorización del Congreso. No lo convoca el Presidente, las Cortes o el Congreso por sí mismos."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 93 de la Constitución, mediante ley orgánica se podrá autorizar la celebración de tratados por los que se atribuya a una organización o institución internacional:",
     "respuestas": ["La potestad legislativa del Estado", "La representación diplomática de España", "El ejercicio de competencias derivadas de la Constitución", "La soberanía nacional"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 93 CE permite atribuir a una organización internacional el ejercicio de competencias derivadas de la Constitución."
+    "explicacion": "El artículo 93 CE permite atribuir a una organización o institución internacional el ejercicio de competencias derivadas de la Constitución. No la potestad legislativa, la representación diplomática o la soberanía nacional como tales."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 94.1 de la Constitución, la prestación del consentimiento del Estado para obligarse por tratados de carácter político, militar o que afecten a la integridad territorial o a los derechos y deberes fundamentales del Título I requiere:",
     "respuestas": ["Solo comunicación al Gobierno", "Aprobación por referéndum obligatorio", "Autorización del Consejo de Ministros", "Previa autorización de las Cortes Generales"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 94.1 CE exige la previa autorización de las Cortes Generales para esos tratados."
+    "explicacion": "El artículo 94.1 CE exige la previa autorización de las Cortes Generales para los tratados de carácter político, militar, los que afecten a la integridad territorial o a los derechos y deberes fundamentales del Título I. No basta comunicarlos al Gobierno, un referéndum o el Consejo de Ministros."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 95.1 de la Constitución, la celebración de un tratado internacional que contenga estipulaciones contrarias a la Constitución exigirá:",
     "respuestas": ["La previa revisión constitucional", "La aprobación por referéndum", "La autorización del Tribunal Constitucional", "La derogación del tratado"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 95.1 CE exige la previa revisión constitucional."
+    "explicacion": "El artículo 95.1 CE exige la previa revisión constitucional cuando un tratado contenga estipulaciones contrarias a la Constitución. No se resuelve con un referéndum, una autorización del Tribunal Constitucional o la derogación del tratado."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 95.2 de la Constitución, ¿quién puede requerir al Tribunal Constitucional para que declare si existe o no contradicción entre un tratado y la Constitución?",
     "respuestas": ["Solo el Gobierno", "El Gobierno o cualquiera de las Cámaras", "Solo el Congreso de los Diputados", "El Defensor del Pueblo"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 95.2 CE legitima al Gobierno y a cualquiera de las Cámaras."
+    "explicacion": "El artículo 95.2 CE legitima al Gobierno y a cualquiera de las Cámaras para requerir al Tribunal Constitucional sobre la contradicción entre un tratado y la Constitución. No solo al Gobierno, al Congreso o al Defensor del Pueblo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 96.1 de la Constitución, los tratados internacionales válidamente celebrados, una vez publicados oficialmente en España:",
     "respuestas": ["Formarán parte del ordenamiento interno", "Solo obligarán al Gobierno", "Requerirán una ley posterior para ser aplicables", "Tendrán rango de ley orgánica"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 96.1 CE incorpora los tratados al ordenamiento interno tras su publicación oficial."
+    "explicacion": "El artículo 96.1 CE incorpora los tratados válidamente celebrados al ordenamiento interno una vez publicados oficialmente en España. No obligan solo al Gobierno, no requieren una ley posterior y no tienen rango de ley orgánica."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 96.2 de la Constitución, para la denuncia de los tratados y convenios internacionales se utilizará:",
     "respuestas": ["Un acuerdo del Consejo de Ministros", "Un Decreto-ley del Gobierno", "El procedimiento previsto para las leyes orgánicas", "El mismo procedimiento previsto para su aprobación en el artículo 94"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 96.2 CE remite al procedimiento del artículo 94 para la denuncia de tratados."
+    "explicacion": "El artículo 96.2 CE remite para la denuncia de los tratados al mismo procedimiento previsto para su aprobación en el artículo 94. No se hace por acuerdo del Consejo de Ministros, decreto-ley o ley orgánica."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 159.1 de la Constitución, ¿cuántos miembros del Tribunal Constitucional propone el Consejo General del Poder Judicial?",
     "respuestas": ["Ocho", "Dos", "Cuatro", "Uno"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 159.1 CE establece que dos miembros son a propuesta del Consejo General del Poder Judicial."
+    "explicacion": "El artículo 159.1 CE atribuye al Consejo General del Poder Judicial la propuesta de dos miembros del Tribunal Constitucional. Las demás cifras corresponden a otros proponentes o al total."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 159.4 de la Constitución, la condición de miembro del Tribunal Constitucional es incompatible con:",
     "respuestas": ["La pertenencia a una asociación cultural", "Todo mandato representativo, los cargos políticos o administrativos, las funciones directivas en partidos o sindicatos, las carreras judicial y fiscal y cualquier actividad profesional o mercantil", "La asistencia a actos académicos", "La publicación de obras jurídicas"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 159.4 CE detalla las incompatibilidades de los miembros del Tribunal Constitucional."
+    "explicacion": "El artículo 159.4 CE declara incompatibles con el cargo de miembro del Tribunal Constitucional todo mandato representativo, los cargos políticos o administrativos, las funciones directivas en partidos o sindicatos, las carreras judicial y fiscal y cualquier actividad profesional o mercantil. Las demás opciones son actividades permitidas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 161.1.b de la Constitución, el Tribunal Constitucional conoce del recurso de amparo por violación de los derechos y libertades referidos en:",
     "respuestas": ["El artículo 10 de la Constitución", "El artículo 14 de la Constitución", "El artículo 24 de la Constitución", "El artículo 53.2 de la Constitución"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 161.1.b CE remite al artículo 53.2 CE."
+    "explicacion": "El artículo 161.1.b CE atribuye al Tribunal Constitucional el recurso de amparo por violación de los derechos y libertades referidos en el artículo 53.2 CE. No se remite a los artículos 10, 14 o 24 como norma de reenvío."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 162.1.a de la Constitución, están legitimados para interponer el recurso de inconstitucionalidad:",
     "respuestas": ["Solo el Presidente del Gobierno y el Defensor del Pueblo", "Cualquier ciudadano que invoque un interés legítimo", "El Gobierno, el Congreso y el Senado", "El Presidente del Gobierno, el Defensor del Pueblo, 50 Diputados, 50 Senadores, los órganos colegiados ejecutivos de las Comunidades Autónomas y, en su caso, las Asambleas de las mismas"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 162.1.a CE enumera los legitimados para el recurso de inconstitucionalidad."
+    "explicacion": "El artículo 162.1.a CE legitima para el recurso de inconstitucionalidad al Presidente del Gobierno, al Defensor del Pueblo, a 50 Diputados, a 50 Senadores, a los órganos colegiados ejecutivos de las Comunidades Autónomas y, en su caso, a sus Asambleas. Las demás opciones son incompletas o incorrectas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 162.1.b de la Constitución, están legitimados para interponer el recurso de amparo:",
     "respuestas": ["El Gobierno y las Comunidades Autónomas", "Toda persona natural o jurídica que invoque un interés legítimo, así como el Defensor del Pueblo y el Ministerio Fiscal", "Solo el Defensor del Pueblo y el Ministerio Fiscal", "Solo los españoles mayores de edad"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 162.1.b CE legitima a toda persona con interés legítimo, al Defensor del Pueblo y al Ministerio Fiscal."
+    "explicacion": "El artículo 162.1.b CE legitima para el amparo a toda persona natural o jurídica que invoque un interés legítimo, al Defensor del Pueblo y al Ministerio Fiscal. No se limita al Gobierno, las Comunidades, el Defensor y el Fiscal o los españoles mayores de edad."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 163 de la Constitución, cuando un órgano judicial considere que una norma con rango de ley aplicable al caso pueda ser contraria a la Constitución:",
     "respuestas": ["Planteará la cuestión ante el Tribunal Constitucional en los supuestos, la forma y con los efectos que establezca la ley", "Deberá inaplicar la norma y continuar el proceso", "Deberá suspender definitivamente el proceso", "Deberá remitir el asunto al Tribunal Supremo"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 163 CE regula la cuestión de inconstitucionalidad promovida por los órganos judiciales."
+    "explicacion": "El artículo 163 CE obliga al órgano judicial que considere una norma legal contraria a la Constitución a plantear la cuestión ante el Tribunal Constitucional en los supuestos y con los efectos que fije la ley. No debe inaplicar la norma, suspender definitivamente el proceso o remitirlo al Tribunal Supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 164.1 de la Constitución, las sentencias que declaren la inconstitucionalidad de una ley o de una norma con fuerza de ley y todas las que no se limiten a la estimación subjetiva de un derecho:",
     "respuestas": ["Requieren ratificación de las Cortes Generales", "Tienen plenos efectos frente a todos", "Solo afectan a las partes del proceso", "Tienen efectos únicamente desde su publicación en el BOE"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 164.1 CE atribuye plenos efectos frente a todos a esas sentencias."
+    "explicacion": "El artículo 164.1 CE atribuye plenos efectos frente a todos a las sentencias que declaren la inconstitucionalidad de una ley o norma con fuerza de ley y a las que no se limiten a la estimación subjetiva de un derecho. No requieren ratificación, no se limitan a las partes y no dependen solo de su publicación."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 164.2 de la Constitución, salvo que en el fallo se disponga otra cosa:",
     "respuestas": ["El Tribunal Constitucional deberá aprobar un nuevo texto", "Subsistirá la vigencia de la ley en la parte no afectada por la inconstitucionalidad", "La ley quedará suspendida hasta su nueva aprobación", "Quedará derogada toda la ley"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 164.2 CE mantiene la vigencia de la ley en la parte no afectada."
+    "explicacion": "El artículo 164.2 CE dispone que, salvo que el fallo diga otra cosa, subsista la vigencia de la ley en la parte no afectada por la inconstitucionalidad. No obliga al Tribunal a aprobar un nuevo texto, no suspende la ley ni la deroga por completo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 165 de la Constitución, una ley orgánica regulará:",
     "respuestas": ["La elección del Presidente del Gobierno", "Solo la composición del Tribunal Constitucional", "El funcionamiento del Tribunal Constitucional, el estatuto de sus miembros, el procedimiento ante el mismo y las condiciones para el ejercicio de las acciones", "Solo el procedimiento de amparo"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 165 CE remite a una ley orgánica esas materias."
+    "explicacion": "El artículo 165 CE remite a una ley orgánica el funcionamiento del Tribunal Constitucional, el estatuto de sus miembros, el procedimiento ante el mismo y las condiciones para el ejercicio de las acciones. No solo la composición o el procedimiento de amparo, ni la elección del Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 1 de la Ley Orgánica del Tribunal Constitucional, el Tribunal Constitucional es:",
     "respuestas": ["Un órgano dependiente del Consejo General del Poder Judicial", "Un órgano consultivo del Gobierno", "El máximo órgano de la Administración de Justicia", "El intérprete supremo de la Constitución, independiente de los demás órganos constitucionales y sometido sólo a la Constitución y a la LOTC"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 1 LOTC define al Tribunal Constitucional como intérprete supremo, independiente y sometido sólo a la Constitución y a la LOTC."
+    "explicacion": "El artículo 1 de la Ley Orgánica del Tribunal Constitucional lo define como intérprete supremo de la Constitución, independiente de los demás órganos constitucionales y sometido solo a la Constitución y a esa ley. No depende del Consejo General del Poder Judicial, no es consultivo y no es el máximo órgano de la Administración de Justicia."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 1.2 de la LOTC, ¿qué carácter tiene el Tribunal Constitucional?",
     "respuestas": ["Es un órgano jurisdiccional ordinario", "Es un órgano consultivo", "Es único en su orden", "Es un órgano dependiente del Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 1.2 LOTC declara que el Tribunal Constitucional es único en su orden."
+    "explicacion": "El artículo 1.2 de la Ley Orgánica del Tribunal Constitucional declara que el Tribunal es único en su orden. No es un órgano jurisdiccional ordinario, consultivo o dependiente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 2.1 de la LOTC, el Tribunal Constitucional conoce, entre otras materias:",
     "respuestas": ["Del recurso y de la cuestión de inconstitucionalidad, del recurso de amparo, de los conflictos de competencia y de la declaración sobre la constitucionalidad de los tratados", "De los conflictos de jurisdicción entre los tribunales ordinarios", "De los recursos de casación y de apelación", "De los recursos contra las sentencias del Tribunal Supremo"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 2.1 LOTC enumera las competencias del Tribunal Constitucional."
+    "explicacion": "El artículo 2.1 de la Ley Orgánica del Tribunal Constitucional le atribuye el recurso y la cuestión de inconstitucionalidad, el amparo, los conflictos de competencia y la declaración sobre la constitucionalidad de los tratados. No conoce de conflictos de jurisdicción, casación, apelación o recursos contra el Tribunal Supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 4.2 de la LOTC, las resoluciones del Tribunal Constitucional:",
     "respuestas": ["No podrán ser enjuiciadas por ningún órgano jurisdiccional del Estado", "Podrán ser revisadas por el Consejo General del Poder Judicial", "Podrán ser anuladas por el Gobierno mediante Decreto-ley", "Podrán ser recurridas ante el Tribunal Supremo"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 4.2 LOTC impide que las resoluciones del Tribunal Constitucional sean enjuiciadas por otro órgano jurisdiccional."
+    "explicacion": "El artículo 4.2 de la Ley Orgánica del Tribunal Constitucional impide que sus resoluciones sean enjuiciadas por cualquier órgano jurisdiccional del Estado. No pueden revisarlas el Consejo General del Poder Judicial, el Gobierno o el Tribunal Supremo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 6.1 de la LOTC, el Tribunal Constitucional actúa en:",
     "respuestas": ["Pleno y Salas, únicamente", "Pleno, Sala o Sección", "Pleno, Salas y Comisiones", "Sala y Sección, únicamente"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 6.1 LOTC establece que el Tribunal actúa en Pleno, en Sala o en Sección."
+    "explicacion": "El artículo 6.1 de la Ley Orgánica del Tribunal Constitucional establece que actúa en Pleno, en Sala o en Sección. No solo en Pleno y Salas, en Comisiones o únicamente en Sala y Sección."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 7.1 de la LOTC, ¿quién nombra a los Magistrados que integran cada una de las Salas del Tribunal Constitucional?",
     "respuestas": ["El Consejo General del Poder Judicial", "El Tribunal en Pleno", "El Rey", "El Presidente del Tribunal"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 7.1 LOTC dispone que los seis Magistrados de cada Sala son nombrados por el Tribunal en Pleno."
+    "explicacion": "El artículo 7.1 de la Ley Orgánica del Tribunal Constitucional dispone que los seis Magistrados de cada Sala son nombrados por el Tribunal en Pleno. No los nombran el Consejo General del Poder Judicial, el Rey o el Presidente del Tribunal."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 9.1 de la LOTC, el Presidente del Tribunal Constitucional es elegido por:",
     "respuestas": ["El Congreso de los Diputados, por mayoría absoluta", "El Consejo General del Poder Judicial", "El Tribunal en Pleno, de entre sus miembros, por votación secreta, y propuesto al Rey para su nombramiento", "El Gobierno, a propuesta del Ministro de Justicia"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 9.1 LOTC atribuye al Pleno la elección del Presidente por votación secreta y su propuesta al Rey."
+    "explicacion": "El artículo 9.1 de la Ley Orgánica del Tribunal Constitucional atribuye al Pleno la elección del Presidente entre sus miembros, por votación secreta, y su propuesta al Rey para el nombramiento. No lo eligen el Congreso, el Consejo General del Poder Judicial o el Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 9.3 de la LOTC, el Presidente del Tribunal Constitucional es nombrado por un período de tres años y:",
     "respuestas": ["Podrá ser reelegido por una sola vez", "No podrá ser reelegido en ningún caso", "Podrá ser reelegido indefinidamente", "Podrá ser reelegido por dos veces"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 9.3 LOTC permite una sola reelección del Presidente."
+    "explicacion": "El artículo 9.3 de la Ley Orgánica del Tribunal Constitucional fija un mandato de tres años y permite una sola reelección del Presidente. No prohíbe toda reelección ni la permite indefinidamente o por dos veces."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 14 de la LOTC, en las Secciones se requerirá la presencia de:",
     "respuestas": ["Dos tercios de sus miembros", "Dos miembros, salvo que haya discrepancia, en cuyo caso se requerirán los tres", "La mayoría absoluta de sus miembros", "Tres miembros en todo caso"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 14 LOTC exige dos miembros en las Secciones, o tres si hay discrepancia."
+    "explicacion": "El artículo 14 de la Ley Orgánica del Tribunal Constitucional exige dos miembros en las Secciones, salvo que haya discrepancia, en cuyo caso se requieren los tres. No exige dos tercios, mayoría absoluta o tres miembros en todo caso."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 16.4 de la LOTC, ningún Magistrado podrá ser propuesto al Rey para otro período inmediato, salvo que:",
     "respuestas": ["Lo autorice el Congreso por mayoría absoluta", "Hubiera ocupado el cargo por un plazo no superior a tres años", "Lo solicite el Presidente del Tribunal", "Hubiera ocupado el cargo por un plazo no superior a seis años"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 16.4 LOTC exceptúa de la prohibición a quien haya ocupado el cargo por un plazo no superior a tres años."
+    "explicacion": "El artículo 16.4 de la Ley Orgánica del Tribunal Constitucional impide proponer al Rey para otro período inmediato, salvo que el Magistrado hubiera ocupado el cargo por un plazo no superior a tres años. No depende de autorización del Congreso, solicitud del Presidente o un plazo de seis años."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 17.2 de la LOTC, los Magistrados del Tribunal Constitucional continuarán en el ejercicio de sus funciones:",
     "respuestas": ["Hasta el día de la expiración de su nombramiento", "Hasta que hayan tomado posesión quienes hubieren de sucederles", "Hasta la disolución de las Cortes Generales", "Hasta que el Congreso elija a sus sustitutos"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 17.2 LOTC prorroga el ejercicio de funciones hasta la toma de posesión de los sucesores."
+    "explicacion": "El artículo 17.2 de la Ley Orgánica del Tribunal Constitucional prorroga el ejercicio de funciones hasta que tomen posesión quienes hayan de suceder. No hasta la expiración del nombramiento, la disolución de las Cortes o la elección de sustitutos por el Congreso."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 18 de la LOTC, los miembros del Tribunal Constitucional deberán ser nombrados entre ciudadanos españoles que sean:",
     "respuestas": ["Cualquier ciudadano con titulación universitaria", "Solo Magistrados y Fiscales", "Solo Profesores de Universidad y Abogados", "Magistrados, Fiscales, Profesores de Universidad, funcionarios públicos o Abogados"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 18 LOTC enumera las profesiones de las que pueden proceder los Magistrados del Tribunal Constitucional."
+    "explicacion": "El artículo 18 de la Ley Orgánica del Tribunal Constitucional exige que los miembros sean ciudadanos españoles y juristas de reconocida competencia procedentes de la carrera judicial o fiscal, la docencia universitaria, la función pública o la abogacía. No basta cualquier titulación universitaria ni se limita a magistrados, fiscales, profesores o abogados."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 19.1 de la LOTC, el cargo de Magistrado del Tribunal Constitucional es incompatible, entre otros, con:",
     "respuestas": ["El de Defensor del Pueblo, el de Diputado o Senador y el ejercicio de cualquier jurisdicción o actividad propia de la carrera judicial o fiscal", "La asistencia a actos académicos", "La publicación de artículos jurídicos", "La pertenencia a una asociación cultural"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 19.1 LOTC enumera las incompatibilidades del cargo de Magistrado del Tribunal Constitucional."
+    "explicacion": "El artículo 19.1 de la Ley Orgánica del Tribunal Constitucional declara incompatible el cargo con el de Defensor del Pueblo, Diputado o Senador y con el ejercicio de cualquier jurisdicción o actividad propia de la carrera judicial o fiscal. La asistencia a actos académicos, la publicación de artículos y la pertenencia a asociaciones culturales no están prohibidas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 26 de la LOTC, la responsabilidad criminal de los Magistrados del Tribunal Constitucional sólo será exigible ante:",
     "respuestas": ["La Sala de lo Penal del Tribunal Supremo", "El Consejo General del Poder Judicial", "El Tribunal en Pleno", "La Sala Segunda del Tribunal Constitucional"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 26 LOTC atribuye la responsabilidad criminal de los Magistrados a la Sala de lo Penal del Tribunal Supremo."
+    "explicacion": "El artículo 26 de la Ley Orgánica del Tribunal Constitucional atribuye la exigencia de responsabilidad criminal de los Magistrados a la Sala de lo Penal del Tribunal Supremo. No al Consejo General del Poder Judicial, al Pleno o a la Sala Segunda del propio Tribunal."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 32.2 de la LOTC, las Comunidades Autónomas están legitimadas para interponer el recurso de inconstitucionalidad contra leyes del Estado que:",
     "respuestas": ["Afecten a cualquier Comunidad Autónoma, sin necesidad de acuerdo", "Regulen materias no reservadas a ley orgánica", "Sean aprobadas por mayoría simple", "Puedan afectar a su propio ámbito de autonomía, previo acuerdo del órgano colegiado ejecutivo o de la Asamblea"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 32.2 LOTC legitima a las Comunidades Autónomas cuando la ley estatal pueda afectar a su ámbito de autonomía."
+    "explicacion": "El artículo 32.2 de la Ley Orgánica del Tribunal Constitucional legitima a las Comunidades Autónomas para impugnar leyes estatales que puedan afectar a su propio ámbito de autonomía, previo acuerdo del órgano colegiado ejecutivo o de la Asamblea. No basta cualquier afectación, una materia no reservada a ley orgánica o una mayoría simple."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 38.1 de la LOTC, las sentencias recaídas en procedimientos de inconstitucionalidad:",
     "respuestas": ["Producirán efectos desde el día siguiente a su publicación", "Requerirán la ratificación de las Cortes Generales", "Vincularán a todos los Poderes Públicos y producirán efectos generales desde la fecha de su publicación en el BOE", "Solo vincularán a las partes del proceso"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 38.1 LOTC atribuye a las sentencias efectos generales y vinculación para todos los Poderes Públicos desde su publicación en el BOE."
+    "explicacion": "El artículo 38.1 de la Ley Orgánica del Tribunal Constitucional dispone que las sentencias de inconstitucionalidad vinculan a todos los Poderes Públicos y producen efectos generales desde su publicación en el BOE. No desde el día siguiente, con ratificación de las Cortes o solo entre las partes."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 39.1 de la LOTC, cuando la sentencia declare la inconstitucionalidad:",
     "respuestas": ["Dejará la norma en vigor hasta que el Gobierno la derogue", "Declarará igualmente la nulidad de los preceptos impugnados y, en su caso, la de aquellos otros a los que deba extenderse por conexión o consecuencia", "Solo anulará el precepto expresamente impugnado", "No podrá anular preceptos no impugnados"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 39.1 LOTC ordena declarar la nulidad de los preceptos impugnados y de los conexos o consecuencia."
+    "explicacion": "El artículo 39.1 de la Ley Orgánica del Tribunal Constitucional ordena declarar la nulidad de los preceptos impugnados y, en su caso, la de aquellos otros a los que deba extenderse por conexión o consecuencia. No deja la norma en vigor hasta que la derogue el Gobierno ni limita la nulidad al precepto impugnado."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 40.1 de la LOTC, las sentencias declaratorias de la inconstitucionalidad de leyes:",
     "respuestas": ["No permitirán revisar procesos fenecidos mediante sentencia con fuerza de cosa juzgada, salvo en los procesos penales o contencioso-administrativos sancionadores en que la nulidad reduzca la pena o sanción o excluya o limite la responsabilidad", "Solo permitirán revisar los procesos civiles", "Permitirán revisar todos los procesos fenecidos", "No permitirán revisar ningún proceso, sin excepciones"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 40.1 LOTC limita la revisión de procesos fenecidos, con la excepción de los procesos penales o sancionadores."
+    "explicacion": "El artículo 40.1 de la Ley Orgánica del Tribunal Constitucional no permite revisar procesos fenecidos con cosa juzgada, salvo en los procesos penales o contencioso-administrativos sancionadores en que la nulidad reduzca la pena o sanción o excluya o limite la responsabilidad. No permite revisar todos los procesos, solo los civiles o ninguno sin excepciones."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 59.1 de la LOTC, el Tribunal Constitucional entiende de los conflictos que opongan:",
     "respuestas": ["Solo al Estado con las Comunidades Autónomas", "Solo a las Comunidades Autónomas entre sí", "Al Estado con una o más Comunidades Autónomas, a dos o más Comunidades Autónomas entre sí, o al Gobierno con el Congreso, el Senado o el Consejo General del Poder Judicial, o a cualquiera de estos órganos entre sí", "Solo a los órganos judiciales entre sí"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 59.1 LOTC enumera los conflictos constitucionales de competencia y entre órganos."
+    "explicacion": "El artículo 59.1 de la Ley Orgánica del Tribunal Constitucional enumera los conflictos entre el Estado y una o más Comunidades Autónomas, entre Comunidades Autónomas, y entre el Gobierno y el Congreso, el Senado o el Consejo General del Poder Judicial, o entre esos órganos. No se limita a los conflictos Estado-CCAA, CCAA entre sí o órganos judiciales."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 62 de la LOTC, cuando el Gobierno considere que una disposición o resolución de una Comunidad Autónoma no respeta el orden de competencias, podrá formalizar el conflicto ante el Tribunal Constitucional en el plazo de:",
     "respuestas": ["Un mes", "Tres meses", "Dos meses", "Cinco meses"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 62 LOTC concede al Gobierno un plazo de dos meses para formalizar el conflicto de competencia."
+    "explicacion": "El artículo 62 de la Ley Orgánica del Tribunal Constitucional concede al Gobierno un plazo de dos meses para formalizar el conflicto de competencia ante el Tribunal. Los plazos de un mes, tres meses o cinco meses no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 78.2 de la LOTC, la declaración del Tribunal Constitucional sobre la constitucionalidad de un tratado internacional tendrá:",
     "respuestas": ["Efectos solo para el Gobierno", "Carácter meramente consultivo", "Carácter vinculante", "Efectos suspensivos hasta la ratificación del tratado"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 78.2 LOTC, en relación con el artículo 95 CE, atribuye carácter vinculante a la declaración."
+    "explicacion": "El artículo 78.2 de la Ley Orgánica del Tribunal Constitucional atribuye carácter vinculante a la declaración sobre la constitucionalidad de un tratado internacional. No tiene efectos solo para el Gobierno, no es consultiva y no queda suspensiva hasta la ratificación."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 2 de la Ley Orgánica del Defensor del Pueblo, el Defensor será designado por:",
     "respuestas": ["Una votación favorable de las tres quintas partes del Congreso y, posteriormente, ratificado por la misma mayoría del Senado en un plazo máximo de veinte días", "Mayoría simple de ambas Cámaras", "Mayoría absoluta del Congreso y mayoría simple del Senado", "Mayoría de dos tercios de cada Cámara"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 2.4 LODP exige tres quintos del Congreso y ratificación por tres quintos del Senado en el plazo máximo de veinte días."
+    "explicacion": "El artículo 2.4 de la Ley Orgánica 3/1981 exige una votación favorable de tres quintos del Congreso y la ratificación por la misma mayoría del Senado en un plazo máximo de veinte días. No basta la mayoría simple, la mayoría absoluta del Congreso y simple del Senado o dos tercios de cada Cámara."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 2 de la Ley Orgánica del Defensor del Pueblo, si no se alcanzan las mayorías de tres quintos, se procederá en nueva sesión de la Comisión y, en el plazo máximo de un mes, a formular sucesivas propuestas; en tal caso, la designación quedará realizada al alcanzarse:",
     "respuestas": ["La mayoría de los tres quintos en el Congreso y la mayoría absoluta del Senado", "Los dos tercios en el Congreso y la mayoría simple del Senado", "La mayoría simple en ambas Cámaras", "La mayoría absoluta en ambas Cámaras"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 2.5 LODP prevé que, en la segunda ronda, baste la mayoría absoluta del Senado tras los tres quintos del Congreso."
+    "explicacion": "El artículo 2.5 de la Ley Orgánica 3/1981 prevé que, tras sucesivas propuestas en el plazo máximo de un mes, la designación se entiende realizada con tres quintos del Congreso y mayoría absoluta del Senado. No con dos tercios y mayoría simple, mayoría simple de ambas o mayoría absoluta de ambas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 4 de la Ley Orgánica del Defensor del Pueblo, el nombramiento del Defensor del Pueblo será acreditado:",
     "respuestas": ["Por el Rey y se publicará en el BOE", "Por la Comisión Mixta Congreso-Senado", "Conjuntamente con las firmas de los Presidentes del Congreso y del Senado y se publicará en el BOE", "Por el Presidente del Gobierno y se publicará en el BOE"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 4.1 LODP exige la acreditación conjunta de los Presidentes de ambas Cámaras y la publicación en el BOE."
+    "explicacion": "El artículo 4.1 de la Ley Orgánica 3/1981 dispone que los Presidentes del Congreso y del Senado acrediten conjuntamente con sus firmas el nombramiento, que se publica en el BOE. No lo acredita el Rey, la Comisión Mixta o el Presidente del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 5 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo cesa, entre otras causas, por:",
     "respuestas": ["Renuncia, expiración del plazo de su nombramiento, muerte o incapacidad sobrevenida, actuar con notoria negligencia en el cumplimiento de sus obligaciones o haber sido condenado por sentencia firme por delito doloso", "Cambio de Gobierno", "Disolución de las Cortes Generales", "Pérdida de la confianza del Presidente del Congreso"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 5.1 LODP enumera las causas de cese del Defensor del Pueblo."
+    "explicacion": "El artículo 5.1 de la Ley Orgánica 3/1981 enumera como causas de cese la renuncia, la expiración del plazo, la muerte o incapacidad sobrevenida, la negligencia notoria y la condena firme por delito doloso. No el cambio de Gobierno, la disolución de las Cortes o la pérdida de confianza del Presidente del Congreso."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 5 de la Ley Orgánica del Defensor del Pueblo, en los casos distintos de muerte, renuncia y expiración del plazo, el cese del Defensor del Pueblo se decide:",
     "respuestas": ["Por mayoría de las tres quintas partes de los componentes de cada Cámara, mediante debate y previa audiencia del interesado", "Por el Gobierno", "Por el Presidente del Congreso", "Por mayoría absoluta de cada Cámara"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 5.2 LODP exige tres quintos de cada Cámara para el cese en los supuestos distintos de muerte, renuncia y expiración del plazo."
+    "explicacion": "El artículo 5.2 de la Ley Orgánica 3/1981 exige mayoría de tres quintos de los componentes de cada Cámara, con debate y audiencia del interesado, para el cese en los casos distintos de muerte, renuncia y expiración del plazo. No decide el Gobierno, el Presidente del Congreso o la mayoría absoluta de cada Cámara."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 6.1 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo:",
     "respuestas": ["No estará sujeto a mandato imperativo alguno y no recibirá instrucciones de ninguna Autoridad", "Dependerá jerárquicamente del Ministerio de Justicia", "Estará sujeto a las instrucciones del Congreso", "Recibirá instrucciones del Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 6.1 LODP declara que el Defensor no está sujeto a mandato imperativo ni recibe instrucciones."
+    "explicacion": "El artículo 6.1 de la Ley Orgánica 3/1981 declara que el Defensor del Pueblo no está sujeto a mandato imperativo y no recibe instrucciones de ninguna autoridad. No depende del Ministerio de Justicia, del Congreso o del Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 6.2 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo goza de:",
     "respuestas": ["Prerrogativa de gracia", "Inmunidad parlamentaria en todo caso", "Aforamiento ante el Tribunal Constitucional", "Inviolabilidad y no podrá ser detenido, expedientado, multado, perseguido o juzgado por las opiniones que formule o los actos que realice en el ejercicio de sus competencias"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 6.2 LODP reconoce la inviolabilidad del Defensor del Pueblo."
+    "explicacion": "El artículo 6.2 de la Ley Orgánica 3/1981 reconoce la inviolabilidad del Defensor del Pueblo y prohíbe detenerlo, expedientarlo, multarlo, perseguirlo o juzgarlo por las opiniones o actos realizados en el ejercicio de sus competencias. No tiene prerrogativa de gracia, inmunidad parlamentaria en todo caso o aforamiento ante el Tribunal Constitucional."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 6.3 de la Ley Orgánica del Defensor del Pueblo, mientras permanezca en el ejercicio de sus funciones, el Defensor del Pueblo no podrá ser detenido ni retenido sino en caso de flagrante delito, correspondiendo la decisión sobre su inculpación, prisión, procesamiento y juicio exclusivamente a:",
     "respuestas": ["La Sala Segunda del Tribunal Supremo", "El Consejo General del Poder Judicial", "La Sala de lo Penal del Tribunal Supremo", "El Tribunal Constitucional"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 6.3 LODP atribuye esas decisiones a la Sala de lo Penal del Tribunal Supremo."
+    "explicacion": "El artículo 6.3 de la Ley Orgánica 3/1981 atribuye exclusivamente a la Sala de lo Penal del Tribunal Supremo la decisión sobre inculpación, prisión, procesamiento y juicio del Defensor del Pueblo. No a la Sala Segunda del Tribunal Supremo, al Consejo General del Poder Judicial o al Tribunal Constitucional."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 7.1 de la Ley Orgánica del Defensor del Pueblo, la condición de Defensor del Pueblo es incompatible, entre otras, con:",
     "respuestas": ["La pertenencia a una asociación cultural", "La asistencia a actos académicos", "Todo mandato representativo, todo cargo político o actividad de propaganda política, la permanencia en el servicio activo de cualquier Administración pública y la afiliación a un partido político", "La publicación de artículos jurídicos"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 7.1 LODP enumera las incompatibilidades del Defensor del Pueblo."
+    "explicacion": "El artículo 7.1 de la Ley Orgánica 3/1981 declara incompatible el cargo con todo mandato representativo, todo cargo político o actividad de propaganda, la permanencia en el servicio activo de cualquier Administración y la afiliación a un partido político. La pertenencia a asociaciones culturales, la asistencia a actos académicos y la publicación de artículos no están prohibidas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 7.2 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo deberá cesar en toda situación de incompatibilidad:",
     "respuestas": ["En el plazo de un mes desde su toma de posesión", "Dentro de los treinta días siguientes a su nombramiento", "Dentro de los diez días siguientes a su nombramiento y antes de tomar posesión", "Al finalizar su mandato"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 7.2 LODP exige el cese en la incompatibilidad dentro de los diez días siguientes al nombramiento y antes de tomar posesión."
+    "explicacion": "El artículo 7.2 de la Ley Orgánica 3/1981 exige que el Defensor del Pueblo cese en toda situación de incompatibilidad dentro de los diez días siguientes a su nombramiento y antes de tomar posesión. No un mes, treinta días o al finalizar el mandato."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 9 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo podrá iniciar y proseguir de oficio o a petición de parte cualquier investigación conducente al esclarecimiento de los actos y resoluciones de:",
     "respuestas": ["Solo la Administración de Justicia", "La Administración pública y sus agentes, en relación con los ciudadanos", "Solo el Gobierno central", "Solo las Comunidades Autónomas"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 9.1 LODP extiende la investigación a la Administración pública y sus agentes."
+    "explicacion": "El artículo 9.1 de la Ley Orgánica 3/1981 extiende la investigación a los actos y resoluciones de la Administración pública y sus agentes en relación con los ciudadanos. No se limita a la Administración de Justicia, al Gobierno central o a las Comunidades Autónomas."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 10.1 de la Ley Orgánica del Defensor del Pueblo, podrá dirigirse al Defensor del Pueblo:",
     "respuestas": ["Toda persona natural o jurídica que invoque un interés legítimo, sin restricción alguna", "Solo los ciudadanos españoles mayores de edad", "Solo las personas que hayan agotado la vía judicial", "Solo los Diputados y Senadores"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 10.1 LODP reconoce el acceso de toda persona natural o jurídica con interés legítimo."
+    "explicacion": "El artículo 10.1 de la Ley Orgánica 3/1981 permite dirigirse al Defensor del Pueblo a toda persona natural o jurídica que invoque un interés legítimo, sin restricción alguna. No se limita a españoles mayores de edad, a quienes agoten la vía judicial o a Diputados y Senadores."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 11 de la Ley Orgánica del Defensor del Pueblo, la actividad del Defensor del Pueblo:",
     "respuestas": ["Depende de la previa autorización del Gobierno", "Se suspende durante los estados de excepción y de sitio", "No se verá interrumpida cuando las Cortes Generales no se encuentren reunidas, hubieren sido disueltas o hubiere expirado su mandato, dirigiéndose en tales casos a las Diputaciones Permanentes", "Se interrumpe automáticamente cuando las Cortes se disuelven"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 11 LODP garantiza la continuidad de la actividad del Defensor y su relación con las Diputaciones Permanentes."
+    "explicacion": "El artículo 11 de la Ley Orgánica 3/1981 dispone que la actividad del Defensor no se interrumpe cuando las Cortes no están reunidas, han sido disueltas o ha expirado su mandato, y que en esos casos se dirige a las Diputaciones Permanentes. No depende de autorización del Gobierno ni se suspende con los estados de excepción o sitio."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 15.1 de la Ley Orgánica del Defensor del Pueblo, toda queja se presentará:",
     "respuestas": ["Ante notario y en el plazo máximo de seis meses", "Por vía telemática exclusivamente y en el plazo de un mes", "Sin necesidad de firma y en cualquier plazo", "Firmada por el interesado, con indicación de su nombre, apellidos y domicilio, en escrito razonado en papel común y en el plazo máximo de un año desde que tuvo conocimiento de los hechos"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 15.1 LODP regula los requisitos formales y el plazo de presentación de las quejas."
+    "explicacion": "El artículo 15.1 de la Ley Orgánica 3/1981 exige que la queja se presente firmada por el interesado, con nombre, apellidos y domicilio, en escrito razonado en papel común y dentro del plazo máximo de un año desde que conoció los hechos. No ante notario, solo por vía telemática o sin firma y sin plazo."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 16 de la Ley Orgánica del Defensor del Pueblo, la correspondencia dirigida al Defensor del Pueblo remitida desde cualquier centro de detención, internamiento o custodia:",
     "respuestas": ["Deberá ser leída por el Ministerio Fiscal antes de su envío", "Solo podrá ser censurada si lo autoriza el juez", "Podrá ser censurada por la dirección del centro", "No podrá ser objeto de censura de ningún tipo"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 16.1 LODP prohíbe cualquier censura de la correspondencia dirigida al Defensor desde centros de detención."
+    "explicacion": "El artículo 16.1 de la Ley Orgánica 3/1981 prohíbe cualquier censura de la correspondencia dirigida al Defensor del Pueblo desde centros de detención, internamiento o custodia. No puede ser leída por el Fiscal, censurada por el juez o por la dirección del centro."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 17.2 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo no entrará en el examen individual de las quejas sobre las que:",
     "respuestas": ["Esté pendiente resolución judicial, y suspenderá su actuación si se interpone demanda o recurso ante los Tribunales ordinarios o el Tribunal Constitucional", "Haya informado el Ministerio Fiscal", "Haya recaído resolución administrativa firme", "Se haya pronunciado la Comisión Mixta Congreso-Senado"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 17.2 LODP impide el examen individual de quejas pendientes de resolución judicial."
+    "explicacion": "El artículo 17.2 de la Ley Orgánica 3/1981 impide al Defensor entrar en el examen individual de quejas pendientes de resolución judicial y lo suspende si se interpone demanda o recurso ante los tribunales ordinarios o el Tribunal Constitucional. No se refiere a que haya informado el Fiscal, exista resolución administrativa firme o se pronunciara la Comisión Mixta."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 18.1 de la Ley Orgánica del Defensor del Pueblo, admitida la queja, el Defensor del Pueblo promoverá la oportuna investigación sumaria e informal y dará cuenta del contenido sustancial de la solicitud al Organismo o Dependencia administrativa procedente para que, por su Jefe, se remita informe escrito en el plazo máximo de:",
     "respuestas": ["Quince días, ampliable cuando concurran circunstancias que lo aconsejen", "Un mes, improrrogable", "Tres meses", "Diez días, improrrogable"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 18.1 LODP fija un plazo máximo de quince días, ampliable, para el informe inicial."
+    "explicacion": "El artículo 18.1 de la Ley Orgánica 3/1981 fija un plazo máximo de quince días para el informe inicial, ampliable cuando concurran circunstancias que lo aconsejen. Los plazos de un mes, tres meses o diez días improrrogables no corresponden."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 22.1 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo podrá solicitar a los poderes públicos todos los documentos que considere necesarios, incluidos los clasificados como secretos; en este último supuesto, la no remisión deberá ser acordada por:",
     "respuestas": ["El Consejo General del Poder Judicial", "El Presidente del Congreso", "El Consejo de Ministros, acompañándose una certificación acreditativa del acuerdo denegatorio", "El Ministro de Justicia"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 22.1 LODP exige acuerdo del Consejo de Ministros y certificación para no remitir documentos secretos."
+    "explicacion": "El artículo 22.1 de la Ley Orgánica 3/1981 permite solicitar documentos secretos; la no remisión debe acordarla el Consejo de Ministros y acompañarse una certificación acreditativa del acuerdo denegatorio. No la acuerdan el Consejo General del Poder Judicial, el Presidente del Congreso o el Ministro de Justicia."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 32 de la Ley Orgánica del Defensor del Pueblo, el Defensor del Pueblo dará cuenta anualmente a las Cortes Generales de su gestión en un informe que presentará:",
     "respuestas": ["Cuando las Cortes se hallen reunidas en periodo ordinario de sesiones", "En cualquier momento, sin importar el periodo de sesiones", "Ante el Tribunal Constitucional", "Ante el Gobierno, que lo remitirá a las Cortes"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 32.1 LODP ordena presentar el informe anual cuando las Cortes estén reunidas en periodo ordinario de sesiones."
+    "explicacion": "El artículo 32.1 de la Ley Orgánica 3/1981 exige presentar el informe anual cuando las Cortes están reunidas en periodo ordinario de sesiones. No en cualquier momento, ante el Tribunal Constitucional o ante el Gobierno."
   },
   {
     "tema": 2,
     "pregunta": "Según el artículo 32.2 de la Ley Orgánica del Defensor del Pueblo, cuando la gravedad o urgencia de los hechos lo aconsejen, el Defensor del Pueblo podrá presentar un informe extraordinario dirigido a:",
     "respuestas": ["El Tribunal Constitucional", "Las Diputaciones Permanentes de las Cámaras si éstas no se encontraren reunidas", "Los Plenos de ambas Cámaras en sesión conjunta", "El Gobierno"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 32.2 LODP prevé el informe extraordinario a las Diputaciones Permanentes cuando las Cámaras no estén reunidas."
+    "explicacion": "El artículo 32.2 de la Ley Orgánica 3/1981 permite presentar un informe extraordinario a las Diputaciones Permanentes de las Cámaras cuando éstas no estén reunidas. No al Tribunal Constitucional, a los Plenos en sesión conjunta o al Gobierno."
   }
 ]

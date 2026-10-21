@@ -4,1455 +4,1504 @@
     "pregunta": "El Rey puede declarar la guerra y hacer la paz",
     "respuestas": ["Previa autorización del Congreso", "Previa autorización de las Cortes Generales", "Cuando crea oportuno", "Previa autorización del Senado"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 63.3 CE exige la previa autorización de las Cortes Generales para declarar la guerra y hacer la paz. No basta con el Congreso o el Senado por separado, y el Rey no puede decidirlo por su propia voluntad."
   },
   {
     "tema": 1,
     "pregunta": "Respecto del derecho al trabajo, en ningún caso puede hacerse discriminación por razón de",
     "respuestas": ["Religión", "Sexo, raza y religión", "Raza", "Sexo"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 35.1 CE prohíbe expresamente la discriminación por razón de sexo en el trabajo. La religión y la raza también están protegidas por la cláusula general del artículo 14, pero no son el motivo que menciona literalmente ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "Los colores de las franjas de la bandera de España son",
     "respuestas": ["Roja, amarilla y amarilla", "Roja, amarilla y roja", "Amarilla, roja y amarilla", "Amarilla, roja y azul"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 4.1 CE define la bandera con tres franjas horizontales roja, amarilla y roja. Las combinaciones con dos amarillas, amarilla-roja-amarilla o azul no coinciden con ese diseño."
   },
   {
     "tema": 1,
     "pregunta": "El reconocimiento, el respeto y la protección de los principios reconocidos en el Capítulo 3º (Título I) de la Constitución informará",
     "respuestas": ["La legislación positiva y la actuación de los poderes públicos", "La práctica judicial y la actuación de los poderes públicos", "La legislación positiva, la práctica judicial y la actuación de los poderes públicos", "La legislación positiva y la práctica judicial"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 53.3 CE dice que los principios del Capítulo III informan la legislación positiva, la práctica judicial y la actuación de los poderes públicos. Las demás alternativas omiten alguno de esos tres ámbitos."
   },
   {
     "tema": 1,
     "pregunta": "Las penas privativas de libertad y las medidas de seguridad estarán orientadas hacia",
     "respuestas": ["La reeducación, resocialización y reinserción social", "La resocialización y reinserción social", "La reeducación y resocialización", "La reeducación y reinserción social"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 25.2 CE orienta las penas privativas de libertad y las medidas de seguridad hacia la reeducación y la reinserción social. Añadir «resocialización» o suprimir la reinserción altera el texto constitucional."
   },
   {
     "tema": 1,
     "pregunta": "Quedan excluidos de la extradición los delitos",
     "respuestas": ["Penales", "Políticos", "Sentenciados", "Civiles"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 13.3 CE excluye de la extradición los delitos políticos y precisa que los actos de terrorismo no se consideran como tales. Los delitos comunes, los ya sentenciados y los civiles no están excluidos por ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "Todos los españoles tendrán el derecho de petición",
     "respuestas": ["Individual y colectiva, por escrito", "Individual, por escrito o verbalmente", "Individual o colectiva, por escrito o verbalmente", "Individual, por escrito"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 29.1 CE reconoce el derecho de petición individual y colectiva y exige que se ejercite por escrito. Las demás alternativas limitan indebidamente el derecho a una sola modalidad o permiten la forma verbal."
   },
   {
     "tema": 1,
     "pregunta": "El estatuto de los trabajadores se regulará",
     "respuestas": ["Por ley", "Por Decreto-Ley", "Por Real Decreto", "Por ley orgánica"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 35.2 CE remite a la ley la regulación de un estatuto de los trabajadores. No reserva la materia a decreto-ley, real decreto ni ley orgánica."
   },
   {
     "tema": 1,
     "pregunta": "En la bandera de España, la franja amarilla",
     "respuestas": ["Es la mitad de ancha que las rojas", "Es de igual anchura que las rojas", "Es de doble anchura que las rojas", "Es de triple anchura que las rojas"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 4.1 CE establece que la franja amarilla tiene doble anchura que cada una de las rojas. Por eso no es de igual, mitad ni triple anchura."
   },
   {
     "tema": 1,
     "pregunta": "Mediante ley podrán regularse los deberes de los ciudadanos en los casos de",
     "respuestas": ["Grave riesgo, catástrofe o calamidad pública", "Grave riesgo o siniestro", "Grave riesgo o catástrofe", "Grave riesgo, siniestro o catástrofe"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 30.4 CE permite regular mediante ley los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública. Las demás opciones omiten alguno de esos supuestos o añaden otro distinto."
   },
   {
     "tema": 1,
     "pregunta": "La Constitución, ¿prohíbe los Tribunales de honor?",
     "respuestas": ["Sí, en el ámbito de la Administración civil", "No, en ningún ámbito", "Sí, en todos los ámbitos", "Sí, en el ámbito de la Administración civil y de las organizaciones profesionales"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 26 CE prohíbe los Tribunales de Honor en el ámbito de la Administración civil y de las organizaciones profesionales. No los prohíbe en todos los ámbitos ni solo en la Administración civil."
   },
   {
     "tema": 1,
     "pregunta": "Los españoles son iguales",
     "respuestas": ["Ante el Rey", "Ante la Constitución", "Ante el Gobierno", "Ante la ley"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 14 CE proclama que los españoles son iguales ante la ley, sin discriminación. La igualdad no se formula ante el Rey, la Constitución o el Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "En el ejercicio de sus derechos e intereses legítimos, todas las personas tienen derecho a obtener la tutela efectiva de",
     "respuestas": ["Los jueces, magistrados, juzgados y tribunales", "Los tribunales", "Los jueces", "Los jueces y tribunales"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 24.1 CE reconoce la tutela efectiva de los jueces y tribunales. Mencionar solo a los tribunales, solo a los jueces o añadir juzgados y magistrados no reproduce el precepto."
   },
   {
     "tema": 1,
     "pregunta": "La detención preventiva no podrá durar más",
     "respuestas": ["Del tiempo estrictamente necesario para la realización de las averiguaciones tendentes al esclarecimiento de los hechos", "De 24 horas", "De 12 horas", "De 48 horas"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 17.2 CE limita la detención preventiva al tiempo estrictamente necesario para las averiguaciones y, en todo caso, a un máximo de 72 horas. Los plazos fijos de 12, 24 o 48 horas no agotan ese límite constitucional."
   },
   {
     "tema": 1,
     "pregunta": "Los atentados contra el patrimonio de los pueblos de España se sancionará mediante",
     "respuestas": ["Multas", "La ley penal", "Sanciones", "Una ley especial"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 46 CE dispone que la ley penal sancionará los atentados contra el patrimonio histórico, cultural y artístico. No remite a multas, sanciones genéricas ni a una ley especial distinta de la penal."
   },
   {
     "tema": 1,
     "pregunta": "Según la Constitución, ¿podrá estableceser un servicio civil?",
     "respuestas": ["Sí, para el cumplimiento de fines de interés general", "No", "Sí, para el cumplimiento de fines colectivos", "No, porque el servicio será militar"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 30.3 CE permite establecer un servicio civil para el cumplimiento de fines de interés general. No lo prohíbe ni lo limita a fines colectivos o al servicio militar."
   },
   {
     "tema": 1,
     "pregunta": "Cualquier ciudadano podrá recabar la tutela de las libertades y derechos reconocidos en el artículo 14 y la sección primera del Capítulo segundo del Titulo 1 de la Constitución",
     "respuestas": ["Ante los Tribunales ordinarios", "Ante el Defensor del Pueblo", "Ante los tribunales penales", "Ante el Ministerio Fiscal"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 53.2 CE permite recabar la tutela de esos derechos ante los Tribunales ordinarios mediante un procedimiento preferente y sumario. El Defensor del Pueblo, los tribunales penales y el Ministerio Fiscal no son el cauce judicial previsto en ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "La inhabilitación del Rey se reconoce por",
     "respuestas": ["El Congreso", "El Gobierno", "Las Cortes Generales", "Tres Poderes constitucionales"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 59.2 CE exige que la imposibilidad del Rey sea reconocida por las Cortes Generales para que entre en juego la Regencia. No corresponde al Congreso, al Gobierno ni a tres poderes constitucionales."
   },
   {
     "tema": 1,
     "pregunta": "El régimen de Seguridad Social garantizará unas prestaciones sociales suficientes ante situaciones de necesidad, especialmente en caso de",
     "respuestas": ["Contingencia protegible", "Desempleo", "Enfermedad", "Necesidad"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 41 CE garantiza prestaciones sociales suficientes ante situaciones de necesidad y menciona especialmente el desempleo. Las demás opciones aluden a supuestos genéricos o distintos que no son el término literal del precepto."
   },
   {
     "tema": 1,
     "pregunta": "A efectos de extradición, los actos de terrorismo",
     "respuestas": ["Tienen un tratamiento específico", "Se equiparan a delitos políticos", "Se equiparan a delitos contra la humanidad", "No se consideran como delitos políticos"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 13.3 CE excluye de la extradición los delitos políticos, pero aclara que los actos de terrorismo no se consideran delitos políticos. No les da un tratamiento específico ni los equipara a delitos contra la humanidad."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos regularán la utilización del suelo de acuerdo con el interés general para impedir",
     "respuestas": ["El urbanismo salvaje", "El enriquecimiento injusto", "La especulación", "La construcción ilegal"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 47 CE ordena regular la utilización del suelo conforme al interés general para impedir la especulación. Las otras expresiones no aparecen en el texto constitucional."
   },
   {
     "tema": 1,
     "pregunta": "Para garantizar el cumplimiento de las leyes, los poderes públicos",
     "respuestas": ["Inspeccionarán, coordinarán y homologarán el sistema educativo", "Inspeccionarán y coordinarán el sistema educativo", "Homologarán y coordinarán el sistema educativo", "Inspeccionarán y homologarán el sistema educativo"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 27.8 CE atribuye a los poderes públicos la inspección y homologación del sistema educativo para garantizar el cumplimiento de las leyes. No menciona la coordinación como función de ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "¿Prohíbe la Constitución algún tipo de asociaciones?",
     "respuestas": ["No", "Si, las secretas", "Si, las de carácter paramilitar y las secretas", "Si, las de carácter paramilitar"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 22.5 CE prohíbe tanto las asociaciones secretas como las de carácter paramilitar. Por eso no basta con prohibir solo unas u otras."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos promoverán la ciencia y la investigación científica y técnica en beneficio",
     "respuestas": ["De la innovación tecnológica", "Del interés general", "Del progreso", "Del desarrollo nacional"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 44.2 CE promueve la ciencia y la investigación científica y técnica en beneficio del interés general. No se refiere al interés tecnológico, al progreso o al desarrollo nacional."
   },
   {
     "tema": 1,
     "pregunta": "La riqueza de las distintas modalidades lingüísticas de España es",
     "respuestas": ["Un bien cultural", "Un patrimonio cultural", "Un patrimonio histórico y cultural", "Un bien protegible"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 3.3 CE califica la riqueza de las modalidades lingüísticas como patrimonio cultural. No emplea las expresiones bien cultural, patrimonio histórico y cultural o bien protegible."
   },
   {
     "tema": 1,
     "pregunta": "¿Las asociaciones deberán inscribirse en un registro?",
     "respuestas": ["Si, a los solos efectos de control", "No", "Si, a efectos de publicidad y control", "Si, a los solos efectos de publicidad"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 22.3 CE exige la inscripción registral a los solos efectos de publicidad. No la configura como control administrativo ni como publicidad y control."
   },
   {
     "tema": 1,
     "pregunta": "La estructura interna y funcionamiento de las organizaciones profesionales deberán ser",
     "respuestas": ["Orgánicos", "Públicos", "Democráticos", "Flexibles"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 52 CE exige que la estructura interna y el funcionamiento de las organizaciones profesionales sean democráticos. No los califica de orgánicos, públicos o flexibles."
   },
   {
     "tema": 1,
     "pregunta": "El Rey es proclamado ante",
     "respuestas": ["El Gobierno", "El Senado", "Las Cortes Generales", "El Congreso"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 61.1 CE establece que el Rey es proclamado ante las Cortes Generales. No lo es ante el Gobierno, el Senado o el Congreso por separado."
   },
   {
     "tema": 1,
     "pregunta": "Los españoles tienen derecho a",
     "respuestas": ["Elegir libremente su residencia y a circular por el territorio nacional", "A circular por el territorio nacional y extranjero", "A elegir libremente su residencia y a circular por el territorio nacional y extranjero", "A elegir libremente su residencia"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 19 CE reconoce a los españoles el derecho a elegir libremente su residencia y a circular por el territorio nacional. La entrada y salida de España se regula aparte y no se incluye en esa primera fórmula."
   },
   {
     "tema": 1,
     "pregunta": "La ley regulará las organizaciones profesionales que contribuyan a la defensa de los intereses económicos",
     "respuestas": ["Nacionales", "Sociales", "Generales", "Propios"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 52 CE se refiere a las organizaciones profesionales que defienden los intereses económicos que les sean propios. Los intereses nacionales, sociales o generales no son el término del precepto."
   },
   {
     "tema": 1,
     "pregunta": "La estructura interna y el funcionamiento de los Colegios profesionales deberán ser",
     "respuestas": ["Flexibles", "Públicos", "Orgánicos", "Democráticos"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 36 CE exige que la estructura interna y el funcionamiento de los Colegios Profesionales sean democráticos. No exige que sean flexibles, públicos u orgánicos."
   },
   {
     "tema": 1,
     "pregunta": "Se reconoce el derecho de fundación",
     "respuestas": ["Para fines de interés general", "Para fines de interés social", "Para fines educativos", "Para fines de interés social y educativos"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 34.1 CE reconoce el derecho de fundación para fines de interés general. No limita la fundación a fines sociales o educativos."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos aseguran la protección integral de las madres, cualesquiera que sea",
     "respuestas": ["Su situación económica", "Su situación social", "Su situación económica y social", "Su estado civil"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 39.2 CE asegura la protección integral de las madres cualquiera que sea su estado civil. No condiciona esa protección a su situación económica o social."
   },
   {
     "tema": 1,
     "pregunta": "La creación de partidos políticos y el ejercicio de su actividad son",
     "respuestas": ["Libres", "Generales", "Plurales", "Voluntarios"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 6 CE declara libres la creación de los partidos políticos y el ejercicio de su actividad, dentro del respeto a la Constitución y a la ley. No los califica de generales, plurales o voluntarios."
   },
   {
     "tema": 1,
     "pregunta": "A los individuos y las comunidades se les garantiza",
     "respuestas": ["La libertad ideológica y religiosa", "La libertad ideológica y de culto", "La libertad ideológica, religiosa y de culto", "La libertad religiosa y de culto"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 16.1 CE garantiza la libertad ideológica, religiosa y de culto de los individuos y las comunidades. Las demás opciones suprimen alguna de esas dimensiones."
   },
   {
     "tema": 1,
     "pregunta": "En el ámbito económico, los poderes públicos realizarán una política orientada",
     "respuestas": ["Al libre mercado", "A un incremento del P.I.B", "A la disminución del desempleo", "Al pleno empleo"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 40.1 CE ordena realizar una política orientada de manera especial al pleno empleo. No fija como objetivo el libre mercado, el aumento del PIB o la simple reducción del desempleo."
   },
   {
     "tema": 1,
     "pregunta": "La soberanía nacional reside",
     "respuestas": ["En el Rey", "En las Cortes Generales", "En el pueblo español", "En la nación"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 1.2 CE afirma que la soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado. No reside en el Rey, en las Cortes ni en la nación como entidad distinta del pueblo."
   },
   {
     "tema": 1,
     "pregunta": "¿Se podrán prohibir las reuniones y manifestaciones que se celebren en lugares de tránsito público?",
     "respuestas": ["Únicamente cuando existan razones fundadas de alteración del orden público, con peligro para personas o bienes", "No, nunca", "Únicamente cuando existan razones fundadas de alteración del orden público, con peligro para personas", "Únicamente cuando existan razones fundadas de alteración del orden público"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 21.2 CE permite prohibir reuniones y manifestaciones en lugares de tránsito público solo cuando existan razones fundadas de alteración del orden público con peligro para personas o bienes. Las demás opciones omiten el peligro para bienes o el propio presupuesto de alteración del orden."
   },
   {
     "tema": 1,
     "pregunta": "¿Reconoce la Constitución el derecho a la propiedad privada?",
     "respuestas": ["No", "Sí, y a la herencia", "Sí, y a la herencia y legados", "Sí, y a la comunal"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 33.1 CE reconoce el derecho a la propiedad privada y a la herencia. No se limita a la propiedad ni añade legados o propiedad comunal."
   },
   {
     "tema": 1,
     "pregunta": "La Constitución reconoce y garantiza el derecho a la autonomía",
     "respuestas": ["De las Comunidades Autónomas que la integran", "De las nacionalidades que la integran", "De las nacionalidades y regiones que la integran", "De las regiones que la integran"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 2 CE reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que integran la Nación española. Las demás opciones se refieren solo a una de esas realidades."
   },
   {
     "tema": 1,
     "pregunta": "Los representantes de los ciudadanos para participar en los asuntos públicos",
     "respuestas": ["Serán libremente elegidos por sufragio censitario", "Serán libremente elegidos en elecciones frecuentes por sufragio censitario", "Serán libremente elegidos por sufragio universal", "Serán libremente elegidos en elecciones periódicas por sufragio universal"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 23.1 CE exige que los representantes sean elegidos libremente en elecciones periódicas por sufragio universal. El sufragio censitario y la falta de periodicidad son incompatibles con ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "La ley garantizará el derecho a la negociación colectiva laboral",
     "respuestas": ["Entre los trabajadores y empresarios", "Entre trabajadores y organizaciones sindicales", "Entre los representantes de los trabajadores y empresarios", "Entre organizaciones sindicales y empresariales"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 37.1 CE garantiza la negociación colectiva entre los representantes de los trabajadores y los empresarios. No la atribuye directamente a los trabajadores o a las organizaciones sindicales."
   },
   {
     "tema": 1,
     "pregunta": "Todos los españoles tienen derecho a disfrutar de una vivienda",
     "respuestas": ["Digna y suficiente", "Adecuada y económica", "Digna y adecuada", "Digna y económica"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 47 CE reconoce el derecho a disfrutar de una vivienda digna y adecuada. No emplea los calificativos suficiente, económica o adecuada y económica."
   },
   {
     "tema": 1,
     "pregunta": "Una persona detenida, ¿puede ser obligada a declarar?",
     "respuestas": ["No, salvo si su abogado está presente", "No", "Si", "Sí, en presencia de su abogado"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 17.3 CE establece que toda persona detenida no puede ser obligada a declarar. No se admite la declaración coactiva ni siquiera con abogado presente."
   },
   {
     "tema": 1,
     "pregunta": "Entre las funciones constitucionales del Rey se encuentra la de",
     "respuestas": ["Sancionar y promulgar las leyes aprobadas por las Cortes Generales", "Sancionar las leyes de las Comunidades Autónomas", "Sancionar y promulgar las leyes aprobadas por el Congreso", "Promulgar las leyes de las Comunidades Autónomas"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 62.a CE atribuye al Rey sancionar y promulgar las leyes aprobadas por las Cortes Generales. No le corresponde sancionar las leyes autonómicas ni solo las del Congreso."
   },
   {
     "tema": 1,
     "pregunta": "Nadie puede ser privado de su libertad",
     "respuestas": ["Salvo con la observancia de lo establecido en el artículo 17 de la Constitución", "Salvo con la observancia de lo establecido en el artículo 17 de la Constitución y en los casos y forma previstos en la ley", "Salvo en los casos y forma previstos en la ley", "Nunca"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 17.1 CE permite privar de libertad solo con la observancia de ese artículo y en los casos y forma previstos en la ley. Las demás opciones omiten una de esas dos exigencias."
   },
   {
     "tema": 1,
     "pregunta": "Respecto al ocio, los poderes públicos facilitarán",
     "respuestas": ["Su adecuada distribución", "Su adecuado disfrute", "Su adecuada utilización", "Su adecuada promoción"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 43.3 CE dispone que los poderes públicos facilitarán la adecuada utilización del ocio. No habla de distribución, disfrute o promoción."
   },
   {
     "tema": 1,
     "pregunta": "La Constitución garantiza",
     "respuestas": ["El derecho a la intimidad personal y familiar", "El derecho al honor, a la intimidad personal y familiar y a la propia imagen", "El derecho al honor y a la intimidad personal y familiar", "El derecho al honor y a la propia imagen"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 18.1 CE garantiza el derecho al honor, a la intimidad personal y familiar y a la propia imagen. Las demás alternativas eliminan alguno de esos tres derechos."
   },
   {
     "tema": 1,
     "pregunta": "Las penas privativas de libertad y las medidas de seguridad, ¿podrán consistir en trabajos forzados?",
     "respuestas": ["No", "Sí, si no exceden de un año", "Sí, totalmente", "Sí, para casos de terrorismo"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 25.2 CE prohíbe que las penas privativas de libertad y las medidas de seguridad consistan en trabajos forzados. No admite excepciones por duración, gravedad o terrorismo."
   },
   {
     "tema": 1,
     "pregunta": "Se reconoce la libertad de empresa en el marco de",
     "respuestas": ["La economía capitalista", "La econocmía occidental", "La economía de mercado", "La productividad nacional"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 38 CE reconoce la libertad de empresa en el marco de la economía de mercado. No la enmarca en la economía capitalista, occidental o en la productividad nacional."
   },
   {
     "tema": 1,
     "pregunta": "La enseñanza básica es",
     "respuestas": ["Obligatoria y gratuita", "Optativa y gratuita", "Obligatoria, gratuita e integral", "Obligatoria e integral"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 27.4 CE declara que la enseñanza básica es obligatoria y gratuita. No la califica de optativa, integral o integral y gratuita."
   },
   {
     "tema": 1,
     "pregunta": "Nadie podrá ser privado de sus bienes y derechos sino por causa justificada de",
     "respuestas": ["Necesiad o interés social", "Utilidad pública o interés social", "Utilidad pública o necesidad", "Utilidad pública, necesidad o interés social"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 33.3 CE permite privar de bienes y derechos por causa justificada de utilidad pública o interés social, con indemnización y conforme a la ley. Las demás opciones alteran o amplían esa causa."
   },
   {
     "tema": 1,
     "pregunta": "El condenado a pena de prisión que estuviera cumpliendo la misma gozará de los derechos constitucionales fundamentales, a excepción de los que se vean expresamente limitados por",
     "respuestas": ["El sentido de la pena y la ley penitenciaria", "El contenido del fallo condenatorio y el sentido de la pena", "El contenido del fallo condenatorio, el sentido de la pena y la ley penitenciaria", "El contenido del fallo condenatorio y la duración de la pena"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 25.2 CE limita los derechos del condenado solo por el contenido del fallo, el sentido de la pena y la ley penitenciaria. Las demás opciones omiten alguno de esos límites."
   },
   {
     "tema": 1,
     "pregunta": "La libertad de expresión podrá realizarse mediante",
     "respuestas": ["La palabra y el escrito", "La palabra, el escrito o cualquier otro medio de reproducción", "El escrito", "La palabra"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 20.1.a CE reconoce la libertad de expresión mediante la palabra, el escrito o cualquier otro medio de reproducción. Las demás opciones reducen los medios admitidos."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué se fundamente la Constitución Española?",
     "respuestas": ["En un Estado social de Derecho", "En un Estado social y democrático de Derecho", "En un Estado territorial y democrático de Derecho", "En un Estado democrático de Derecho"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 1.1 CE define España como un Estado social y democrático de Derecho. Las demás fórmulas omiten alguno de esos caracteres o añaden uno que no aparece en el precepto."
   },
   {
     "tema": 1,
     "pregunta": "Respecto de la protección de la familia, los hijos son iguales ante la ley con independencia de",
     "respuestas": ["Su raza", "Su edad", "Su nacimiento", "Su filiación"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 39.2 CE declara iguales a los hijos ante la ley con independencia de su filiación. No se refiere a la raza, la edad o el nacimiento."
   },
   {
     "tema": 1,
     "pregunta": "La institución del Defensor del Pueblo se regulará",
     "respuestas": ["Mediante una ley orgánica", "Mediante una ley ordinaria", "Mediante un Real Decreto", "Mediante un Decreto-Ley"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE ordena regular mediante ley orgánica la institución del Defensor del Pueblo. No basta una ley ordinaria, un real decreto o un decreto-ley."
   },
   {
     "tema": 1,
     "pregunta": "La nacionalidad española se adquiere, se conserva y se pierde de acuerdo con lo establecido por",
     "respuestas": ["La Constitución", "Los Tratados Internacionales", "Los Derechos Humanos", "La ley"],
-    "respuesta_correcta": "a",
-    "explicacion": ""
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 11.1 CE remite a la ley la adquisición, conservación y pérdida de la nacionalidad española. La Constitución no regula directamente esos extremos ni los remite a los tratados o a los derechos humanos."
   },
   {
     "tema": 1,
     "pregunta": "¿Queda abolida la pena de muerte en la Constitución?",
     "respuestas": ["Sí, totalmente", "Sí, salvo lo que puedan disponer las leyes penales militares para tiempos de guerra", "Sí, salvo lo que pueda disponer una ley orgánica para tiempos de guerra", "No"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 15 CE abole la pena de muerte salvo lo que puedan disponer las leyes penales militares para tiempos de guerra. No la mantiene sin límites ni la remite a una ley orgánica."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos garantizarán la conservación y promoverán el enriquecimiento del patrimonio",
     "respuestas": ["Histórico, cultural y folclórico de los pueblos de España", "Histórico, cultural y artístico de los pueblos de España", "Cultural y Folclórico de los pueblos de España", "Histórico y cultural de los pueblos de España"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 46 CE se refiere al patrimonio histórico, cultural y artístico de los pueblos de España. No emplea la expresión folclórico ni suprime el término artístico."
   },
   {
     "tema": 1,
     "pregunta": "Salvo resolución judicial, se garantiza el secreto de las comunicaciones y, en especial, de las",
     "respuestas": ["Postales, telegráficas, telefónicas y electrónicas", "Postales, telefónicas y electrónicas", "Postales, telegráficas y electrónicas", "Postales, telegráficas y telefónicas"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 18.3 CE garantiza el secreto de las comunicaciones postales, telegráficas y telefónicas, salvo resolución judicial. No menciona las electrónicas."
   },
   {
     "tema": 1,
     "pregunta": "Nadie puede ser condenado o sancionado por acciones u omisiones que en el momento de producirse no constituyan",
     "respuestas": ["Delito, falta o infracción judicial", "Delito o infracción judicial", "Delito, falta o infracción administrativa", "Delito o falta"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 25.1 CE exige que la acción u omisión esté tipificada como delito, falta o infracción administrativa en el momento de producirse. Las demás opciones omiten alguna de esas categorías o añaden una incorrecta."
   },
   {
     "tema": 1,
     "pregunta": "La más alta representación del Estado español en las relaciones internacionales es asumida por",
     "respuestas": ["El Rey", "El Defensor del Pueblo", "El Presidente del Gobierno", "El Presidente del Congreso"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 56.1 CE atribuye al Rey la más alta representación del Estado español en las relaciones internacionales. No corresponde al Defensor del Pueblo, al Presidente del Gobierno ni al Presidente del Congreso."
   },
   {
     "tema": 1,
     "pregunta": "La forma política del Estado español es",
     "respuestas": ["La República", "La Monarquía parlamentaria", "La Monarquía hereditaria", "La democracia parlamentaria"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 1.3 CE establece que la forma política del Estado español es la Monarquía parlamentaria. No es una república, una monarquía hereditaria sin más ni una democracia parlamentaria."
   },
   {
     "tema": 1,
     "pregunta": "Las Fuerzas Armadas no tienen como misión",
     "respuestas": ["Defender la integridad territorial de España", "Garantizar la soberanía e independencia de España", "Garantizar la neutralidad de España", "Defender el ordenamiento constitucional de España"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 8.1 CE fija como misiones de las Fuerzas Armadas garantizar la soberanía e independencia, defender la integridad territorial y el ordenamiento constitucional. Garantizar la neutralidad no figura entre ellas."
   },
   {
     "tema": 1,
     "pregunta": "Un detenido deberá ser puesto en libertad o a disposición de la autoridad judicial en el plazo máximo de",
     "respuestas": ["72 horas", "12 horas", "48 horas", "24 horas"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 17.2 CE fija en 72 horas el plazo máximo para poner al detenido en libertad o a disposición judicial. Los plazos de 12, 24 o 48 horas son inferiores y no agotan el máximo constitucional."
   },
   {
     "tema": 1,
     "pregunta": "Cualquier ciudadano podrá recabar la tutela de las libertades y derechos reconocidos en el artículo 14 y la sección primera del Capítulo segundo del Titulo 1 de la Constitución mediante un procedimiento basado en los principios de",
     "respuestas": ["Preferencia y ejecutividad", "Preferencia y sumariedad", "Precedencia y ejecutividad", "Celeridad y equidad"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 53.2 CE configura el procedimiento ante los Tribunales ordinarios con los principios de preferencia y sumariedad. No emplea los términos ejecutividad, precedencia, celeridad o equidad."
   },
   {
     "tema": 1,
     "pregunta": "Respecto el Estado, el Rey es símbolo de su",
     "respuestas": ["Unidad e integridad", "Unidad y soberanía", "Integridad y soberanía", "Unidad y permanencia"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 56.1 CE define al Rey como símbolo de la unidad y permanencia del Estado. No se refiere a la integridad o a la soberanía como términos de esa definición."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos garantizan el derecho que asiste a los padres para que sus hijos reciban la formación",
     "respuestas": ["Integral que esté de acuerdo con sus propios ideales", "Religiosa y moral que esté de acuerdo con sus propias convicciones", "Religiosa que esté de acuerdo con sus propias convicciones", "Religiosa y moral que esté de acuerdo con sus propios ideales"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 27.3 CE garantiza a los padres que sus hijos reciban formación religiosa y moral conforme a sus propias convicciones. No se refiere a una formación integral ni a sus ideales."
   },
   {
     "tema": 1,
     "pregunta": "Para cumplir su comentido, el Defensor del Pueblo podrá supervisas la actividad",
     "respuestas": ["Del Poder Judicial", "De las Cortes Generales", "Del Gobierno", "De la Administración"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE permite al Defensor del Pueblo supervisar la actividad de la Administración, dando cuenta a las Cortes Generales. No supervisa al Poder Judicial, a las Cortes o al Gobierno como tal."
   },
   {
     "tema": 1,
     "pregunta": "Los españoles, ¿tienen el derecho de defender a España?",
     "respuestas": ["No", "Sí, si han cumplido o están cumpliendo el servicio militar", "Sí, y también el deber", "Sí, si son mayores de 18 años"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 30.1 CE establece que los españoles tienen el derecho y el deber de defender a España. No lo condiciona al servicio militar ni a la mayoría de edad."
   },
   {
     "tema": 1,
     "pregunta": "¿Las asociaciones podrán ser disueltas o suspendidas en sus actividades?",
     "respuestas": ["No", "Si, en virtud de resolución administrativa", "Si, en virtud de resolución judicial o administrativa", "Si, en virtud de resolución judicial"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 22.4 CE exige resolución judicial motivada para disolver o suspender una asociación. No basta una resolución administrativa ni la mera decisión del Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Todos los españoles tienen",
     "respuestas": ["El derecho a la ocupación plena", "El deber de trabajar", "El derecho y deber de trabajar", "El derecho al trabajo"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 35.1 CE reconoce a los españoles el deber y el derecho al trabajo. No se limita a un derecho al trabajo ni a una ocupación plena."
   },
   {
     "tema": 1,
     "pregunta": "Los ciudadanos tienen derecho a acceder en condiciones de igualdad",
     "respuestas": ["A las funciones y empleos públicos", "A las funciones públicas", "A las funciones y cargos públicos", "A los cargos y empleos públicos"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 23.2 CE reconoce el derecho a acceder en condiciones de igualdad a las funciones y cargos públicos. No emplea solo funciones públicas o cargos y empleos públicos."
   },
   {
     "tema": 1,
     "pregunta": "¿Reconoce la Constitución el derecho a la educación?",
     "respuestas": ["Sí, y también la libertad de enseñanza", "No", "Sí, pero no la libertad de enseñanza", "Sí, y también el deber de enseñanza"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 27.1 CE reconoce el derecho a la educación y la libertad de enseñanza. No se limita al derecho a la educación ni establece un deber de enseñanza."
   },
   {
     "tema": 1,
     "pregunta": "La mayoría de edad de los españoles es",
     "respuestas": ["A la edad que fije una ley orgánica", "A los dieciséis años", "A los veintiun años", "A los dieciocho años"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 12 CE fija la mayoría de edad de los españoles en los dieciocho años. No la remite a una ley orgánica ni la sitúa en los dieciséis o veintiún años."
   },
   {
     "tema": 1,
     "pregunta": "Nadie podrá ser obligado a declarar",
     "respuestas": ["Sobre su ideología", "Sobre su religión y creencias", "Sobre su ideología, religión y creencias", "Sobre su ideología y su religión"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 16.2 CE dispone que nadie podrá ser obligado a declarar sobre su ideología, religión o creencias. Las demás opciones omiten alguno de esos tres ámbitos."
   },
   {
     "tema": 1,
     "pregunta": "Según la Constitución, la Ley podrá limitar o exceptuar el ejercicio del derecho de sindicación",
     "respuestas": ["A las Fuerzas Armadas o Institutos armados", "A los funcionarios públicos", "A las Fuerzas o Institutos armados y los demás cuerpos sometidos a disciplina militar", "A las Fuerzas Armadas y funcionarios públicos"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 28.1 CE permite limitar o exceptuar la sindicación a las Fuerzas o Institutos armados y a los demás cuerpos sometidos a disciplina militar. No se refiere a los funcionarios públicos en general."
   },
   {
     "tema": 1,
     "pregunta": "Respecto los condumidores y usuarios, los poderes públicos protegerán mediante procedimientos eficaces",
     "respuestas": ["La seguridad, la salud y los legítimos intereses económicos de los mismos", "La seguridad y los legítimos intereses económicos de los mismos", "La seguridad de los mismos", "La seguridad y la salud de los mismos"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 51.1 CE protege la seguridad, la salud y los legítimos intereses económicos de consumidores y usuarios. Las demás opciones suprimen alguno de esos tres bienes."
   },
   {
     "tema": 1,
     "pregunta": "El procedimiento para producir la inmediata puesta a disposición judicial de toda persona detenida ilegalmente se denomina",
     "respuestas": ["De legalidad penal", "De \"habeas corpus\"", "corpus", "De interdicción"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 17.4 CE ordena regular por ley el procedimiento de «habeas corpus» para poner inmediatamente a disposición judicial a quien esté detenido ilegalmente. No se denomina legalidad penal, corpus ni interdicción."
   },
   {
     "tema": 1,
     "pregunta": "La libertad de cátedra",
     "respuestas": ["Es una obligación", "Es un derecho", "Es un deber", "No está contemplada en la Constitución"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 20.1.c CE reconoce la libertad de cátedra como derecho. No es una obligación, un deber ni una institución ajena a la Constitución."
   },
   {
     "tema": 1,
     "pregunta": "Se reconoce y protege el derecho a la producción y creación",
     "respuestas": ["Científica y técnica", "Literaria y artística", "Literaria, artística, científica y técnica", "Literaria, artística y técnica"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 20.1.b CE reconoce y protege la producción y creación literaria, artística, científica y técnica. Las demás opciones omiten alguna de esas modalidades."
   },
   {
     "tema": 1,
     "pregunta": "El Jefe del Estado es",
     "respuestas": ["El Defensor del Pueblo", "El Presidente del Congreso", "El Rey", "El Presidente del Gobierno"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 56.1 CE define al Rey como Jefe del Estado. No lo son el Defensor del Pueblo, el Presidente del Congreso o el Presidente del Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos promoverán las condiciones para la participación libre y eficaz de la juventud en el desarrollo",
     "respuestas": ["Político, social y económico", "Político, social, económico y cultural", "Político, social y cultural", "Social, económico y cultural"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 48 CE promueve la participación de la juventud en el desarrollo político, social, económico y cultural. Las demás opciones omiten alguno de esos ámbitos."
   },
   {
     "tema": 1,
     "pregunta": "El derecho a adoptar medidas de conflicto colectivo se reconoce a favor de",
     "respuestas": ["La autoridad laboral", "Los trabajadores", "Los empresarios", "Los trabajadores y empresarios"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 37.2 CE reconoce a los trabajadores y empresarios el derecho a adoptar medidas de conflicto colectivo. No lo atribuye solo a una de las partes ni a la autoridad laboral."
   },
   {
     "tema": 1,
     "pregunta": "¿Quiénes intervendrán en el control y gestión de todos los centros sostenidos por la Administración con fondos públicos?",
     "respuestas": ["Los profesores, los padres y, en su caso, los alumnos", "Los profesores", "Los profesores y los padres", "Los profesores y, en su caso, los alumnos"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 27.7 CE hace intervenir en el control y gestión de los centros sostenidos con fondos públicos a los profesores, los padres y, en su caso, los alumnos. Las demás opciones excluyen a alguno de esos sectores."
   },
   {
     "tema": 1,
     "pregunta": "El hombre y la mujer tienen derecho a contraer matrimonio",
     "respuestas": ["Con plena igualdad económica y social", "En cualquier momento", "Con plena igualdad social", "Con plena igualdad jurídica"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 32.1 CE reconoce el derecho del hombre y la mujer a contraer matrimonio con plena igualdad jurídica. No se refiere a igualdad económica o social."
   },
   {
     "tema": 1,
     "pregunta": "Si se agotan todas las líneas llamadas a la sucesión en la Corona de España, se",
     "respuestas": ["Establece una Dictadura", "Proclama la República", "Proveerá a la sucesión en la Corona por las Cortes Generales", "Nombran Regentes"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 57.3 CE dispone que, extinguidas todas las líneas llamadas en Derecho, las Cortes Generales proveerán a la sucesión en la Corona. No se proclama una dictadura o república ni se nombran regentes."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 1.1 de  la Constitución, el Estado es",
     "respuestas": ["Apolítico", "Federal", "Social", "Aconfesional"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 1.1 CE define el Estado como social y democrático de Derecho. No lo califica de apolítico, federal o aconfesional en ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos promoverán el bienestar de la tercera edad mediante un sistema de servicios sociales que atenderán sus problemas específicos de",
     "respuestas": ["Salud y vivienda", "Salud, vivienda, cultura y ocio", "Cultura y ocio", "Salud, vivienda y cultura"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 50 CE ordena atender los problemas específicos de salud, vivienda, cultura y ocio de la tercera edad. Las demás opciones suprimen alguno de esos ámbitos."
   },
   {
     "tema": 1,
     "pregunta": "Se garantiza la asistencia de abogado al detenido",
     "respuestas": ["En las diligencias judiciales, exclusivamente", "En las diligencias policiales, exclusivamente", "En las diligencias policiales y judiciales", "En las diligencias policiales, judiciales y administrativas"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 17.3 CE garantiza la asistencia de abogado al detenido en las diligencias policiales y judiciales. No la limita a una sola de ellas ni la extiende a las administrativas."
   },
   {
     "tema": 1,
     "pregunta": "¿Quién designa al Defensor del Pueblo?",
     "respuestas": ["Las Cortes Generales", "El Congreso", "El Senado", "El Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE atribuye a las Cortes Generales la designación del Defensor del Pueblo. No lo designan el Congreso, el Senado o el Gobierno por separado."
   },
   {
     "tema": 1,
     "pregunta": "La capital del Estado español es",
     "respuestas": ["La Comunidad Autónoma de Madrid", "El municipio de Madrid", "La villa de Madrid", "Aquella en la que resida el Rey"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 5 CE declara que la capital del Estado es la villa de Madrid. No la Comunidad Autónoma, el municipio como entidad distinta o el lugar donde resida el Rey."
   },
   {
     "tema": 1,
     "pregunta": "Los poderes públicos garantizarán la suficiencia económica a los ciudadanos durante la tercera edad mediante pensiones",
     "respuestas": ["Suficientes y periódicamente actualizadas", "Adecuadas y suficientes", "Adecuadas, suficientes y periódicamente actualizadas", "Adecuadas y periódicamente actualizadas"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 50 CE garantiza pensiones adecuadas y periódicamente actualizadas para la suficiencia económica en la tercera edad. Las demás opciones suprimen la periodicidad de la actualización o añaden el término suficiente."
   },
   {
     "tema": 1,
     "pregunta": "Respecto de la familia, los poderes públicos asegurarán su protección",
     "respuestas": ["Social, económica y administrativa", "Económica, jurídica y administrativa", "Social, económica y jurídica", "Social, jurídica y administrativa"],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 39.1 CE asegura la protección social, económica y jurídica de la familia. No menciona la protección administrativa."
   },
   {
     "tema": 1,
     "pregunta": "Los partidos políticos expresan",
     "respuestas": ["El pluralismo político", "El pluralismo social", "La democracia alternativa", "La alternancia en el poder"],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 6 CE afirma que los partidos políticos expresan el pluralismo político. No el pluralismo social, la democracia alternativa o la alternancia en el poder."
   },
   {
     "tema": 1,
     "pregunta": "Toda persona detenida debe ser informada de forma inmediata y de modo que le sea comprensible",
     "respuestas": ["De las razones de su detención", "De sus derechos, y, de las razones y duración de su detención", "De sus derechos", "De sus derechos y de las razones de su detención"],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 17.3 CE obliga a informar al detenido inmediatamente y de forma comprensible de sus derechos y de las razones de la detención. La duración no forma parte de esa información según el texto."
   },
   {
     "tema": 1,
     "pregunta": "La Constitución, ¿reconoce el derecho a la huelga de los trabajadores?",
     "respuestas": ["Sí, para la defensa de sus salarios", "Sí, para la defensa de sus intereses", "No, lo encomienta una ley", "Sí, para la defensa de sus contratos"],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El artículo 28.2 CE reconoce el derecho a la huelga de los trabajadores para la defensa de sus intereses. No lo limita a la defensa de salarios o contratos ni lo remite a una ley."
   },
   {
     "tema": 1,
     "pregunta": "En relación a los derechos y deberes de los ciudadanos, el artículo 30 de la Constitución Española indica que:",
     "respuestas": ["Mediante ley podrán ser de obligado cumplimiento los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante Real Decreto podrán ser de obligado cumplimiento los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante ley podrán eliminarse los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública.", "Mediante ley podrán regularse los deberes de los ciudadanos en los casos de grave riesgo, catástrofe o calamidad pública."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 30.4 CE permite regular mediante ley los deberes de los ciudadanos en casos de grave riesgo, catástrofe o calamidad pública. No se hace por real decreto ni se trata de eliminar deberes."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 62 de la Constitución Española, ¿a quién corresponde expedir los decretos acordados en el Consejo de Ministros?",
     "respuestas": ["Al Rey.", "Al Presidente del Gobierno.", "Al titular del Ministerio de la Presidencia.", "Al Presidente de la Mesa del Congreso."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 62.f CE atribuye al Rey expedir los decretos acordados en el Consejo de Ministros. No corresponde al Presidente del Gobierno, al titular del Ministerio de la Presidencia ni al Presidente de la Mesa del Congreso."
   },
   {
     "tema": 1,
     "pregunta": "Indique cuál es el Título de la Constitución Española relativo a la Organización Territorial del Estado:",
     "respuestas": ["Título IV.", "Título VI.", "Título VIII.", "Título X."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El Título VIII CE se titula «De la Organización Territorial del Estado». Los Títulos IV, VI y X regulan otras materias (Gobierno, Poder Judicial y reforma constitucional)."
   },
   {
     "tema": 1,
     "pregunta": "De acuerdo con el artículo 64 de la Constitución Española de 1978 (en adelante CE), los actos del Rey, excepto la propuesta y el nombramiento del Presidente del Gobierno, y la disolución de las Cámaras prevista en el artículo 99, serán refrendados por:",
     "respuestas": ["Los Presidentes del Congreso y el Senado.", "Los Ministros o los Secretarios de Estado en función de la materia.", "El Presidente del Gobierno y, en su caso, por los Presidentes del Congreso y el Senado.", "El Presidente del Gobierno y, en su caso, por los Ministros competentes."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "El artículo 64.1 CE dispone que los actos del Rey sean refrendados por el Presidente del Gobierno y, en su caso, por los Ministros competentes. No los refrendan los Presidentes de ambas Cámaras; el Presidente del Congreso solo refrenda los actos indicados en ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "La suspensión de los derechos y libertades se encuentra regulada en la CE en:",
     "respuestas": ["En el Capítulo III del Título I.", "En sus artículos 52 y 53.", "En el artículo 58.", "En el Capítulo V del Título I."],
     "respuesta_correcta": "d",
-    "explicacion": ""
+    "explicacion": "La suspensión de los derechos y libertades se regula en el Capítulo V del Título I (artículo 55). No está en el Capítulo III, en los artículos 52 y 53 o en el artículo 58."
   },
   {
     "tema": 1,
     "pregunta": "¿Cuál de los siguientes derechos recogidos en el Capítulo Segundo del Título I de la Constitución Española NO forma parte de los Derechos Fundamentales y Libertades Públicas (Artículos 15 a 29)?",
     "respuestas": ["Derecho a sindicarse libremente.", "Derecho a la propiedad privada.", "Derecho a la producción y creación literaria, artística, científica y técnica.", "Derecho a elegir libremente su residencia."],
     "respuesta_correcta": "b",
-    "explicacion": ""
+    "explicacion": "El derecho a la propiedad privada se reconoce en el artículo 33, dentro de la Sección 2.ª, y no entre los derechos fundamentales de los artículos 15 a 29. La sindicación, la creación artística y la residencia sí están en ese bloque."
   },
   {
     "tema": 1,
     "pregunta": "Según el Título I, Capítulo Cuarto, “De las garantías de las libertades y derechos fundamentales” de la Constitución Española de 1978, señale la opción correcta:",
     "respuestas": ["Los derechos y libertades reconocidos no vinculan a todas las Administraciones Públicas.", "Sólo por ley orgánica podrá regularse el ejercicio de tales derechos y libertades.", "Una ley orgánica regulará la institución del Defensor del Pueblo.", "El reconocimiento, el respeto y la protección de los principios reconocidos en el Capítulo tercero, informará la judicialización positiva, la práctica legislativa y la actuación de los poderes públicos."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 54 CE exige una ley orgánica para regular el Defensor del Pueblo. Las demás afirmaciones son incorrectas: los derechos vinculan a todas las Administraciones, la ley ordinaria puede regular su ejercicio y los principios del Capítulo III informan la legislación, la práctica judicial y la actuación pública."
   },
   {
     "tema": 1,
     "pregunta": "Señale la respuesta INCORRECTA de acuerdo con el Título II, artículo 62 de la Constitución Española de 1978. Corresponde al Rey:",
     "respuestas": ["Convocar a referéndum en los casos previstos en la Constitución, previa autorización de las Cortes Generales.", "Convocar y disolver las Cortes Generales y convocar elecciones en los términos previstos en la Constitución.", "Proponer el candidato a Presidente de Gobierno y, en su caso, nombrarlo, así como poner fin a sus funciones en los términos previstos en la Constitución.", "Nombrar y separar a los miembros del Gobierno, a propuesta de su Presidente."],
     "respuesta_correcta": "a",
-    "explicacion": ""
+    "explicacion": "El artículo 62.c CE atribuye al Rey convocar a referéndum en los casos previstos en la Constitución, sin mencionar una autorización previa de las Cortes Generales; además, el artículo 92.2 exige la autorización del Congreso de los Diputados. Por eso esa afirmación es la incorrecta; las demás corresponden a funciones del Rey."
   },
   {
     "tema": 1,
     "pregunta": "En la Constitución Española de 1978, en relación con la sucesión al trono se prefiere siempre:",
     "respuestas": ["En la misma línea, el grado más lejano al más próximo.", "En el mismo grado, la línea anterior a las posteriores.", "En la misma línea, el grado más próximo al más remoto.", "En el mismo grado, la línea posterior a las anteriores."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 57.1 CE prefiere la línea anterior a las posteriores y, en la misma línea, el grado más próximo al más remoto. Las demás opciones invierten ese orden."
   },
   {
     "tema": 1,
     "pregunta": "Indique cuál de los siguientes principios se garantiza en el artículo 9 de la Constitución Española de 1978:",
     "respuestas": ["La retroactividad de disposiciones sancionadoras no favorables o restrictivas de derechos individuales.", "La retroactividad de disposiciones sancionadoras favorables.", "La interdicción de la arbitrariedad de los poderes públicos.", "La irretroactividad de disposiciones sancionadoras favorables o restrictivas de derechos colectivos."],
     "respuesta_correcta": "c",
-    "explicacion": ""
+    "explicacion": "El artículo 9.3 CE garantiza la interdicción de la arbitrariedad de los poderes públicos. También consagra la irretroactividad de las disposiciones sancionadoras no favorables o restrictivas de derechos individuales, no la retroactividad."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué artículo de la Constitución Española se define España como un Estado social y democrático de Derecho?",
     "respuestas": ["Artículo 10", "Artículo 2", "Artículo 1", "Artículo 9"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 1.1 CE define España como un Estado social y democrático de Derecho."
+    "explicacion": "El artículo 1.1 CE define España como un Estado social y democrático de Derecho. Los artículos 10, 2 y 9 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo de la Constitución proclama que la soberanía nacional reside en el pueblo español?",
     "respuestas": ["Artículo 9", "Artículo 2", "Artículo 3", "Artículo 1"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 1.2 CE establece que la soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado."
+    "explicacion": "El artículo 1.2 CE proclama que la soberanía nacional reside en el pueblo español. Los artículos 9, 2 y 3 no contienen esa declaración."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué artículo se establece que la forma política del Estado español es la Monarquía parlamentaria?",
     "respuestas": ["Artículo 56", "Artículo 2", "Artículo 57", "Artículo 1"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 1.3 CE dispone que la forma política del Estado español es la Monarquía parlamentaria."
+    "explicacion": "El artículo 1.3 CE establece que la forma política del Estado es la Monarquía parlamentaria. Los artículos 56, 2 y 57 regulan la Corona y la sucesión, no esa declaración."
   },
   {
     "tema": 1,
     "pregunta": "¿Cuáles son los valores superiores del ordenamiento jurídico que propugna la Constitución en su artículo 1.1?",
     "respuestas": ["La libertad, la justicia, la equidad y la participación", "La libertad, la seguridad, la igualdad y la solidaridad", "La dignidad, la libertad, la justicia y el pluralismo político", "La libertad, la justicia, la igualdad y el pluralismo político"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 1.1 CE propugna como valores superiores la libertad, la justicia, la igualdad y el pluralismo político."
+    "explicacion": "El artículo 1.1 CE enumera como valores superiores la libertad, la justicia, la igualdad y el pluralismo político. Las demás listas incluyen términos que no figuran en ese precepto."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué artículo se reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones?",
     "respuestas": ["Artículo 137", "Artículo 2", "Artículo 3", "Artículo 1"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 2 CE reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que integran la Nación española."
+    "explicacion": "El artículo 2 CE reconoce y garantiza la autonomía de las nacionalidades y regiones. El artículo 137 regula la organización territorial, pero no esa declaración."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 2 de la Constitución, ¿en qué se fundamenta la Constitución?",
     "respuestas": ["En la indisoluble unidad de la Nación española, patria común e indivisible de todos los españoles", "En la soberanía popular y en la separación de poderes", "En el pluralismo político y en la libertad de los pueblos de España", "En la igualdad de todas las Comunidades Autónomas"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 2 CE fundamenta la Constitución en la indisoluble unidad de la Nación española."
+    "explicacion": "El artículo 2 CE fundamenta la Constitución en la indisoluble unidad de la Nación española. Las demás opciones no reproducen esa fórmula."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué deber tienen todos los españoles respecto del castellano según el artículo 3?",
     "respuestas": ["El deber de conocerlo, sin derecho a usarlo", "El derecho a conocerlo y el deber de usarlo", "El deber de conocerlo y el derecho a usarlo", "Únicamente el derecho a usarlo"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 3.1 CE establece que todos los españoles tienen el deber de conocer el castellano y el derecho a usarlo."
+    "explicacion": "El artículo 3.1 CE impone a todos los españoles el deber de conocer el castellano y les reconoce el derecho a usarlo. Las demás opciones invierten o suprimen alguno de esos dos términos."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula los partidos políticos?",
     "respuestas": ["Artículo 22", "Artículo 6", "Artículo 7", "Artículo 8"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 6 CE regula los partidos políticos."
+    "explicacion": "El artículo 6 CE regula los partidos políticos. El artículo 22 regula el derecho de asociación y los artículos 7 y 8 los sindicatos y las Fuerzas Armadas."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 6, la estructura interna y el funcionamiento de los partidos políticos deberán ser:",
     "respuestas": ["Democráticos", "Jerárquicos", "Participativos", "Transparentes"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 6 CE exige que la estructura interna y el funcionamiento de los partidos políticos sean democráticos."
+    "explicacion": "El artículo 6 CE exige que la estructura interna y el funcionamiento de los partidos políticos sean democráticos. No exige que sean jerárquicos, participativos o transparentes."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula los sindicatos de trabajadores y las asociaciones empresariales?",
     "respuestas": ["Artículo 7", "Artículo 37", "Artículo 6", "Artículo 28"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 7 CE regula los sindicatos de trabajadores y las asociaciones empresariales."
+    "explicacion": "El artículo 7 CE regula los sindicatos de trabajadores y las asociaciones empresariales. El artículo 37 regula la negociación colectiva y el 28 la libertad sindical; el 6 se refiere a los partidos."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula las Fuerzas Armadas?",
     "respuestas": ["Artículo 62", "Artículo 9", "Artículo 30", "Artículo 8"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 8 CE regula las Fuerzas Armadas."
+    "explicacion": "El artículo 8 CE regula las Fuerzas Armadas. Los artículos 62, 9 y 30 se refieren a funciones del Rey, principios constitucionales y deberes de los españoles."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 8, las Fuerzas Armadas están constituidas por:",
     "respuestas": ["El Ejército de Tierra, la Armada, el Ejército del Aire y la Guardia Civil", "El Ejército de Tierra, la Armada y el Ejército del Aire", "El Ejército de Tierra, la Armada, el Ejército del Aire y las Fuerzas y Cuerpos de Seguridad", "El Ejército de Tierra y la Armada"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 8.1 CE constituye las Fuerzas Armadas con el Ejército de Tierra, la Armada y el Ejército del Aire."
+    "explicacion": "El artículo 8.1 CE constituye las Fuerzas Armadas con el Ejército de Tierra, la Armada y el Ejército del Aire. No incluye a la Guardia Civil ni a las Fuerzas y Cuerpos de Seguridad."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo enumera los principios de legalidad, jerarquía normativa, publicidad de las normas, irretroactividad, seguridad jurídica, responsabilidad e interdicción de la arbitrariedad?",
     "respuestas": ["Artículo 1", "Artículo 10", "Artículo 9", "Artículo 53"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 9.3 CE garantiza esos principios."
+    "explicacion": "El artículo 9.3 CE enumera los principios de legalidad, jerarquía normativa, publicidad, irretroactividad, seguridad jurídica, responsabilidad e interdicción de la arbitrariedad. Los artículos 1, 10 y 53 no los enumeran."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo establece que la dignidad de la persona, los derechos inviolables que le son inherentes, el libre desarrollo de la personalidad, el respeto a la ley y a los derechos de los demás son fundamento del orden político y de la paz social?",
     "respuestas": ["Artículo 14", "Artículo 15", "Artículo 9", "Artículo 10"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 10.1 CE establece ese fundamento del orden político y de la paz social."
+    "explicacion": "El artículo 10.1 CE sitúa la dignidad de la persona, los derechos inviolables, el libre desarrollo de la personalidad y el respeto a la ley como fundamento del orden político y la paz social. Los artículos 14, 15 y 9 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 10.2, las normas relativas a los derechos fundamentales y libertades se interpretarán de conformidad con:",
     "respuestas": ["La jurisprudencia del Tribunal Constitucional", "Las leyes orgánicas que desarrollen cada derecho", "Los Estatutos de Autonomía", "La Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre la materia ratificados por España"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 10.2 CE ordena interpretar esas normas conforme a la Declaración Universal de Derechos Humanos y los tratados ratificados por España."
+    "explicacion": "El artículo 10.2 CE ordena interpretar las normas sobre derechos fundamentales conforme a la Declaración Universal de Derechos Humanos y los tratados ratificados por España. No remite a la jurisprudencia, a las leyes orgánicas o a los Estatutos."
   },
   {
     "tema": 1,
     "pregunta": "¿Cuántos títulos, además del Título Preliminar, integran la Constitución Española?",
     "respuestas": ["Doce", "Diez", "Once", "Nueve"],
     "respuesta_correcta": "b",
-    "explicacion": "La Constitución se compone de un Título Preliminar y diez títulos (I a X)."
+    "explicacion": "La Constitución tiene un Título Preliminar y diez títulos numerados del I al X. Por eso no son doce, once o nueve."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina el Título I de la Constitución?",
     "respuestas": ["De la Corona", "De las Cortes Generales", "Del Gobierno y la Administración", "De los derechos y deberes fundamentales"],
     "respuesta_correcta": "d",
-    "explicacion": "El Título I se titula «De los derechos y deberes fundamentales»."
+    "explicacion": "El Título I CE se titula «De los derechos y deberes fundamentales». Los títulos II, III y IV regulan la Corona, las Cortes y el Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué título de la Constitución está dedicado a la Corona?",
     "respuestas": ["Título III", "Título I", "Título II", "Título IV"],
     "respuesta_correcta": "c",
-    "explicacion": "El Título II se titula «De la Corona» (artículos 56 a 65)."
+    "explicacion": "El Título II CE se titula «De la Corona» y comprende los artículos 56 a 65. Los títulos I, III y IV regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Cuántos capítulos tiene el Título I de la Constitución?",
     "respuestas": ["Tres", "Cinco", "Seis", "Cuatro"],
     "respuesta_correcta": "b",
-    "explicacion": "El Título I tiene cinco capítulos: I, II, III, IV y V."
+    "explicacion": "El Título I CE tiene cinco capítulos: I, II, III, IV y V. No tiene tres, cuatro o seis."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina el Capítulo I del Título I?",
     "respuestas": ["De las garantías de las libertades y derechos fundamentales", "De los principios rectores de la política social y económica", "De los derechos y libertades", "De los españoles y los extranjeros"],
     "respuesta_correcta": "d",
-    "explicacion": "El Capítulo I del Título I se titula «De los españoles y los extranjeros»."
+    "explicacion": "El Capítulo I del Título I se titula «De los españoles y los extranjeros» y comprende los artículos 11 a 13. Las demás denominaciones corresponden a otros capítulos."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué capítulo del Título I regula los derechos y libertades?",
     "respuestas": ["Capítulo I", "Capítulo III", "Capítulo IV", "Capítulo II"],
     "respuesta_correcta": "d",
-    "explicacion": "El Capítulo II del Título I se titula «Derechos y libertades»."
+    "explicacion": "El Capítulo II del Título I se titula «Derechos y libertades» y comprende los artículos 14 a 38. Los capítulos I, III y IV regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina el Capítulo II del Título I?",
     "respuestas": ["De los principios rectores de la política social y económica", "Derechos y libertades", "De los españoles y los extranjeros", "De las garantías de las libertades y derechos fundamentales"],
     "respuesta_correcta": "b",
-    "explicacion": "El Capítulo II del Título I se titula «Derechos y libertades»."
+    "explicacion": "El Capítulo II del Título I se denomina «Derechos y libertades». Las demás opciones son títulos de otros capítulos del mismo Título."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué capítulo del Título I contiene los principios rectores de la política social y económica?",
     "respuestas": ["Capítulo II", "Capítulo IV", "Capítulo I", "Capítulo III"],
     "respuesta_correcta": "d",
-    "explicacion": "El Capítulo III del Título I se titula «De los principios rectores de la política social y económica»."
+    "explicacion": "El Capítulo III del Título I contiene los principios rectores de la política social y económica (artículos 39 a 52). Los capítulos I, II y IV regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina el Capítulo III del Título I?",
     "respuestas": ["De los principios rectores de la política social y económica", "Derechos y libertades", "De la suspensión de los derechos y libertades", "De las garantías de las libertades y derechos fundamentales"],
     "respuesta_correcta": "a",
-    "explicacion": "El Capítulo III del Título I se titula «De los principios rectores de la política social y económica»."
+    "explicacion": "El Capítulo III del Título I se titula «De los principios rectores de la política social y económica». Las demás denominaciones corresponden a otros capítulos."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué capítulo del Título I regula las garantías de las libertades y derechos fundamentales?",
     "respuestas": ["Capítulo II", "Capítulo III", "Capítulo IV", "Capítulo V"],
     "respuesta_correcta": "c",
-    "explicacion": "El Capítulo IV del Título I se titula «De las garantías de las libertades y derechos fundamentales»."
+    "explicacion": "El Capítulo IV del Título I regula las garantías de las libertades y derechos fundamentales (artículos 53 y 54). No es el Capítulo II, III o V."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué capítulo del Título I regula la suspensión de los derechos y libertades?",
     "respuestas": ["Capítulo IV", "Capítulo III", "Capítulo V", "Capítulo II"],
     "respuesta_correcta": "c",
-    "explicacion": "El Capítulo V del Título I se titula «De la suspensión de los derechos y libertades»."
+    "explicacion": "El Capítulo V del Título I regula la suspensión de los derechos y libertades (artículo 55). No es el Capítulo II, III o IV."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículos comprende la Sección 1.ª del Capítulo II del Título I?",
     "respuestas": ["Artículos 15 a 29", "Artículos 30 a 38", "Artículos 14 a 29", "Artículos 15 a 38"],
     "respuesta_correcta": "a",
-    "explicacion": "La Sección 1.ª del Capítulo II comprende los artículos 15 a 29."
+    "explicacion": "La Sección 1.ª del Capítulo II comprende los artículos 15 a 29, que recogen los derechos fundamentales y libertades públicas. La Sección 2.ª comprende los artículos 30 a 38."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina la Sección 1.ª del Capítulo II del Título I?",
     "respuestas": ["De los derechos y deberes de los ciudadanos", "De los derechos fundamentales y de las libertades públicas", "De los españoles y los extranjeros", "De las garantías de las libertades y derechos fundamentales"],
     "respuesta_correcta": "b",
-    "explicacion": "La Sección 1.ª se titula «De los derechos fundamentales y de las libertades públicas»."
+    "explicacion": "La Sección 1.ª del Capítulo II se titula «De los derechos fundamentales y de las libertades públicas». Las demás opciones corresponden a otras secciones o capítulos."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículos comprende la Sección 2.ª del Capítulo II del Título I?",
     "respuestas": ["Artículos 30 a 52", "Artículos 29 a 38", "Artículos 30 a 38", "Artículos 39 a 52"],
     "respuesta_correcta": "c",
-    "explicacion": "La Sección 2.ª del Capítulo II comprende los artículos 30 a 38."
+    "explicacion": "La Sección 2.ª del Capítulo II comprende los artículos 30 a 38, dedicados a los derechos y deberes de los ciudadanos. No llega al artículo 52 ni empieza en el 29."
   },
   {
     "tema": 1,
     "pregunta": "¿Cómo se denomina la Sección 2.ª del Capítulo II del Título I?",
     "respuestas": ["De los principios rectores de la política social y económica", "De los derechos y deberes de los ciudadanos", "De los derechos fundamentales y de las libertades públicas", "De los españoles y los extranjeros"],
     "respuesta_correcta": "b",
-    "explicacion": "La Sección 2.ª se titula «De los derechos y deberes de los ciudadanos»."
+    "explicacion": "La Sección 2.ª del Capítulo II se titula «De los derechos y deberes de los ciudadanos». Las demás denominaciones corresponden a otras partes del Título I."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículos comprende el Capítulo I del Título I?",
     "respuestas": ["Artículos 11 a 14", "Artículos 11 a 13", "Artículos 11 a 29", "Artículos 10 a 13"],
     "respuesta_correcta": "b",
-    "explicacion": "El Capítulo I del Título I comprende los artículos 11 a 13."
+    "explicacion": "El Capítulo I del Título I comprende los artículos 11 a 13, sobre nacionalidad, mayoría de edad y extranjeros. No incluye el artículo 14 ni llega al 29."
   },
   {
     "tema": 1,
     "pregunta": "El artículo 14 de la Constitución, que proclama la igualdad ante la ley, se encuentra:",
     "respuestas": ["En la Sección 1.ª del Capítulo II del Título I", "En el Capítulo IV del Título I", "En el Capítulo II del Título I, antes de la Sección 1.ª", "En el Capítulo I del Título I"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 14 está en el Capítulo II del Título I, fuera de las dos secciones."
+    "explicacion": "El artículo 14 CE está en el Capítulo II del Título I, antes de la Sección 1.ª, y proclama la igualdad ante la ley. No está en la Sección 1.ª, en el Capítulo IV o en el Capítulo I."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué Sección del Título I se encuentra el derecho a la propiedad privada (artículo 33)?",
     "respuestas": ["Sección 1.ª del Capítulo II", "Sección 2.ª del Capítulo II", "Capítulo IV", "Capítulo III"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 33 está en la Sección 2.ª del Capítulo II del Título I."
+    "explicacion": "El artículo 33 CE, que reconoce la propiedad privada y la herencia, está en la Sección 2.ª del Capítulo II del Título I. No está en la Sección 1.ª, el Capítulo III o el Capítulo IV."
   },
   {
     "tema": 1,
     "pregunta": "¿En qué Capítulo del Título I se encuentra el derecho a la protección de la salud (artículo 43)?",
     "respuestas": ["Capítulo V", "Capítulo IV", "Capítulo III", "Capítulo II"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 43 está en el Capítulo III del Título I (principios rectores)."
+    "explicacion": "El artículo 43 CE, sobre protección de la salud, está en el Capítulo III del Título I, dedicado a los principios rectores. No está en el Capítulo II, IV o V."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula la adquisición, conservación y pérdida de la nacionalidad española?",
     "respuestas": ["Artículo 13", "Artículo 11", "Artículo 12", "Artículo 14"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 11 CE regula la nacionalidad española."
+    "explicacion": "El artículo 11 CE regula la adquisición, conservación y pérdida de la nacionalidad española. Los artículos 12, 13 y 14 regulan la mayoría de edad, los extranjeros y la igualdad."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 11.2, ¿puede un español de origen ser privado de su nacionalidad?",
     "respuestas": ["Solo si adquiere otra nacionalidad", "No, en ningún caso", "Sí, por delito grave", "Sí, mediante ley orgánica"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 11.2 CE dispone que ningún español de origen podrá ser privado de su nacionalidad."
+    "explicacion": "El artículo 11.2 CE dispone que ningún español de origen podrá ser privado de su nacionalidad. No admite excepciones por adquirir otra nacionalidad, cometer un delito o mediante ley orgánica."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 11.3, el Estado podrá concertar tratados de doble nacionalidad con:",
     "respuestas": ["Los países iberoamericanos o con aquellos que hayan tenido o tengan una particular vinculación con España", "Únicamente con países de la Unión Europea", "Cualquier país del mundo", "Únicamente con países hispanohablantes"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 11.3 CE permite tratados de doble nacionalidad con países iberoamericanos o con particular vinculación con España."
+    "explicacion": "El artículo 11.3 CE permite concertar tratados de doble nacionalidad con países iberoamericanos o con los que hayan tenido o tengan una particular vinculación con España. No se limita a la UE, a los hispanohablantes o a cualquier país."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 13.2, ¿quiénes son titulares de los derechos reconocidos en el artículo 23?",
     "respuestas": ["Todas las personas mayores de edad", "Todos los residentes en España", "Los españoles y los extranjeros comunitarios, en todo caso", "Solamente los españoles, salvo el derecho de sufragio en las elecciones municipales que pueda establecerse por tratado o ley atendiendo a criterios de reciprocidad"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 13.2 CE reserva esos derechos a los españoles, con la excepción del sufragio municipal por reciprocidad."
+    "explicacion": "El artículo 13.2 CE reserva a los españoles los derechos del artículo 23, salvo el sufragio municipal que puede establecerse por tratado o ley con criterios de reciprocidad. No los atribuye a todos los residentes o a los extranjeros comunitarios en todo caso."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho de asilo de los ciudadanos de otros países y de los apátridas?",
     "respuestas": ["Artículo 14", "Artículo 11", "Artículo 13", "Artículo 12"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 13.4 CE remite a la ley para regular el derecho de asilo."
+    "explicacion": "El artículo 13.4 CE remite a la ley la regulación del derecho de asilo de los ciudadanos de otros países y de los apátridas. Los artículos 14, 11 y 12 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a la vida y a la integridad física y moral y prohíbe la tortura y las penas o tratos inhumanos o degradantes?",
     "respuestas": ["Artículo 17", "Artículo 16", "Artículo 18", "Artículo 15"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 15 CE reconoce el derecho a la vida y a la integridad física y moral."
+    "explicacion": "El artículo 15 CE reconoce el derecho a la vida y a la integridad física y moral y prohíbe la tortura y las penas o tratos inhumanos o degradantes. Los artículos 16, 17 y 18 regulan otras garantías."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 16.2, ¿puede alguien ser obligado a declarar sobre su ideología, religión o creencias?",
     "respuestas": ["Solo si es funcionario público", "Sí, en un procedimiento administrativo", "Sí, ante un juez", "No, en ningún caso"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 16.2 CE establece que nadie podrá ser obligado a declarar sobre su ideología, religión o creencias."
+    "explicacion": "El artículo 16.2 CE establece que nadie podrá ser obligado a declarar sobre su ideología, religión o creencias. No hay excepciones para funcionarios, procedimientos administrativos o comparecencias judiciales."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el procedimiento de «habeas corpus»?",
     "respuestas": ["Artículo 18", "Artículo 24", "Artículo 17", "Artículo 25"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 17.4 CE ordena regular por ley el procedimiento de «habeas corpus»."
+    "explicacion": "El artículo 17.4 CE ordena regular por ley el procedimiento de «habeas corpus». No está en los artículos 18, 24 o 25."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 18.2, el domicilio es inviolable y no podrá entrarse o registrarse en él sin:",
     "respuestas": ["Orden del Ministerio Fiscal", "Comunicación previa a la autoridad", "Autorización del alcalde", "Consentimiento del titular o resolución judicial, salvo en caso de flagrante delito"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 18.2 CE permite la entrada con consentimiento del titular o resolución judicial, salvo flagrante delito."
+    "explicacion": "El artículo 18.2 CE permite entrar o registrar el domicilio con consentimiento del titular o resolución judicial, salvo flagrante delito. No basta la orden del fiscal, la comunicación previa o la autorización del alcalde."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 19, el derecho a entrar y salir libremente de España no podrá ser limitado por:",
     "respuestas": ["Razones de seguridad nacional", "Motivos económicos", "Razones de orden público", "Motivos políticos o ideológicos"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 19 CE prohíbe limitar ese derecho por motivos políticos o ideológicos."
+    "explicacion": "El artículo 19 CE dispone que la entrada y salida de España no podrá ser limitada por motivos políticos o ideológicos. Las otras opciones no recogen esa prohibición expresa, aunque la ley pueda establecer otros límites."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 20.2, el ejercicio de los derechos de expresión e información no puede restringirse mediante:",
     "respuestas": ["Sanción administrativa", "Resolución judicial", "Ningún tipo de censura previa", "Ley orgánica"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 20.2 CE prohíbe la censura previa."
+    "explicacion": "El artículo 20.2 CE prohíbe cualquier tipo de censura previa. Las sanciones administrativas, las resoluciones judiciales y las leyes orgánicas no son censura previa."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 20.5, el secuestro de publicaciones, grabaciones y otros medios de información solo podrá acordarse:",
     "respuestas": ["Por el Ministerio Fiscal", "Por el Gobierno", "Por la autoridad administrativa", "Por resolución judicial"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 20.5 CE exige resolución judicial para el secuestro de publicaciones y otros medios."
+    "explicacion": "El artículo 20.5 CE exige resolución judicial para secuestrar publicaciones, grabaciones y otros medios de información. No basta el Ministerio Fiscal, el Gobierno o la autoridad administrativa."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho de reunión pacífica y sin armas?",
     "respuestas": ["Artículo 20", "Artículo 23", "Artículo 21", "Artículo 22"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 21 CE regula el derecho de reunión."
+    "explicacion": "El artículo 21 CE regula el derecho de reunión pacífica y sin armas. Los artículos 20, 22 y 23 regulan la libertad de expresión, la asociación y la participación política."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho de asociación?",
     "respuestas": ["Artículo 21", "Artículo 24", "Artículo 23", "Artículo 22"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 22 CE regula el derecho de asociación."
+    "explicacion": "El artículo 22 CE regula el derecho de asociación. Los artículos 21, 23 y 24 regulan la reunión, la participación política y la tutela judicial."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a participar en los asuntos públicos y a acceder en condiciones de igualdad a las funciones y cargos públicos?",
     "respuestas": ["Artículo 22", "Artículo 24", "Artículo 23", "Artículo 25"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 23 CE reconoce la participación política y el acceso a funciones y cargos públicos."
+    "explicacion": "El artículo 23 CE reconoce el derecho a participar en los asuntos públicos y a acceder en condiciones de igualdad a funciones y cargos públicos. Los artículos 22, 24 y 25 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a la tutela judicial efectiva y al juez ordinario predeterminado por la ley?",
     "respuestas": ["Artículo 26", "Artículo 24", "Artículo 25", "Artículo 23"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 24 CE reconoce la tutela judicial efectiva y las garantías del proceso."
+    "explicacion": "El artículo 24 CE reconoce la tutela judicial efectiva y el derecho al juez ordinario predeterminado por la ley. Los artículos 23, 25 y 26 regulan la participación política, la legalidad sancionadora y los Tribunales de Honor."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 25.3, la Administración civil:",
     "respuestas": ["Podrá imponer penas privativas de libertad", "No podrá imponer sanciones que, directa o subsidiariamente, impliquen privación de libertad", "Podrá imponer sanciones privativas de libertad con autorización judicial", "Solo podrá imponer sanciones económicas"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 25.3 CE prohíbe a la Administración civil imponer sanciones que impliquen privación de libertad."
+    "explicacion": "El artículo 25.3 CE prohíbe a la Administración civil imponer sanciones que, directa o subsidiariamente, impliquen privación de libertad. No puede imponerlas ni con autorización judicial ni limitarse solo a sanciones económicas."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo prohíbe los Tribunales de Honor en el ámbito de la Administración civil y de las organizaciones profesionales?",
     "respuestas": ["Artículo 25", "Artículo 28", "Artículo 26", "Artículo 27"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 26 CE prohíbe los Tribunales de Honor."
+    "explicacion": "El artículo 26 CE prohíbe los Tribunales de Honor en la Administración civil y en las organizaciones profesionales. Los artículos 25, 27 y 28 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho a la educación y la libertad de enseñanza?",
     "respuestas": ["Artículo 26", "Artículo 27", "Artículo 28", "Artículo 29"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 27 CE regula el derecho a la educación y la libertad de enseñanza."
+    "explicacion": "El artículo 27 CE regula el derecho a la educación y la libertad de enseñanza. Los artículos 26, 28 y 29 regulan los Tribunales de Honor, la libertad sindical y el derecho de petición."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a la huelga de los trabajadores para la defensa de sus intereses?",
     "respuestas": ["Artículo 27", "Artículo 28", "Artículo 37", "Artículo 29"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 28.2 CE reconoce el derecho a la huelga."
+    "explicacion": "El artículo 28.2 CE reconoce el derecho a la huelga de los trabajadores para la defensa de sus intereses. El artículo 37 regula la negociación colectiva y el conflicto colectivo, no la huelga."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 28.1, ¿puede alguien ser obligado a afiliarse a un sindicato?",
     "respuestas": ["Solo los funcionarios públicos", "Sí, si lo establece un convenio colectivo", "No, nadie podrá ser obligado a afiliarse a un sindicato", "Sí, si trabaja en el sector público"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 28.1 CE dispone que nadie podrá ser obligado a afiliarse a un sindicato."
+    "explicacion": "El artículo 28.1 CE declara que nadie podrá ser obligado a afiliarse a un sindicato. No hay excepciones para funcionarios, convenios colectivos o el sector público."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho de petición?",
     "respuestas": ["Artículo 29", "Artículo 28", "Artículo 30", "Artículo 27"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 29 CE regula el derecho de petición."
+    "explicacion": "El artículo 29 CE regula el derecho de petición. Los artículos 27, 28 y 30 regulan la educación, la libertad sindical y la defensa de España."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho y el deber de defender a España y la objeción de conciencia?",
     "respuestas": ["Artículo 30", "Artículo 32", "Artículo 31", "Artículo 29"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 30 CE regula la defensa de España y la objeción de conciencia."
+    "explicacion": "El artículo 30 CE regula el derecho y el deber de defender a España y la objeción de conciencia. Los artículos 29, 31 y 32 regulan la petición, el sistema tributario y el matrimonio."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 30.3, podrá establecerse un servicio civil para:",
     "respuestas": ["La protección civil en caso de catástrofe", "Sustituir al servicio militar obligatorio en todos los casos", "El cumplimiento de fines de interés general", "El desarrollo de las Fuerzas Armadas"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 30.3 CE permite establecer un servicio civil para fines de interés general."
+    "explicacion": "El artículo 30.3 CE permite establecer un servicio civil para el cumplimiento de fines de interés general. No se limita a la protección civil, a sustituir siempre el servicio militar o al desarrollo de las Fuerzas Armadas."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 31.1, el sistema tributario será justo y se inspirará en los principios de:",
     "respuestas": ["Igualdad y proporcionalidad, con alcance redistributivo", "Progresividad y solidaridad, sin alcance confiscatorio", "Proporcionalidad y equidad, sin alcance confiscatorio", "Igualdad y progresividad, sin alcance confiscatorio"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 31.1 CE exige un sistema tributario justo inspirado en igualdad y progresividad, sin alcance confiscatorio."
+    "explicacion": "El artículo 31.1 CE exige un sistema tributario justo inspirado en los principios de igualdad y progresividad, sin alcance confiscatorio. Las demás opciones cambian o añaden principios."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho del hombre y la mujer a contraer matrimonio con plena igualdad jurídica?",
     "respuestas": ["Artículo 32", "Artículo 31", "Artículo 33", "Artículo 34"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 32 CE reconoce el derecho a contraer matrimonio con plena igualdad jurídica."
+    "explicacion": "El artículo 32 CE reconoce el derecho del hombre y la mujer a contraer matrimonio con plena igualdad jurídica. Los artículos 31, 33 y 34 regulan otras materias."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 33.2, la función social de la propiedad y la herencia:",
     "respuestas": ["No está reconocida en la Constitución", "Solo se aplica a los bienes inmuebles", "Delimitará su contenido, de acuerdo con las leyes", "Corresponde exclusivamente a las Comunidades Autónomas"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 33.2 CE establece que la función social delimita el contenido de esos derechos."
+    "explicacion": "El artículo 33.2 CE dispone que la función social de la propiedad y la herencia delimita su contenido de acuerdo con las leyes. No se limita a los inmuebles ni se atribuye a las Comunidades Autónomas."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el derecho al trabajo, la libre elección de profesión u oficio y el estatuto de los trabajadores?",
     "respuestas": ["Artículo 34", "Artículo 37", "Artículo 35", "Artículo 36"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 35 CE regula el derecho al trabajo y remite a la ley para el estatuto de los trabajadores."
+    "explicacion": "El artículo 35 CE regula el derecho al trabajo, la libre elección de profesión u oficio y remite a la ley el estatuto de los trabajadores. Los artículos 34, 36 y 37 regulan la fundación, los Colegios Profesionales y la negociación colectiva."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula la negociación colectiva y el derecho de los trabajadores y empresarios a adoptar medidas de conflicto colectivo?",
     "respuestas": ["Artículo 36", "Artículo 38", "Artículo 28", "Artículo 37"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 37 CE regula la negociación colectiva y el conflicto colectivo."
+    "explicacion": "El artículo 37 CE regula la negociación colectiva y el derecho de trabajadores y empresarios a adoptar medidas de conflicto colectivo. Los artículos 28, 36 y 38 regulan la libertad sindical, los Colegios Profesionales y la libertad de empresa."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula la protección social, económica y jurídica de la familia?",
     "respuestas": ["Artículo 38", "Artículo 41", "Artículo 40", "Artículo 39"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 39 CE regula la protección de la familia."
+    "explicacion": "El artículo 39 CE regula la protección social, económica y jurídica de la familia. Los artículos 38, 40 y 41 regulan la libertad de empresa, la política social y la Seguridad Social."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el régimen público de Seguridad Social?",
     "respuestas": ["Artículo 42", "Artículo 40", "Artículo 41", "Artículo 43"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 41 CE regula la Seguridad Social."
+    "explicacion": "El artículo 41 CE regula el régimen público de Seguridad Social. Los artículos 40, 42 y 43 regulan el pleno empleo, los trabajadores en el extranjero y la protección de la salud."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a la protección de la salud?",
     "respuestas": ["Artículo 43", "Artículo 42", "Artículo 45", "Artículo 44"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 43 CE reconoce el derecho a la protección de la salud."
+    "explicacion": "El artículo 43 CE reconoce el derecho a la protección de la salud. Los artículos 42, 44 y 45 regulan los trabajadores en el extranjero, la cultura y el medio ambiente."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a disfrutar de un medio ambiente adecuado para el desarrollo de la persona?",
     "respuestas": ["Artículo 45", "Artículo 47", "Artículo 44", "Artículo 46"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 45 CE reconoce el derecho a un medio ambiente adecuado."
+    "explicacion": "El artículo 45 CE reconoce el derecho a disfrutar de un medio ambiente adecuado para el desarrollo de la persona. Los artículos 44, 46 y 47 regulan la cultura, el patrimonio y la vivienda."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo reconoce el derecho a disfrutar de una vivienda digna y adecuada?",
     "respuestas": ["Artículo 47", "Artículo 46", "Artículo 49", "Artículo 48"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 47 CE reconoce el derecho a una vivienda digna y adecuada."
+    "explicacion": "El artículo 47 CE reconoce el derecho a disfrutar de una vivienda digna y adecuada. Los artículos 46, 48 y 49 regulan el patrimonio, la juventud y la discapacidad."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 49, los poderes públicos impulsarán políticas que garanticen:",
     "respuestas": ["La integración laboral exclusiva de las personas con discapacidad", "La plena autonomía personal y la inclusión social de las personas con discapacidad, en entornos universalmente accesibles", "La tutela judicial de las personas con discapacidad", "La asistencia económica de las personas con discapacidad"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 49 CE, reformado en 2024, impulsa la autonomía personal y la inclusión social de las personas con discapacidad."
+    "explicacion": "El artículo 49.2 CE, tras la reforma de 2024, impulsa políticas que garanticen la plena autonomía personal y la inclusión social de las personas con discapacidad en entornos universalmente accesibles. No se limita a la integración laboral, la tutela judicial o la asistencia económica."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 53.1, el ejercicio de los derechos y libertades del Capítulo II solo podrá regularse:",
     "respuestas": ["Por ley, que en todo caso deberá respetar su contenido esencial", "Por ley orgánica exclusivamente", "Por reglamento del Gobierno", "Por real decreto"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 53.1 CE exige ley y respeto al contenido esencial de los derechos y libertades."
+    "explicacion": "El artículo 53.1 CE permite regular el ejercicio de los derechos y libertades del Capítulo II solo por ley y con respeto a su contenido esencial. No exige ley orgánica, reglamento del Gobierno o real decreto."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 53.2, el recurso de amparo ante el Tribunal Constitucional es aplicable a:",
     "respuestas": ["Todos los derechos del Título I", "El artículo 14, la Sección 1.ª del Capítulo II y la objeción de conciencia del artículo 30", "Únicamente a los derechos de la Sección 2.ª del Capítulo II", "Los derechos del Capítulo II y los principios del Capítulo III"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 53.2 CE limita el amparo al artículo 14, la Sección 1.ª y la objeción de conciencia."
+    "explicacion": "El artículo 53.2 CE limita el recurso de amparo al artículo 14, la Sección 1.ª del Capítulo II y la objeción de conciencia del artículo 30. No alcanza a todos los derechos del Título I ni a los principios del Capítulo III."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 53.3, los principios reconocidos en el Capítulo III:",
     "respuestas": ["Informarán la legislación positiva, la práctica judicial y la actuación de los poderes públicos, y solo podrán ser alegados ante la jurisdicción ordinaria de acuerdo con las leyes que los desarrollen", "Solo informan la actuación del Gobierno", "Tienen el mismo régimen de protección que los derechos fundamentales", "Son directamente aplicables ante cualquier tribunal"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 53.3 CE regula el valor de los principios rectores del Capítulo III."
+    "explicacion": "El artículo 53.3 CE dispone que los principios del Capítulo III informan la legislación positiva, la práctica judicial y la actuación de los poderes públicos, y solo pueden alegarse ante la jurisdicción ordinaria según las leyes que los desarrollen. No tienen el mismo régimen que los derechos fundamentales."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 54, el Defensor del Pueblo es:",
     "respuestas": ["Un órgano del Gobierno", "Un comisionado del Poder Judicial", "Un magistrado del Tribunal Constitucional", "Un alto comisionado de las Cortes Generales, designado por éstas para la defensa de los derechos comprendidos en el Título I"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 54 CE define al Defensor del Pueblo como alto comisionado de las Cortes Generales."
+    "explicacion": "El artículo 54 CE define al Defensor del Pueblo como alto comisionado de las Cortes Generales, designado por ellas para defender los derechos del Título I. No es órgano del Gobierno, del Poder Judicial o del Tribunal Constitucional."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 55.1, ¿qué derechos pueden ser suspendidos cuando se acuerde la declaración del estado de excepción o de sitio?",
     "respuestas": ["Los reconocidos en los artículos 17, 18.2 y 18.3, 19, 20.1.a) y d) y 20.5, 21, 28.2 y 37.2", "Los derechos de los artículos 14 a 29", "Únicamente los derechos de la Sección 1.ª del Capítulo II", "Todos los derechos del Título I"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 55.1 CE enumera los derechos suspendibles en los estados de excepción y sitio."
+    "explicacion": "El artículo 55.1 CE enumera los derechos suspendibles en los estados de excepción y sitio: los artículos 17, 18.2 y 18.3, 19, 20.1.a) y d), 20.5, 21, 28.2 y 37.2. No suspende todos los derechos del Título I ni solo la Sección 1.ª."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 55.1, en el supuesto de declaración del estado de excepción se exceptúa de la suspensión:",
     "respuestas": ["El artículo 18.2", "El artículo 28.2", "El apartado 3 del artículo 17", "El artículo 21"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 55.1 CE exceptúa el artículo 17.3 en el estado de excepción."
+    "explicacion": "El artículo 55.1 CE exceptúa de la suspensión el artículo 17.3 en el estado de excepción. No exceptúa los artículos 18.2, 28.2 o 21, que sí figuran entre los suspendibles."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 55.2, la suspensión individual de derechos para investigaciones de bandas armadas o elementos terroristas requiere:",
     "respuestas": ["Una ley orgánica, la necesaria intervención judicial y el adecuado control parlamentario", "Una ley ordinaria", "Un real decreto-ley", "Una resolución judicial sin control parlamentario"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 55.2 CE exige ley orgánica, intervención judicial y control parlamentario."
+    "explicacion": "El artículo 55.2 CE exige una ley orgánica, la necesaria intervención judicial y el adecuado control parlamentario para suspender individualmente derechos en investigaciones de bandas armadas o terroristas. No basta una ley ordinaria, un decreto-ley o una resolución judicial sin control."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo define al Rey como Jefe del Estado, símbolo de su unidad y permanencia, que arbitra y modera el funcionamiento regular de las instituciones?",
     "respuestas": ["Artículo 56", "Artículo 64", "Artículo 62", "Artículo 57"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 56.1 CE define al Rey como Jefe del Estado."
+    "explicacion": "El artículo 56.1 CE define al Rey como Jefe del Estado, símbolo de su unidad y permanencia, que arbitra y modera el funcionamiento regular de las instituciones. Los artículos 57, 62 y 64 regulan la sucesión, las funciones y el refrendo."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 56.3, la persona del Rey es:",
     "respuestas": ["Inviolable, pero sujeta a responsabilidad política", "Responsable ante el Tribunal Constitucional", "Responsable ante las Cortes Generales", "Inviolable y no está sujeta a responsabilidad"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 56.3 CE declara inviolable al Rey y no sujeto a responsabilidad."
+    "explicacion": "El artículo 56.3 CE declara inviolable al Rey y precisa que no está sujeto a responsabilidad. No está sujeto a responsabilidad política, ante el Tribunal Constitucional o ante las Cortes."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula la sucesión en la Corona?",
     "respuestas": ["Artículo 58", "Artículo 59", "Artículo 56", "Artículo 57"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 57 CE regula la sucesión en la Corona."
+    "explicacion": "El artículo 57 CE regula la sucesión en la Corona. Los artículos 56, 58 y 59 regulan la posición del Rey, el consorte y la Regencia."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 57.2, el Príncipe heredero tendrá la dignidad de:",
     "respuestas": ["Duque de Cádiz", "Príncipe de la Corona", "Príncipe de Asturias y los demás títulos vinculados tradicionalmente al sucesor de la Corona", "Príncipe de España"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 57.2 CE atribuye al heredero la dignidad de Príncipe de Asturias."
+    "explicacion": "El artículo 57.2 CE atribuye al Príncipe heredero la dignidad de Príncipe de Asturias y los demás títulos vinculados tradicionalmente al sucesor. No es Duque de Cádiz, Príncipe de la Corona o Príncipe de España."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 57.4, quienes tengan derecho a la sucesión en el trono y contraigan matrimonio contra la expresa prohibición del Rey y de las Cortes Generales:",
     "respuestas": ["Necesitarán autorización del Gobierno", "Quedarán excluidos de la sucesión a la Corona por sí y sus descendientes", "Mantendrán su derecho a la sucesión", "Solo perderán su derecho ellos, pero no sus descendientes"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 57.4 CE excluye de la sucesión a quienes contravengan esa prohibición."
+    "explicacion": "El artículo 57.4 CE excluye de la sucesión, por sí y por sus descendientes, a quienes contraigan matrimonio contra la expresa prohibición del Rey y de las Cortes Generales. No se limita a perder el derecho propio ni requiere autorización del Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 57.5, las abdicaciones, renuncias y cualquier duda de hecho o de derecho en el orden de sucesión a la Corona se resolverán por:",
     "respuestas": ["Ley orgánica", "Ley ordinaria", "Real decreto", "Acuerdo del Consejo de Ministros"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 57.5 CE remite a una ley orgánica."
+    "explicacion": "El artículo 57.5 CE remite a una ley orgánica la resolución de las abdicaciones, renuncias y dudas de hecho o de derecho en el orden de sucesión. No basta una ley ordinaria, un real decreto o un acuerdo del Consejo de Ministros."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo establece que la Reina consorte o el consorte de la Reina no podrán asumir funciones constitucionales, salvo lo dispuesto para la Regencia?",
     "respuestas": ["Artículo 58", "Artículo 60", "Artículo 59", "Artículo 57"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 58 CE regula la posición del consorte."
+    "explicacion": "El artículo 58 CE dispone que la Reina consorte o el consorte de la Reina no podrán asumir funciones constitucionales, salvo lo previsto para la Regencia. No es el artículo 57, 59 o 60."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 59.1, cuando el Rey fuere menor de edad, entrará a ejercer la Regencia:",
     "respuestas": ["El padre o la madre del Rey y, en su defecto, el pariente mayor de edad más próximo a suceder en la Corona", "El Presidente de las Cortes Generales", "El tutor nombrado en testamento", "El Presidente del Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 59.1 CE regula la Regencia durante la minoría de edad del Rey."
+    "explicacion": "El artículo 59.1 CE establece que, si el Rey es menor de edad, ejerce la Regencia el padre o la madre y, en su defecto, el pariente mayor de edad más próximo a suceder en la Corona. No corresponde al Presidente de las Cortes, al tutor testamentario o al Presidente del Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 59.3, si no hubiere ninguna persona a quien corresponda la Regencia, ésta será nombrada por las Cortes Generales y se compondrá de:",
     "respuestas": ["Una, tres o cinco personas", "Dos o cuatro personas", "Una sola persona", "Tres personas exclusivamente"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 59.3 CE permite que la Regencia se componga de una, tres o cinco personas."
+    "explicacion": "El artículo 59.3 CE dispone que, si no hay persona a quien corresponda la Regencia, la nombran las Cortes Generales y se compone de una, tres o cinco personas. No de dos, cuatro o exclusivamente tres."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 59.4, para ejercer la Regencia es preciso:",
     "respuestas": ["Ser español de nacimiento y mayor de edad", "Ser español y mayor de edad", "Ser mayor de edad y no tener antecedentes penales", "Ser español y tener la nacionalidad de origen"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 59.4 CE exige ser español y mayor de edad."
+    "explicacion": "El artículo 59.4 CE exige para ejercer la Regencia ser español y mayor de edad. No exige español de nacimiento, carecer de antecedentes o tener nacionalidad de origen."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 60.1, será tutor del Rey menor:",
     "respuestas": ["La persona que en su testamento hubiese nombrado el Rey difunto, siempre que sea mayor de edad y español de nacimiento", "El Regente, en todo caso", "El Presidente del Gobierno", "El Presidente del Congreso"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 60.1 CE regula la tutela del Rey menor."
+    "explicacion": "El artículo 60.1 CE nombra tutor del Rey menor a quien haya designado en testamento el Rey difunto, siempre que sea mayor de edad y español de nacimiento. No lo es el Regente en todo caso, el Presidente del Gobierno o el Presidente del Congreso."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 60.2, el ejercicio de la tutela es incompatible con:",
     "respuestas": ["La profesión de abogado", "El ejercicio de todo cargo o representación política", "La nacionalidad española", "El ejercicio de la Regencia, en todos los casos"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 60.2 CE declara incompatible la tutela con todo cargo o representación política."
+    "explicacion": "El artículo 60.2 CE declara incompatible el ejercicio de la tutela con todo cargo o representación política. No lo es con la abogacía, la nacionalidad española o la Regencia en todos los casos."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 61.1, el Rey, al ser proclamado ante las Cortes Generales, prestará juramento de:",
     "respuestas": ["Respetar los derechos de los ciudadanos, únicamente", "Desempeñar sus funciones y guardar fidelidad al Gobierno", "Guardar la Constitución y las leyes, únicamente", "Desempeñar fielmente sus funciones, guardar y hacer guardar la Constitución y las leyes y respetar los derechos de los ciudadanos y de las Comunidades Autónomas"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 61.1 CE detalla el juramento del Rey."
+    "explicacion": "El artículo 61.1 CE detalla el juramento del Rey: desempeñar fielmente sus funciones, guardar y hacer guardar la Constitución y las leyes y respetar los derechos de los ciudadanos y de las Comunidades Autónomas. Las demás opciones omiten partes esenciales."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 61.2, el Príncipe heredero, al alcanzar la mayoría de edad, y el Regente o Regentes, al hacerse cargo de sus funciones, prestarán:",
     "respuestas": ["El mismo juramento que el Rey y el de fidelidad al Rey", "Solo el juramento de fidelidad al Rey", "El juramento de guardar la Constitución, sin fidelidad al Rey", "Un juramento ante el Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 61.2 CE exige el mismo juramento y el de fidelidad al Rey."
+    "explicacion": "El artículo 61.2 CE exige al Príncipe heredero y al Regente o Regentes el mismo juramento que el Rey y, además, el de fidelidad al Rey. No basta solo la fidelidad o el juramento ante el Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 62, ¿quién tiene el mando supremo de las Fuerzas Armadas?",
     "respuestas": ["El Rey", "El Jefe del Estado Mayor de la Defensa", "El Ministro de Defensa", "El Presidente del Gobierno"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 62.h) CE atribuye al Rey el mando supremo de las Fuerzas Armadas."
+    "explicacion": "El artículo 62.h CE atribuye al Rey el mando supremo de las Fuerzas Armadas. No corresponde al Jefe del Estado Mayor de la Defensa, al Ministro de Defensa o al Presidente del Gobierno."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 62, el derecho de gracia del Rey:",
     "respuestas": ["Corresponde al Presidente del Gobierno", "Requiere autorización de las Cortes Generales en todo caso", "Permite autorizar indultos generales", "Se ejerce con arreglo a la ley, que no podrá autorizar indultos generales"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 62.i) CE permite el derecho de gracia con arreglo a la ley, sin indultos generales."
+    "explicacion": "El artículo 62.i CE permite al Rey ejercer el derecho de gracia con arreglo a la ley, que no podrá autorizar indultos generales. No corresponde al Presidente del Gobierno ni requiere autorización de las Cortes en todo caso."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 62, corresponde al Rey el Alto Patronazgo de:",
     "respuestas": ["El Consejo de Estado", "Las Universidades públicas", "Las Reales Academias", "Las Cortes Generales"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 62.j) CE atribuye al Rey el Alto Patronazgo de las Reales Academias."
+    "explicacion": "El artículo 62.j CE atribuye al Rey el Alto Patronazgo de las Reales Academias. No del Consejo de Estado, las Universidades públicas o las Cortes Generales."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 62, ¿en qué caso preside el Rey las sesiones del Consejo de Ministros?",
     "respuestas": ["Cuando lo solicite el Congreso de los Diputados", "Siempre que se reúna el Consejo de Ministros", "Cuando lo estime oportuno, a petición del Presidente del Gobierno", "Nunca puede presidirlas"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 62.g) CE permite al Rey presidir el Consejo de Ministros a petición del Presidente del Gobierno."
+    "explicacion": "El artículo 62.g CE permite al Rey presidir las sesiones del Consejo de Ministros cuando lo estime oportuno, a petición del Presidente del Gobierno. No siempre que se reúna ni por solicitud del Congreso."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 63.2, corresponde al Rey:",
     "respuestas": ["Autorizar la ratificación de los tratados sin intervención de las Cortes", "Manifestar el consentimiento del Estado para obligarse internacionalmente por medio de tratados, de conformidad con la Constitución y las leyes", "Negociar los tratados internacionales", "Aprobar los tratados internacionales"],
     "respuesta_correcta": "b",
-    "explicacion": "El artículo 63.2 CE atribuye al Rey manifestar el consentimiento del Estado en los tratados."
+    "explicacion": "El artículo 63.2 CE atribuye al Rey manifestar el consentimiento del Estado para obligarse internacionalmente por medio de tratados, conforme a la Constitución y las leyes. No le corresponde negociar o aprobar los tratados ni autorizar su ratificación sin intervención de las Cortes."
   },
   {
     "tema": 1,
     "pregunta": "¿Qué artículo regula el refrendo de los actos del Rey?",
     "respuestas": ["Artículo 62", "Artículo 63", "Artículo 64", "Artículo 65"],
     "respuesta_correcta": "c",
-    "explicacion": "El artículo 64 CE regula el refrendo de los actos del Rey."
+    "explicacion": "El artículo 64 CE regula el refrendo de los actos del Rey. Los artículos 62, 63 y 65 regulan las funciones del Rey, los tratados y la Casa Real."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 64.2, de los actos del Rey serán responsables:",
     "respuestas": ["Las personas que los refrenden", "El Rey", "El Presidente del Congreso", "El Gobierno en pleno"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 64.2 CE declara responsables a quienes refrendan los actos del Rey."
+    "explicacion": "El artículo 64.2 CE declara responsables de los actos del Rey a las personas que los refrendan. No al Rey, al Presidente del Congreso o al Gobierno en pleno."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 56.3, los actos del Rey carecen de validez sin refrendo, salvo:",
     "respuestas": ["Los actos relativos a la sucesión", "Los actos de carácter internacional", "Los actos de sanción y promulgación de las leyes", "Lo dispuesto en el artículo 65.2"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 56.3 CE exceptúa de refrendo lo dispuesto en el artículo 65.2."
+    "explicacion": "El artículo 56.3 CE exige refrendo para los actos del Rey, salvo lo dispuesto en el artículo 65.2. No exceptúa los actos de sucesión, los internacionales o la sanción y promulgación de las leyes."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 65.1, el Rey recibe de los Presupuestos del Estado:",
     "respuestas": ["Una cantidad fija y finalista para cada miembro de la Casa Real", "Una asignación aprobada por las Cortes Generales cada año", "Los ingresos procedentes del patrimonio de la Corona", "Una cantidad global para el sostenimiento de su Familia y Casa, y distribuye libremente la misma"],
     "respuesta_correcta": "d",
-    "explicacion": "El artículo 65.1 CE regula la cantidad global para el sostenimiento de la Familia y Casa del Rey."
+    "explicacion": "El artículo 65.1 CE asigna al Rey una cantidad global de los Presupuestos para el sostenimiento de su Familia y Casa, que distribuye libremente. No es una cantidad fija por miembro, una asignación anual de las Cortes o los ingresos del patrimonio de la Corona."
   },
   {
     "tema": 1,
     "pregunta": "Según el artículo 65.2, el Rey nombra y releva libremente a:",
     "respuestas": ["Los miembros civiles y militares de su Casa", "Los presidentes de las Reales Academias", "Los miembros del Gobierno", "Los embajadores"],
     "respuesta_correcta": "a",
-    "explicacion": "El artículo 65.2 CE permite al Rey nombrar y relevar libremente a los miembros de su Casa."
+    "explicacion": "El artículo 65.2 CE permite al Rey nombrar y relevar libremente a los miembros civiles y militares de su Casa. No a los presidentes de las Reales Academias, los miembros del Gobierno o los embajadores."
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el artículo 3.2 de la Constitución, las demás lenguas españolas serán también oficiales en las respectivas Comunidades Autónomas de acuerdo con",
+    "respuestas": ["Una ley orgánica estatal", "Sus Estatutos", "La ley ordinaria de cada Comunidad", "Los convenios con el Estado"],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 3.2 CE remite a los Estatutos de las respectivas Comunidades Autónomas la oficialidad de las demás lenguas españolas. No son fuente de esa oficialidad una ley orgánica estatal, una ley ordinaria autonómica o un convenio con el Estado."
+  },
+  {
+    "tema": 1,
+    "pregunta": "Las banderas y enseñas propias de las Comunidades Autónomas se utilizarán junto a la bandera de España",
+    "respuestas": ["En sus edificios públicos y en sus actos oficiales", "Solo en sus edificios públicos", "Solo en sus actos oficiales", "En todo el territorio del Estado, también en los edificios estatales"],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 4.2 CE permite usar las banderas y enseñas autonómicas junto a la bandera de España en los edificios públicos y actos oficiales de la Comunidad. No las limita a uno solo de esos ámbitos ni las extiende a todos los edificios estatales."
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el artículo 13.1 de la Constitución, los extranjeros gozarán en España de",
+    "respuestas": ["Todos los derechos políticos en igualdad con los españoles", "El derecho de sufragio en las elecciones generales", "Las libertades públicas que garantiza el Título I, en los términos que establezcan los tratados y la ley", "Los derechos del Título I sin ninguna limitación"],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 13.1 CE reconoce a los extranjeros las libertades públicas del Título I en los términos de los tratados y la ley. No les atribuye todos los derechos políticos, el sufragio en las elecciones generales ni los derechos del Título I sin límites."
+  },
+  {
+    "tema": 1,
+    "pregunta": "Según el artículo 16.3 de la Constitución, los poderes públicos mantendrán relaciones de cooperación con",
+    "respuestas": ["La Iglesia Católica únicamente", "Las confesiones inscritas en el Registro de Entidades Religiosas", "Las confesiones con notorio arraigo", "La Iglesia Católica y las demás confesiones"],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 16.3 CE, tras declarar que ninguna confesión tendrá carácter estatal, ordena a los poderes públicos cooperar con la Iglesia Católica y las demás confesiones. No limita la cooperación a la Iglesia Católica, a las confesiones inscritas o a las de notorio arraigo."
+  },
+  {
+    "tema": 1,
+    "pregunta": "La ley limitará el uso de la informática para garantizar",
+    "respuestas": ["Únicamente la seguridad del Estado", "El honor y la intimidad personal y familiar de los ciudadanos y el pleno ejercicio de sus derechos", "Solo el secreto de las comunicaciones", "La libertad de empresa y la propiedad privada"],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 18.4 CE permite limitar por ley el uso de la informática para proteger el honor, la intimidad personal y familiar y el pleno ejercicio de los derechos. No se limita a la seguridad del Estado, al secreto de las comunicaciones o a la libertad de empresa."
+  },
+  {
+    "tema": 1,
+    "pregunta": "El gasto público realizará una asignación equitativa de los recursos públicos y su programación y ejecución responderán a los criterios de",
+    "respuestas": ["Eficiencia y economía", "Eficacia y transparencia", "Economía y solidaridad", "Proporcionalidad y eficacia"],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 31.2 CE exige una asignación equitativa de los recursos públicos y que su programación y ejecución respondan a los criterios de eficiencia y economía. Las demás parejas de criterios no reproducen el precepto."
+  },
+  {
+    "tema": 1,
+    "pregunta": "El Estado velará especialmente por la salvaguardia de los derechos económicos y sociales de los trabajadores españoles en el extranjero y orientará su política hacia",
+    "respuestas": ["Su integración definitiva en el país de destino", "La cooperación internacional", "Su retorno", "La protección de sus familias"],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 42 CE ordena velar por los derechos económicos y sociales de los trabajadores españoles en el extranjero y orientar la política hacia su retorno. No fija como objetivo su integración definitiva, la cooperación internacional o la protección de sus familias."
   }
 ]
