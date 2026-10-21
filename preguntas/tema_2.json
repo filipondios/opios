@@ -698,5 +698,110 @@
     "respuestas": ["Por sufragio nacional, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo y secreto, en los términos que establezca la ley", "Por sufragio nacional, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley", "Por sufragio universal, libre, igual, directo o indirecto y secreto, en los términos que establezca la ley"],
     "respuesta_correcta": "b",
     "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el artículo 159 de la Constitución Española, el Tribunal Constitucional se compone de:",
+    "respuestas": ["Doce miembros nombrados por el Rey; de ellos, tres serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Doce miembros nombrados por el Rey; de ellos, cuatro serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Dieciséis miembros nombrados por el Rey; de ellos, cuatro serán a propuesta del Congreso por mayoría de tres quintos de sus miembros.", "Dieciséis miembros nombrados por el Rey; de ellos, tres serán a propuesta del Congreso por mayoría de tres quintos de sus miembros."],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el artículo 68 de la Constitución Española, indique de cuántos diputados se compone el Congreso:",
+    "respuestas": ["De un mínimo de 250 y de un máximo de 350.", "De un mínimo de 300 y de un máximo de 400.", "De un mínimo de 300 y de un máximo de 350.", "De un mínimo de 350 y de un máximo de 400."],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según se expone en el artículo 113 de la Constitución Española, la moción de censura deberá ser propuesta por:",
+    "respuestas": ["Al menos la décima parte de los Diputados.", "Al menos un veinte por ciento de los Diputados.", "Al menos la décima parte de cada una de las Cámaras.", "Al menos 20 Diputados y 20 Senadores."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según lo establecido en el artículo 82 de la Constitución Española, cuando se trate de refundir varios textos legales en uno solo, la delegación legislativa de las Cortes Generales en el Gobierno deberá otorgarse mediante:",
+    "respuestas": ["Una Ley de Bases.", "Una Ley Orgánica.", "Una Ley Ordinaria.", "Un Decreto Legislativo."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el artículo 68 de la CE, ¿cuál es la circunscripción electoral en nuestro sistema electoral?",
+    "respuestas": ["La provincia.", "El municipio.", "La Comunidad Autónoma.", "Distrito Municipal."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "De acuerdo con el artículo 78 de la CE, expirado el mandato de las Cortes Generales o en caso de disolución de las mismas, las Diputaciones Permanentes seguirán ejerciendo sus funciones hasta:",
+    "respuestas": ["La celebración de las elecciones.", "La proclamación de los resultados electorales definitivos.", "La elección de los nuevos presidentes de cada una de las Cámaras de las Cortes Generales.", "La constitución de las nuevas Cortes Generales."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La CE regula la institución del Defensor del Pueblo como:",
+    "respuestas": ["Alto comisionado del Congreso de los Diputados.", "Alto comisionado de las Cortes Generales.", "Alto comisionado del Poder judicial.", "Alto comisionado del Gobierno de la nación."],
+    "respuesta_correcta": "b",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Quién puede ser elegido Defensor del Pueblo, según la Ley Orgánica 3/1981, de 6 de abril?",
+    "respuestas": ["Cualquier Magistrado elegido por las Cortes Generales.", "Cualquier Senador elegido por las Cortes Generales.", "Cualquier persona que se encuentre en el pleno disfrute de sus derechos civiles.", "Cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos civiles y políticos."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el artículo 71 de la Constitución Española de 1978, ¿quién es el competente en las causas contra Diputados y Senadores?",
+    "respuestas": ["Sala de lo Penal del Tribunal Constitucional.", "Sala de lo Contencioso Administrativo del Tribunal Supremo.", "Sala de lo Penal del Tribunal Supremo.", "Sala de lo Civil del Tribunal Supremo."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según el Título III \"De las Cortes Generales\" de la Constitución Española de 1978, las Cámaras podrán:",
+    "respuestas": ["Recibir peticiones individuales y colectivas, siempre por escrito, quedando prohibida la presentación directa por manifestaciones ciudadanas.", "Delegar en las Comisiones Legislativas Permanentes la aprobación de proyectos o proposiciones de ley relativas a los Presupuestos Generales del Estado.", "Reunirse en sesión extraordinaria a petición de la mayoría simple de los miembros de cualquiera de las Cámaras.", "Nombrar conjuntamente Comisiones de Investigación sobre asuntos de interés público. Sus conclusiones serán vinculantes para los Tribunales."],
+    "respuesta_correcta": "a",
+    "explicacion": "La opción B es la única correcta porque reproduce literalmente el artículo 77.1 de la Constitución Española, el cual exige que las peticiones a las Cámaras sean siempre por escrito y prohíbe expresamente su presentación directa mediante manifestaciones.\nPor el contrario, la opción A es falsa porque el artículo 75.3 excluye a los Presupuestos Generales del Estado de la delegación en Comisiones Legislativas Permanentes.\nLa opción C falla porque el artículo 76.1 establece que las conclusiones de las Comisiones de Investigación no serán vinculantes para los Tribunales.\nFinalmente, la opción D es errónea porque el artículo 73.2 requiere la petición de la mayoría absoluta de los miembros de la Cámara para celebrar sesiones extraordinarias, no simple."
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según lo establecido en el artículo 159 de la Constitución Española de 1978, los miembros del Tribunal Constitucional serán designados por períodos de:",
+    "respuestas": ["9 años y se renovarán por terceras partes cada 3.", "9 años y se renovarán por terceras partes cada 2.", "6 años y se renovarán por terceras partes cada 3.", "6 años y se renovarán por terceras partes cada 2."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "La Constitución Española de 1978 en su artículo 113 establece que:",
+    "respuestas": ["El Congreso de los Diputados puede exigir la responsabilidad jurídica del Gobierno mediante la adopción por mayoría absoluta de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad política del Gobierno mediante la adopción por mayoría simple de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad civil del Gobierno mediante la adopción por mayoría absoluta de la moción de censura.", "El Congreso de los Diputados puede exigir la responsabilidad política del Gobierno mediante la adopción por mayoría absoluta de la moción de censura."],
+    "respuesta_correcta": "d",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuál de las siguientes afirmaciones sobre la Diputación Permanente es correcta, según el artículo 78 de la Constitución Española de 1978?",
+    "respuestas": ["Cada Cámara contará con una Diputación Permanente de al menos quince miembros, elegidos por sufragio directo de entre los parlamentarios de cada grupo.", "La Diputación Permanente del Congreso será presidida por el Presidente del Senado, y la del Senado por el Presidente del Congreso.", "En cada Cámara habrá una Diputación Permanente compuesta de un mínimo de veintiún miembros, que representarán a los grupos parlamentarios en proporción a su importancia numérica.", "La Diputación Permanente solo puede ejercer sus funciones durante los períodos entre sesiones ordinarias, quedando suspendidas en caso de disolución de las Cámaras."],
+    "respuesta_correcta": "c",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "¿Cuáles son las funciones que el artículo 66 de la Constitución Española de 1978 atribuye directamente a las Cortes Generales?",
+    "respuestas": ["Ejercer la potestad legislativa del Estado, aprobar los Presupuestos y controlar la acción del Gobierno.", "Elegir al Presidente del Gobierno, aprobar los Presupuestos y ratificar los tratados internacionales.", "Dictar decretos-leyes, aprobar los Presupuestos y controlar la acción del Gobierno.", "Ejercer la potestad legislativa del Estado, nombrar al Defensor del Pueblo y elegir a los magistrados del Tribunal Supremo."],
+    "respuesta_correcta": "a",
+    "explicacion": ""
+  },
+  {
+    "tema": 2,
+    "pregunta": "Según establece el artículo 99 de la Constitución Española de 1978 que regula el proceso de investidura del Presidente del Gobierno, ¿qué mayoría se exige en la primera votación?",
+    "respuestas": ["Mayoría simple del Congreso de los Diputados.", "Mayoría absoluta del Congreso de los Diputados.", "Mayoría absoluta del Senado.", "Mayoría de dos tercios del Congreso de los Diputados."],
+    "respuesta_correcta": "b",
+    "explicacion": ""
   }
 ]
