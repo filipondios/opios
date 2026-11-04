@@ -17,10 +17,10 @@ describe("importación de los JSON existentes", () => {
   test("importa todo, es idempotente y conserva la respuesta correcta", async () => {
     const r1 = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r1.errores).toEqual([]);
-    expect(r1.nuevas).toBe(430);
+    expect(r1.nuevas).toBe(580);
     const r2 = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r2.nuevas).toBe(0);
-    expect(r2.duplicadas).toBe(430);
+    expect(r2.duplicadas).toBe(580);
     const orig = (await Bun.file(DIR_PREGUNTAS + "/tema_1.json").json())[0];
     const p = repo.listar({ tema: 1, texto: orig.pregunta }).items[0];
     expect(p.respuestas).toEqual(orig.respuestas);
@@ -161,7 +161,7 @@ describe("temario por bloques", () => {
     const t = await (await pet("/api/temario")).json();
     const b1 = t.find((b) => b.id === 1);
     expect(b1.nombre).toBe("Bloque 1");
-    expect(b1.temas.map((x) => x.numero)).toEqual([1, 2]);
+    expect(b1.temas.map((x) => x.numero)).toEqual([1, 2, 3]);
   });
 
   test("crear bloques y temas, con validaciones", async () => {
