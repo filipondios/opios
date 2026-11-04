@@ -1066,5 +1066,737 @@
     ],
     "respuesta_correcta": "d",
     "explicacion": "El artículo 21.1 de la Ley 50/1997, del Gobierno, establece que el Gobierno en funciones limitará su gestión al despacho ordinario de los asuntos públicos, absteniéndose de adoptar medidas que puedan comprometer el proceso de formación del nuevo Gobierno o las competencias de este. Por eso no puede aprobar el Proyecto de Ley de Presupuestos, presentar proyectos de ley ni proponer al Rey la disolución del Congreso."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Respecto de los Ministros sin cartera, la Ley 50/1997, del Gobierno, establece que:",
+    "respuestas": [
+      "No pueden existir; todos los Ministros deben ser titulares de un Departamento.",
+      "Podrán existir, y por Real Decreto se determinará el ámbito de sus competencias, su estructura administrativa y los medios materiales y personales adscritos.",
+      "Solo pueden existir cuando el Gobierno esté en funciones.",
+      "Su nombramiento exige una ley orgánica que fije sus competencias."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 4.2 de la Ley 50/1997 permite la existencia de Ministros sin cartera y dispone que, por Real Decreto, se determinará el ámbito de sus competencias, la estructura administrativa y los medios materiales y personales adscritos."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Cuando un Vicepresidente del Gobierno asume la titularidad de un Departamento Ministerial, además de la condición de Vicepresidente ostenta la de:",
+    "respuestas": [
+      "Secretario de Estado",
+      "Subsecretario",
+      "Ministro",
+      "Director General"
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 3.2 de la Ley 50/1997 establece que el Vicepresidente que asuma la titularidad de un Departamento Ministerial ostentará, además, la condición de Ministro."
+  },
+  {
+    "tema": 3,
+    "pregunta": "De acuerdo con la Ley 50/1997, las funciones que corresponden al Vicepresidente o Vicepresidentes del Gobierno son:",
+    "respuestas": [
+      "Las que les encomiende el Presidente del Gobierno.",
+      "Las que les atribuye directamente la Constitución, sin intervención del Presidente.",
+      "Las que apruebe el Consejo de Ministros por mayoría absoluta.",
+      "Las que les delegue el Congreso de los Diputados."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 3.1 de la Ley 50/1997 dispone que al Vicepresidente o Vicepresidentes, cuando existan, les corresponderá el ejercicio de las funciones que les encomiende el Presidente del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿A quién corresponde establecer el programa político del Gobierno y determinar las directrices de la política interior y exterior?",
+    "respuestas": [
+      "Al Consejo de Ministros",
+      "Al Congreso de los Diputados",
+      "Al Presidente del Gobierno",
+      "Al Ministro de la Presidencia"
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 2.2.b) de la Ley 50/1997 atribuye al Presidente del Gobierno establecer el programa político y determinar las directrices de la política interior y exterior, velando por su cumplimiento."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Entre las funciones que la Ley 50/1997 atribuye expresamente al Presidente del Gobierno se encuentra la de:",
+    "respuestas": [
+      "Declarar el estado de sitio.",
+      "Convalidar los Reales Decretos-leyes.",
+      "Aprobar los Presupuestos Generales del Estado.",
+      "Interponer el recurso de inconstitucionalidad."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 2.2.i) de la Ley 50/1997 incluye entre las funciones del Presidente la de interponer el recurso de inconstitucionalidad. El estado de sitio lo declara el Congreso, la convalidación de Decretos-leyes corresponde al Congreso y los Presupuestos los aprueban las Cortes."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿Quién resuelve los conflictos de atribuciones que puedan surgir entre los diferentes Ministerios?",
+    "respuestas": [
+      "El Consejo de Estado",
+      "El Presidente del Gobierno",
+      "El Congreso de los Diputados",
+      "La Sala de lo Contencioso-Administrativo del Tribunal Supremo"
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 2.2.l) de la Ley 50/1997 atribuye al Presidente del Gobierno resolver los conflictos de atribuciones que puedan surgir entre los diferentes Ministerios."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿A quién corresponde impartir instrucciones a los demás miembros del Gobierno?",
+    "respuestas": [
+      "Al Consejo de Ministros",
+      "Al Ministro de la Presidencia",
+      "Al Secretario de Estado de Comunicación",
+      "Al Presidente del Gobierno"
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 2.2.m) de la Ley 50/1997 atribuye al Presidente del Gobierno impartir instrucciones a los demás miembros del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Para que el Presidente del Gobierno proponga al Rey la convocatoria de un referéndum consultivo se requiere:",
+    "respuestas": [
+      "La autorización previa del Congreso de los Diputados.",
+      "La autorización previa del Senado.",
+      "El acuerdo de la Comisión General de Secretarios de Estado y Subsecretarios.",
+      "Una ley orgánica aprobada por las Cortes Generales en sesión conjunta."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 2.2.e) de la Ley 50/1997 exige la previa autorización del Congreso de los Diputados para que el Presidente proponga al Rey la convocatoria de un referéndum consultivo, en línea con el artículo 92.2 de la Constitución."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Ministros, como titulares de sus Departamentos, ejercen la potestad reglamentaria:",
+    "respuestas": [
+      "En cualquier materia, siempre que lo autorice el Consejo de Ministros.",
+      "En las materias propias de su Departamento.",
+      "Solo mediante Real Decreto acordado en Consejo de Ministros.",
+      "Únicamente para desarrollar las leyes orgánicas."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 4.1.b) de la Ley 50/1997 reconoce a los Ministros la potestad reglamentaria en las materias propias de su Departamento, sin perjuicio de la competencia del Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Ministros desarrollan la acción del Gobierno en el ámbito de su Departamento de conformidad con:",
+    "respuestas": [
+      "Las instrucciones del Congreso de los Diputados.",
+      "Los acuerdos de la Comisión General de Secretarios de Estado y Subsecretarios.",
+      "Los acuerdos adoptados en Consejo de Ministros o las directrices del Presidente del Gobierno.",
+      "Las resoluciones del Consejo de Estado."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 4.1.a) de la Ley 50/1997 dispone que los Ministros desarrollan la acción del Gobierno en el ámbito de su Departamento de conformidad con los acuerdos adoptados en Consejo de Ministros o con las directrices del Presidente del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿Qué órgano aprueba los Reales Decretos-leyes y los Reales Decretos Legislativos?",
+    "respuestas": [
+      "El Presidente del Gobierno",
+      "El Consejo de Ministros",
+      "Las Cortes Generales",
+      "El Consejo de Estado"
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 5.1.c) de la Ley 50/1997 atribuye al Consejo de Ministros aprobar los Reales Decretos-leyes y los Reales Decretos Legislativos."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Corresponde al Consejo de Ministros:",
+    "respuestas": [
+      "Acordar la negociación y firma de los Tratados internacionales, así como su aplicación provisional.",
+      "Manifestar el consentimiento del Estado para obligarse por tratados.",
+      "Autorizar la celebración de tratados que atribuyan competencias a organizaciones internacionales.",
+      "Declarar la guerra y hacer la paz."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 5.1.d) de la Ley 50/1997 atribuye al Consejo de Ministros acordar la negociación y firma de los Tratados internacionales y su aplicación provisional. Manifestar el consentimiento corresponde al Rey (art. 63.2 CE), la autorización de los tratados del art. 93 a las Cortes y la declaración de guerra y paz al Rey con autorización de las Cortes (art. 63.3 CE)."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Consejo de Ministros aprueba los reglamentos para el desarrollo y ejecución de las leyes, previo dictamen de:",
+    "respuestas": [
+      "El Tribunal Constitucional.",
+      "La Comisión General de Secretarios de Estado y Subsecretarios.",
+      "El Congreso de los Diputados.",
+      "El Consejo de Estado."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 5.1.h) de la Ley 50/1997 exige el previo dictamen del Consejo de Estado para que el Consejo de Ministros apruebe los reglamentos de desarrollo y ejecución de las leyes."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Al Consejo de Ministros le corresponde crear, modificar y suprimir:",
+    "respuestas": [
+      "Los Departamentos Ministeriales y las Secretarías de Estado.",
+      "Los órganos directivos de los Departamentos Ministeriales.",
+      "Las Comisiones Delegadas del Gobierno.",
+      "Los grupos parlamentarios."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 5.1.i) de la Ley 50/1997 atribuye al Consejo de Ministros crear, modificar y suprimir los órganos directivos de los Departamentos Ministeriales. Los Departamentos y Secretarías de Estado corresponden al Presidente (art. 2.2.j) y las Comisiones Delegadas se acuerdan por el Consejo a propuesta del Presidente (art. 6.1)."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Consejo de Ministros puede adoptar:",
+    "respuestas": [
+      "Leyes orgánicas de desarrollo de los derechos fundamentales.",
+      "Sentencias que anulen reglamentos ilegales.",
+      "Programas, planes y directrices vinculantes para todos los órganos de la Administración General del Estado.",
+      "Reglamentos de las Cámaras."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 5.1.j) de la Ley 50/1997 permite al Consejo de Ministros adoptar programas, planes y directrices vinculantes para todos los órganos de la Administración General del Estado."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Las Comisiones Delegadas del Gobierno resolverán los asuntos que, afectando a más de un Ministerio:",
+    "respuestas": [
+      "Requieran siempre ser elevados al Consejo de Ministros.",
+      "No requieran ser elevados al Consejo de Ministros.",
+      "Afecten a la seguridad del Estado, en todo caso.",
+      "Hayan sido previamente informados por el Consejo de Estado."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 6.4.c) de la Ley 50/1997 atribuye a las Comisiones Delegadas resolver los asuntos que, afectando a más de un Ministerio, no requieran ser elevados al Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La Comisión General de Secretarios de Estado y Subsecretarios está integrada por:",
+    "respuestas": [
+      "Los Ministros y los Vicepresidentes del Gobierno.",
+      "Los Directores Generales y los Secretarios Generales Técnicos.",
+      "Los Presidentes de las Comisiones Delegadas del Gobierno.",
+      "Los titulares de las Secretarías de Estado y los Subsecretarios de los distintos Departamentos Ministeriales."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 8.1 de la Ley 50/1997 integra la Comisión General con los titulares de las Secretarías de Estado y los Subsecretarios de los distintos Departamentos Ministeriales; también asiste el Abogado General del Estado y los altos cargos convocados por el Presidente."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La Presidencia de la Comisión General de Secretarios de Estado y Subsecretarios corresponde a:",
+    "respuestas": [
+      "El Presidente del Gobierno.",
+      "Un Vicepresidente del Gobierno o, en su defecto, el Ministro de la Presidencia.",
+      "El Subsecretario de la Presidencia.",
+      "El Director del Secretariado del Gobierno."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 8.2 de la Ley 50/1997 atribuye la presidencia de la Comisión General a un Vicepresidente del Gobierno o, en su defecto, al Ministro de la Presidencia."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿Qué asuntos quedan excluidos del examen previo de la Comisión General de Secretarios de Estado y Subsecretarios antes de ser aprobados por el Consejo de Ministros?",
+    "respuestas": [
+      "Los nombramientos, ceses y ascensos a oficiales generales y los que, por razones de urgencia, deban someterse directamente al Consejo.",
+      "Todos los proyectos de ley.",
+      "Los Reales Decretos-leyes.",
+      "Los Tratados internacionales."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 8.5.a) de la Ley 50/1997 excluye del examen de la Comisión General los nombramientos, ceses y ascensos a cualquiera de los empleos de la categoría de oficiales generales y los asuntos que, excepcionalmente y por razones de urgencia, deban someterse directamente al Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Secretariado del Gobierno es órgano de apoyo de:",
+    "respuestas": [
+      "El Congreso de los Diputados y el Senado.",
+      "El Consejo de Estado y el Tribunal Constitucional.",
+      "El Consejo de Ministros, las Comisiones Delegadas del Gobierno y la Comisión General de Secretarios de Estado y Subsecretarios.",
+      "El Presidente del Gobierno y los grupos parlamentarios."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 9.1 de la Ley 50/1997 define el Secretariado del Gobierno como órgano de apoyo del Consejo de Ministros, de las Comisiones Delegadas y de la Comisión General de Secretarios de Estado y Subsecretarios."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Con carácter ordinario, ¿quién convoca y preside las reuniones del Consejo de Ministros?",
+    "respuestas": [
+      "El Rey, cuando lo estime oportuno.",
+      "El Presidente del Gobierno.",
+      "El Ministro de la Presidencia.",
+      "El Secretario de Estado de Comunicación."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 18.1 de la Ley 50/1997 dispone que el Presidente del Gobierno convoca y preside las reuniones del Consejo de Ministros, actuando como Secretario el Ministro de la Presidencia. El Rey puede presidir alguna sesión a petición del Presidente (art. 62.g CE), pero no es la regla ordinaria."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El orden del día de las reuniones del Consejo de Ministros se fija por:",
+    "respuestas": [
+      "El Ministro de la Presidencia.",
+      "El Consejo de Ministros por mayoría absoluta.",
+      "El Congreso de los Diputados.",
+      "El Presidente del Gobierno."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 18.3 de la Ley 50/1997 atribuye al Presidente del Gobierno fijar el orden del día de las reuniones del Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "En el nombramiento de las personas titulares de las Vicepresidencias y los Ministerios se garantizará el principio de presencia equilibrada de mujeres y hombres, de forma que cada sexo suponga como mínimo:",
+    "respuestas": [
+      "El cuarenta por ciento en su conjunto.",
+      "El veinte por ciento en su conjunto.",
+      "El treinta por ciento en su conjunto.",
+      "El cincuenta por ciento en su conjunto."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 12.2 bis de la Ley 50/1997 exige que cada sexo suponga como mínimo el cuarenta por ciento en el conjunto de las personas titulares de las Vicepresidencias y los Ministerios."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La separación de los Vicepresidentes del Gobierno llevará aparejada:",
+    "respuestas": [
+      "La extinción automática del Gobierno.",
+      "La convocatoria inmediata de elecciones generales.",
+      "La extinción de dichos órganos, salvo que simultáneamente se designe otro Vicepresidente en sustitución del separado.",
+      "La asunción de sus funciones por el Ministro de la Presidencia, en todo caso."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 12.3 de la Ley 50/1997 establece que la separación de los Vicepresidentes llevará aparejada la extinción de dichos órganos, salvo que simultáneamente se designe otro Vicepresidente en sustitución del separado."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La separación de los Ministros sin cartera llevará aparejada:",
+    "respuestas": [
+      "La extinción de dichos órganos.",
+      "Su conversión en Secretarías de Estado.",
+      "La continuidad del órgano hasta el final de la legislatura.",
+      "La convocatoria de un referéndum consultivo."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 12.2 de la Ley 50/1997 dispone que la separación de los Ministros sin cartera llevará aparejada la extinción de dichos órganos."
+  },
+  {
+    "tema": 3,
+    "pregunta": "En los casos de vacante, ausencia o enfermedad del Presidente del Gobierno, sus funciones serán asumidas por:",
+    "respuestas": [
+      "El Ministro de la Presidencia, en todo caso.",
+      "El Presidente del Congreso de los Diputados.",
+      "El Rey.",
+      "Los Vicepresidentes, según el orden de prelación y, en su defecto, los Ministros según el orden de precedencia de los Departamentos."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 13.1 de la Ley 50/1997 regula la suplencia del Presidente: asumen sus funciones los Vicepresidentes según el correspondiente orden de prelación y, en defecto de ellos, los Ministros según el orden de precedencia de los Departamentos."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La suplencia de los Ministros para el despacho ordinario de los asuntos de su competencia se determina:",
+    "respuestas": [
+      "Por acuerdo del Congreso de los Diputados.",
+      "Por Real Decreto del Presidente del Gobierno, debiendo recaer en otro miembro del Gobierno.",
+      "Por Real Decreto del Consejo de Estado.",
+      "Por ley orgánica."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 13.2 de la Ley 50/1997 dispone que la suplencia de los Ministros se determina por Real Decreto del Presidente del Gobierno y debe recaer en otro miembro del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Secretarios de Estado son nombrados y separados por:",
+    "respuestas": [
+      "Real Decreto del Presidente del Gobierno, sin intervención del Consejo.",
+      "Orden Ministerial del Ministro de la Presidencia.",
+      "Real Decreto del Consejo de Ministros, a propuesta del Presidente del Gobierno o del miembro del Gobierno a cuyo Departamento pertenezcan.",
+      "Ley orgánica de las Cortes Generales."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 15.1 de la Ley 50/1997 establece que los Secretarios de Estado son nombrados y separados por Real Decreto del Consejo de Ministros, aprobado a propuesta del Presidente del Gobierno o del miembro del Gobierno a cuyo Departamento pertenezcan."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Directores de los Gabinetes del Presidente del Gobierno, de los Vicepresidentes y de los Ministros son nombrados y separados por:",
+    "respuestas": [
+      "Real Decreto aprobado en Consejo de Ministros.",
+      "Orden Ministerial del Ministro correspondiente.",
+      "Acuerdo del Congreso de los Diputados.",
+      "Resolución del Secretariado del Gobierno."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 16.1 de la Ley 50/1997 dispone que los Directores de los Gabinetes del Presidente, de los Vicepresidentes y de los Ministros son nombrados y separados por Real Decreto aprobado en Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Directores de Gabinete de los Secretarios de Estado son nombrados por:",
+    "respuestas": [
+      "Real Decreto del Presidente del Gobierno.",
+      "Acuerdo de la Comisión General de Secretarios de Estado y Subsecretarios.",
+      "Ley orgánica.",
+      "Orden Ministerial, previo conocimiento del Consejo de Ministros."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 16.2 de la Ley 50/1997 establece que los Directores de Gabinete de los Secretarios de Estado son nombrados por Orden Ministerial, previo conocimiento del Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Directores de los Gabinetes cesan automáticamente:",
+    "respuestas": [
+      "Al finalizar cada período de sesiones de las Cortes.",
+      "Cuando cese el titular del cargo del que dependen; en el Gobierno en funciones continúan hasta la formación del nuevo Gobierno.",
+      "Cuando lo acuerde el Congreso de los Diputados por mayoría simple.",
+      "A los dos años de su nombramiento, en todo caso."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 16.3 de la Ley 50/1997 dispone el cese automático de los Directores de los Gabinetes cuando cese el titular del cargo del que dependen y que, en el supuesto del Gobierno en funciones, continúan hasta la formación del nuevo Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los miembros de los Gabinetes no podrán:",
+    "respuestas": [
+      "Realizar tareas de confianza y asesoramiento especial.",
+      "Prestar apoyo a los miembros del Gobierno en su labor parlamentaria.",
+      "Adoptar actos o resoluciones que correspondan legalmente a los órganos de la Administración General del Estado o de las organizaciones adscritas a ella.",
+      "Asistir a órganos colegiados que adopten decisiones administrativas."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 10.1 de la Ley 50/1997 prohíbe a los miembros de los Gabinetes adoptar actos o resoluciones que correspondan legalmente a los órganos de la Administración General del Estado o de las organizaciones adscritas a ella, sin perjuicio de su asistencia o pertenencia a órganos colegiados."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La responsabilidad criminal del Presidente y de los demás miembros del Gobierno será exigible ante:",
+    "respuestas": [
+      "La Sala de lo Penal del Tribunal Supremo.",
+      "La Sala de lo Contencioso-Administrativo del Tribunal Supremo.",
+      "El Tribunal Constitucional.",
+      "La Audiencia Nacional."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 102.1 de la Constitución establece que la responsabilidad criminal del Presidente y de los demás miembros del Gobierno será exigible, en su caso, ante la Sala de lo Penal del Tribunal Supremo."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Respecto de la responsabilidad criminal de los miembros del Gobierno, la prerrogativa real de gracia:",
+    "respuestas": [
+      "Se aplicará previo informe favorable del Consejo de Ministros.",
+      "Solo podrá aplicarse si lo autoriza el Congreso por mayoría absoluta.",
+      "Se aplicará únicamente en los delitos contra la seguridad del Estado.",
+      "No será aplicable a ninguno de los supuestos del artículo 102 de la Constitución."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 102.3 de la Constitución dispone que la prerrogativa real de gracia no será aplicable a ninguno de los supuestos del artículo 102, que regula la responsabilidad criminal de los miembros del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Rey propone un candidato a la Presidencia del Gobierno:",
+    "respuestas": [
+      "Únicamente después de cada renovación del Senado.",
+      "Después de cada renovación del Congreso de los Diputados y en los demás supuestos constitucionales en que así proceda.",
+      "Cuando lo solicite la mayoría absoluta del Consejo de Ministros.",
+      "Al inicio de cada período de sesiones de las Cortes Generales."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 99.1 de la Constitución dispone que, después de cada renovación del Congreso de los Diputados y en los demás supuestos constitucionales en que así proceda, el Rey propondrá un candidato a la Presidencia del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Si el Congreso de los Diputados otorga su confianza al candidato a la Presidencia del Gobierno por mayoría absoluta, ¿quién le nombra Presidente?",
+    "respuestas": [
+      "El Presidente del Congreso.",
+      "El Consejo de Ministros.",
+      "El Rey.",
+      "El Tribunal Constitucional."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 99.3 de la Constitución establece que, si el Congreso otorga su confianza por mayoría absoluta, el Rey nombrará Presidente al candidato."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Según el artículo 97 de la Constitución, el Gobierno dirige, además de la política interior y exterior:",
+    "respuestas": [
+      "La Administración civil y militar y la defensa del Estado.",
+      "El Poder Judicial y la Administración de Justicia.",
+      "Las Cortes Generales y sus Comisiones.",
+      "El Tribunal Constitucional y el Consejo de Estado."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 97 de la Constitución dispone que el Gobierno dirige la política interior y exterior, la Administración civil y militar y la defensa del Estado, y ejerce la función ejecutiva y la potestad reglamentaria."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Según el artículo 103.2 de la Constitución, los órganos de la Administración del Estado son creados, regidos y coordinados:",
+    "respuestas": [
+      "Por Real Decreto del Presidente del Gobierno, en todo caso.",
+      "Por acuerdo del Consejo de Ministros, sin necesidad de ley.",
+      "Por los Reglamentos de las Cámaras.",
+      "De acuerdo con la ley."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 103.2 de la Constitución establece que los órganos de la Administración del Estado son creados, regidos y coordinados de acuerdo con la ley."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El acceso a la función pública se realizará de acuerdo con los principios de:",
+    "respuestas": [
+      "Antigüedad y discrecionalidad.",
+      "Mérito y capacidad.",
+      "Confianza política y libre designación, en todo caso.",
+      "Igualdad y jerarquía."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 103.3 de la Constitución exige que el acceso a la función pública se realice de acuerdo con los principios de mérito y capacidad."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Presidente del Gobierno puede delegar el ejercicio de competencias propias en:",
+    "respuestas": [
+      "Los Secretarios de Estado y los Subsecretarios.",
+      "Los Delegados del Gobierno en las Comunidades Autónomas.",
+      "El Vicepresidente o Vicepresidentes y los Ministros.",
+      "Los Directores Generales de los Ministerios."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 20.1.a) de la Ley 50/1997 permite al Presidente del Gobierno delegar el ejercicio de competencias propias en el Vicepresidente o Vicepresidentes y en los Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los Ministros pueden delegar el ejercicio de competencias propias en:",
+    "respuestas": [
+      "Los Secretarios de Estado, los Subsecretarios, los Delegados del Gobierno en las Comunidades Autónomas y los demás órganos directivos del Ministerio.",
+      "Los Presidentes de las Comisiones Delegadas del Gobierno.",
+      "Los Diputados y Senadores.",
+      "El Consejo de Estado."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 20.1.b) de la Ley 50/1997 permite a los Ministros delegar en los Secretarios de Estado y Subsecretarios dependientes de ellos, en los Delegados del Gobierno en las Comunidades Autónomas y en los demás órganos directivos del Ministerio."
+  },
+  {
+    "tema": 3,
+    "pregunta": "¿Cuál de las siguientes competencias no es delegable?",
+    "respuestas": [
+      "Las funciones administrativas del Consejo de Ministros en las Comisiones Delegadas.",
+      "Las competencias de los Ministros en sus Secretarios de Estado.",
+      "Las competencias del Presidente en los Vicepresidentes.",
+      "Las atribuidas directamente por la Constitución."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 20.3.a) de la Ley 50/1997 declara no delegables las competencias atribuidas directamente por la Constitución. Las funciones administrativas del Consejo sí pueden delegarse en las Comisiones Delegadas (art. 20.2) y las de Presidente y Ministros en los términos del artículo 20.1."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Consejo de Ministros podrá avocar para sí, a propuesta del Presidente del Gobierno, el conocimiento de un asunto cuya decisión corresponda a:",
+    "respuestas": [
+      "El Congreso de los Diputados.",
+      "Las Comisiones Delegadas del Gobierno.",
+      "El Tribunal Constitucional.",
+      "El Consejo de Estado."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 20.4 de la Ley 50/1997 permite al Consejo de Ministros avocar para sí, a propuesta del Presidente, el conocimiento de un asunto cuya decisión corresponda a las Comisiones Delegadas del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Las decisiones del Consejo de Ministros que no deban adoptar la forma de Real Decreto revisten la forma de:",
+    "respuestas": [
+      "Órdenes Ministeriales.",
+      "Reales Decretos-leyes.",
+      "Acuerdos del Consejo de Ministros.",
+      "Resoluciones del Presidente del Gobierno."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 24.1.d) de la Ley 50/1997 dispone que las decisiones del Consejo de Ministros que no deban adoptar la forma de Real Decreto revisten la forma de Acuerdos del Consejo de Ministros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Según la Ley 50/1997, los reglamentos se ordenan jerárquicamente del siguiente modo:",
+    "respuestas": [
+      "Primero, los aprobados por Real Decreto del Presidente o acordados en Consejo de Ministros; segundo, los aprobados por Orden Ministerial.",
+      "Primero, las Órdenes Ministeriales; segundo, los Reales Decretos.",
+      "Primero, los Acuerdos del Consejo; segundo, los Reales Decretos.",
+      "Todos tienen el mismo rango jerárquico."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 24.2 de la Ley 50/1997 ordena los reglamentos en dos niveles: primero, las disposiciones aprobadas por Real Decreto del Presidente del Gobierno o acordadas en Consejo de Ministros; segundo, las aprobadas por Orden Ministerial."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Gobierno aprobará anualmente:",
+    "respuestas": [
+      "Un Plan de Estabilidad Presupuestaria que sustituirá a los Presupuestos Generales del Estado.",
+      "Un Plan de Reestructuración de las Cortes Generales.",
+      "Un Plan de Disolución de las Cámaras.",
+      "Un Plan Normativo que contendrá las iniciativas legislativas o reglamentarias que vayan a ser elevadas para su aprobación en el año siguiente."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 25.1 de la Ley 50/1997 obliga al Gobierno a aprobar anualmente un Plan Normativo con las iniciativas legislativas o reglamentarias que vayan a ser elevadas para su aprobación en el año siguiente."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Según el artículo 29 de la Ley 50/1997, todos los actos y omisiones del Gobierno están sometidos a:",
+    "respuestas": [
+      "Control previo del Consejo de Estado.",
+      "Control político de las Cortes Generales.",
+      "Autorización del Tribunal Constitucional.",
+      "Fiscalización del Consejo de Ministros."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 29.2 de la Ley 50/1997 somete todos los actos y omisiones del Gobierno al control político de las Cortes Generales, sin perjuicio del control de legalidad por los tribunales."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Las Cámaras y sus Comisiones pueden reclamar:",
+    "respuestas": [
+      "La dimisión del Presidente del Gobierno.",
+      "La disolución de las Cámaras.",
+      "La presencia de los miembros del Gobierno.",
+      "La convocatoria de un referéndum consultivo."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 110.1 de la Constitución permite a las Cámaras y sus Comisiones reclamar la presencia de los miembros del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los miembros del Gobierno tienen acceso a las sesiones de las Cámaras y a sus Comisiones y la facultad de:",
+    "respuestas": [
+      "Hacerse oír en ellas.",
+      "Votar en las votaciones parlamentarias.",
+      "Presentar enmiendas a los proyectos de ley.",
+      "Sustituir a los Diputados y Senadores ausentes."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 110.2 de la Constitución reconoce a los miembros del Gobierno el acceso a las sesiones de las Cámaras y de sus Comisiones y la facultad de hacerse oír en ellas, pudiendo solicitar que informen ante las mismas funcionarios de sus Departamentos."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Para las interpelaciones y preguntas al Gobierno, los Reglamentos de las Cámaras establecerán:",
+    "respuestas": [
+      "Un plazo máximo de cuarenta y ocho horas para responder.",
+      "La obligación de responder por escrito en todos los casos.",
+      "Un turno único al mes.",
+      "Un tiempo mínimo semanal."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 111.1 de la Constitución dispone que los Reglamentos establecerán un tiempo mínimo semanal para las interpelaciones y preguntas al Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La cuestión de confianza que el Presidente del Gobierno puede plantear ante el Congreso de los Diputados versa sobre:",
+    "respuestas": [
+      "La aprobación de los Presupuestos Generales del Estado.",
+      "Su programa o una declaración de política general.",
+      "La convalidación de un Real Decreto-ley.",
+      "La reforma de la Constitución."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 112 de la Constitución permite al Presidente plantear la cuestión de confianza sobre su programa o sobre una declaración de política general."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Para plantear la cuestión de confianza, el Presidente del Gobierno necesita:",
+    "respuestas": [
+      "La autorización previa del Senado.",
+      "El acuerdo de la mayoría absoluta del Congreso.",
+      "La previa deliberación del Consejo de Ministros.",
+      "El dictamen del Consejo de Estado."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 112 de la Constitución exige que el Presidente del Gobierno, previa deliberación del Consejo de Ministros, plantee la cuestión de confianza ante el Congreso de los Diputados."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La moción de censura deberá incluir necesariamente:",
+    "respuestas": [
+      "Un candidato a la Presidencia del Gobierno.",
+      "La dimisión previa del Presidente del Gobierno.",
+      "Un programa de gobierno detallado.",
+      "La firma de la mayoría absoluta de los Diputados."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 113.2 de la Constitución exige que la moción de censura sea propuesta al menos por la décima parte de los Diputados y que incluya un candidato a la Presidencia del Gobierno."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Si el Congreso niega su confianza al Gobierno, este:",
+    "respuestas": [
+      "Permanecerá en funciones hasta las siguientes elecciones generales.",
+      "Disolverá inmediatamente las Cámaras.",
+      "Será sustituido por el candidato de la moción de censura.",
+      "Presentará su dimisión al Rey y se procederá a la designación de Presidente del Gobierno conforme al artículo 99."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 114.1 de la Constitución dispone que, si el Congreso niega su confianza al Gobierno, este presentará su dimisión al Rey y se procederá a la designación de Presidente del Gobierno según lo previsto en el artículo 99."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Si el Congreso adopta una moción de censura, el candidato incluido en ella:",
+    "respuestas": [
+      "Deberá someterse a una nueva votación de investidura.",
+      "Se entenderá investido de la confianza de la Cámara y el Rey le nombrará Presidente del Gobierno.",
+      "Solo será nombrado si obtiene la mayoría absoluta en una segunda votación.",
+      "Será nombrado por el Presidente del Congreso."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 114.2 de la Constitución establece que, si el Congreso adopta una moción de censura, el Gobierno presenta su dimisión al Rey y el candidato incluido en la moción se entiende investido de la confianza de la Cámara, siendo nombrado Presidente por el Rey."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El decreto de disolución del Congreso, del Senado o de las Cortes Generales fijará:",
+    "respuestas": [
+      "El programa del nuevo Gobierno.",
+      "La composición de las nuevas Cámaras.",
+      "La fecha de las elecciones.",
+      "El candidato a la Presidencia del Gobierno."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 115.1 de la Constitución dispone que el decreto de disolución fijará la fecha de las elecciones."
+  },
+  {
+    "tema": 3,
+    "pregunta": "La propuesta de disolución de las Cámaras no podrá presentarse:",
+    "respuestas": [
+      "Cuando esté en trámite una moción de censura.",
+      "Durante el mes de agosto.",
+      "En el último año de la legislatura.",
+      "Si el Gobierno está en funciones."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 115.2 de la Constitución prohíbe presentar la propuesta de disolución cuando esté en trámite una moción de censura."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Salvo lo previsto en el artículo 99.5, no procederá una nueva disolución de las Cámaras antes de que transcurra:",
+    "respuestas": [
+      "Seis meses desde la anterior.",
+      "Dos años desde la anterior.",
+      "Tres meses desde la anterior.",
+      "Un año desde la anterior."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 115.3 de la Constitución establece que no procederá nueva disolución antes de que transcurra un año desde la anterior, salvo lo previsto en el artículo 99.5."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Los estados de alarma, de excepción y de sitio, y las competencias y limitaciones correspondientes, se regularán por:",
+    "respuestas": [
+      "Real Decreto-ley.",
+      "Ley orgánica.",
+      "Ley ordinaria.",
+      "Real Decreto acordado en Consejo de Ministros."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 116.1 de la Constitución remite a una ley orgánica la regulación de los estados de alarma, de excepción y de sitio, así como las competencias y limitaciones correspondientes."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Mientras estén declarados los estados de alarma, de excepción o de sitio, no podrá procederse a:",
+    "respuestas": [
+      "La reunión de las Cámaras.",
+      "La prórroga del estado de alarma.",
+      "La disolución del Congreso.",
+      "La comparecencia del Gobierno ante el Congreso."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 116.5 de la Constitución prohíbe la disolución del Congreso mientras estén declarados algunos de esos estados, quedando automáticamente convocadas las Cámaras si no estuvieren en período de sesiones."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Declarados los estados de alarma, de excepción o de sitio, si las Cámaras no estuvieren en período de sesiones:",
+    "respuestas": [
+      "Quedarán automáticamente convocadas.",
+      "Permanecerán disueltas hasta el fin del estado.",
+      "Solo se convocará al Senado.",
+      "Deberá convocarlas el Consejo de Ministros mediante Real Decreto."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El artículo 116.5 de la Constitución dispone que, declarados esos estados, las Cámaras quedan automáticamente convocadas si no estuvieren en período de sesiones, sin que pueda interrumpirse su funcionamiento."
   }
 ]
