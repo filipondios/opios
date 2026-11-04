@@ -1,0 +1,50 @@
+[
+  {
+    "tema": 3,
+    "pregunta": "De acuerdo con el artículo 103.1 de la Constitución Española, la Administración Pública sirve con objetividad los intereses generales y actúa de acuerdo con los principios de:",
+    "respuestas": [
+      "Eficacia, eficiencia, descentralización, desconcentración y cooperación, con sometimiento pleno a la Ley y al Derecho.",
+      "Eficacia, jerarquía, descentralización, desconcentración y coordinación, con sometimiento pleno a la ley y al Derecho.",
+      "Eficacia, jerarquía, descentralización, concentración y coordinación, con sometimiento pleno al ordenamiento jurídico.",
+      "Eficacia, jerarquía, descentralización, desconcentración y cooperación, con sometimiento pleno a la Ley y al Derecho."
+    ],
+    "respuesta_correcta": "b",
+    "explicacion": "El artículo 103.1 de la Constitución establece que la Administración Pública sirve con objetividad los intereses generales y actúa de acuerdo con los principios de eficacia, jerarquía, descentralización, desconcentración y coordinación, con sometimiento pleno a la ley y al Derecho. La opción b reproduce esa enumeración; las demás alteran alguno de sus principios."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Según el artículo 18 de la ley 50/1997, de 27 de noviembre, del Gobierno que regula el funcionamiento del Consejo de Ministros, ¿quién actúa como Secretario de este órgano colegiado?",
+    "respuestas": [
+      "El Vicepresidente Primero.",
+      "El Ministro portavoz del Gobierno.",
+      "El Ministro de la Presidencia.",
+      "El Ministro de Justicia."
+    ],
+    "respuesta_correcta": "c",
+    "explicacion": "El artículo 18.2 de la Ley 50/1997, de 27 de noviembre, del Gobierno, dispone que el Ministro de la Presidencia actúa como Secretario del Consejo de Ministros. No corresponde al Vicepresidente Primero, al Ministro portavoz ni al Ministro de Justicia."
+  },
+  {
+    "tema": 3,
+    "pregunta": "El Gobierno se rige, en su organización y funcionamiento, entre otras, por la Ley:",
+    "respuestas": [
+      "Ley 50/1997, de 27 de noviembre.",
+      "Ley 50/1999, de 26 de noviembre.",
+      "Ley 50/1996, de 28 de noviembre.",
+      "Ley 50/1998, de 29 de noviembre."
+    ],
+    "respuesta_correcta": "a",
+    "explicacion": "El Gobierno se rige por la Ley 50/1997, de 27 de noviembre, del Gobierno, que desarrolla la Constitución y regula su composición, organización, funcionamiento y funciones, así como el estatuto de sus miembros."
+  },
+  {
+    "tema": 3,
+    "pregunta": "Conforme al artículo 21 de la Ley 50/1997, de 27 de noviembre, del Gobierno, ¿cuál de las siguientes opciones es una función del Gobierno en funciones?",
+    "respuestas": [
+      "Aprobar el Proyecto de Ley de Presupuestos Generales del Estado.",
+      "Presentar Proyectos de Ley al Congreso de los Diputados.",
+      "Proponer al Rey la disolución del Congreso de los Diputados.",
+      "Limitar su gestión al despacho ordinario de los asuntos públicos."
+    ],
+    "respuesta_correcta": "d",
+    "explicacion": "El artículo 21.1 de la Ley 50/1997, del Gobierno, establece que el Gobierno en funciones limitará su gestión al despacho ordinario de los asuntos públicos, absteniéndose de adoptar medidas que puedan comprometer el proceso de formación del nuevo Gobierno o las competencias de este. Por eso no puede aprobar el Proyecto de Ley de Presupuestos, presentar proyectos de ley ni proponer al Rey la disolución del Congreso."
+  }
+]
