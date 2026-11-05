@@ -147,7 +147,7 @@ describe("páginas y estáticos", () => {
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/js/test.js", "/js/maker.js", "/js/temario.js"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);
@@ -234,6 +234,79 @@ describe("temario por bloques", () => {
     expect(r.errores).toEqual([]);
     expect(otra.temario().find((x) => x.nombre === "Bloque 2").temas[0]).toMatchObject({ numero: 1, preguntas: 1 });
     expect(otra.todas().find((p) => p.bloque_nombre === "Bloque 2")).toMatchObject({ tema_numero: 1 });
+  });
+});
+
+describe("estadísticas y simulacros", () => {
+  beforeEach(async () => {
+    for (let i = 0; i < 3; i++)
+      await pet("/api/preguntas", "POST", nueva({ tema: 1, pregunta: "Pregunta simulacro " + i, respuestas: ["A", "B", "C", "D"], correcta: i % 4 }));
+  });
+
+  const conProgreso = async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    await pet("/api/progreso", "POST", [
+      { id: bank[0].id, caja: 5, vence: "2999-01-01", aciertos: 4, fallos: 1 },
+      { id: bank[1].id, caja: 0, vence: hoyIso(), aciertos: 0, fallos: 3 },
+    ]);
+    return bank;
+  };
+
+  test("la página de estadísticas refleja progreso y fallos; sin datos muestra aviso", async () => {
+    let html = await (await pet("/estadisticas")).text();
+    expect(html).toContain("Todavía no hay progreso registrado");
+    expect(html).toContain('href="/simulacro"');
+    await conProgreso();
+    html = await (await pet("/estadisticas")).text();
+    expect(html).not.toContain("Todavía no hay progreso registrado");
+    expect(html).toContain("Pregunta simulacro 1"); // la más fallada
+    expect(html).toContain("50 %"); // precision 4/8
+  });
+
+  test("/simulacro ofrece la configuración del examen", async () => {
+    const html = await (await pet("/simulacro")).text();
+    expect(html).toContain('id="btn-empezar"');
+    expect(html).toContain('id="cfg-pen"');
+    expect(html).toContain("/js/simulacro.js");
+  });
+
+  test("guardar un simulacro recalcula el resultado y se puede listar y ver en detalle", async () => {
+    const bank = await conProgreso();
+    const r = await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 600, penalizacion: 1 / 3,
+      respuestas: [
+        { id: bank[0].id, elegida: bank[0].correcta },
+        { id: bank[1].id, elegida: (bank[1].correcta + 1) % 4 },
+        { id: bank[2].id, elegida: -1 },
+      ],
+    });
+    expect(r.status).toBe(201);
+    const s = await r.json();
+    expect(s).toMatchObject({ temas: [1], total: 3, aciertos: 1, fallos: 1, en_blanco: 1, segundos: 600 });
+    expect(s.puntos).toBeCloseTo(2 / 3, 2);
+
+    expect((await (await pet("/api/simulacros")).json()).length).toBe(1);
+    const uno = await (await pet("/api/simulacros/" + s.id)).json();
+    expect(uno.detalle).toEqual([
+      { id: bank[0].id, elegida: bank[0].correcta, correcta: bank[0].correcta },
+      { id: bank[1].id, elegida: (bank[1].correcta + 1) % 4, correcta: bank[1].correcta },
+      { id: bank[2].id, elegida: null, correcta: bank[2].correcta },
+    ]);
+    const html = await (await pet("/estadisticas")).text();
+    expect(html).toContain("10:00"); // 600 s en la tabla de simulacros
+  });
+
+  test("simulacro inválido o con preguntas inexistentes", async () => {
+    const bank = await conProgreso();
+    const cuerpo = (o = {}) => ({ temas: [1], segundos: 1, penalizacion: 0, respuestas: [{ id: bank[0].id, elegida: 0 }], ...o });
+    for (const mala of [
+      cuerpo({ temas: [] }), cuerpo({ temas: "x" }), cuerpo({ segundos: -1 }), cuerpo({ penalizacion: 2 }),
+      cuerpo({ respuestas: [] }), cuerpo({ respuestas: [{ id: 0, elegida: 0 }] }),
+      cuerpo({ respuestas: [{ id: bank[0].id, elegida: 9 }] }),
+      cuerpo({ respuestas: [{ id: bank[0].id, elegida: 0 }, { id: bank[0].id, elegida: 1 }] }),
+    ]) expect((await pet("/api/simulacros", "POST", mala)).status).toBe(400);
+    expect((await pet("/api/simulacros", "POST", { temas: [1], segundos: 1, penalizacion: 0, respuestas: [{ id: 99999, elegida: 0 }] })).status).toBe(400);
+    expect((await pet("/api/simulacros/99999")).status).toBe(404);
   });
 });
 

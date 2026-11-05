@@ -96,6 +96,34 @@ export function validarTema(b) {
   return { bloque, numero, nombre };
 }
 
+/** Valida el resultado de un simulacro: { temas, segundos, penalizacion, respuestas: [{ id, elegida }] }. */
+export function validarSimulacro(b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) throw mal("El cuerpo debe ser un objeto.");
+  if (!Array.isArray(b.temas) || b.temas.length === 0 || b.temas.length > 5000)
+    throw mal("Indica al menos un tema para el simulacro.");
+  const temas = b.temas.map(Number);
+  if (temas.some((t) => !Number.isInteger(t) || t < 0)) throw mal("Hay un tema no válido.");
+  const segundos = Number(b.segundos);
+  if (!Number.isInteger(segundos) || segundos < 0 || segundos > 86_400)
+    throw mal("El tiempo del simulacro no es válido.");
+  const penalizacion = Number(b.penalizacion);
+  if (!Number.isFinite(penalizacion) || penalizacion < 0 || penalizacion > 1)
+    throw mal("La penalización debe estar entre 0 y 1.");
+  if (!Array.isArray(b.respuestas) || b.respuestas.length < 1 || b.respuestas.length > 500)
+    throw mal("Hacen falta entre 1 y 500 respuestas.");
+  const respuestas = b.respuestas.map((e) => {
+    if (!e || typeof e !== "object" || Array.isArray(e)) throw mal("Respuesta de simulacro no válida.");
+    const id = Number(e.id);
+    const elegida = e.elegida == null || e.elegida === "" ? -1 : Number(e.elegida);
+    if (!Number.isInteger(id) || id <= 0) throw mal("Identificador de pregunta no válido.");
+    if (!Number.isInteger(elegida) || elegida < -1 || elegida >= MAX_OPC) throw mal("Opción elegida no válida.");
+    return { id, elegida };
+  });
+  if (new Set(respuestas.map((r) => r.id)).size !== respuestas.length)
+    throw mal("Hay preguntas repetidas en el simulacro.");
+  return { temas: [...new Set(temas)], segundos, penalizacion, respuestas };
+}
+
 /** Valida una entrada de progreso enviada por el test. */
 export function validarProgreso(e) {
   if (!e || typeof e !== "object") throw mal("Entrada de progreso no válida.");

@@ -2,13 +2,15 @@ import { join, normalize, sep } from "node:path";
 import { timingSafeEqual } from "node:crypto";
 import { PUBLIC_DIR, CAJA_DOMINADA } from "./config.js";
 import { ErrorApi } from "./errores.js";
-import { hoyIso } from "./fechas.js";
-import { validarPregunta, validarProgreso, validarBloque, validarTema } from "./validar.js";
+import { hoyIso, sumarDias } from "./fechas.js";
+import { validarPregunta, validarProgreso, validarBloque, validarTema, validarSimulacro } from "./validar.js";
 import { serializarJson } from "./exportar.js";
 import { aTexto } from "./views/html.js";
 import { paginaHome, temasGrid } from "./views/home.js";
 import { paginaMaker } from "./views/maker.js";
 import { paginaTemario } from "./views/temario.js";
+import { paginaEstadisticas } from "./views/estadisticas.js";
+import { paginaSimulacro } from "./views/simulacro.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
 const pagina = (r) => new Response(aTexto(r), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
@@ -114,6 +116,22 @@ export function crearApp(repo, { auth = null } = {}) {
       if (m === "DELETE") { repo.reiniciarProgreso(); return json({ ok: true }); }
     }
 
+    if (ruta === "/api/simulacros") {
+      if (m === "GET") {
+        const limite = entero(url.searchParams.get("limite") ?? 20, { min: 1, max: 100 });
+        if (Number.isNaN(limite)) throw new ErrorApi(400, "Parámetros no válidos.");
+        return json(repo.listarSimulacros(limite));
+      }
+      if (m === "POST") return json(repo.crearSimulacro(validarSimulacro(await cuerpoJson(req))), 201);
+    }
+
+    const msim = ruta.match(/^\/api\/simulacros\/(\d+)$/);
+    if (msim && m === "GET") {
+      const s = repo.obtenerSimulacro(Number(msim[1]));
+      if (!s) throw new ErrorApi(404, "El simulacro no existe.");
+      return json(s);
+    }
+
     if (ruta === "/api/exportar" && m === "GET") {
       return new Response(serializarJson(repo.todas()), {
         headers: { "Content-Type": "application/json; charset=utf-8", "Content-Disposition": 'attachment; filename="preguntas.json"' },
@@ -179,6 +197,20 @@ export function crearApp(repo, { auth = null } = {}) {
         if (ruta === "/") return pagina(paginaHome({ temas: estadisticas() }));
         if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
         if (ruta === "/temario") return pagina(paginaTemario());
+        if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
+        if (ruta === "/estadisticas") {
+          const hoy = hoyIso();
+          return pagina(paginaEstadisticas({
+            global: repo.estadisticasGlobales(hoy, CAJA_DOMINADA),
+            temas: estadisticas(),
+            prevision: repo.previsionRepasos(hoy, 7),
+            falladas: repo.preguntasMasFalladas(20),
+            actividad: repo.actividadReciente(sumarDias(hoy, -13)),
+            simulacros: repo.listarSimulacros(5),
+            totalSimulacros: repo.contarSimulacros(),
+            hoy,
+          }));
+        }
         if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas()));
         return await estatico(ruta);
       }

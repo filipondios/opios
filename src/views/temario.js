@@ -35,7 +35,12 @@ export function paginaTemario() {
   return layout({
     titulo: "Temario",
     marca: "Temario",
-    enlaces: [{ href: "/", texto: "Hacer test" }, { href: "/maker", texto: "Añadir preguntas" }],
+    enlaces: [
+      { href: "/", texto: "Hacer test" },
+      { href: "/simulacro", texto: "Simulacro" },
+      { href: "/estadisticas", texto: "Estadísticas" },
+      { href: "/maker", texto: "Añadir preguntas" },
+    ],
     estado: "Guardado en la base de datos",
     css: ["maker.css", "temario.css"],
     js: ["temario.js"],
