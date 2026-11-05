@@ -29,6 +29,9 @@
 button.opt{width:100%;font:inherit;color:inherit;text-align:left}
 button.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
 button.opt[aria-pressed="true"] .bubble{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.opt[data-cursor="true"]{outline:2px solid var(--accent);outline-offset:2px}
+
+#exam-text{margin-top:16px}
 
 .exam-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .palette{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;flex:1;max-height:132px;overflow:auto;padding:2px}

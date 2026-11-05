@@ -378,17 +378,31 @@ export function abrirDb(ruta = DB_PATH) {
         WHERE vence <= ? GROUP BY vence ORDER BY vence`).all(hasta);
     },
 
-    /** Preguntas con más fallos, para detectar puntos débiles. */
+    /** Preguntas con más fallos, sumando los tests y los simulacros. */
     preguntasMasFalladas(limite = 20) {
       return db.query(`
+        WITH sim AS (
+          SELECT CAST(json_extract(j.value, '$.id') AS INTEGER) AS pregunta_id,
+                 SUM(CASE WHEN json_extract(j.value, '$.elegida') IS NOT NULL
+                           AND json_extract(j.value, '$.elegida') <> json_extract(j.value, '$.correcta')
+                      THEN 1 ELSE 0 END) AS fallos,
+                 SUM(CASE WHEN json_extract(j.value, '$.elegida') = json_extract(j.value, '$.correcta')
+                      THEN 1 ELSE 0 END) AS aciertos
+          FROM simulacros s, json_each(s.detalle) j
+          GROUP BY pregunta_id
+        )
         SELECT p.id, p.enunciado, t.numero AS tema_numero, t.nombre AS tema_nombre,
-               b.nombre AS bloque_nombre, pr.fallos, pr.aciertos, pr.caja
-        FROM progreso pr
-        JOIN preguntas p ON p.id = pr.pregunta_id
+               b.nombre AS bloque_nombre,
+               COALESCE(pr.fallos, 0) + COALESCE(sim.fallos, 0)   AS fallos,
+               COALESCE(pr.aciertos, 0) + COALESCE(sim.aciertos, 0) AS aciertos,
+               pr.caja
+        FROM preguntas p
         JOIN temas t ON t.id = p.tema_id
         LEFT JOIN bloques b ON b.id = t.bloque_id
-        WHERE pr.fallos > 0
-        ORDER BY pr.fallos DESC, pr.aciertos ASC, p.id
+        LEFT JOIN progreso pr ON pr.pregunta_id = p.id
+        LEFT JOIN sim ON sim.pregunta_id = p.id
+        WHERE COALESCE(pr.fallos, 0) + COALESCE(sim.fallos, 0) > 0
+        ORDER BY fallos DESC, aciertos ASC, p.id
         LIMIT ?`).all(limite);
     },
 

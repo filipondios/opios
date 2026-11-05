@@ -43,7 +43,7 @@ async function api(url, metodo = "GET", cuerpo){
 }
 
 let pantalla = "setup";
-let preguntas = [], respuestas = [], cur = 0;
+let preguntas = [], respuestas = [], cur = 0, cursor = 0;
 let temas = [], penalizacion = 0, minutos = 60;
 let inicio = 0, fin = 0, timer = null, finalizado = false;
 
@@ -119,6 +119,7 @@ async function empezar(){
         id: q.id, tema: q.tema, temaNumero: q.tema_numero ?? q.tema,
         bloque: q.bloque_nombre ?? "", pregunta: q.pregunta,
         opciones: orden.map((k) => q.respuestas[k]),
+        originales: orden,
         correcta: orden.indexOf(q.correcta),
         explicacion: q.explicacion,
       };
@@ -142,10 +143,12 @@ async function empezar(){
 function pintarPregunta(){
   const q = preguntas[cur];
   if (!q) return;
+  cursor = respuestas[cur] ?? 0;
   $("#exam-tema").textContent = (q.bloque ? q.bloque + " · " : "") + "Tema " + q.temaNumero;
   $("#exam-text").textContent = q.pregunta;
   $("#exam-opts").replaceChildren(...q.opciones.map((texto, k) => h("button", {
     type: "button", class: "opt", "aria-pressed": String(respuestas[cur] === k),
+    "data-cursor": k === cursor ? "true" : null,
     onclick: () => elegir(k),
   }, h("span", { class: "bubble", text: LETRAS[k] }), h("span", { class: "otext", text: texto }))));
   $("#exam-progress").textContent = `Pregunta ${cur + 1} de ${preguntas.length}`;
@@ -155,10 +158,27 @@ function pintarPregunta(){
   pintarPaleta();
 }
 
+function pintarCursor(){
+  [...document.querySelectorAll("#exam-opts .opt")].forEach((o, i) => {
+    if (i === cursor) o.setAttribute("data-cursor", "true");
+    else o.removeAttribute("data-cursor");
+  });
+}
+
+function moverOpcion(d){
+  if (pantalla !== "exam" || finalizado) return;
+  const n = preguntas[cur]?.opciones.length ?? 0;
+  if (!n) return;
+  cursor = (cursor + d + n) % n;
+  pintarCursor();
+}
+
 function elegir(k){
   if (pantalla !== "exam" || finalizado) return;
+  cursor = k;
   respuestas[cur] = k;
   [...document.querySelectorAll("#exam-opts .opt")].forEach((o, i) => o.setAttribute("aria-pressed", String(i === k)));
+  pintarCursor();
   $("#exam-answered").textContent = `${respuestas.filter((r) => r != null).length} respondidas`;
   pintarPaleta();
   const sr = $("#sr");
@@ -182,6 +202,12 @@ function irA(i){
   cur = Math.max(0, Math.min(preguntas.length - 1, i));
   pintarPregunta();
   window.scrollTo(0, 0);
+}
+
+function responderYAvanzar(){
+  if (!preguntas[cur]) return;
+  elegir(cursor);
+  if (cur < preguntas.length - 1) irA(cur + 1);
 }
 
 function finalizar(forzado = false){
@@ -310,7 +336,10 @@ async function guardarResultado(res){
       temas,
       segundos: res.segundos,
       penalizacion,
-      respuestas: preguntas.map((q, i) => ({ id: q.id, elegida: respuestas[i] == null ? -1 : respuestas[i] })),
+      respuestas: preguntas.map((q, i) => ({
+        id: q.id,
+        elegida: respuestas[i] == null ? -1 : q.originales[respuestas[i]],
+      })),
     });
     if (!r.ok){
       const d = await r.json().catch(() => ({}));
@@ -349,18 +378,17 @@ document.addEventListener("keydown", (e) => {
   if (["input", "select", "textarea"].includes(tag)) return;
   const k = e.key;
   if (k === "Escape"){ e.preventDefault(); salir(); return; }
+  if (k === "ArrowUp"){ e.preventDefault(); moverOpcion(-1); return; }
+  if (k === "ArrowDown"){ e.preventDefault(); moverOpcion(1); return; }
   if (k === "ArrowLeft"){ e.preventDefault(); irA(cur - 1); return; }
   if (k === "ArrowRight"){ e.preventDefault(); irA(cur + 1); return; }
   if (k === "Enter"){
-    if (tag === "button") return;
+    const enOpcion = e.target && e.target.closest && e.target.closest("#exam-opts .opt");
+    if (tag === "button" && !enOpcion) return;
     e.preventDefault();
-    if (cur === preguntas.length - 1) finalizar(false); else irA(cur + 1);
+    responderYAvanzar();
     return;
   }
-  let n = -1;
-  if (/^[1-9]$/.test(k)) n = Number(k) - 1;
-  else if (/^[a-hA-H]$/.test(k)) n = k.toLowerCase().charCodeAt(0) - 97;
-  if (n >= 0 && n < preguntas[cur].opciones.length){ e.preventDefault(); elegir(n); }
 });
 
 actualizarResumen();
