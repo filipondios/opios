@@ -133,6 +133,7 @@ describe("páginas y estáticos", () => {
     html = await (await pet("/")).text();
     expect(html).toContain('data-tema="1"'); expect(html).toContain('data-tema="2"');
     expect(html).toContain('href="/maker"'); expect(html).toContain("/js/test.js");
+    expect(html).toContain('type="module"');
     const m = await (await pet("/maker")).text();
     expect(m).toContain('href="/"'); expect(m).toContain("Hacer test"); expect(m).toContain("/js/maker.js");
     const t = await (await pet("/temario")).text();
@@ -147,7 +148,7 @@ describe("páginas y estáticos", () => {
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);

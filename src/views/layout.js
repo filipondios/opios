@@ -4,8 +4,9 @@ import { html } from "./html.js";
  * Plantilla base de todas las páginas.
  * `enlace` es el botón de cabecera hacia la otra página: { href, texto }.
  * `enlaces` permite varios botones; si se indica, tiene prioridad sobre `enlace`.
+ * `jsModulo` carga los scripts con `type="module"` (necesario si usan `import`).
  */
-export function layout({ titulo, marca, enlace, enlaces, estado, ancho = false, css = [], js = [], cuerpo }) {
+export function layout({ titulo, marca, enlace, enlaces, estado, ancho = false, css = [], js = [], jsModulo = false, cuerpo }) {
   const botones = enlaces ?? (enlace ? [enlace] : []);
   return html`<!doctype html>
 <html lang="es">
@@ -31,7 +32,9 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
   </header>
 ${cuerpo}
 </div>
-${js.map((s) => html`<script src="/js/${s}" defer></script>`)}
+${js.map((s) => jsModulo
+  ? html`<script type="module" src="/js/${s}"></script>`
+  : html`<script src="/js/${s}" defer></script>`)}
 </body>
 </html>
 `;

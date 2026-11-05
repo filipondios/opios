@@ -1,12 +1,11 @@
-/* Test infinito (cliente): planificador de repasos y UI del test.
+import { Sesion } from "./repaso.js";
+
+/* Test infinito (cliente): UI del test. El planificador vive en ./repaso.js.
    Los datos viven en el servidor (SQLite): preguntas por /api/test y progreso por /api/progreso. */
 (() => {
 "use strict";
 
-/* ---------- Parámetros del repaso (ajústalos a tu gusto) ---------- */
-const INTERVALOS_DIAS   = [0, 1, 3, 7, 16, 35, 90]; // días hasta el siguiente repaso según la caja (7 cajas: 0..6)
-const PASOS_APRENDIZAJE = [3, 8];  // tras fallar: reaparece tras 3 preguntas, luego tras 8
-const PROB_REPASO       = 0.6;     // si hay repasos y nuevas a la vez, probabilidad de sacar un repaso
+/* ---------- Parámetros de la UI ---------- */
 const PAUSA_ACIERTO_MS  = 450;     // pausa tras un acierto antes de pasar a la siguiente
 const ETIQUETA          = "Guardado en la base de datos";
 const LETRAS = "ABCDEFGH";
@@ -24,10 +23,6 @@ function h(tag, props, ...kids){
   for (const c of kids.flat()) if (c != null) e.append(c);
   return e;
 }
-const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-const hoy = () => iso(new Date());
-const masDias = (n) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return iso(d); };
-const elegir = (a) => a[Math.floor(Math.random()*a.length)];
 function barajar(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const msgError = (e) => (e && e.message) ? e.message : String(e);
 
@@ -85,73 +80,6 @@ async function guardarProgreso(){
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") guardarProgreso(); });
 window.addEventListener("pagehide", () => { guardarProgreso(); });
-
-/* ---------- Planificador de repasos ---------- */
-class Sesion {
-  constructor(pool){
-    this.pool = pool;
-    this.porId = new Map(pool.map((q) => [q.i, q]));
-    this.n = 0; this.aprendizaje = new Map(); this.ultima = null;
-    this.aciertos = 0; this.fallos = 0;
-  }
-  siguiente(){
-    const hoyIso = hoy();
-    // 1) preguntas falladas cuyo turno ya llegó
-    let mejor = null;
-    for (const [id, [, v]] of this.aprendizaje) if (v <= this.n && (!mejor || v < mejor.v)) mejor = { id, v };
-    if (mejor) return [this.porId.get(mejor.id), "Reintento"];
-    // 2) repasos vencidos y 3) nuevas
-    const repasos = [], nuevas = [];
-    for (const q of this.pool){
-      const p = progress[q.i];
-      if (!p) nuevas.push(q);
-      else if (!this.aprendizaje.has(q.i) && p[1] <= hoyIso) repasos.push(q);
-    }
-    if (repasos.length && (!nuevas.length || Math.random() < PROB_REPASO)){
-      const menor = repasos.reduce((m, q) => progress[q.i][1] < m ? progress[q.i][1] : m, "9999-99-99");
-      return [elegir(repasos.filter((q) => progress[q.i][1] === menor)), "Repaso"];
-    }
-    if (nuevas.length) return [elegir(nuevas), "Nueva"];
-    // 4) nada pendiente salvo reintentos que aún no tocan
-    if (this.aprendizaje.size){
-      let m = null; for (const [id, [, v]] of this.aprendizaje) if (!m || v < m.v) m = { id, v };
-      return [this.porId.get(m.id), "Reintento"];
-    }
-    // 5) modo libre infinito: más peso a las cajas bajas y a las más falladas
-    let cand = this.pool.filter((q) => q.i !== this.ultima); if (!cand.length) cand = this.pool;
-    const pesos = cand.map((q) => { const p = progress[q.i]; return 1/(p[0]+1) + 0.3*p[3]/Math.max(1, p[2]+p[3]); });
-    let r = Math.random() * pesos.reduce((a, b) => a + b, 0);
-    for (let k = 0; k < cand.length; k++){ r -= pesos[k]; if (r <= 0) return [cand[k], "Práctica libre"]; }
-    return [cand[cand.length-1], "Práctica libre"];
-  }
-  registrar(q, acierto){
-    const id = q.i, existia = !!progress[id];
-    const p = progress[id] || (progress[id] = [0, hoy(), 0, 0]);
-    this.n++; this.ultima = id;
-    if (acierto){
-      this.aciertos++; p[2]++;
-      if (this.aprendizaje.has(id)){
-        const paso = this.aprendizaje.get(id)[0] + 1;
-        if (paso >= PASOS_APRENDIZAJE.length){ this.aprendizaje.delete(id); p[0] = 1; p[1] = masDias(INTERVALOS_DIAS[1]); }
-        else this.aprendizaje.set(id, [paso, this.n + PASOS_APRENDIZAJE[paso]]);
-      } else if (existia && p[0] === 0){
-        // fallada en una sesión anterior: un reintento más antes de graduarla
-        this.aprendizaje.set(id, [1, this.n + PASOS_APRENDIZAJE[1]]);
-      } else {
-        p[0] = Math.min(p[0] + 1, INTERVALOS_DIAS.length - 1); p[1] = masDias(INTERVALOS_DIAS[p[0]]);
-      }
-    } else {
-      this.fallos++; p[3]++; p[0] = 0; p[1] = hoy();
-      this.aprendizaje.set(id, [0, this.n + PASOS_APRENDIZAJE[0]]);
-    }
-    marcarSucio(id);
-  }
-  pendientes(){
-    const hoyIso = hoy(); let rep = 0, nue = 0;
-    for (const q of this.pool){ const p = progress[q.i]; if (!p) nue++; else if (p[1] <= hoyIso) rep++; }
-    return { rep, nue };
-  }
-}
 
 /* ---------- Pantalla de preparación (la rejilla llega ya pintada desde el servidor) ---------- */
 const chips = () => [...document.querySelectorAll("#grid .chip")];
@@ -254,7 +182,7 @@ async function empezar(){
   }
   setStatus("ok", ETIQUETA); boton.disabled = false;
   nota(null);
-  sesion = new Sesion(bank);
+  sesion = new Sesion(bank, { progreso: progress, alCambiar: marcarSucio });
   pantalla = "quiz";
   $("#screen-setup").hidden = true; $("#screen-quiz").hidden = false;
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
