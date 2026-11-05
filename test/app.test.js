@@ -254,13 +254,30 @@ describe("estadísticas y simulacros", () => {
 
   test("la página de estadísticas refleja progreso y fallos; sin datos muestra aviso", async () => {
     let html = await (await pet("/estadisticas")).text();
-    expect(html).toContain("Todavía no hay progreso registrado");
+    expect(html).toContain("Todavía no hay actividad registrada");
     expect(html).toContain('href="/simulacro"');
     await conProgreso();
     html = await (await pet("/estadisticas")).text();
-    expect(html).not.toContain("Todavía no hay progreso registrado");
+    expect(html).not.toContain("Todavía no hay actividad registrada");
     expect(html).toContain("Pregunta simulacro 1"); // la más fallada
     expect(html).toContain("50 %"); // precision 4/8
+  });
+
+  test("el cliente envía el índice original al guardar (opciones barajadas)", async () => {
+    const js = await (await pet("/js/simulacro.js")).text();
+    expect(js).toContain("q.originales[respuestas[i]]");
+  });
+
+  test("el aviso distingue entre sin actividad y solo simulacros", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 10, penalizacion: 0,
+      respuestas: [{ id: bank[0].id, elegida: bank[0].correcta }],
+    });
+    const html = await (await pet("/estadisticas")).text();
+    expect(html).toContain("Todavía no has hecho ningún test");
+    expect(html).toContain("1 simulacro registrado");
+    expect(html).not.toContain("Todavía no hay actividad registrada");
   });
 
   test("/simulacro ofrece la configuración del examen", async () => {
@@ -294,6 +311,36 @@ describe("estadísticas y simulacros", () => {
     ]);
     const html = await (await pet("/estadisticas")).text();
     expect(html).toContain("10:00"); // 600 s en la tabla de simulacros
+  });
+
+  test("las preguntas falladas incluyen los fallos de simulacros aunque no haya tests", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 20, penalizacion: 0,
+      respuestas: [
+        { id: bank[0].id, elegida: (bank[0].correcta + 1) % bank[0].respuestas.length },
+        { id: bank[1].id, elegida: bank[1].correcta },
+        { id: bank[2].id, elegida: -1 },
+      ],
+    });
+    const html = await (await pet("/estadisticas")).text();
+    expect(html).not.toContain("Todavía no hay fallos registrados");
+    expect(html).toContain(bank[0].pregunta);
+    expect(html).not.toContain(bank[1].pregunta); // acertada: no entra en la tabla
+    expect(html).not.toContain(bank[2].pregunta); // en blanco: tampoco
+    expect(repo.preguntasMasFalladas(20)).toEqual([
+      expect.objectContaining({ id: bank[0].id, fallos: 1, aciertos: 0, caja: null }),
+    ]);
+  });
+
+  test("los fallos de test y simulacro se suman en la misma pregunta", async () => {
+    const bank = await conProgreso();
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 20, penalizacion: 0,
+      respuestas: [{ id: bank[1].id, elegida: (bank[1].correcta + 1) % bank[1].respuestas.length }],
+    });
+    const fila = repo.preguntasMasFalladas(20).find((p) => p.id === bank[1].id);
+    expect(fila).toMatchObject({ fallos: 4, aciertos: 0, caja: 0 }); // 3 del test + 1 del simulacro
   });
 
   test("simulacro inválido o con preguntas inexistentes", async () => {

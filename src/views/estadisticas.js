@@ -112,7 +112,7 @@ function tablaFalladas(falladas) {
           <td class="pregunta-cell">${p.enunciado}</td>
           <td><b>${fmt(p.fallos)}</b></td>
           <td>${fmt(p.aciertos)}</td>
-          <td>${p.caja}</td>
+          <td>${p.caja ?? "—"}</td>
         </tr>`)}</tbody>
     </table>
   </div>`;
@@ -141,6 +141,11 @@ function tablaSimulacros(simulacros) {
 export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, simulacros, totalSimulacros, hoy }) {
   const vistas = global.total - global.nuevas;
   const sinProgreso = global.nuevas === global.total;
+  const aviso = !sinProgreso
+    ? ""
+    : totalSimulacros > 0
+      ? `Todavía no has hecho ningún test, pero ya tienes ${fmt(totalSimulacros)} simulacro${totalSimulacros === 1 ? "" : "s"} registrado${totalSimulacros === 1 ? "" : "s"}. Abajo se muestran sus resultados; haz un test para empezar a registrar progreso de repaso.`
+      : "Todavía no hay actividad registrada. Haz un test o un simulacro para empezar a ver datos.";
   const cuerpo = html`
   <main class="stack">
     <div class="page-head">
@@ -151,7 +156,7 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
       <div class="row"><a class="btn primary" href="/">Hacer test</a><a class="btn" href="/simulacro">Simulacro</a></div>
     </div>
 
-    ${sinProgreso ? html`<div class="note">Todavía no hay progreso registrado. Haz un test o un simulacro para empezar a ver datos.</div>` : ""}
+    ${aviso ? html`<div class="note">${aviso}</div>` : ""}
 
     <section class="kpis" aria-label="Resumen">
       ${kpi(fmt(global.total), "preguntas")}
@@ -174,6 +179,7 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
 
     <section class="stack">
       <h2>Preguntas que más fallas</h2>
+      <p class="hint">Suma los fallos de los tests y de los simulacros. La caja solo existe en las preguntas practicadas en test; «—» indica que solo han salido en simulacros.</p>
       ${tablaFalladas(falladas)}
     </section>
 

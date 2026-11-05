@@ -103,9 +103,9 @@ export function paginaSimulacro({ temario }) {
     </div>
 
     <p class="keys">
+      <span><kbd>↑</kbd><kbd>↓</kbd> elegir</span>
       <span><kbd>←</kbd><kbd>→</kbd> navegar</span>
-      <span><kbd>A</kbd>–<kbd>D</kbd> o <kbd>1</kbd>–<kbd>4</kbd> responder</span>
-      <span><kbd>Enter</kbd> siguiente</span>
+      <span><kbd>Enter</kbd> responder y siguiente</span>
       <span><kbd>Esc</kbd> salir</span>
     </p>
     <div class="sr" id="sr" aria-live="polite"></div>
