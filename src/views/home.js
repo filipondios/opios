@@ -69,6 +69,8 @@ export function paginaHome({ temas }) {
         <button class="btn" type="button" id="btn-all">Todos</button>
         <button class="btn" type="button" id="btn-none">Ninguno</button>
         <span class="spacer"></span>
+        <a class="btn" href="/simulacro">Simulacro</a>
+        <a class="btn" href="/estadisticas">Estadísticas</a>
         <a class="btn" href="/temario">Organizar temario</a>
         <a class="btn" href="/maker">Añadir preguntas</a>
       </div>
@@ -107,7 +109,11 @@ export function paginaHome({ temas }) {
   return layout({
     titulo: "Test infinito",
     marca: "Test infinito",
-    enlace: { href: "/maker", texto: "Añadir preguntas" },
+    enlaces: [
+      { href: "/simulacro", texto: "Simulacro" },
+      { href: "/estadisticas", texto: "Estadísticas" },
+      { href: "/maker", texto: "Añadir preguntas" },
+    ],
     estado: "Guardado en la base de datos",
     css: ["test.css"],
     js: vacio ? [] : ["test.js"],

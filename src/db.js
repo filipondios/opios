@@ -3,6 +3,7 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DB_PATH } from "./config.js";
 import { ErrorApi } from "./errores.js";
+import { sumarDias } from "./fechas.js";
 import { claveDe } from "./validar.js";
 
 const MIGRACIONES = [
@@ -62,7 +63,34 @@ const MIGRACIONES = [
   CREATE UNIQUE INDEX ux_temas_bloque_numero ON temas(bloque_id, numero);
   CREATE INDEX idx_temas_bloque ON temas(bloque_id);
   `,
+
+  /* v3: resultados de simulacros (modo examen). No altera el progreso del repaso. */
+  /* v3 */ `
+  CREATE TABLE simulacros (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha        TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
+    temas        TEXT    NOT NULL,                     -- JSON con los ids de tema elegidos
+    total        INTEGER NOT NULL CHECK (total > 0),
+    aciertos     INTEGER NOT NULL CHECK (aciertos >= 0),
+    fallos       INTEGER NOT NULL CHECK (fallos >= 0),
+    en_blanco    INTEGER NOT NULL CHECK (en_blanco >= 0),
+    penalizacion REAL    NOT NULL DEFAULT 0 CHECK (penalizacion >= 0 AND penalizacion <= 1),
+    puntos       REAL    NOT NULL,
+    segundos     INTEGER NOT NULL CHECK (segundos >= 0),
+    detalle      TEXT    NOT NULL DEFAULT '[]',        -- JSON [{ id, elegida, correcta }]
+    CHECK (aciertos + fallos + en_blanco = total)
+  );
+  CREATE INDEX idx_simulacros_fecha ON simulacros(fecha DESC, id DESC);
+  `,
 ];
+
+/** Convierte una fila de `simulacros` en el objeto que consume la app. */
+function normalizarSimulacro(fila) {
+  if (!fila) return null;
+  const s = { ...fila, temas: JSON.parse(fila.temas) };
+  if (fila.detalle !== undefined) s.detalle = JSON.parse(fila.detalle);
+  return s;
+}
 
 function migrar(db) {
   const actual = db.query("PRAGMA user_version").get().user_version;
@@ -224,7 +252,9 @@ export function abrirDb(ruta = DB_PATH) {
                COALESCE(SUM(pr.pregunta_id IS NULL), 0) AS nuevas,
                COALESCE(SUM(pr.vence <= ?), 0)          AS repaso,
                COALESCE(SUM(pr.caja >= ?), 0)           AS dominadas,
-               COALESCE(SUM(pr.caja < ?), 0)            AS aprendiendo
+               COALESCE(SUM(pr.caja < ?), 0)            AS aprendiendo,
+               COALESCE(SUM(pr.aciertos), 0)            AS aciertos,
+               COALESCE(SUM(pr.fallos), 0)              AS fallos
         FROM preguntas p
         JOIN temas t ON t.id = p.tema_id
         LEFT JOIN bloques b ON b.id = t.bloque_id
@@ -326,6 +356,89 @@ export function abrirDb(ruta = DB_PATH) {
       for (const e of entradas) q.upsertProgreso.run(e.id, e.caja, e.vence, e.aciertos, e.fallos);
     }),
     reiniciarProgreso: () => { q.borrarProgreso.run(); },
+
+    /** Totales globales de progreso, para la cabecera de la página de estadísticas. */
+    estadisticasGlobales(hoy, cajaDominada) {
+      return db.query(`
+        SELECT COUNT(*) AS total,
+               COALESCE(SUM(pr.pregunta_id IS NULL), 0)                  AS nuevas,
+               COALESCE(SUM(pr.caja >= ?), 0)                            AS dominadas,
+               COALESCE(SUM(pr.caja < ? AND pr.pregunta_id IS NOT NULL), 0) AS aprendiendo,
+               COALESCE(SUM(pr.vence <= ?), 0)                           AS repaso,
+               COALESCE(SUM(pr.aciertos), 0)                             AS aciertos,
+               COALESCE(SUM(pr.fallos), 0)                               AS fallos
+        FROM preguntas p LEFT JOIN progreso pr ON pr.pregunta_id = p.id`).get(cajaDominada, cajaDominada, hoy);
+    },
+
+    /** Repasos agrupados por fecha de vencimiento, desde el pasado hasta `hoy + dias - 1`. */
+    previsionRepasos(hoy, dias = 7) {
+      const hasta = sumarDias(hoy, Math.max(1, dias) - 1);
+      return db.query(`
+        SELECT vence, COUNT(*) AS n FROM progreso
+        WHERE vence <= ? GROUP BY vence ORDER BY vence`).all(hasta);
+    },
+
+    /** Preguntas con más fallos, para detectar puntos débiles. */
+    preguntasMasFalladas(limite = 20) {
+      return db.query(`
+        SELECT p.id, p.enunciado, t.numero AS tema_numero, t.nombre AS tema_nombre,
+               b.nombre AS bloque_nombre, pr.fallos, pr.aciertos, pr.caja
+        FROM progreso pr
+        JOIN preguntas p ON p.id = pr.pregunta_id
+        JOIN temas t ON t.id = p.tema_id
+        LEFT JOIN bloques b ON b.id = t.bloque_id
+        WHERE pr.fallos > 0
+        ORDER BY pr.fallos DESC, pr.aciertos ASC, p.id
+        LIMIT ?`).all(limite);
+    },
+
+    /** Preguntas actualizadas por día desde `desde` (AAAA-MM-DD). */
+    actividadReciente(desde) {
+      return db.query(`
+        SELECT date(actualizado, 'localtime') AS dia, COUNT(*) AS n
+        FROM progreso
+        WHERE date(actualizado, 'localtime') >= ?
+        GROUP BY dia ORDER BY dia`).all(desde);
+    },
+
+    contarSimulacros: () => db.query("SELECT COUNT(*) AS n FROM simulacros").get().n,
+
+    /** Guarda un simulacro. Los aciertos se recalculan aquí desde las opciones correctas. */
+    crearSimulacro: db.transaction(({ temas, segundos, penalizacion, respuestas }) => {
+      const ids = respuestas.map((r) => r.id);
+      const filas = db.query(
+        `SELECT pregunta_id, posicion FROM opciones
+         WHERE es_correcta = 1 AND pregunta_id IN (${marcas(ids.length)})`).all(...ids);
+      const correctas = new Map(filas.map((f) => [f.pregunta_id, f.posicion]));
+      const detalle = [];
+      let aciertos = 0, fallos = 0, enBlanco = 0;
+      for (const r of respuestas) {
+        const correcta = correctas.get(r.id);
+        if (correcta == null) throw new ErrorApi(400, `La pregunta ${r.id} no existe.`);
+        const blanco = r.elegida == null || r.elegida < 0;
+        if (blanco) enBlanco++;
+        else if (r.elegida === correcta) aciertos++;
+        else fallos++;
+        detalle.push({ id: r.id, elegida: blanco ? null : r.elegida, correcta });
+      }
+      const total = respuestas.length;
+      const puntos = Math.round((aciertos - fallos * penalizacion) * 100) / 100;
+      const info = db.query(`
+        INSERT INTO simulacros (temas, total, aciertos, fallos, en_blanco, penalizacion, puntos, segundos, detalle)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+          JSON.stringify(temas), total, aciertos, fallos, enBlanco, penalizacion, puntos, segundos, JSON.stringify(detalle));
+      return normalizarSimulacro(db.query("SELECT * FROM simulacros WHERE id = ?").get(Number(info.lastInsertRowid)));
+    }),
+
+    listarSimulacros(limite = 20) {
+      return db.query(`
+        SELECT id, fecha, temas, total, aciertos, fallos, en_blanco, penalizacion, puntos, segundos
+        FROM simulacros ORDER BY fecha DESC, id DESC LIMIT ?`).all(limite).map(normalizarSimulacro);
+    },
+
+    obtenerSimulacro(id) {
+      return normalizarSimulacro(db.query("SELECT * FROM simulacros WHERE id = ?").get(id));
+    },
 
     /** Listado paginado del creador, con filtro por tema y búsqueda en el enunciado.
         La búsqueda se hace en JS porque lower() de SQLite solo entiende ASCII (acentos y mayúsculas como «Ú»). */
