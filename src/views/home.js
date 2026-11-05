@@ -111,6 +111,7 @@ export function paginaHome({ temas }) {
     estado: "Guardado en la base de datos",
     css: ["test.css"],
     js: vacio ? [] : ["test.js"],
+    jsModulo: !vacio,
     cuerpo,
   });
 }
