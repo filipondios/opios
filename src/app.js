@@ -48,9 +48,11 @@ function igual(a, b) {
 /**
  * Crea el manejador de peticiones (independiente del puerto, así se puede probar sin red).
  * Con `auth = { usuario, clave }` se exige autenticación HTTP Basic en todo salvo /healthz.
+ * `ahora` devuelve la fecha actual; los tests la fijan para calcular repasos «de hoy».
  */
-export function crearApp(repo, { auth = null } = {}) {
-  const estadisticas = () => repo.estadisticasTemas(hoyIso(), CAJA_DOMINADA);
+export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
+  const fechaHoy = () => hoyIso(ahora());
+  const estadisticas = () => repo.estadisticasTemas(fechaHoy(), CAJA_DOMINADA);
 
   async function api(req, url, ruta) {
     const m = req.method;
@@ -199,7 +201,7 @@ export function crearApp(repo, { auth = null } = {}) {
         if (ruta === "/temario") return pagina(paginaTemario());
         if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
         if (ruta === "/estadisticas") {
-          const hoy = hoyIso();
+          const hoy = fechaHoy();
           return pagina(paginaEstadisticas({
             global: repo.estadisticasGlobales(hoy, CAJA_DOMINADA),
             temas: estadisticas(),
