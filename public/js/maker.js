@@ -42,7 +42,7 @@ let etiquetas = new Map(); // id de tema -> { bloque, numero, nombre }
 function nuevoBorrador(tema){ return { tema, pregunta: "", opciones: Array(OPC_INICIALES).fill(""), c: 0, expl: "" }; }
 /* Recorta las etiquetas largas para que los desplegables no se alarguen de más. */
 const recortar = (s, max = MAX_ETIQUETA) => (s.length > max ? s.slice(0, max - 3).trimEnd() + "..." : s);
-const textoOpcion = (t) => "Tema " + (t.numero ?? t.id) + (t.nombre ? " — " + t.nombre : "");
+const textoOpcion = (t) => etiquetaTema(t, { bloque: false });
 
 /* ---------- Mensajes ---------- */
 let tFlash = null;
@@ -191,7 +191,8 @@ async function cargarTemas(){
   const selTema = $("#f-tema"), temaActual = draft.tema || selTema.value;
   temario = await api("/api/temario");
   etiquetas = new Map();
-  for (const b of temario) for (const t of b.temas) etiquetas.set(t.id, { bloque: b.nombre, numero: t.numero, nombre: t.nombre });
+  for (const b of temario) for (const t of b.temas)
+    etiquetas.set(t.id, { ...t, bloque_nombre: b.nombre });
 
   const suma = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
   filtro.replaceChildren(h("option", { value: "", text: "Todos los temas (" + suma + ")" }),
@@ -243,9 +244,9 @@ function pintarLista(){
     const et = etiquetas.get(q.tema);
     return h("li", { class: "item" + (q.id === editando ? " editing" : "") },
       h("div", { class: "imain" },
-        h("span", { class: "itag", text: "T" + (et?.numero ?? q.tema), title: et?.bloque ?? "" }),
+        h("span", { class: "itag", text: "T" + (et?.numero ?? q.tema), title: et ? etiquetaTema(et) : "" }),
         h("span", { class: "itext", text: q.pregunta })),
-      h("div", { class: "imeta", text: "nº " + q.id + (et ? " · " + et.bloque : "") + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.correcta] }),
+      h("div", { class: "imeta", text: "nº " + q.id + (et ? " · " + et.bloque_nombre : "") + " · " + q.respuestas.length + " opciones · correcta " + LETRAS[q.correcta] }),
       h("div", { class: "iact" },
         h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => editar(q) }),
         h("button", { class: "btn small", type: "button", text: "Duplicar", onclick: () => duplicar(q) }),

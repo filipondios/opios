@@ -37,6 +37,9 @@ async function api(url, metodo, cuerpo){
 /* ---------- Estado ---------- */
 let bloques = [];
 let modo = null; // { tipo: "bloque"|"tema", id, bloque }
+const limites = document.querySelector("#temario")?.dataset ?? {};
+const MAX_BLOQUE = Number(limites.maxBloque) || 120;
+const MAX_TEMA_NOMBRE = Number(limites.maxTema) || 500;
 
 /* ---------- Pintar ---------- */
 function confirmable(texto, clase, fn){
@@ -57,16 +60,17 @@ function siguienteNumero(b){
   const nums = b.temas.map((t) => Number(t.numero) || 0);
   return (nums.length ? Math.max(...nums) : 0) + 1;
 }
-function filaTema(t){
-  const bloque = bloques.find((b) => b.temas.includes(t));
-  return h("li", { class: "tema-item" },
+function filaTema(t, bloque){
+  return h("li", { class: "tema-item", title: etiquetaTema({ ...t, bloque_nombre: bloque.nombre }) },
     h("span", { class: "tnum", text: "T" + (t.numero ?? "?") }),
     h("div", { class: "tinfo" },
       h("span", { class: "tnombre" + (t.nombre ? "" : " sin"), text: t.nombre || "Sin nombre" }),
       h("span", { class: "tmeta", text: t.preguntas + (t.preguntas === 1 ? " pregunta" : " preguntas") + " · nº " + t.id })),
     h("div", { class: "tacciones" },
-      h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => abrirTema(bloque, t) }),
-      confirmable("Borrar", "danger", () => borrarTema(t))));
+      bloque.gestionado
+        ? h("span", { class: "hint", text: "Solo lectura" })
+        : h("button", { class: "btn small", type: "button", text: "Editar", onclick: () => abrirTema(bloque, t) }),
+      bloque.gestionado ? null : confirmable("Borrar", "danger", () => borrarTema(t))));
 }
 function pintar(){
   const reales = bloques.filter((b) => b.id != null);
@@ -74,20 +78,22 @@ function pintar(){
   $("#bloques").replaceChildren(...bloques.map((b) => {
     const total = b.temas.reduce((s, t) => s + t.preguntas, 0);
     const i = reales.indexOf(b);
+    const gestionado = !!b.gestionado;
     return h("section", { class: "card bloque", "data-bloque": b.id ?? "" },
       h("div", { class: "bloque-head" },
         h("div", { class: "bloque-titulo" },
           h("h2", { text: b.nombre }),
           h("span", { text: b.temas.length + (b.temas.length === 1 ? " tema · " : " temas · ") + total + (total === 1 ? " pregunta" : " preguntas") }),
+          gestionado ? h("span", { class: "hint", text: "Definido en preguntas/bloque_" + b.numero + "/info.json · solo lectura" }) : null,
           b.id == null ? h("span", { class: "hint", text: "Temas sin bloque: edítalos para asignarles uno." }) : null),
         h("div", { class: "bloque-acciones" },
           b.id != null ? h("button", { class: "btn small", type: "button", text: "↑", title: "Subir bloque", disabled: i === 0, onclick: () => moverBloque(i, -1) }) : null,
           b.id != null ? h("button", { class: "btn small", type: "button", text: "↓", title: "Bajar bloque", disabled: i === reales.length - 1, onclick: () => moverBloque(i, 1) }) : null,
-          b.id != null ? h("button", { class: "btn small", type: "button", text: "Renombrar", onclick: () => abrirBloque(b) }) : null,
-          b.id != null ? confirmable("Borrar bloque", "danger", () => borrarBloque(b)) : null,
-          b.id != null ? h("button", { class: "btn small primary", type: "button", text: "+ Tema", onclick: () => abrirTema(b, null) }) : null)),
+          b.id != null && !gestionado ? h("button", { class: "btn small", type: "button", text: "Renombrar", onclick: () => abrirBloque(b) }) : null,
+          b.id != null && !gestionado ? confirmable("Borrar bloque", "danger", () => borrarBloque(b)) : null,
+          b.id != null && !gestionado ? h("button", { class: "btn small primary", type: "button", text: "+ Tema", onclick: () => abrirTema(b, null) }) : null)),
       h("ul", { class: "temas" },
-        b.temas.length ? b.temas.map(filaTema) : h("li", { class: "tema-item" }, h("span", { class: "tmeta", text: "Sin temas todavía." }))));
+        b.temas.length ? b.temas.map((t) => filaTema(t, b)) : h("li", { class: "tema-item" }, h("span", { class: "tmeta", text: "Sin temas todavía." }))));
   }));
 }
 
@@ -132,7 +138,7 @@ function abrirBloque(b){
   $("#dlg-campos").replaceChildren(
     h("div", { class: "field" },
       h("label", { for: "d-nombre", text: "Nombre" }),
-      h("input", { id: "d-nombre", type: "text", value: b?.nombre ?? "", maxlength: 120, autocomplete: "off" })));
+      h("input", { id: "d-nombre", type: "text", value: b?.nombre ?? "", maxlength: MAX_BLOQUE, autocomplete: "off" })));
   $("#dlg").showModal();
   $("#d-nombre").focus(); $("#d-nombre").select();
 }
@@ -152,7 +158,7 @@ function abrirTema(b, t){
         value: String(t?.numero ?? siguienteNumero(b)) })),
     h("div", { class: "field" },
       h("label", { for: "d-tnombre", text: "Nombre (opcional)" }),
-      h("input", { id: "d-tnombre", type: "text", value: t?.nombre ?? "", maxlength: 200, autocomplete: "off" })),
+      h("input", { id: "d-tnombre", type: "text", value: t?.nombre ?? "", maxlength: MAX_TEMA_NOMBRE, autocomplete: "off" })),
     h("div", { class: "field" },
       h("label", { for: "d-bloque", text: "Bloque" }),
       select));

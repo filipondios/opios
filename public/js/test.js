@@ -172,7 +172,7 @@ async function empezar(){
     await guardarProgreso();
     const d = await (await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","))).json();
     bank = d.preguntas.map((q) => ({
-      i: q.id, t: q.tema, tn: q.tema_numero ?? q.tema, bn: q.bloque_nombre ?? "",
+      i: q.id, t: q.tema, tn: q.tema_numero ?? q.tema, bn: q.bloque_nombre ?? "", nb: q.tema_nombre ?? "",
       p: q.pregunta, o: q.respuestas, c: q.correcta, e: q.explicacion,
     }));
     progress = d.progreso;
@@ -193,7 +193,7 @@ function preguntar(){
   const [q, tipo] = sesion.siguiente();
   const orden = barajar(q.o.map((_, k) => k));
   cur = { q, tipo, orden, sel: 0, corr: orden.indexOf(q.c), fase: "elegir" };
-  $("#q-tema").textContent = (q.bn ? q.bn + " · " : "") + "Tema " + q.tn;
+  $("#q-tema").textContent = etiquetaTema({ tema: q.t, tema_numero: q.tn, bloque_nombre: q.bn, nombre: q.nb });
   const kind = $("#q-kind"); kind.textContent = tipo; kind.dataset.kind = tipo;
   $("#q-text").textContent = q.p;
   $("#q-opts").replaceChildren(...orden.map((oi, k) =>

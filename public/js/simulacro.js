@@ -117,7 +117,8 @@ async function empezar(){
       const orden = barajar(q.respuestas.map((_, k) => k));
       return {
         id: q.id, tema: q.tema, temaNumero: q.tema_numero ?? q.tema,
-        bloque: q.bloque_nombre ?? "", pregunta: q.pregunta,
+        bloque: q.bloque_nombre ?? "", temaNombre: q.tema_nombre ?? "",
+        pregunta: q.pregunta,
         opciones: orden.map((k) => q.respuestas[k]),
         originales: orden,
         correcta: orden.indexOf(q.correcta),
@@ -144,7 +145,7 @@ function pintarPregunta(){
   const q = preguntas[cur];
   if (!q) return;
   cursor = respuestas[cur] ?? 0;
-  $("#exam-tema").textContent = (q.bloque ? q.bloque + " · " : "") + "Tema " + q.temaNumero;
+  $("#exam-tema").textContent = etiquetaTema({ tema: q.tema, tema_numero: q.temaNumero, bloque_nombre: q.bloque, nombre: q.temaNombre });
   $("#exam-text").textContent = q.pregunta;
   $("#exam-opts").replaceChildren(...q.opciones.map((texto, k) => h("button", {
     type: "button", class: "opt", "aria-pressed": String(respuestas[cur] === k),
@@ -217,7 +218,7 @@ function finalizar(forzado = false){
   finalizado = true;
   clearInterval(timer);
   const segundos = Math.min(Math.round((Date.now() - inicio) / 1000), minutos * 60);
-  const res = calcularResultado(segundos);
+  const res = calcularResultado(preguntas, respuestas, penalizacion, segundos);
   pantalla = "results";
   $("#screen-exam").hidden = true; $("#screen-results").hidden = false;
   pintarResultado(res);
@@ -238,29 +239,6 @@ function salir(){
 }
 
 /* ---------- Resultado ---------- */
-function calcularResultado(segundos){
-  let aciertos = 0, fallos = 0, blancos = 0;
-  const porTema = new Map();
-  preguntas.forEach((q, i) => {
-    const r = respuestas[i];
-    let estado;
-    if (r == null){ blancos++; estado = "blanco"; }
-    else if (r === q.correcta){ aciertos++; estado = "acierto"; }
-    else { fallos++; estado = "fallo"; }
-    const t = porTema.get(q.temaNumero) ?? { tema: q.temaNumero, total: 0, aciertos: 0, fallos: 0, blancos: 0 };
-    t.total++;
-    t[estado === "acierto" ? "aciertos" : estado === "fallo" ? "fallos" : "blancos"]++;
-    porTema.set(q.temaNumero, t);
-  });
-  const total = preguntas.length;
-  const puntos = Math.round((aciertos - fallos * penalizacion) * 100) / 100;
-  const nota = total ? Math.round((puntos / total) * 1000) / 100 : 0;
-  return {
-    total, aciertos, fallos, blancos, puntos, nota, segundos,
-    porTema: [...porTema.values()].sort((a, b) => a.tema - b.tema),
-  };
-}
-
 function kpi(valor, etiqueta){
   return h("div", { class: "kpi" },
     h("span", { class: "kpi-n", text: valor }),
@@ -286,7 +264,7 @@ function pintarResultado(res){
     h("thead", null, h("tr", null, ["Tema", "Preguntas", "Aciertos", "Fallos", "Blancos", "Precisión"]
       .map((x) => h("th", { text: x })))),
     h("tbody", null, res.porTema.map((t) => h("tr", null,
-      h("td", null, h("b", { text: "Tema " + t.tema })),
+      h("td", null, h("b", { text: etiquetaTema({ tema: t.tema, tema_numero: t.numero, bloque_nombre: t.bloque, nombre: t.nombre }) })),
       h("td", { text: String(t.total) }),
       h("td", { text: String(t.aciertos) }),
       h("td", { text: String(t.fallos) }),
@@ -309,7 +287,7 @@ function itemRevision(q, i){
       h("span", { class: "review-estado " + estado, text: etiqueta }),
       h("span", { class: "review-preg", text: q.pregunta })),
     h("div", { class: "review-body" },
-      h("p", { class: "review-meta", text: `Tema ${q.temaNumero}${q.bloque ? " · " + q.bloque : ""}` }),
+      h("p", { class: "review-meta", text: etiquetaTema({ tema: q.tema, tema_numero: q.temaNumero, bloque_nombre: q.bloque, nombre: q.temaNombre }) }),
       h("ul", { class: "review-opts" }, q.opciones.map((texto, k) => {
         const clases = ["review-opt"];
         if (k === q.correcta) clases.push("ok");

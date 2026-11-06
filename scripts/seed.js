@@ -7,5 +7,6 @@ const repo = abrirDb();
 const r = await importarDirectorio(repo, process.argv[2] ?? DIR_PREGUNTAS);
 console.log(`${r.archivos} archivo(s): ${r.nuevas} preguntas nuevas, ${r.duplicadas} ya existentes.`);
 for (const e of r.errores) console.error("error:", e);
+for (const a of r.avisos ?? []) console.warn("aviso:", a);
 repo.close();
 process.exit(r.errores.length ? 1 : 0);
