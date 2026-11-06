@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
 import { importarDirectorio } from "../src/seed.js";
 import { DIR_PREGUNTAS } from "../src/config.js";
 import { hoyIso } from "../src/fechas.js";
+
+const DIR_FIXTURE = join(import.meta.dir, "fixtures");
+const TOTAL_TEMA_1 = 4;
+const TOTAL_TEMA_2 = 3;
+const TOTAL_FIXTURE = TOTAL_TEMA_1 + TOTAL_TEMA_2;
 
 let repo, app;
 const JSON_H = { "Content-Type": "application/json" };
@@ -13,21 +19,28 @@ const nueva = (o = {}) => ({ tema: 3, pregunta: "¿Capital de Francia?", respues
 
 beforeEach(() => { repo = abrirDb(":memory:"); app = crearApp(repo); });
 
-describe("importación de los JSON existentes", () => {
-  test("importa todo, es idempotente y conserva la respuesta correcta", async () => {
-    const r1 = await importarDirectorio(repo, DIR_PREGUNTAS);
+describe("importación de JSON", () => {
+  test("importa la fixture, es idempotente y conserva la respuesta correcta", async () => {
+    const r1 = await importarDirectorio(repo, DIR_FIXTURE);
     expect(r1.errores).toEqual([]);
-    expect(r1.nuevas).toBe(580);
-    const r2 = await importarDirectorio(repo, DIR_PREGUNTAS);
+    expect(r1.nuevas).toBe(TOTAL_FIXTURE);
+    const r2 = await importarDirectorio(repo, DIR_FIXTURE);
     expect(r2.nuevas).toBe(0);
-    expect(r2.duplicadas).toBe(580);
-    const orig = (await Bun.file(DIR_PREGUNTAS + "/tema_1.json").json())[0];
+    expect(r2.duplicadas).toBe(TOTAL_FIXTURE);
+    const orig = (await Bun.file(join(DIR_FIXTURE, "tema_1.json")).json())[0];
     const p = repo.listar({ tema: 1, texto: orig.pregunta }).items[0];
     expect(p.respuestas).toEqual(orig.respuestas);
     expect(p.correcta).toBe("abcdefgh".indexOf(orig.respuesta_correcta));
   });
+
+  test("el banco real importa sin errores (smoke)", async () => {
+    const r = await importarDirectorio(repo, DIR_PREGUNTAS);
+    expect(r.errores).toEqual([]);
+    expect(r.nuevas).toBeGreaterThan(0);
+  });
+
   test("exportar y reimportar da el mismo banco", async () => {
-    await importarDirectorio(repo, DIR_PREGUNTAS);
+    await importarDirectorio(repo, DIR_FIXTURE);
     const txt = await (await pet("/api/exportar")).text();
     const otra = abrirDb(":memory:");
     const dir = (await import("node:os")).tmpdir() + "/opios-test-" + Date.now();
@@ -82,11 +95,11 @@ describe("API de preguntas", () => {
 });
 
 describe("test y progreso", () => {
-  beforeEach(async () => { await importarDirectorio(repo, DIR_PREGUNTAS); });
+  beforeEach(async () => { await importarDirectorio(repo, DIR_FIXTURE); });
 
   test("/api/test devuelve preguntas del tema y su progreso", async () => {
     const d = await (await pet("/api/test?temas=2")).json();
-    expect(d.preguntas.length).toBe(215);
+    expect(d.preguntas.length).toBe(TOTAL_TEMA_2);
     expect(d.preguntas.every((q) => q.tema === 2 && q.respuestas.length >= 2 && q.correcta < q.respuestas.length)).toBe(true);
     expect(d.progreso).toEqual({});
     expect((await pet("/api/test")).status).toBe(400);
@@ -103,8 +116,10 @@ describe("test y progreso", () => {
     expect(d.progreso[a.id]).toEqual([5, "2999-01-01", 3, 0]);
     expect(d.progreso[b.id]).toEqual([1, "2999-01-01", 1, 1]);
     const t1 = repo.estadisticasTemas(hoyIso(), 4).find((t) => t.tema === 1);
-    expect(t1).toMatchObject({ total: 215, nuevas: 213, dominadas: 1, aprendiendo: 1, repaso: 0 });
-    expect(await (await pet("/")).text()).toContain("213");
+    expect(t1).toMatchObject({ total: TOTAL_TEMA_1, nuevas: TOTAL_TEMA_1 - 2, dominadas: 1, aprendiendo: 1, repaso: 0 });
+    const html = await (await pet("/")).text();
+    expect(html).toContain(`data-tema="1"`);
+    expect(html).toContain(`data-nuevas="${TOTAL_TEMA_1 - 2}"`);
     await pet("/api/progreso", "DELETE");
     expect((await (await pet("/api/test?temas=1")).json()).progreso).toEqual({});
   });
@@ -129,7 +144,7 @@ describe("páginas y estáticos", () => {
     let html = await (await pet("/")).text();
     expect(html).toContain("Todavía no hay preguntas");
     expect(html).toContain('href="/maker"');
-    await importarDirectorio(repo, DIR_PREGUNTAS);
+    await importarDirectorio(repo, DIR_FIXTURE);
     html = await (await pet("/")).text();
     expect(html).toContain('data-tema="1"'); expect(html).toContain('data-tema="2"');
     expect(html).toContain('href="/maker"'); expect(html).toContain("/js/test.js");
@@ -155,14 +170,30 @@ describe("páginas y estáticos", () => {
   });
 });
 
+describe("fecha inyectada", () => {
+  test("crearApp usa `ahora` para calcular los repasos de hoy", async () => {
+    const p = await (await pet("/api/preguntas", "POST", nueva({ tema: 1, pregunta: "Pregunta con fecha inyectada" }))).json();
+    await pet("/api/progreso", "POST", [{ id: p.id, caja: 4, vence: "2000-01-01", aciertos: 0, fallos: 0 }]);
+
+    const conFecha = crearApp(repo, { ahora: () => new Date(2000, 0, 1) });
+    const html = await (await conFecha(new Request("http://localhost/"))).text();
+    expect(html).toContain('data-repaso="1"');
+    expect(html).toContain("1 por repasar hoy");
+
+    const antes = crearApp(repo, { ahora: () => new Date(1999, 11, 31) });
+    const htmlAntes = await (await antes(new Request("http://localhost/"))).text();
+    expect(htmlAntes).toContain('data-repaso="0"');
+  });
+});
+
 describe("temario por bloques", () => {
-  beforeEach(async () => { await importarDirectorio(repo, DIR_PREGUNTAS); });
+  beforeEach(async () => { await importarDirectorio(repo, DIR_FIXTURE); });
 
   test("la primera importación crea el bloque 1 con los temas numerados", async () => {
     const t = await (await pet("/api/temario")).json();
     const b1 = t.find((b) => b.id === 1);
     expect(b1.nombre).toBe("Bloque 1");
-    expect(b1.temas.map((x) => x.numero)).toEqual([1, 2, 3]);
+    expect(b1.temas.map((x) => x.numero)).toEqual([1, 2]);
   });
 
   test("crear bloques y temas, con validaciones", async () => {
