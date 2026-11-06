@@ -1,7 +1,6 @@
 import { html } from "./html.js";
 import { layout } from "./layout.js";
-
-const etiquetaTema = (t) => `Tema ${t.numero ?? t.id}${t.nombre ? ` — ${t.nombre}` : ""}`;
+import { etiquetaTema } from "../etiquetas.js";
 
 function selectorTemas(temario) {
   const bloques = temario.filter((b) => b.temas.length);
@@ -15,7 +14,7 @@ function selectorTemas(temario) {
       <div class="temas-checks">${b.temas.map((t) => html`
         <label class="tema-check">
           <input type="checkbox" name="tema" value="${t.id}" data-total="${t.preguntas}" checked>
-          <span class="tema-check-name">${etiquetaTema(t)}</span>
+          <span class="tema-check-name">${etiquetaTema(t, { bloque: false })}</span>
           <span class="tema-check-n">${t.preguntas}</span>
         </label>`)}</div>
     </section>`);
@@ -154,7 +153,7 @@ export function paginaSimulacro({ temario }) {
     ],
     estado: "Guardado en la base de datos",
     css: ["test.css", "estadisticas.css", "simulacro.css"],
-    js: ["simulacro.js"],
+    js: ["etiquetas.js", "resultado.js", "simulacro.js"],
     cuerpo,
   });
 }

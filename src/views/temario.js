@@ -1,12 +1,13 @@
 import { html } from "./html.js";
 import { layout } from "./layout.js";
+import { MAX_BLOQUE, MAX_TEMA_NOMBRE } from "../config.js";
 
 /** Página de gestión del temario: bloques y temas. El cliente la pinta a partir de /api/temario. */
 export function paginaTemario() {
   const cuerpo = html`
   <div id="note" class="note" hidden></div>
 
-  <main class="stack">
+  <main class="stack" id="temario" data-max-bloque="${MAX_BLOQUE}" data-max-tema="${MAX_TEMA_NOMBRE}">
     <div class="page-head">
       <div>
         <h1>Temario</h1>
@@ -43,7 +44,7 @@ export function paginaTemario() {
     ],
     estado: "Guardado en la base de datos",
     css: ["maker.css", "temario.css"],
-    js: ["temario.js"],
+    js: ["etiquetas.js", "temario.js"],
     cuerpo,
   });
 }

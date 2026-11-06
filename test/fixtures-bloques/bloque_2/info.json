@@ -1,0 +1,7 @@
+{
+  "nombre": "Bloque II de prueba",
+  "temas": [
+    { "numero": 1, "titulo": "Tema uno del bloque dos" },
+    { "numero": 2, "titulo": "Tema vacío del bloque dos" }
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "pregunta": "Bloque I: ¿Cuál es la capital de Francia?",
+    "respuestas": ["París", "Roma", "Lisboa"],
+    "respuesta_correcta": "a",
+    "explicacion": "París es la capital de Francia."
+  },
+  {
+    "pregunta": "Bloque I: ¿Cuántos lados tiene un triángulo?",
+    "respuestas": ["Dos", "Tres", "Cuatro"],
+    "respuesta_correcta": "b",
+    "explicacion": "Un triángulo tiene tres lados."
+  }
+]

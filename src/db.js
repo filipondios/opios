@@ -82,6 +82,18 @@ const MIGRACIONES = [
   );
   CREATE INDEX idx_simulacros_fecha ON simulacros(fecha DESC, id DESC);
   `,
+
+  /* v4: número estable de bloque (I, II, III...). El nombre puede cambiar; el número no. */
+  /* v4 */ `
+  ALTER TABLE bloques ADD COLUMN numero INTEGER CHECK (numero IS NULL OR numero > 0);
+  UPDATE bloques SET numero = id;
+  CREATE UNIQUE INDEX ux_bloques_numero ON bloques(numero);
+  `,
+
+  /* v5: bloques gestionados por `preguntas/bloque_X/info.json` (nombre y títulos de solo lectura). */
+  /* v5 */ `
+  ALTER TABLE bloques ADD COLUMN gestionado INTEGER NOT NULL DEFAULT 0 CHECK (gestionado IN (0, 1));
+  `,
 ];
 
 /** Convierte una fila de `simulacros` en el objeto que consume la app. */
@@ -118,8 +130,7 @@ export function abrirDb(ruta = DB_PATH) {
     maxNumeroTema: db.query("SELECT COALESCE(MAX(numero), -1) AS n FROM temas WHERE bloque_id = ?"),
     insertarTema: db.query("INSERT INTO temas (id, bloque_id, numero, nombre) VALUES (?, ?, ?, ?)"),
     porClave: db.query("SELECT id, tema_id AS tema FROM preguntas WHERE clave = ?"),
-    insertarPregunta: db.query("INSERT INTO preguntas (tema_id, enunciado, clave, explicacion) VALUES (?, ?, ?, ?)"),
-    actualizarPregunta: db.query(
+    insertarPregunta: db.query("INSERT INTO preguntas (tema_id, enunciado, clave, explicacion) VALUES (?, ?, ?, ?)"),    actualizarPregunta: db.query(
       "UPDATE preguntas SET tema_id = ?, enunciado = ?, clave = ?, explicacion = ?, modificada = datetime('now') WHERE id = ?"),
     insertarOpcion: db.query("INSERT INTO opciones (pregunta_id, posicion, texto, es_correcta) VALUES (?, ?, ?, ?)"),
     borrarOpciones: db.query("DELETE FROM opciones WHERE pregunta_id = ?"),
@@ -143,6 +154,7 @@ export function abrirDb(ruta = DB_PATH) {
         tema_numero: p.tema_numero ?? p.tema,
         tema_nombre: p.tema_nombre ?? null,
         bloque: p.bloque ?? null,
+        bloque_numero: p.bloque_numero ?? null,
         bloque_nombre: p.bloque_nombre ?? "Sin bloque",
         pregunta: p.enunciado, respuestas: [], correcta: 0, explicacion: p.explicacion,
       });
@@ -167,15 +179,24 @@ export function abrirDb(ruta = DB_PATH) {
   function bloquePorDefecto() {
     const b = db.query("SELECT id FROM bloques ORDER BY orden, id LIMIT 1").get();
     if (b) return b.id;
-    return Number(db.query("INSERT INTO bloques (nombre, orden) VALUES ('Bloque 1', 0)").run().lastInsertRowid);
+    return Number(db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (1, 'Bloque 1', 0)").run().lastInsertRowid);
   }
 
-  /* Id del bloque con ese nombre; si no existe, se crea al final. */
+  /* Bloque por su nombre; si no existe, se crea al final con el siguiente número. */
   function bloquePorNombre(nombre) {
     const b = db.query("SELECT id FROM bloques WHERE nombre = ?").get(nombre);
     if (b) return b.id;
+    const numero = db.query("SELECT COALESCE(MAX(numero), 0) + 1 AS n FROM bloques").get().n;
     const orden = db.query("SELECT COALESCE(MAX(orden), -1) + 1 AS n FROM bloques").get().n;
-    return Number(db.query("INSERT INTO bloques (nombre, orden) VALUES (?, ?)").run(nombre, orden).lastInsertRowid);
+    return Number(db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)").run(numero, nombre, orden).lastInsertRowid);
+  }
+
+  /* Bloque por número (identidad estable); si no existe, se crea con ese nombre. */
+  function asegurarBloque(numero, nombre) {
+    const b = db.query("SELECT id FROM bloques WHERE numero = ?").get(numero);
+    if (b) return b.id;
+    const orden = db.query("SELECT COALESCE(MAX(orden), -1) + 1 AS n FROM bloques").get().n;
+    return Number(db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)").run(numero, nombre || `Bloque ${numero}`, orden).lastInsertRowid);
   }
 
   /* Número libre dentro de un bloque: el preferido si está libre, si no el siguiente. */
@@ -192,9 +213,9 @@ export function abrirDb(ruta = DB_PATH) {
     return tema;
   }
 
-  /* Garantiza que existe el tema `numero` dentro del bloque `nombre` y devuelve su id. */
-  function asegurarTemaEnBloque(nombre, numero) {
-    const bloque = bloquePorNombre(nombre);
+  /* Garantiza que existe el tema `numero` dentro del bloque (por número estable o, si falta, por nombre). */
+  function asegurarTemaEnBloque(bloqueNumero, bloqueNombre, numero) {
+    const bloque = bloqueNumero != null ? asegurarBloque(bloqueNumero, bloqueNombre) : bloquePorNombre(bloqueNombre);
     const existente = q.temaPorBloqueNumero.get(bloque, numero);
     if (existente) return existente.id;
     return Number(q.insertarTema.run(null, bloque, numero, null).lastInsertRowid);
@@ -208,7 +229,7 @@ export function abrirDb(ruta = DB_PATH) {
       throw new ErrorApi(409, `Ya hay una pregunta con este mismo enunciado (nº ${otra.id}, tema ${otra.tema}).`, { existente: { id: otra.id, tema: otra.tema } });
     }
     const tema = v.bloque
-      ? asegurarTemaEnBloque(v.bloque, v.tema_numero ?? v.tema)
+      ? asegurarTemaEnBloque(v.bloque_numero ?? null, v.bloque, v.tema_numero ?? v.tema)
       : asegurarTema(v.tema);
     if (id == null) {
       id = Number(q.insertarPregunta.run(tema, v.pregunta, clave, v.explicacion).lastInsertRowid);
@@ -223,7 +244,7 @@ export function abrirDb(ruta = DB_PATH) {
   /* Consulta base que añade el tema y el bloque a cada pregunta. */
   const CAMPOS_PREGUNTA = `
     p.id, p.tema_id AS tema, t.numero AS tema_numero, t.nombre AS tema_nombre,
-    t.bloque_id AS bloque, b.nombre AS bloque_nombre, p.enunciado, p.explicacion`;
+    t.bloque_id AS bloque, b.numero AS bloque_numero, b.nombre AS bloque_nombre, p.enunciado, p.explicacion`;
   const JOINS_PREGUNTA = `
     FROM preguntas p
     JOIN temas t ON t.id = p.tema_id
@@ -247,7 +268,7 @@ export function abrirDb(ruta = DB_PATH) {
     estadisticasTemas(hoy, cajaDominada) {
       return db.query(`
         SELECT p.tema_id AS tema, t.numero AS tema_numero, t.nombre AS tema_nombre,
-               t.bloque_id AS bloque, b.nombre AS bloque_nombre,
+               t.bloque_id AS bloque, b.nombre AS bloque_nombre, b.numero AS bloque_numero,
                COALESCE(b.orden, 2147483647) AS bloque_orden, COUNT(*) AS total,
                COALESCE(SUM(pr.pregunta_id IS NULL), 0) AS nuevas,
                COALESCE(SUM(pr.vence <= ?), 0)          AS repaso,
@@ -265,8 +286,8 @@ export function abrirDb(ruta = DB_PATH) {
 
     /** Bloques ordenados con sus temas (numerados dentro del bloque) y el número de preguntas de cada tema. */
     temario() {
-      const bloques = db.query("SELECT id, nombre, orden FROM bloques ORDER BY orden, id").all()
-        .map((b) => ({ id: b.id, nombre: b.nombre, orden: b.orden, temas: [] }));
+      const bloques = db.query("SELECT id, numero, nombre, orden, gestionado FROM bloques ORDER BY orden, id").all()
+        .map((b) => ({ id: b.id, numero: b.numero, nombre: b.nombre, orden: b.orden, gestionado: !!b.gestionado, temas: [] }));
       const porId = new Map(bloques.map((b) => [b.id, b]));
       const filas = db.query(`
         SELECT t.id, t.bloque_id AS bloque, t.numero, t.nombre, COUNT(p.id) AS preguntas
@@ -282,22 +303,55 @@ export function abrirDb(ruta = DB_PATH) {
       return bloques;
     },
 
+    /** Crea el bloque si no existe; no cambia el nombre de uno existente. */
+    asegurarBloque: db.transaction(({ numero, nombre }) => {
+      const id = asegurarBloque(numero, nombre);
+      return db.query("SELECT id, numero, nombre, orden, gestionado FROM bloques WHERE id = ?").get(id);
+    }),
+
+    /**
+     * Sincroniza un bloque con su `info.json`: nombre, títulos de temas y marca de gestionado.
+     * No borra temas que ya no aparezcan en el archivo.
+     */
+    sincronizarInfoBloque: db.transaction((numero, info) => {
+      const id = asegurarBloque(numero, info.nombre);
+      db.query("UPDATE bloques SET nombre = ?, gestionado = 1 WHERE id = ?").run(info.nombre, id);
+      for (const t of info.temas) {
+        const existente = q.temaPorBloqueNumero.get(id, t.numero);
+        if (existente) db.query("UPDATE temas SET nombre = ? WHERE id = ?").run(t.titulo, existente.id);
+        else q.insertarTema.run(null, id, t.numero, t.titulo);
+      }
+      return { id, numero, nombre: info.nombre, temas: info.temas.length };
+    }),
+
+    /** Quita la marca de gestionado a los bloques que ya no tienen `info.json`. */
+    desmarcarGestionadosExcepto: db.transaction((numeros) => {
+      const lista = [...new Set(numeros)];
+      if (!lista.length) return db.query("UPDATE bloques SET gestionado = 0 WHERE gestionado = 1").run().changes;
+      return db.query(`UPDATE bloques SET gestionado = 0 WHERE gestionado = 1 AND numero NOT IN (${marcas(lista.length)})`).run(...lista).changes;
+    }),
+
     crearBloque: db.transaction(({ nombre }) => {
       if (db.query("SELECT 1 FROM bloques WHERE nombre = ?").get(nombre)) throw new ErrorApi(409, `Ya existe el bloque «${nombre}».`);
+      const numero = db.query("SELECT COALESCE(MAX(numero), 0) + 1 AS n FROM bloques").get().n;
       const orden = db.query("SELECT COALESCE(MAX(orden), -1) + 1 AS n FROM bloques").get().n;
-      const id = Number(db.query("INSERT INTO bloques (nombre, orden) VALUES (?, ?)").run(nombre, orden).lastInsertRowid);
-      return { id, nombre, orden, temas: [] };
+      const id = Number(db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)").run(numero, nombre, orden).lastInsertRowid);
+      return { id, numero, nombre, orden, gestionado: false, temas: [] };
     }),
 
     actualizarBloque: db.transaction((id, { nombre }) => {
-      if (!db.query("SELECT 1 FROM bloques WHERE id = ?").get(id)) return false;
+      const bloque = db.query("SELECT id, numero, gestionado FROM bloques WHERE id = ?").get(id);
+      if (!bloque) return false;
+      if (bloque.gestionado) throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
       const otro = db.query("SELECT id FROM bloques WHERE nombre = ? AND id <> ?").get(nombre, id);
       if (otro) throw new ErrorApi(409, `Ya existe el bloque «${nombre}».`);
       db.query("UPDATE bloques SET nombre = ? WHERE id = ?").run(nombre, id);
-      return { id, nombre };
+      return { id, numero: bloque.numero, nombre, gestionado: false };
     }),
 
     borrarBloque(id) {
+      const bloque = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(id);
+      if (bloque?.gestionado) throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
       const n = db.query(`SELECT COUNT(*) AS n FROM temas t JOIN bloques b ON b.id = t.bloque_id WHERE b.id = ?`).get(id).n;
       if (n) throw new ErrorApi(409, `No se puede borrar el bloque: todavía tiene ${n} tema(s). Muévelos o bórralos primero.`);
       return db.query("DELETE FROM bloques WHERE id = ?").run(id).changes > 0;
@@ -314,15 +368,22 @@ export function abrirDb(ruta = DB_PATH) {
     }),
 
     crearTema: db.transaction(({ bloque, numero, nombre }) => {
-      if (!db.query("SELECT 1 FROM bloques WHERE id = ?").get(bloque)) throw new ErrorApi(404, "El bloque no existe.");
+      const b = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(bloque);
+      if (!b) throw new ErrorApi(404, "El bloque no existe.");
+      if (b.gestionado) throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
       if (q.temaPorBloqueNumero.get(bloque, numero)) throw new ErrorApi(409, `Ya hay un tema ${numero} en ese bloque.`);
       const id = Number(q.insertarTema.run(null, bloque, numero, nombre || null).lastInsertRowid);
       return temaConPreguntas(id);
     }),
 
     actualizarTema: db.transaction((id, { bloque, numero, nombre }) => {
-      if (!q.temaPorId.get(id)) return false;
-      if (!db.query("SELECT 1 FROM bloques WHERE id = ?").get(bloque)) throw new ErrorApi(404, "El bloque no existe.");
+      const actual = db.query(`
+        SELECT t.id, b.gestionado FROM temas t JOIN bloques b ON b.id = t.bloque_id WHERE t.id = ?`).get(id);
+      if (!actual) return false;
+      if (actual.gestionado) throw new ErrorApi(409, "Este tema se define en preguntas/bloque_X/info.json y es de solo lectura.");
+      const b = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(bloque);
+      if (!b) throw new ErrorApi(404, "El bloque no existe.");
+      if (b.gestionado) throw new ErrorApi(409, "No se puede mover un tema a un bloque gestionado por info.json.");
       const otro = db.query("SELECT id FROM temas WHERE bloque_id = ? AND numero = ? AND id <> ?").get(bloque, numero, id);
       if (otro) throw new ErrorApi(409, `Ya hay un tema ${numero} en ese bloque (nº ${otro.id}).`);
       db.query("UPDATE temas SET bloque_id = ?, numero = ?, nombre = ? WHERE id = ?").run(bloque, numero, nombre || null, id);
@@ -330,6 +391,8 @@ export function abrirDb(ruta = DB_PATH) {
     }),
 
     borrarTema(id) {
+      const t = db.query(`SELECT b.gestionado FROM temas t JOIN bloques b ON b.id = t.bloque_id WHERE t.id = ?`).get(id);
+      if (t?.gestionado) throw new ErrorApi(409, "Este tema se define en preguntas/bloque_X/info.json y es de solo lectura.");
       const n = db.query("SELECT COUNT(*) AS n FROM preguntas WHERE tema_id = ?").get(id).n;
       if (n) throw new ErrorApi(409, `No se puede borrar el tema: todavía tiene ${n} pregunta(s).`);
       return db.query("DELETE FROM temas WHERE id = ?").run(id).changes > 0;

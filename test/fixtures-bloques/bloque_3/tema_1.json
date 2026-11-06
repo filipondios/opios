@@ -1,0 +1,8 @@
+[
+  {
+    "pregunta": "Bloque sin info.json: ¿Cuántos continentes hay?",
+    "respuestas": ["Cinco", "Seis", "Siete"],
+    "respuesta_correcta": "b",
+    "explicacion": "Se suelen contar seis continentes."
+  }
+]

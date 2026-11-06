@@ -43,15 +43,22 @@ export function validarPregunta(b, { estricto = true } = {}) {
   if (explicacion.length > MAX_EXPLICACION) throw mal("La explicación es demasiado larga.");
 
   /* Metadatos opcionales del temario (los usa la importación/exportación por bloques). */
-  let bloque = null, temaNumero = null;
+  let bloque = null, temaNumero = null, bloqueNumero = null;
+  if (b.bloque_numero != null && String(b.bloque_numero).trim() !== "") {
+    bloqueNumero = Number(b.bloque_numero);
+    if (!Number.isInteger(bloqueNumero) || bloqueNumero <= 0) throw mal("El número de bloque no es válido.");
+  }
   if (b.bloque != null && String(b.bloque).trim() !== "") {
     bloque = texto(b.bloque);
     if (bloque.length > MAX_BLOQUE) throw mal("El nombre del bloque es demasiado largo.");
+  }
+  if (bloque != null || bloqueNumero != null) {
+    if (!bloque) bloque = `Bloque ${bloqueNumero}`;
     temaNumero = Number(b.tema_numero ?? b.tema);
     if (!Number.isInteger(temaNumero) || temaNumero < 0 || temaNumero > MAX_TEMA)
       throw mal("El número de tema no es válido.");
   }
-  return { tema, bloque, tema_numero: temaNumero, pregunta, respuestas, correcta, explicacion };
+  return { tema, bloque, bloque_numero: bloqueNumero, tema_numero: temaNumero, pregunta, respuestas, correcta, explicacion };
 }
 
 /** Convierte una pregunta del formato JSON antiguo (`respuesta_correcta` = letra) al formato interno. */
@@ -69,7 +76,7 @@ export function desdeJsonAntiguo(p) {
     }
   }
   return validarPregunta({
-    tema: p.tema, bloque: p.bloque, tema_numero: p.tema_numero,
+    tema: p.tema, bloque: p.bloque, bloque_numero: p.bloque_numero, tema_numero: p.tema_numero,
     pregunta: p.pregunta, respuestas: p.respuestas, correcta, explicacion: p.explicacion,
   }, { estricto: false });
 }
@@ -94,6 +101,31 @@ export function validarTema(b) {
   const nombre = texto(b.nombre);
   if (nombre.length > MAX_TEMA_NOMBRE) throw mal("El nombre del tema es demasiado largo.");
   return { bloque, numero, nombre };
+}
+
+/** Valida el `info.json` de un bloque: { nombre, temas: [{ numero, titulo }] }. */
+export function validarInfoBloque(info) {
+  if (!info || typeof info !== "object" || Array.isArray(info)) throw mal("info.json debe ser un objeto.");
+  const nombre = texto(info.nombre);
+  if (!nombre) throw mal("Falta el nombre del bloque en info.json.");
+  if (nombre.length > MAX_BLOQUE) throw mal("El nombre del bloque es demasiado largo.");
+  if (info.temas != null && !Array.isArray(info.temas)) throw mal("«temas» debe ser una lista en info.json.");
+  const temas = (info.temas ?? []).map((t, i) => {
+    if (!t || typeof t !== "object" || Array.isArray(t)) throw mal(`El tema #${i + 1} de info.json no es válido.`);
+    const numero = Number(t.numero);
+    if (!Number.isInteger(numero) || numero < 0 || numero > MAX_TEMA)
+      throw mal(`El número del tema #${i + 1} de info.json no es válido.`);
+    const titulo = texto(t.titulo);
+    if (!titulo) throw mal(`Falta el título del tema ${numero} en info.json.`);
+    if (titulo.length > MAX_TEMA_NOMBRE) throw mal(`El título del tema ${numero} es demasiado largo.`);
+    return { numero, titulo };
+  });
+  const vistos = new Set();
+  for (const t of temas) {
+    if (vistos.has(t.numero)) throw mal(`El tema ${t.numero} aparece dos veces en info.json.`);
+    vistos.add(t.numero);
+  }
+  return { nombre, temas };
 }
 
 /** Valida el resultado de un simulacro: { temas, segundos, penalizacion, respuestas: [{ id, elegida }] }. */
