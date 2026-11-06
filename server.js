@@ -10,6 +10,7 @@ if (repo.contarPreguntas() === 0) {
   const r = await importarDirectorio(repo, DIR_PREGUNTAS);
   console.log(`DB vacía: importadas ${r.nuevas} preguntas desde ${r.archivos} archivo(s) de preguntas/.`);
   for (const e of r.errores) console.warn("  aviso:", e);
+  for (const a of r.avisos ?? []) console.warn("  aviso:", a);
 }
 
 const servidor = Bun.serve({ hostname: HOST, port: PORT, fetch: crearApp(repo, { auth: AUTH }) });
