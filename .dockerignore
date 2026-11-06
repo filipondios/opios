@@ -3,6 +3,14 @@
 node_modules
 data
 test
+.github
 README.md
+INSPECCION.md
+TODO.md
+CONTEXT.md
+apuntes
+preguntas/examenes
+**/generated
+**/generated/**
 Dockerfile
 .dockerignore
