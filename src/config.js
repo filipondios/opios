@@ -7,6 +7,14 @@ export const DIR_PREGUNTAS = join(ROOT, "preguntas");
 export const PORT = Number(process.env.PORT ?? 8000);
 // Solo accesible desde esta máquina.
 export const HOST = process.env.HOST ?? "127.0.0.1";
+/* Nombres de host aceptados en la cabecera `Host` (mitiga DNS rebinding). Los de ALLOWED_HOSTS se suman al loopback. */
+const HOSTS_POR_DEFECTO = ["localhost", "127.0.0.1", "[::1]", "::1"];
+const HOSTS_EXTRA = (process.env.ALLOWED_HOSTS ?? "")
+  .split(",").map((h) => h.trim().toLowerCase()).filter(Boolean);
+export const ALLOWED_HOSTS = [...new Set([...HOSTS_POR_DEFECTO, ...HOSTS_EXTRA])];
+// Si se escucha en una IP concreta (p. ej. HOST=192.168.1.5), también se acepta esa.
+if (HOST && HOST !== "0.0.0.0" && HOST !== "::" && !ALLOWED_HOSTS.includes(HOST.toLowerCase()))
+  ALLOWED_HOSTS.push(HOST.toLowerCase());
 // Si se definen ambas, la app pide usuario y contraseña (HTTP Basic). Imprescindible si se publica en internet.
 export const AUTH = process.env.AUTH_USER && process.env.AUTH_PASS
   ? { usuario: process.env.AUTH_USER, clave: process.env.AUTH_PASS } : null;

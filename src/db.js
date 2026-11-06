@@ -156,7 +156,51 @@ const MIGRACIONES = [
     valor TEXT
   );
   `,
+
+  /* v10: búsqueda con FTS5 (si el build de SQLite la incluye). Índice sobre el enunciado con
+     `remove_diacritics`, de modo que «normalizacion» encuentra «normalización». */
+  (db) => {
+    if (!tieneFts5(db)) return "SELECT 1";
+    return `
+    CREATE VIRTUAL TABLE preguntas_fts USING fts5(
+      enunciado,
+      content='preguntas', content_rowid='id',
+      tokenize='unicode61 remove_diacritics 2');
+
+    CREATE TRIGGER preguntas_ai AFTER INSERT ON preguntas BEGIN
+      INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
+    END;
+    CREATE TRIGGER preguntas_ad AFTER DELETE ON preguntas BEGIN
+      INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
+    END;
+    CREATE TRIGGER preguntas_au AFTER UPDATE ON preguntas BEGIN
+      INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
+      INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
+    END;
+
+    INSERT INTO preguntas_fts(preguntas_fts) VALUES ('rebuild');
+    `;
+  },
 ];
+
+/** Comprueba si el SQLite de este build incluye FTS5. */
+function tieneFts5(db) {
+  try {
+    db.run("CREATE VIRTUAL TABLE temp.fts_probe USING fts5(x, tokenize='unicode61 remove_diacritics 2')");
+    db.run("DROP TABLE temp.fts_probe");
+    return true;
+  } catch {
+    try { db.run("DROP TABLE IF EXISTS temp.fts_probe"); } catch { /* nada */ }
+    return false;
+  }
+}
+
+/** Convierte un texto libre en una consulta FTS5 segura (comillas + comodín de prefijo por palabra). */
+function consultaFts(texto) {
+  const palabras = String(texto).split(/[^\p{L}\p{N}_]+/u).filter(Boolean);
+  if (!palabras.length) return null;
+  return palabras.map((p) => `"${p.replace(/"/g, '""')}"*`).join(" ");
+}
 
 /** Convierte una fila de `simulacros` en el objeto que consume la app. */
 function normalizarSimulacro(fila) {
@@ -174,7 +218,8 @@ function migrar(db) {
   try {
     for (let v = actual; v < MIGRACIONES.length; v++) {
       db.transaction(() => {
-        db.run(MIGRACIONES[v]);
+        const migracion = MIGRACIONES[v];
+        db.run(typeof migracion === "function" ? migracion(db) : migracion);
         const roto = db.query("PRAGMA foreign_key_check").all();
         if (roto.length) throw new Error(`La migración v${v + 1} deja referencias rotas.`);
         db.run(`PRAGMA user_version = ${v + 1}`);
@@ -194,6 +239,7 @@ export function abrirDb(ruta = DB_PATH) {
   db.run("PRAGMA journal_mode = WAL");
   db.run("PRAGMA foreign_keys = ON");
   migrar(db);
+  const ftsDisponible = tieneFts5(db);
 
   const q = {
     temaPorId: db.query("SELECT id FROM temas WHERE id = ?"),
@@ -259,6 +305,15 @@ export function abrirDb(ruta = DB_PATH) {
     return db.query(
       `SELECT pregunta_id, posicion, texto, es_correcta FROM opciones
        WHERE pregunta_id IN (${marcas(ids.length)}) ORDER BY pregunta_id, posicion`).all(...ids);
+  }
+
+  /* Búsqueda de respaldo sin FTS5: filtra en JS porque lower() de SQLite solo entiende ASCII. */
+  function buscarEnJs(texto, tema) {
+    const cond = tema !== null ? "WHERE tema_id = ?" : "";
+    const args = tema !== null ? [tema] : [];
+    const buscado = texto.toLowerCase();
+    return db.query(`SELECT id, enunciado FROM preguntas ${cond} ORDER BY id DESC`).all(...args)
+      .filter((f) => f.enunciado.toLowerCase().includes(buscado)).map((f) => f.id);
   }
 
   /* Primer bloque por orden, o uno nuevo si aún no hay ninguno. */
@@ -679,16 +734,25 @@ export function abrirDb(ruta = DB_PATH) {
     },
 
     /** Listado paginado del creador, con filtro por tema y búsqueda en el enunciado.
-        La búsqueda se hace en JS porque lower() de SQLite solo entiende ASCII (acentos y mayúsculas como «Ú»). */
+        Con FTS5 la búsqueda va en SQL (insensible a tildes y mayúsculas); si no, se filtra en JS. */
     listar({ tema = null, texto = "", limite = 50, desde = 0 } = {}) {
-      const cond = tema !== null ? "WHERE tema_id = ?" : "";
-      const args = tema !== null ? [tema] : [];
       let ids;
-      if (texto) {
-        const buscado = texto.toLowerCase();
-        ids = db.query(`SELECT id, enunciado FROM preguntas ${cond} ORDER BY id DESC`).all(...args)
-          .filter((f) => f.enunciado.toLowerCase().includes(buscado)).map((f) => f.id);
+      const consulta = texto && ftsDisponible ? consultaFts(texto) : null;
+      if (consulta) {
+        const filtro = tema !== null ? "AND p.tema_id = ?" : "";
+        const args = tema !== null ? [consulta, tema] : [consulta];
+        try {
+          ids = db.query(
+            `SELECT p.id FROM preguntas_fts f JOIN preguntas p ON p.id = f.rowid
+             WHERE f.preguntas_fts MATCH ? ${filtro} ORDER BY p.id DESC`).all(...args).map((f) => f.id);
+        } catch {
+          ids = buscarEnJs(texto, tema); // consulta FTS no válida pese al saneado
+        }
+      } else if (texto) {
+        ids = buscarEnJs(texto, tema);
       } else {
+        const cond = tema !== null ? "WHERE tema_id = ?" : "";
+        const args = tema !== null ? [tema] : [];
         ids = db.query(`SELECT id FROM preguntas ${cond} ORDER BY id DESC`).all(...args).map((f) => f.id);
       }
       const pagina = ids.slice(desde, desde + limite);
