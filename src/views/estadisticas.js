@@ -1,6 +1,7 @@
 import { html } from "./html.js";
 import { layout } from "./layout.js";
 import { sumarDias } from "../fechas.js";
+import { etiquetaTema } from "../etiquetas.js";
 
 const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
 const pct = (n, d) => (d > 0 ? Math.round((n / d) * 100) + " %" : "—");
@@ -52,7 +53,7 @@ function tablaTemas(temas) {
           </tr></thead>
           <tbody>${b.temas.map((t) => html`
             <tr class="${t.repaso > 0 ? "fila-hoy" : ""}">
-              <td><b>Tema ${t.tema_numero ?? t.tema}</b>${t.tema_nombre ? html`<span class="tema-nombre">${t.tema_nombre}</span>` : ""}</td>
+              <td><b>${etiquetaTema(t, { bloque: false, nombre: false })}</b>${t.tema_nombre ? html`<span class="tema-nombre">${t.tema_nombre}</span>` : ""}</td>
               <td>${fmt(t.total)}</td>
               <td>${fmt(t.total - t.nuevas)}</td>
               <td>${fmt(t.dominadas)}</td>
@@ -108,7 +109,7 @@ function tablaFalladas(falladas) {
       <thead><tr><th>Tema</th><th>Pregunta</th><th>Fallos</th><th>Aciertos</th><th>Caja</th></tr></thead>
       <tbody>${falladas.map((p) => html`
         <tr>
-          <td>${p.bloque_nombre ? html`<span class="tema-nombre">${p.bloque_nombre}</span>` : ""}<b>Tema ${p.tema_numero}</b></td>
+          <td>${p.bloque_nombre ? html`<span class="tema-nombre">${p.bloque_nombre}</span>` : ""}<b>${etiquetaTema(p, { bloque: false, nombre: false })}</b></td>
           <td class="pregunta-cell">${p.enunciado}</td>
           <td><b>${fmt(p.fallos)}</b></td>
           <td>${fmt(p.aciertos)}</td>
@@ -118,15 +119,30 @@ function tablaFalladas(falladas) {
   </div>`;
 }
 
-function tablaSimulacros(simulacros) {
+/** Índice id de tema → tema con el nombre de su bloque, para resolver `simulacros.temas`. */
+function indiceTemas(temario) {
+  const indice = new Map();
+  for (const b of temario) for (const t of b.temas) indice.set(t.id, { ...t, bloque_nombre: b.nombre });
+  return indice;
+}
+
+function etiquetaTemasSimulacro(s, indice) {
+  const temas = s.temas.map((id) => indice.get(id)).filter(Boolean);
+  if (temas.length === 1) return etiquetaTema(temas[0]);
+  if (temas.length > 1) return `${temas.length} temas`;
+  return `${s.temas.length} tema${s.temas.length === 1 ? "" : "s"}`;
+}
+
+function tablaSimulacros(simulacros, temario) {
   if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro. <a href="/simulacro">Empieza uno</a>.</p>`;
+  const indice = indiceTemas(temario);
   return html`<div class="tabla-wrap">
     <table class="tabla">
       <thead><tr><th>Fecha</th><th>Temas</th><th>Preguntas</th><th>Aciertos</th><th>Fallos</th><th>Blancos</th><th>Puntos</th><th>Tiempo</th></tr></thead>
       <tbody>${simulacros.map((s) => html`
         <tr>
           <td>${fechaCorta(s.fecha)}</td>
-          <td>${s.temas.length === 1 ? `Tema ${s.temas[0]}` : `${s.temas.length} temas`}</td>
+          <td>${etiquetaTemasSimulacro(s, indice)}</td>
           <td>${fmt(s.total)}</td>
           <td>${fmt(s.aciertos)}</td>
           <td>${fmt(s.fallos)}</td>
@@ -138,7 +154,7 @@ function tablaSimulacros(simulacros) {
   </div>`;
 }
 
-export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, simulacros, totalSimulacros, hoy }) {
+export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, simulacros, totalSimulacros, temario = [], hoy }) {
   const vistas = global.total - global.nuevas;
   const sinProgreso = global.nuevas === global.total;
   const aviso = !sinProgreso
@@ -190,7 +206,7 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
 
     <section class="stack">
       <h2>Últimos simulacros</h2>
-      ${tablaSimulacros(simulacros)}
+      ${tablaSimulacros(simulacros, temario)}
     </section>
   </main>`;
 

@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
+import { exportarPorBloques } from "../src/exportar.js";
 import { importarDirectorio } from "../src/seed.js";
 import { DIR_PREGUNTAS } from "../src/config.js";
 import { hoyIso } from "../src/fechas.js";
 
 const DIR_FIXTURE = join(import.meta.dir, "fixtures");
+const DIR_BLOQUES = join(import.meta.dir, "fixtures-bloques");
 const TOTAL_TEMA_1 = 4;
 const TOTAL_TEMA_2 = 3;
 const TOTAL_FIXTURE = TOTAL_TEMA_1 + TOTAL_TEMA_2;
@@ -37,6 +39,9 @@ describe("importación de JSON", () => {
     const r = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r.errores).toEqual([]);
     expect(r.nuevas).toBeGreaterThan(0);
+    const t = repo.temario();
+    expect(t[0]).toMatchObject({ numero: 1, gestionado: true });
+    expect(t[0].temas.length).toBeGreaterThanOrEqual(3);
   });
 
   test("exportar y reimportar da el mismo banco", async () => {
@@ -48,6 +53,103 @@ describe("importación de JSON", () => {
     const r = await importarDirectorio(otra, dir);
     expect(r.errores).toEqual([]);
     expect(otra.todas()).toEqual(repo.todas().map((p) => ({ ...p, id: expect.any(Number) })));
+  });
+});
+
+describe("importación por bloques", () => {
+  test("lee info.json, crea bloques/temas, ignora generated y es idempotente", async () => {
+    const r = await importarDirectorio(repo, DIR_BLOQUES);
+    expect(r.errores).toEqual([]);
+    expect(r.nuevas).toBe(5);
+
+    const t = repo.temario();
+    expect(t.map((b) => [b.numero, b.nombre, b.gestionado])).toEqual([
+      [1, "Bloque I de prueba", true],
+      [2, "Bloque II de prueba", true],
+      [3, "Bloque 3", false],
+    ]);
+    expect(t[0].temas.map((x) => [x.numero, x.nombre])).toEqual([[1, "Tema uno"], [2, "Tema dos"]]);
+    expect(t[1].temas.map((x) => x.numero)).toEqual([1, 2]);
+    expect(t[1].temas.find((x) => x.numero === 2).preguntas).toBe(0);
+    expect(t[2].gestionado).toBe(false);
+
+    expect(repo.todas().some((p) => p.pregunta.includes("generated"))).toBe(false);
+    expect(repo.todas().find((p) => p.pregunta.includes("Bloque II"))).toMatchObject({ bloque_numero: 2, tema_numero: 1 });
+
+    const r2 = await importarDirectorio(repo, DIR_BLOQUES);
+    expect(r2.nuevas).toBe(0);
+    expect(r2.duplicadas).toBe(5);
+  });
+
+  test("rechaza una pregunta cuyo bloque declarado no coincide con la carpeta", async () => {
+    const dir = (await import("node:os")).tmpdir() + "/opios-bloque-malo-" + Date.now();
+    await Bun.write(dir + "/bloque_1/info.json", JSON.stringify({ nombre: "Bloque de prueba", temas: [] }));
+    await Bun.write(dir + "/bloque_1/tema_1.json", JSON.stringify([{
+      bloque: "Bloque 2", pregunta: "Pregunta mal ubicada", respuestas: ["A", "B"], respuesta_correcta: "a",
+    }]));
+    const r = await importarDirectorio(repo, dir);
+    expect(r.errores.length).toBeGreaterThan(0);
+    expect(r.nuevas).toBe(0);
+  });
+
+  test("info.json inválido (tema duplicado) se reporta y no crea el bloque gestionado", async () => {
+    const dir = (await import("node:os")).tmpdir() + "/opios-bloque-info-" + Date.now();
+    await Bun.write(dir + "/bloque_1/info.json", JSON.stringify({
+      nombre: "Bloque inválido",
+      temas: [{ numero: 1, titulo: "Uno" }, { numero: 1, titulo: "Otra vez uno" }],
+    }));
+    const r = await importarDirectorio(repo, dir);
+    expect(r.errores.some((e) => e.includes("aparece dos veces"))).toBe(true);
+    expect(repo.temario().find((b) => b.numero === 1).gestionado).toBe(false);
+  });
+
+  test("exportar por bloques y reimportar conserva bloques, títulos y preguntas", async () => {
+    await importarDirectorio(repo, DIR_BLOQUES);
+    const dir = (await import("node:os")).tmpdir() + "/opios-export-bloques-" + Date.now();
+    const r = await exportarPorBloques(repo, dir);
+    expect(r).toMatchObject({ bloques: 3, preguntas: 5, omitidas: 0 });
+
+    const info = await Bun.file(join(dir, "bloque_1", "info.json")).json();
+    expect(info).toEqual({
+      nombre: "Bloque I de prueba",
+      temas: [{ numero: 1, titulo: "Tema uno" }, { numero: 2, titulo: "Tema dos" }],
+    });
+    expect(await Bun.file(join(dir, "bloque_1", "tema_1.json")).exists()).toBe(true);
+
+    const otra = abrirDb(":memory:");
+    const imp = await importarDirectorio(otra, dir);
+    expect(imp.errores).toEqual([]);
+    expect(imp.nuevas).toBe(5);
+    const t = otra.temario();
+    expect(t.map((b) => [b.numero, b.nombre])).toEqual([
+      [1, "Bloque I de prueba"], [2, "Bloque II de prueba"], [3, "Bloque 3"],
+    ]);
+    expect(t[0].temas.map((x) => [x.numero, x.nombre, x.preguntas])).toEqual([
+      [1, "Tema uno", 2], [2, "Tema dos", 1],
+    ]);
+    expect(t[1].temas.find((x) => x.numero === 2).preguntas).toBe(0);
+    otra.close();
+  });
+
+  test("el cliente del temario marca los bloques gestionados como solo lectura", async () => {
+    const js = await (await pet("/js/temario.js")).text();
+    expect(js).toContain("bloque.gestionado");
+    expect(js).toContain("Solo lectura");
+    expect(js).toContain("Definido en preguntas/bloque_");
+  });
+
+  test("un bloque gestionado por info.json es de solo lectura en la API", async () => {    await importarDirectorio(repo, DIR_BLOQUES);
+    expect((await pet("/api/bloques/1", "PUT", { nombre: "Otro nombre" })).status).toBe(409);
+    expect((await pet("/api/temas", "POST", { bloque: 1, numero: 9, nombre: "Nuevo" })).status).toBe(409);
+    const tema = repo.temario()[0].temas[0];
+    expect((await pet("/api/temas/" + tema.id, "PUT", { bloque: 1, numero: 9 })).status).toBe(409);
+    expect((await pet("/api/temas/" + tema.id, "DELETE")).status).toBe(409);
+    expect((await pet("/api/bloques/1", "DELETE")).status).toBe(409);
+
+    const libre = repo.temario().find((b) => b.numero === 3);
+    const r = await pet("/api/bloques/" + libre.id, "PUT", { nombre: "Bloque 3 renombrado" });
+    expect(r.status).toBe(200);
+    expect((await r.json()).numero).toBe(3);
   });
 });
 
@@ -319,6 +421,19 @@ describe("estadísticas y simulacros", () => {
     expect(html).toContain("/js/simulacro.js");
   });
 
+  test("la tabla de simulacros resuelve el id del tema a su número y bloque", async () => {
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque 2" })).json();
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 7, nombre: "Tema siete" })).json();
+    const p = await (await pet("/api/preguntas", "POST", nueva({ tema: t.id, pregunta: "Pregunta del tema siete" }))).json();
+    await pet("/api/simulacros", "POST", {
+      temas: [t.id], segundos: 10, penalizacion: 0,
+      respuestas: [{ id: p.id, elegida: p.correcta }],
+    });
+    const html = await (await pet("/estadisticas")).text();
+    expect(html).toContain("Bloque 2 · Tema 7 — Tema siete");
+    expect(html).not.toContain(`<td>Tema ${t.id}</td>`);
+  });
+
   test("guardar un simulacro recalcula el resultado y se puede listar y ver en detalle", async () => {
     const bank = await conProgreso();
     const r = await pet("/api/simulacros", "POST", {
@@ -386,6 +501,57 @@ describe("estadísticas y simulacros", () => {
     ]) expect((await pet("/api/simulacros", "POST", mala)).status).toBe(400);
     expect((await pet("/api/simulacros", "POST", { temas: [1], segundos: 1, penalizacion: 0, respuestas: [{ id: 99999, elegida: 0 }] })).status).toBe(400);
     expect((await pet("/api/simulacros/99999")).status).toBe(404);
+  });
+});
+
+describe("etiquetas y resultados del cliente", () => {
+  const evaluarCliente = async (archivo) => {
+    const codigo = await Bun.file(join(import.meta.dir, "..", "public", "js", archivo)).text();
+    const global = {};
+    new Function("window", codigo)(global);
+    return global;
+  };
+
+  test("la etiqueta de tema es la misma en servidor y cliente", async () => {
+    const { etiquetaTema } = await import("../src/etiquetas.js");
+    const { etiquetaTema: enCliente } = await evaluarCliente("etiquetas.js");
+    const casos = [
+      { numero: 3, nombre: "Redes", bloque_nombre: "Bloque II" },
+      { tema: 5, tema_numero: 2, tema_nombre: "Hardware", bloque_nombre: "Bloque I" },
+      { tema_numero: 1 },
+      { id: 9, numero: 7 },
+    ];
+    for (const c of casos) expect(enCliente(c)).toBe(etiquetaTema(c));
+    expect(etiquetaTema(casos[0])).toBe("Bloque II · Tema 3 — Redes");
+    expect(etiquetaTema(casos[0], { bloque: false })).toBe("Tema 3 — Redes");
+    expect(etiquetaTema(casos[1], { nombre: false })).toBe("Bloque I · Tema 2");
+  });
+
+  test("el desglose del simulacro agrupa por id de tema, no por número", async () => {
+    const { calcularResultado } = await evaluarCliente("resultado.js");
+    const preguntas = [
+      { tema: 10, temaNumero: 1, temaNombre: "Uno del bloque I", bloque: "Bloque I", correcta: 0 },
+      { tema: 20, temaNumero: 1, temaNombre: "Uno del bloque II", bloque: "Bloque II", correcta: 1 },
+      { tema: 20, temaNumero: 1, temaNombre: "Uno del bloque II", bloque: "Bloque II", correcta: 2 },
+    ];
+    const res = calcularResultado(preguntas, [0, 0, 2], 0, 30);
+    expect(res).toMatchObject({ total: 3, aciertos: 2, fallos: 1, blancos: 0 });
+    expect(res.porTema).toHaveLength(2);
+    expect(res.porTema.map((t) => [t.tema, t.numero, t.total, t.aciertos, t.fallos])).toEqual([
+      [10, 1, 1, 1, 0],
+      [20, 1, 2, 1, 1],
+    ]);
+  });
+
+  test("los límites de la interfaz salen de la configuración, no van escritos a mano", async () => {
+    const html = await (await pet("/temario")).text();
+    expect(html).toContain('data-max-bloque="120"');
+    expect(html).toContain('data-max-tema="500"');
+    const js = await (await pet("/js/temario.js")).text();
+    expect(js).toContain("maxlength: MAX_BLOQUE");
+    expect(js).toContain("maxlength: MAX_TEMA_NOMBRE");
+    expect(js).not.toContain("maxlength: 120");
+    expect(js).not.toContain("maxlength: 200");
   });
 });
 

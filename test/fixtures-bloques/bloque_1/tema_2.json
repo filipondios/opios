@@ -1,0 +1,8 @@
+[
+  {
+    "pregunta": "Bloque I, tema dos: ¿Qué planeta es el más cercano al Sol?",
+    "respuestas": ["Mercurio", "Venus", "Marte"],
+    "respuesta_correcta": "a",
+    "explicacion": "Mercurio es el planeta más cercano al Sol."
+  }
+]

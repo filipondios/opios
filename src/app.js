@@ -210,6 +210,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
             actividad: repo.actividadReciente(sumarDias(hoy, -13)),
             simulacros: repo.listarSimulacros(5),
             totalSimulacros: repo.contarSimulacros(),
+            temario: repo.temario(),
             hoy,
           }));
         }
