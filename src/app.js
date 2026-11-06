@@ -1,6 +1,6 @@
 import { join, normalize, sep } from "node:path";
 import { timingSafeEqual } from "node:crypto";
-import { PUBLIC_DIR, CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN } from "./config.js";
+import { PUBLIC_DIR, CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN, ALLOWED_HOSTS } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import { hoyIso, sumarDias, diasEntre } from "./fechas.js";
 import { validarPregunta, validarProgreso, validarRespuestas, validarBloque, validarTema, validarSimulacro, validarAjustes } from "./validar.js";
@@ -43,6 +43,44 @@ function idsDe(cuerpo) {
 function igual(a, b) {
   const x = Buffer.from(a), y = Buffer.from(b);
   return x.length === y.length && timingSafeEqual(x, y);
+}
+
+/** Nombre de host de la petición, sin el puerto (`[::1]:8000` -> `[::1]`).
+    En peticiones reales manda la cabecera `Host`; si falta (p. ej. en tests), se usa el de la URL. */
+function hostDe(req) {
+  const host = (req.headers.get("host") ?? new URL(req.url).host ?? "").trim().toLowerCase();
+  return host.startsWith("[") ? host.slice(0, host.indexOf("]") + 1) : host.split(":")[0];
+}
+
+/** Rechaza peticiones cuyo `Host` no esté en la lista permitida (protección contra DNS rebinding). */
+function hostPermitido(req) {
+  return ALLOWED_HOSTS.includes(hostDe(req));
+}
+
+const COMPRIMIBLE = /^(text\/|application\/json|application\/javascript|application\/xml|image\/svg)/;
+const MIN_COMPRIMIR = 1024; // por debajo, comprimir no compensa
+
+/**
+ * Comprime con gzip las respuestas de texto cuando el cliente lo acepta (Fase 4.4).
+ * Devuelve siempre una respuesta nueva (el cuerpo original se consume aquí).
+ */
+async function comprimir(req, res) {
+  if (!res || req.method === "HEAD" || res.status === 204 || res.status === 304 || !res.body) return res;
+  const tipo = res.headers.get("content-type") ?? "";
+  if (!COMPRIMIBLE.test(tipo) || res.headers.has("content-encoding")) return res;
+  const buf = Buffer.from(await res.arrayBuffer());
+  const aceptaGzip = (req.headers.get("accept-encoding") ?? "").toLowerCase().includes("gzip");
+  if (!aceptaGzip || buf.length < MIN_COMPRIMIR) {
+    const h = new Headers(res.headers);
+    h.append("Vary", "Accept-Encoding");
+    return new Response(buf, { status: res.status, statusText: res.statusText, headers: h });
+  }
+  const comprimido = Bun.gzipSync(buf);
+  const h = new Headers(res.headers);
+  h.set("Content-Encoding", "gzip");
+  h.set("Content-Length", String(comprimido.length));
+  h.append("Vary", "Accept-Encoding");
+  return new Response(comprimido, { status: res.status, statusText: res.statusText, headers: h });
 }
 
 /**
@@ -213,51 +251,58 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
     if (!archivo.startsWith(PUBLIC_DIR + sep)) return new Response("No encontrado", { status: 404 });
     const f = Bun.file(archivo);
     if (!(await f.exists())) return new Response("No encontrado", { status: 404 });
-    return new Response(f, { headers: { "Cache-Control": "no-cache" } });
+    /* Fuentes e imágenes no cambian: se cachean para siempre. El resto se revalida (los nombres no llevan hash). */
+    const cache = /\.(woff2?|ttf|otf|png|jpe?g|gif|svg|ico)$/i.test(archivo)
+      ? "public, max-age=31536000, immutable" : "no-cache";
+    return new Response(f, { headers: { "Cache-Control": cache } });
+  }
+
+  async function responder(req, url, ruta) {
+    if (!hostPermitido(req)) return new Response("Host no permitido.", { status: 403 });
+    if (ruta === "/healthz") return new Response("ok", { headers: { "Cache-Control": "no-store" } });
+    if (auth) {
+      const m = /^Basic (.+)$/.exec(req.headers.get("authorization") ?? "");
+      const [u = "", ...resto] = m ? Buffer.from(m[1], "base64").toString().split(":") : [];
+      if (!(m && igual(u, auth.usuario) && igual(resto.join(":"), auth.clave)))
+        return new Response("Autenticación necesaria", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="opios", charset="UTF-8"' } });
+    }
+    if (ruta.startsWith("/api/")) return await api(req, url, ruta);
+    if (req.method === "GET" || req.method === "HEAD") {
+      if (ruta === "/") return pagina(paginaHome({ temas: estadisticas(), carga: repo.cargaDiaria(fechaHoy()), examen: infoExamen() }));
+      if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
+      if (ruta === "/temario") return pagina(paginaTemario());
+      if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
+      if (ruta === "/estadisticas") {
+        const hoy = fechaHoy();
+        return pagina(paginaEstadisticas({
+          global: repo.estadisticasGlobales(hoy, CAJA_DOMINADA),
+          temas: estadisticas(),
+          prevision: repo.previsionRepasos(hoy, 7),
+          falladas: repo.preguntasMasFalladas(20),
+          actividad: repo.actividadReciente(sumarDias(hoy, -13)),
+          racha: repo.rachaDias(hoy),
+          semanas: repo.precisionSemanal(hoy, 8),
+          tiempo: repo.tiempoMedio(),
+          simulacros: repo.listarSimulacros(5),
+          totalSimulacros: repo.contarSimulacros(),
+          temario: repo.temario(),
+          hoy,
+          examen: infoExamen(),
+        }));
+      }
+      if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas(), repo.cargaDiaria(fechaHoy())));
+      return await estatico(ruta);
+    }
+    return new Response("Método no permitido", { status: 405 });
   }
 
   return async function manejar(req) {
     const url = new URL(req.url);
-    const ruta = url.pathname;
     try {
-      if (ruta === "/healthz") return new Response("ok", { headers: { "Cache-Control": "no-store" } });
-      if (auth) {
-        const m = /^Basic (.+)$/.exec(req.headers.get("authorization") ?? "");
-        const [u = "", ...resto] = m ? Buffer.from(m[1], "base64").toString().split(":") : [];
-        if (!(m && igual(u, auth.usuario) && igual(resto.join(":"), auth.clave)))
-          return new Response("Autenticación necesaria", { status: 401, headers: { "WWW-Authenticate": 'Basic realm="opios", charset="UTF-8"' } });
-      }
-      if (ruta.startsWith("/api/")) return await api(req, url, ruta);
-      if (req.method === "GET" || req.method === "HEAD") {
-        if (ruta === "/") return pagina(paginaHome({ temas: estadisticas(), carga: repo.cargaDiaria(fechaHoy()), examen: infoExamen() }));
-        if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
-        if (ruta === "/temario") return pagina(paginaTemario());
-        if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
-        if (ruta === "/estadisticas") {
-          const hoy = fechaHoy();
-          return pagina(paginaEstadisticas({
-            global: repo.estadisticasGlobales(hoy, CAJA_DOMINADA),
-            temas: estadisticas(),
-            prevision: repo.previsionRepasos(hoy, 7),
-            falladas: repo.preguntasMasFalladas(20),
-            actividad: repo.actividadReciente(sumarDias(hoy, -13)),
-            racha: repo.rachaDias(hoy),
-            semanas: repo.precisionSemanal(hoy, 8),
-            tiempo: repo.tiempoMedio(),
-            simulacros: repo.listarSimulacros(5),
-            totalSimulacros: repo.contarSimulacros(),
-            temario: repo.temario(),
-            hoy,
-            examen: infoExamen(),
-          }));
-        }
-        if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas(), repo.cargaDiaria(fechaHoy())));
-        return await estatico(ruta);
-      }
-      return new Response("Método no permitido", { status: 405 });
+      return await comprimir(req, await responder(req, url, url.pathname));
     } catch (e) {
       if (e instanceof ErrorApi) return json({ error: e.message, ...e.extra }, e.status);
-      console.error(e);
+      console.error(new Date().toISOString(), e);
       return json({ error: "Error interno del servidor." }, 500);
     }
   };

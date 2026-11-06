@@ -707,7 +707,7 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
   const carga = async () => (await pet("/api/carga")).json();
 
   test("la migración crea la tabla respuestas con sus índices", () => {
-    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(9);
+    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(10);
     expect(repo.db.query("SELECT name FROM sqlite_master WHERE type='table' AND name='respuestas'").get()).toBeTruthy();
     const indices = repo.db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='respuestas'").all().map((r) => r.name);
     expect(indices).toContain("idx_respuestas_fecha");
@@ -850,6 +850,109 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
 
     await pet("/api/ajustes", "PUT", { fecha_examen: null });
     expect((await (await pet("/api/ajustes")).json()).fecha_examen).toBeUndefined();
+  });
+});
+
+describe("validación de la cabecera Host (Fase 4.1)", () => {
+  const conHost = (host, ruta = "/") =>
+    app(new Request("http://" + host + ruta, { headers: { Host: host } }));
+
+  test("acepta los hosts locales, con y sin puerto", async () => {
+    for (const h of ["localhost", "localhost:8000", "127.0.0.1", "127.0.0.1:8000", "[::1]:8000"])
+      expect((await conHost(h)).status).toBe(200);
+  });
+
+  test("rechaza un Host ajeno (DNS rebinding) sin filtrar datos", async () => {
+    const r = await conHost("evil.com", "/api/temas");
+    expect(r.status).toBe(403);
+    expect(await r.text()).not.toContain("total");
+  });
+
+  test("manda la cabecera Host, no la URL", async () => {
+    const r = await app(new Request("http://localhost/", { headers: { Host: "evil.com" } }));
+    expect(r.status).toBe(403);
+  });
+});
+
+describe("búsqueda con FTS5 (Fase 4.6)", () => {
+  const hayFts = () => !!repo.db.query("SELECT 1 FROM sqlite_master WHERE name = 'preguntas_fts'").get();
+
+  test("encuentra sin tildes y sin distinguir mayúsculas", () => {
+    if (!hayFts()) return; // build sin FTS5: el respaldo en JS no cubre las tildes
+    const tema = crearTemaPrueba(1);
+    repo.crear(nueva({ tema, pregunta: "Normalización de bases de datos" }));
+    repo.crear(nueva({ tema, pregunta: "Transacciones ACID y atomicidad" }));
+    expect(repo.listar({ texto: "normalizacion" }).total).toBe(1);
+    expect(repo.listar({ texto: "NORMALIZACIÓN" }).total).toBe(1);
+    expect(repo.listar({ texto: "norm" }).total).toBe(1);
+    expect(repo.listar({ texto: "bases datos" }).total).toBe(1);
+    expect(repo.listar({ texto: "acid" }).total).toBe(1);
+    expect(repo.listar({ texto: "inexistente" }).total).toBe(0);
+  });
+
+  test("respeta el filtro por tema", () => {
+    if (!hayFts()) return;
+    const t1 = crearTemaPrueba(1), t2 = crearTemaPrueba(2);
+    repo.crear(nueva({ tema: t1, pregunta: "Normalización en el tema uno" }));
+    repo.crear(nueva({ tema: t2, pregunta: "Normalización en el tema dos" }));
+    expect(repo.listar({ texto: "normalizacion" }).total).toBe(2);
+    expect(repo.listar({ tema: t1, texto: "normalizacion" }).total).toBe(1);
+  });
+
+  test("se mantiene al crear, modificar y borrar", () => {
+    if (!hayFts()) return;
+    const tema = crearTemaPrueba(1);
+    const id = repo.crear(nueva({ tema, pregunta: "Alicates de precisión" }));
+    expect(repo.listar({ texto: "alicates" }).total).toBe(1);
+    repo.actualizar(id, nueva({ tema, pregunta: "Destornilladores planos" }));
+    expect(repo.listar({ texto: "alicates" }).total).toBe(0);
+    expect(repo.listar({ texto: "destornilladores" }).total).toBe(1);
+    repo.borrar(id);
+    expect(repo.listar({ texto: "destornilladores" }).total).toBe(0);
+  });
+
+  test("una consulta con caracteres especiales no rompe la búsqueda", () => {
+    if (!hayFts()) return;
+    const tema = crearTemaPrueba(1);
+    repo.crear(nueva({ tema, pregunta: "Entidad-relación" }));
+    expect(() => repo.listar({ texto: 'foo"bar (baz) NEAR*' })).not.toThrow();
+    expect(repo.listar({ texto: 'foo"bar (baz)' }).total).toBe(0);
+  });
+});
+
+describe("compresión gzip de las respuestas (Fase 4.4)", () => {
+  beforeEach(async () => { await importarDirectorio(repo, DIR_FIXTURE); });
+
+  test("comprime HTML y JSON grandes si el cliente acepta gzip", async () => {
+    const desc = (buf) => new TextDecoder().decode(buf);
+    const html = await app(new Request("http://localhost/estadisticas", { headers: { "Accept-Encoding": "gzip" } }));
+    expect(html.headers.get("content-encoding")).toBe("gzip");
+    expect(html.headers.get("vary")).toContain("Accept-Encoding");
+    expect(desc(Bun.gunzipSync(Buffer.from(await html.arrayBuffer())))).toContain("racha");
+
+    const exp = await app(new Request("http://localhost/api/exportar", { headers: { "Accept-Encoding": "gzip" } }));
+    const texto = desc(Bun.gunzipSync(Buffer.from(await exp.arrayBuffer())));
+    expect(JSON.parse(texto).length).toBe(TOTAL_FIXTURE);
+  });
+
+  test("sin Accept-Encoding no comprime y respuestas pequeñas van en claro", async () => {
+    expect((await pet("/estadisticas")).headers.get("content-encoding")).toBe(null);
+    const pequena = await app(new Request("http://localhost/api/temas", { headers: { "Accept-Encoding": "gzip" } }));
+    expect(pequena.headers.get("content-encoding")).toBe(null);
+    expect(pequena.headers.get("vary")).toContain("Accept-Encoding");
+  });
+});
+
+describe("fuentes autoalojadas (Fase 4.2)", () => {
+  test("el HTML no depende de Google Fonts y sirve los woff2 locales", async () => {
+    const html = await (await pet("/")).text();
+    expect(html).not.toContain("fonts.googleapis.com");
+    expect(html).toContain("/css/base.css");
+
+    const f = await pet("/fonts/newsreader-latin.woff2");
+    expect(f.status).toBe(200);
+    expect(f.headers.get("content-type")).toContain("font/woff2");
+    expect(f.headers.get("cache-control")).toContain("immutable");
   });
 });
 

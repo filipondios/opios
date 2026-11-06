@@ -2,6 +2,13 @@
 /* Concepto: hoja de respuestas de oposición. Una columna, letras en burbujas como en una hoja de lectura óptica;
    el único color vivo de la página es la burbuja marcada. Papel gris azulado, tinta azul marino.
    Tipos: Newsreader (lectura de preguntas), IBM Plex Sans (interfaz), IBM Plex Mono (letras y cifras). */
+
+/* Fuentes autoalojadas (Fase 4.2): subconjunto latin, licencia SIL OFL. Evita depender de Google Fonts. */
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 500;font-display:swap;src:url("/fonts/newsreader-latin.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Sans";font-style:normal;font-weight:400 600;font-stretch:100%;font-display:swap;src:url("/fonts/ibm-plex-sans-latin.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url("/fonts/ibm-plex-mono-500-latin.woff2") format("woff2")}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url("/fonts/ibm-plex-mono-600-latin.woff2") format("woff2")}
+
 :root{
   --paper:#EDF0F4; --card:#FAFBFD; --ink:#18202E; --ink-2:#566073; --line:#D1D7E0;
   --accent:#2D49C9; --accent-ink:#FFFFFF; --accent-soft:#E2E8FB;
