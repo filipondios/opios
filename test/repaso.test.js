@@ -40,18 +40,42 @@ describe("fechas del repaso", () => {
 });
 
 describe("planificador de repaso", () => {
-  test("un fallo deja caja 0, vence hoy y programa el reintento", () => {
+  test("un fallo baja 2 cajas (mínimo 1), vence hoy y programa el reintento", () => {
     const pool = [q(1), q(2)];
     const { sesion, progreso, cambios } = crear(pool);
 
     sesion.registrar(pool[0], false);
 
-    expect(progreso[1]).toEqual([0, HOY, 0, 1]);
+    expect(progreso[1]).toEqual([1, HOY, 0, 1]);
     expect(sesion.fallos).toBe(1);
     expect(sesion.aciertos).toBe(0);
     expect(sesion.n).toBe(1);
     expect(sesion.aprendizaje.get(1)).toEqual([0, 1 + PASOS_APRENDIZAJE[0]]);
     expect(cambios).toEqual([1]);
+  });
+
+  test("un fallo desde caja 6 baja a 4 y desde caja 2 a 1", () => {
+    const pool = [q(1), q(2)];
+    const { sesion, progreso } = crear(pool, {
+      progreso: { 1: [6, "2026-03-01", 5, 0], 2: [2, "2026-03-01", 1, 0] },
+    });
+
+    sesion.registrar(pool[0], false);
+    expect(progreso[1]).toEqual([4, HOY, 5, 1]);
+
+    sesion.registrar(pool[1], false);
+    expect(progreso[2]).toEqual([1, HOY, 1, 1]);
+  });
+
+  test("una nueva sesión conserva la caja baja tras fallar", () => {
+    const pool = [q(1)];
+    const { sesion, progreso } = crear(pool, { progreso: { 1: [6, "2026-03-01", 5, 0] } });
+
+    sesion.registrar(pool[0], false);
+    expect(progreso[1][0]).toBe(4);
+
+    const otra = crear(pool, { progreso });
+    expect(otra.progreso[1][0]).toBe(4);
   });
 
   test("el reintento llega tras 3 preguntas y tiene prioridad sobre las nuevas", () => {
@@ -72,24 +96,36 @@ describe("planificador de repaso", () => {
     expect(pregunta.i).toBe(1);
   });
 
-  test("acertar el reintento mantiene caja 0 y el segundo acierto gradúa a caja 1", () => {
+  test("acertar el reintento mantiene la caja baja y el segundo acierto gradúa sin volver a bajarla", () => {
     const pool = [q(1)];
     const { sesion, progreso } = crear(pool);
 
-    sesion.registrar(pool[0], false);
-    sesion.registrar(pool[0], true); // primer acierto del reintento
+    sesion.registrar(pool[0], false); // nueva: caja 1
+    expect(progreso[1][0]).toBe(1);
 
+    sesion.registrar(pool[0], true); // primer acierto del reintento
     expect(sesion.aprendizaje.get(1)).toEqual([1, 2 + PASOS_APRENDIZAJE[1]]);
-    expect(progreso[1][0]).toBe(0);
-    expect(progreso[1][1]).toBe(HOY);
-    expect(progreso[1][2]).toBe(1);
+    expect(progreso[1]).toEqual([1, HOY, 1, 1]);
 
     sesion.registrar(pool[0], true); // segundo acierto: gradúa
 
     expect(sesion.aprendizaje.has(1)).toBe(false);
-    expect(progreso[1][0]).toBe(1);
-    expect(progreso[1][1]).toBe(sumarDias(HOY, INTERVALOS_DIAS[1]));
-    expect(progreso[1][2]).toBe(2);
+    expect(progreso[1]).toEqual([1, sumarDias(HOY, INTERVALOS_DIAS[1]), 2, 1]);
+  });
+
+  test("graduar tras fallar desde caja 6 conserva la caja 4", () => {
+    const pool = [q(1)];
+    const { sesion, progreso } = crear(pool, { progreso: { 1: [6, "2026-03-01", 5, 0] } });
+
+    sesion.registrar(pool[0], false);
+    expect(progreso[1][0]).toBe(4);
+
+    sesion.registrar(pool[0], true);
+    expect(progreso[1][0]).toBe(4);
+
+    sesion.registrar(pool[0], true);
+    expect(progreso[1][0]).toBe(4);
+    expect(progreso[1][1]).toBe(sumarDias(HOY, INTERVALOS_DIAS[4]));
   });
 
   test("una pregunta fallada en una sesión anterior recibe un reintento antes de graduarse", () => {
@@ -109,6 +145,24 @@ describe("planificador de repaso", () => {
     sesion.registrar(pool[0], true);
 
     expect(progreso[1]).toEqual([3, sumarDias(HOY, INTERVALOS_DIAS[3]), 6, 1]);
+  });
+
+  test("la práctica libre no sube de caja ni mueve la fecha al acertar", () => {
+    const pool = [q(1)];
+    const { sesion, progreso } = crear(pool, { progreso: { 1: [2, "2026-04-01", 5, 1] } });
+
+    for (let i = 0; i < 8; i++) sesion.registrar(pool[0], true);
+
+    expect(progreso[1]).toEqual([2, "2026-04-01", 13, 1]);
+  });
+
+  test("fallar en práctica libre sí baja la caja y deja la pregunta vencida", () => {
+    const pool = [q(1)];
+    const { sesion, progreso } = crear(pool, { progreso: { 1: [4, "2026-04-01", 5, 1] } });
+
+    sesion.registrar(pool[0], false);
+
+    expect(progreso[1]).toEqual([2, HOY, 5, 2]);
   });
 
   test("la caja no supera el máximo", () => {
@@ -168,5 +222,32 @@ describe("planificador de repaso", () => {
     sesion.registrar(pool[0], true);
 
     expect(cambios).toEqual([1, 1]);
+  });
+
+  test("el cupo diario limita las preguntas nuevas y luego pasa a práctica libre", () => {
+    const pool = [q(1), q(2), q(3), q(4)];
+    const { sesion } = crear(pool, { azar: () => 0, nuevasPermitidas: 2 });
+    const tipos = [];
+    for (let k = 0; k < 6; k++) { const [pregunta, tipo] = sesion.siguiente(); tipos.push(tipo); sesion.registrar(pregunta, true); }
+
+    expect(tipos.filter((t) => t === "Nueva")).toHaveLength(2);
+    expect(tipos.slice(2).every((t) => t === "Práctica libre")).toBe(true);
+  });
+
+  test("con cupo 0 no se introducen nuevas", () => {
+    const pool = [q(1), q(2)];
+    const { sesion } = crear(pool, { azar: () => 0, nuevasPermitidas: 0 });
+
+    expect(sesion.siguiente()[1]).not.toBe("Nueva");
+  });
+
+  test("el tope de intervalo (fecha de examen) recorta la espera", () => {
+    const pool = [q(1)];
+    const { sesion, progreso } = crear(pool, { progreso: { 1: [5, "2026-03-01", 1, 0] }, topeIntervalo: 20 });
+
+    sesion.registrar(pool[0], true);
+
+    expect(progreso[1][0]).toBe(6);
+    expect(progreso[1][1]).toBe(sumarDias(HOY, 20)); // 90 días recortados a 20
   });
 });

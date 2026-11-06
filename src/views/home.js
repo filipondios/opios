@@ -1,4 +1,4 @@
-import { html } from "./html.js";
+import { html, raw } from "./html.js";
 import { layout } from "./layout.js";
 
 /** Una ficha por tema, con barra de progreso. Los data-* los usa el cliente para el resumen. */
@@ -18,8 +18,34 @@ function chip(t) {
   </button>`;
 }
 
+/** Atributos de datos con la carga del día; el cliente los lee para mostrar el cupo y limitar las nuevas. */
+function datosCarga(carga) {
+  if (!carga) return "";
+  return `data-nuevas-hoy="${carga.nuevasHoy}" data-cupo-nuevas="${carga.cupoNuevas}" `
+    + `data-repasos="${carga.repasosPendientes}" data-atrasados="${carga.repasosAtrasados}" `
+    + `data-bloqueado="${carga.bloqueadoPorAtraso ? 1 : 0}"`;
+}
+
+/** Texto del cupo diario; el mismo resumen lo recalcula el cliente al refrescar los temas. */
+export function textoCarga(carga) {
+  if (!carga) return "";
+  const restantes = Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
+  const partes = [`Nuevas hoy: ${carga.nuevasHoy}/${carga.cupoNuevas}`];
+  if (carga.repasosPendientes) partes.push(`${carga.repasosPendientes} por repasar`);
+  if (carga.bloqueadoPorAtraso) partes.push(`frenado: ${carga.repasosAtrasados} repasos atrasados`);
+  else if (restantes === 0) partes.push("cupo de nuevas agotado hoy");
+  return partes.join(" · ");
+}
+
+/** Texto con los días que quedan y el tope de intervalo derivado (Fase 3.6). */
+export function textoExamen(examen) {
+  if (!examen || !examen.fecha) return "";
+  if (examen.dias == null || examen.dias <= 0) return "La fecha de examen ya ha pasado.";
+  return `${examen.dias} día${examen.dias === 1 ? "" : "s"} hasta el examen · los repasos se acortan a ${examen.topeDias} día${examen.topeDias === 1 ? "" : "s"}`;
+}
+
 /** Rejilla de temas agrupada por bloques del temario. */
-export function temasGrid(temas) {
+export function temasGrid(temas, carga = null) {
   const bloques = [];
   const porBloque = new Map();
   for (const t of temas) {
@@ -31,7 +57,7 @@ export function temasGrid(temas) {
     }
     porBloque.get(clave).temas.push(t);
   }
-  return html`${bloques.map((b) => html`
+  return html`<div class="carga" hidden ${raw(datosCarga(carga))}></div>${bloques.map((b) => html`
     <section class="bloque" data-bloque="${b.id ?? ""}">
       <div class="bloque-head">
         <h2>${b.nombre}</h2>
@@ -42,7 +68,7 @@ export function temasGrid(temas) {
     </section>`)}`;
 }
 
-export function paginaHome({ temas }) {
+export function paginaHome({ temas, carga = null, examen = null }) {
   const vacio = temas.length === 0;
   const cuerpo = html`
   <div id="note" class="note" hidden></div>
@@ -58,11 +84,16 @@ export function paginaHome({ temas }) {
     <section id="ready" class="stack">
       <h1>Elige los temas</h1>
       <p class="sum" id="sum"></p>
-      <div class="stack" id="grid" role="group" aria-label="Temas">${temasGrid(temas)}</div>
+      <p class="cupo" id="cupo">${textoCarga(carga)}</p>
+      <div class="stack" id="grid" role="group" aria-label="Temas">${temasGrid(temas, carga)}</div>
       <div class="legend" aria-hidden="true">
         <span><i class="b-ok"></i>Dominadas</span>
         <span><i class="b-mid"></i>En aprendizaje</span>
         <span><i class="l-new"></i>Nuevas</span>
+      </div>
+      <div class="examen-row">
+        <label class="field"><span>Fecha de examen</span><input type="date" id="cfg-examen" value="${examen?.fecha ?? ""}"></label>
+        <span class="hint" id="examen-info">${textoExamen(examen)}</span>
       </div>
       <div class="row">
         <button class="btn primary" type="button" id="btn-start">Empezar <kbd>Enter</kbd></button>

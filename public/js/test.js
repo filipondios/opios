@@ -46,8 +46,12 @@ let pantalla = "setup";
 let sesion = null;
 let cur = null;         // pregunta en pantalla
 let timerAcierto = null;
-const sucios = new Set();
+let sucios = new Set();
 let timerGuardado = null;
+let carga = null;            // cupo diario que devuelve el servidor
+let examenInfo = null;       // fecha de examen y tope de intervalo (Fase 3.6)
+let respuestasCola = [];     // respuestas pendientes de enviar a /api/respuestas
+let timerRespuestas = null;
 
 function setStatus(kind, text){ const s = $("#status"); s.dataset.state = kind; s.textContent = text; }
 function nota(texto, lineas){
@@ -78,8 +82,58 @@ async function guardarProgreso(){
     setStatus("ok", ETIQUETA);
   } catch (e) { ids.forEach((id) => sucios.add(id)); setStatus("warn", "No se pudo guardar: " + msgError(e)); }
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") guardarProgreso(); });
-window.addEventListener("pagehide", () => { guardarProgreso(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden"){ guardarProgreso(); guardarRespuestas(); } });
+window.addEventListener("pagehide", () => { guardarProgreso(); guardarRespuestas(); });
+
+/* ---------- Respuestas: un evento por pregunta, para las estadísticas y el cupo diario ---------- */
+function encolarRespuesta(id, acierto, ms){
+  respuestasCola.push({ id, acierto, ms });
+  clearTimeout(timerRespuestas);
+  timerRespuestas = setTimeout(guardarRespuestas, 700);
+}
+async function guardarRespuestas(){
+  clearTimeout(timerRespuestas);
+  if (!respuestasCola.length) return;
+  const lote = respuestasCola; respuestasCola = [];
+  try {
+    await api("/api/respuestas", {
+      method: "POST", headers: JSON_HEAD, keepalive: true,
+      body: JSON.stringify({ respuestas: lote }),
+    });
+  } catch (e) {
+    respuestasCola = lote.concat(respuestasCola);
+    setStatus("warn", "No se pudieron guardar las respuestas: " + msgError(e));
+  }
+}
+
+/* ---------- Cupo diario (lo calcula el servidor; aquí solo se muestra) ---------- */
+function leerCarga(){
+  const el = document.querySelector("#grid .carga");
+  if (!el){ return; }
+  carga = {
+    nuevasHoy: Number(el.dataset.nuevasHoy || 0),
+    cupoNuevas: Number(el.dataset.cupoNuevas || 0),
+    repasosPendientes: Number(el.dataset.repasos || 0),
+    repasosAtrasados: Number(el.dataset.atrasados || 0),
+    bloqueadoPorAtraso: el.dataset.bloqueado === "1",
+  };
+}
+function pintarCarga(){
+  const el = $("#cupo"); if (!el) return;
+  if (!carga){ el.textContent = ""; return; }
+  const restantes = Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
+  const partes = ["Nuevas hoy: " + carga.nuevasHoy + "/" + carga.cupoNuevas];
+  if (carga.repasosPendientes) partes.push(carga.repasosPendientes + " por repasar");
+  if (carga.bloqueadoPorAtraso) partes.push("frenado: " + carga.repasosAtrasados + " repasos atrasados");
+  else if (restantes === 0) partes.push("cupo de nuevas agotado hoy");
+  el.textContent = partes.join(" · ");
+}
+/** Nuevas que aún se pueden introducir en esta sesión, según el cupo del servidor. */
+function nuevasPermitidas(){
+  if (!carga) return Infinity;
+  if (carga.bloqueadoPorAtraso) return 0;
+  return Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
+}
 
 /* ---------- Pantalla de preparación (la rejilla llega ya pintada desde el servidor) ---------- */
 const chips = () => [...document.querySelectorAll("#grid .chip")];
@@ -114,7 +168,9 @@ function actualizarResumen(){
 async function refrescarTemas(){
   try {
     $("#grid").innerHTML = await (await api("/fragmentos/temas")).text();
+    leerCarga();
     sincronizarSeleccion();
+    pintarCarga();
   } catch (e) { setStatus("warn", "No se pudieron actualizar los temas: " + msgError(e)); }
 }
 
@@ -152,6 +208,7 @@ function conConfirmacion(btn, texto, accion){
 }
 conConfirmacion($("#btn-clear-prog"), "Progreso reiniciado: todas las preguntas vuelven a ser nuevas.", async () => {
   clearTimeout(timerGuardado); sucios.clear();
+  clearTimeout(timerRespuestas); respuestasCola = [];
   await api("/api/progreso", { method: "DELETE" });
   progress = {};
   await refrescarTemas();
@@ -159,6 +216,25 @@ conConfirmacion($("#btn-clear-prog"), "Progreso reiniciado: todas las preguntas 
 $("#btn-all").addEventListener("click", () => fijarSeleccion(true));
 $("#btn-none").addEventListener("click", () => fijarSeleccion(false));
 $("#btn-start").addEventListener("click", empezar);
+
+/* ---------- Fecha de examen (Fase 3.6): acorta los intervalos de repaso ---------- */
+function pintarExamen(){
+  const el = $("#examen-info"); if (!el) return;
+  const ex = examenInfo;
+  if (!ex || !ex.fecha){ el.textContent = ""; return; }
+  el.textContent = ex.dias > 0
+    ? `${ex.dias} día${ex.dias === 1 ? "" : "s"} hasta el examen · los repasos se acortan a ${ex.topeDias} día${ex.topeDias === 1 ? "" : "s"}`
+    : "La fecha de examen ya ha pasado.";
+}
+async function guardarExamen(){
+  const input = $("#cfg-examen"); if (!input) return;
+  setStatus("busy", "Guardando...");
+  try {
+    const d = await (await api("/api/ajustes", { method: "PUT", headers: JSON_HEAD, body: JSON.stringify({ fecha_examen: input.value || null }) })).json();
+    examenInfo = d.examen; pintarExamen(); setStatus("ok", ETIQUETA);
+  } catch (e) { setStatus("warn", "No se pudo guardar la fecha: " + msgError(e)); }
+}
+$("#cfg-examen")?.addEventListener("change", guardarExamen);
 
 /* ---------- Test ---------- */
 const ICO_OK  = '<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l4.5 4.5 8.5-9.5"/></svg>';
@@ -170,19 +246,23 @@ async function empezar(){
   setStatus("busy", "Cargando preguntas…");
   try {
     await guardarProgreso();
+    await guardarRespuestas();
     const d = await (await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","))).json();
     bank = d.preguntas.map((q) => ({
       i: q.id, t: q.tema, tn: q.tema_numero ?? q.tema, bn: q.bloque_nombre ?? "", nb: q.tema_nombre ?? "",
       p: q.pregunta, o: q.respuestas, c: q.correcta, e: q.explicacion,
     }));
     progress = d.progreso;
+    if (d.carga) carga = d.carga;
+    if (d.examen) { examenInfo = d.examen; pintarExamen(); }
     if (!bank.length) throw new Error("Los temas elegidos no tienen preguntas.");
   } catch (e) {
     setStatus("warn", "No se pudieron cargar las preguntas: " + msgError(e)); boton.disabled = false; return;
   }
   setStatus("ok", ETIQUETA); boton.disabled = false;
   nota(null);
-  sesion = new Sesion(bank, { progreso: progress, alCambiar: marcarSucio });
+  pintarCarga();
+  sesion = new Sesion(bank, { progreso: progress, alCambiar: marcarSucio, nuevasPermitidas: nuevasPermitidas(), topeIntervalo: examenInfo?.topeDias ?? 0 });
   pantalla = "quiz";
   $("#screen-setup").hidden = true; $("#screen-quiz").hidden = false;
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -192,7 +272,7 @@ function preguntar(){
   clearTimeout(timerAcierto);
   const [q, tipo] = sesion.siguiente();
   const orden = barajar(q.o.map((_, k) => k));
-  cur = { q, tipo, orden, sel: 0, corr: orden.indexOf(q.c), fase: "elegir" };
+  cur = { q, tipo, orden, sel: 0, corr: orden.indexOf(q.c), fase: "elegir", t0: Date.now() };
   $("#q-tema").textContent = etiquetaTema({ tema: q.t, tema_numero: q.tn, bloque_nombre: q.bn, nombre: q.nb });
   const kind = $("#q-kind"); kind.textContent = tipo; kind.dataset.kind = tipo;
   $("#q-text").textContent = q.p;
@@ -224,6 +304,7 @@ function confirmar(){
   if (!cur || cur.fase !== "elegir") return;
   const ok = cur.sel === cur.corr;
   sesion.registrar(cur.q, ok);
+  encolarRespuesta(cur.q.i, ok, Math.max(0, Date.now() - cur.t0));
   const ops = opciones();
   ops.forEach((o) => o.setAttribute("aria-checked", "false"));
   ops[cur.corr].classList.add("ok"); ops[cur.corr].querySelector(".mark").innerHTML = ICO_OK;
@@ -257,6 +338,7 @@ async function salir(){
   nota(n ? "Sesión terminada: " + aciertos + " de " + n + " acertadas (" + Math.round(100 * aciertos / n) + " %)." : null);
   window.scrollTo(0, 0);
   await guardarProgreso();
+  await guardarRespuestas();
   await refrescarTemas();
 }
 
@@ -281,6 +363,8 @@ document.addEventListener("keydown", (e) => {
 
 /* ---------- Arranque ---------- */
 sincronizarSeleccion(leerSeleccion() || []);
+leerCarga();
+pintarCarga();
 setStatus("ok", ETIQUETA);
 
 })();

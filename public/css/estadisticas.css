@@ -30,8 +30,17 @@
 .forecast-row.vencidas b,.forecast-row.vencidas span:first-child{color:var(--bad)}
 
 .actividad{display:flex;gap:3px;align-items:flex-end;height:90px;padding-top:4px}
-.actividad-dia{flex:1;height:100%;display:flex;align-items:flex-end;min-width:0}
-.actividad-barra{display:block;width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px}
+.actividad-dia{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+.actividad-barra{display:block;width:100%;border-radius:2px;min-height:0}
+.actividad-barra.ok{background:var(--ok)}
+.actividad-barra.bad{background:var(--bad)}
+.actividad-barra:first-child{border-radius:2px 2px 0 0}
+.actividad-barra:last-child{border-radius:0 0 2px 2px}
+
+.evolucion{display:flex;gap:6px;align-items:flex-end;height:110px;padding-top:4px}
+.evol-dia{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;min-width:0}
+.evol-barra{display:block;width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px}
+.evol-dia b{font:600 10px var(--f-mono);color:var(--ink-2)}
 
 @media (max-width:520px){
   .kpi-n{font-size:19px}

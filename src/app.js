@@ -1,9 +1,9 @@
 import { join, normalize, sep } from "node:path";
 import { timingSafeEqual } from "node:crypto";
-import { PUBLIC_DIR, CAJA_DOMINADA } from "./config.js";
+import { PUBLIC_DIR, CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN } from "./config.js";
 import { ErrorApi } from "./errores.js";
-import { hoyIso, sumarDias } from "./fechas.js";
-import { validarPregunta, validarProgreso, validarBloque, validarTema, validarSimulacro } from "./validar.js";
+import { hoyIso, sumarDias, diasEntre } from "./fechas.js";
+import { validarPregunta, validarProgreso, validarRespuestas, validarBloque, validarTema, validarSimulacro, validarAjustes } from "./validar.js";
 import { serializarJson } from "./exportar.js";
 import { aTexto } from "./views/html.js";
 import { paginaHome, temasGrid } from "./views/home.js";
@@ -49,10 +49,23 @@ function igual(a, b) {
  * Crea el manejador de peticiones (independiente del puerto, así se puede probar sin red).
  * Con `auth = { usuario, clave }` se exige autenticación HTTP Basic en todo salvo /healthz.
  * `ahora` devuelve la fecha actual; los tests la fijan para calcular repasos «de hoy».
+ * `zona` (por defecto `APP_TZ`) decide en qué zona horaria se calcula ese «hoy».
  */
-export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
-  const fechaHoy = () => hoyIso(ahora());
+export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = APP_TZ } = {}) {
+  const fechaHoy = () => hoyIso(ahora(), zona);
   const estadisticas = () => repo.estadisticasTemas(fechaHoy(), CAJA_DOMINADA);
+
+  /**
+   * Fecha de examen y tope de intervalo asociado (Fase 3.6): el intervalo de repaso no debe
+   * superar ~FACTOR_EXAMEN del tiempo que queda, según Cepeda et al. (2008).
+   */
+  function infoExamen() {
+    const { fecha_examen: fecha } = repo.ajustes();
+    if (!fecha) return { fecha: null, dias: null, topeDias: 0 };
+    const dias = diasEntre(fechaHoy(), fecha);
+    if (dias <= 0) return { fecha, dias, topeDias: 0 };
+    return { fecha, dias, topeDias: Math.max(1, Math.round(FACTOR_EXAMEN * dias)) };
+  }
 
   async function api(req, url, ruta) {
     const m = req.method;
@@ -105,7 +118,27 @@ export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
     if (ruta === "/api/test" && m === "GET") {
       const temas = (url.searchParams.get("temas") ?? "").split(",").filter(Boolean).map(Number);
       if (!temas.length || temas.some((t) => !Number.isInteger(t) || t < 0)) throw new ErrorApi(400, "Indica los temas: ?temas=1,2,3");
-      return json(repo.paraTest([...new Set(temas)]));
+      return json({ ...repo.paraTest([...new Set(temas)]), carga: repo.cargaDiaria(fechaHoy()), examen: infoExamen() });
+    }
+
+    /* Ajustes de la instancia (fecha de examen). */
+    if (ruta === "/api/ajustes") {
+      if (m === "GET") return json({ ...repo.ajustes(), examen: infoExamen() });
+      if (m === "PUT") {
+        const { fecha_examen: fecha } = validarAjustes(await cuerpoJson(req));
+        repo.guardarAjuste("fecha_examen", fecha);
+        return json({ fecha_examen: fecha, examen: infoExamen() });
+      }
+    }
+
+    /* Carga del día (cupo de nuevas y repasos pendientes); el cliente la muestra y la usa para limitar. */
+    if (ruta === "/api/carga" && m === "GET") return json(repo.cargaDiaria(fechaHoy()));
+
+    /* Registro de las respuestas del test (el simulacro escribe las suyas al guardarse). */
+    if (ruta === "/api/respuestas" && m === "POST") {
+      const cuerpo = await cuerpoJson(req);
+      const lista = validarRespuestas(cuerpo && Array.isArray(cuerpo.respuestas) ? cuerpo.respuestas : cuerpo);
+      return json({ registradas: repo.registrarRespuestas(lista, fechaHoy()) }, 201);
     }
 
     if (ruta === "/api/progreso") {
@@ -124,7 +157,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
         if (Number.isNaN(limite)) throw new ErrorApi(400, "Parámetros no válidos.");
         return json(repo.listarSimulacros(limite));
       }
-      if (m === "POST") return json(repo.crearSimulacro(validarSimulacro(await cuerpoJson(req))), 201);
+      if (m === "POST") return json(repo.crearSimulacro(validarSimulacro(await cuerpoJson(req)), fechaHoy()), 201);
     }
 
     const msim = ruta.match(/^\/api\/simulacros\/(\d+)$/);
@@ -196,7 +229,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
       }
       if (ruta.startsWith("/api/")) return await api(req, url, ruta);
       if (req.method === "GET" || req.method === "HEAD") {
-        if (ruta === "/") return pagina(paginaHome({ temas: estadisticas() }));
+        if (ruta === "/") return pagina(paginaHome({ temas: estadisticas(), carga: repo.cargaDiaria(fechaHoy()), examen: infoExamen() }));
         if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
         if (ruta === "/temario") return pagina(paginaTemario());
         if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
@@ -208,13 +241,17 @@ export function crearApp(repo, { auth = null, ahora = () => new Date() } = {}) {
             prevision: repo.previsionRepasos(hoy, 7),
             falladas: repo.preguntasMasFalladas(20),
             actividad: repo.actividadReciente(sumarDias(hoy, -13)),
+            racha: repo.rachaDias(hoy),
+            semanas: repo.precisionSemanal(hoy, 8),
+            tiempo: repo.tiempoMedio(),
             simulacros: repo.listarSimulacros(5),
             totalSimulacros: repo.contarSimulacros(),
             temario: repo.temario(),
             hoy,
+            examen: infoExamen(),
           }));
         }
-        if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas()));
+        if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas(), repo.cargaDiaria(fechaHoy())));
         return await estatico(ruta);
       }
       return new Response("Método no permitido", { status: 405 });

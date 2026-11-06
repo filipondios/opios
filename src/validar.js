@@ -153,7 +153,41 @@ export function validarSimulacro(b) {
   });
   if (new Set(respuestas.map((r) => r.id)).size !== respuestas.length)
     throw mal("Hay preguntas repetidas en el simulacro.");
-  return { temas: [...new Set(temas)], segundos, penalizacion, respuestas };
+  const clave = b.clave_idempotencia;
+  if (clave != null && (typeof clave !== "string" || !/^[A-Za-z0-9-]{8,100}$/.test(clave)))
+    throw mal("La clave de idempotencia no es válida.");
+  return { temas: [...new Set(temas)], segundos, penalizacion, respuestas, clave_idempotencia: clave ?? null };
+}
+
+/** Valida el cuerpo de ajustes: { fecha_examen: "AAAA-MM-DD" | "" }. */
+export function validarAjustes(b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) throw mal("El cuerpo debe ser un objeto.");
+  const fecha = b.fecha_examen;
+  if (fecha != null && String(fecha).trim() !== "") {
+    const d = typeof fecha === "string" ? new Date(fecha + "T00:00:00Z") : null;
+    const valida = typeof fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(fecha)
+      && d && !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === fecha;
+    if (!valida) throw mal("La fecha de examen no es válida (usa AAAA-MM-DD).");
+    return { fecha_examen: fecha };
+  }
+  return { fecha_examen: null };
+}
+
+/** Valida un lote de respuestas del test: [{ id, acierto, ms? }]. */export function validarRespuestas(b) {
+  if (!Array.isArray(b) || b.length === 0 || b.length > 5000)
+    throw mal("Se esperaba una lista de respuestas.");
+  return b.map((e) => {
+    if (!e || typeof e !== "object" || Array.isArray(e)) throw mal("Respuesta no válida.");
+    const id = Number(e.id);
+    if (!Number.isInteger(id) || id <= 0) throw mal("Identificador de pregunta no válido.");
+    const r = e.acierto;
+    const acierto = r === true || r === 1 ? 1 : r === false || r === 0 ? 0 : null;
+    if (acierto === null) throw mal("El resultado de la respuesta no es válido.");
+    const ms = e.ms == null || e.ms === "" ? null : Number(e.ms);
+    if (ms !== null && (!Number.isInteger(ms) || ms < 0 || ms > 3_600_000))
+      throw mal("El tiempo de respuesta no es válido.");
+    return { id, acierto, ms };
+  });
 }
 
 /** Valida una entrada de progreso enviada por el test. */

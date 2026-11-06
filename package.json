@@ -8,6 +8,7 @@
     "dev": "bun --watch server.js",
     "seed": "bun scripts/seed.js",
     "export": "bun scripts/export.js",
+    "backup": "bun scripts/backup.js",
     "test": "bun test"
   }
 }

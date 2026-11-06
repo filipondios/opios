@@ -8,6 +8,11 @@
 .chip-name{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sum{font-size:14px;color:var(--ink-2)}
 .sum b{color:var(--ink);font-weight:600;font-family:var(--f-mono)}
+.cupo{font:500 12px var(--f-mono);color:var(--ink-2)}
+.cupo:empty{display:none}
+.examen-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.examen-row .field{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ink-2)}
+.examen-row input{font:500 13px var(--f-mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
 .chip{
   all:unset; box-sizing:border-box; cursor:pointer; background:var(--card); border:1px solid var(--line);

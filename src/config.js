@@ -11,6 +11,8 @@ export const HOST = process.env.HOST ?? "127.0.0.1";
 export const AUTH = process.env.AUTH_USER && process.env.AUTH_PASS
   ? { usuario: process.env.AUTH_USER, clave: process.env.AUTH_PASS } : null;
 export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
+// Zona horaria para calcular «hoy» en el servidor (p. ej. Europe/Madrid). Vacío = zona del sistema.
+export const APP_TZ = process.env.APP_TZ ?? null;
 
 /* Reglas compartidas */
 export const MIN_OPC = 2;
@@ -21,3 +23,8 @@ export const MAX_BLOQUE = 120;
 export const MAX_TEMA_NOMBRE = 500;
 /* Longitud máxima de las etiquetas de los desplegables (se recortan con "..."). */
 export const MAX_ETIQUETA = 60;
+
+/* Límites diarios (Fase 3). El cupo lo calcula el servidor a partir de `respuestas`. */
+export const CUPO_NUEVAS = 15;   // preguntas nuevas que se introducen como máximo cada día
+export const FRENO_ATRASO = 2;   // si hay más de FRENO_ATRASO × CUPO_NUEVAS repasos atrasados, no entran nuevas
+export const FACTOR_EXAMEN = 0.15; // tope de intervalo = FACTOR_EXAMEN × días hasta el examen (Fase 3.6)

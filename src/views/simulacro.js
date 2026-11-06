@@ -35,6 +35,15 @@ export function paginaSimulacro({ temario }) {
       <a class="btn" href="/">Volver al test</a>
     </div>
 
+    <section id="reanudar" class="card stack" hidden>
+      <h2>Simulacro en curso</h2>
+      <p class="hint" id="reanudar-info"></p>
+      <div class="row">
+        <button class="btn primary" type="button" id="btn-reanudar">Reanudar simulacro</button>
+        <button class="btn" type="button" id="btn-descartar">Descartar</button>
+      </div>
+    </section>
+
     ${hayTemas ? html`
     <section class="card stack">
       <div class="row">
@@ -55,7 +64,7 @@ export function paginaSimulacro({ temario }) {
           <select id="cfg-pen">
             <option value="0">Sin penalización</option>
             <option value="0.25">1/4 por fallo</option>
-            <option value="0.3333" selected>1/3 por fallo</option>
+            <option value="0.3333333333333333" selected>1/3 por fallo</option>
             <option value="0.5">1/2 por fallo</option>
           </select>
         </label>
