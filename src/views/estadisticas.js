@@ -2,6 +2,7 @@ import { html } from "./html.js";
 import { layout } from "./layout.js";
 import { sumarDias } from "../fechas.js";
 import { etiquetaTema } from "../etiquetas.js";
+import { textoExamen } from "./home.js";
 
 const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
 const pct = (n, d) => (d > 0 ? Math.round((n / d) * 100) + " %" : "—");
@@ -89,17 +90,55 @@ function previsionRepasos(prevision, hoy) {
 }
 
 function actividad(actividad, hoy) {
-  const porDia = new Map(actividad.map((a) => [a.dia, a.n]));
+  const porDia = new Map(actividad.map((a) => [a.dia, a]));
   const dias = Array.from({ length: 14 }, (_, i) => {
     const fecha = sumarDias(hoy, i - 13);
-    return { fecha, n: porDia.get(fecha) ?? 0 };
+    const a = porDia.get(fecha);
+    return { fecha, n: a?.n ?? 0, aciertos: a?.aciertos ?? 0, fallos: a?.fallos ?? 0 };
   });
   const max = Math.max(1, ...dias.map((d) => d.n));
+  const alto = (n) => (n ? Math.max(2, Math.round((n / max) * 100)) : 0);
   return html`
-    <div class="actividad" role="img" aria-label="Preguntas actualizadas por día en los últimos 14 días">
-      ${dias.map((d) => html`<span class="actividad-dia" title="${fechaCorta(d.fecha)}: ${fmt(d.n)}"><i class="actividad-barra" style="height:${Math.max(2, Math.round((d.n / max) * 100))}%"></i></span>`)}
+    <div class="actividad" role="img" aria-label="Respuestas por día en los últimos 14 días (aciertos y fallos)">
+      ${dias.map((d) => html`<span class="actividad-dia" title="${fechaCorta(d.fecha)}: ${fmt(d.n)} respuestas · ${fmt(d.aciertos)} aciertos, ${fmt(d.fallos)} fallos">
+        <i class="actividad-barra ok" style="height:${alto(d.aciertos)}%"></i><i class="actividad-barra bad" style="height:${alto(d.fallos)}%"></i>
+      </span>`)}
     </div>
-    <p class="hint">Del ${fechaCorta(dias[0].fecha)} al ${fechaCorta(dias[dias.length - 1].fecha)} · preguntas actualizadas por día</p>`;
+    <p class="hint">Del ${fechaCorta(dias[0].fecha)} al ${fechaCorta(dias[dias.length - 1].fecha)} · respuestas por día (arriba aciertos, abajo fallos)</p>`;
+}
+
+/** Precisión agrupada por semana natural (lunes a domingo). */
+function tablaSemanas(semanas) {
+  if (!semanas.length) return html`<p class="empty">Todavía no hay respuestas registradas. Haz un test para empezar.</p>`;
+  return html`<div class="tabla-wrap">
+    <table class="tabla">
+      <thead><tr><th>Semana</th><th>Respuestas</th><th>Aciertos</th><th>Fallos</th><th>Precisión</th></tr></thead>
+      <tbody>${semanas.map((s) => html`
+        <tr>
+          <td>${fechaCorta(s.desde)} – ${fechaCorta(s.hasta)}</td>
+          <td>${fmt(s.aciertos + s.fallos)}</td>
+          <td>${fmt(s.aciertos)}</td>
+          <td>${fmt(s.fallos)}</td>
+          <td><b>${precision(s.aciertos, s.fallos)}</b></td>
+        </tr>`)}</tbody>
+    </table>
+  </div>`;
+}
+
+/** Evolución de la nota de los simulacros (aciertos / total × 10). */
+function evolucionSimulacros(simulacros) {
+  if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro.</p>`;
+  const serie = [...simulacros].reverse().map((s) => ({
+    fecha: s.fecha, nota: (s.aciertos / s.total) * 10, puntos: Number(s.puntos),
+  }));
+  const max = Math.max(1, ...serie.map((x) => x.nota));
+  return html`
+    <div class="evolucion" role="img" aria-label="Evolución de la nota de los últimos simulacros">
+      ${serie.map((x) => html`<span class="evol-dia" title="${fechaCorta(x.fecha)}: nota ${x.nota.toFixed(2)}/10 · ${x.puntos.toFixed(2)} puntos">
+        <i class="evol-barra" style="height:${Math.max(2, Math.round((x.nota / max) * 100))}%"></i><b>${x.nota.toFixed(1)}</b>
+      </span>`)}
+    </div>
+    <p class="hint">Nota sobre 10 de cada simulacro, del más antiguo al más reciente. La penalización se aplica en «Puntos».</p>`;
 }
 
 function tablaFalladas(falladas) {
@@ -154,7 +193,7 @@ function tablaSimulacros(simulacros, temario) {
   </div>`;
 }
 
-export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, simulacros, totalSimulacros, temario = [], hoy }) {
+export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, racha = 0, semanas = [], tiempo = { ms: null, n: 0 }, simulacros, totalSimulacros, temario = [], hoy, examen = null }) {
   const vistas = global.total - global.nuevas;
   const sinProgreso = global.nuevas === global.total;
   const aviso = !sinProgreso
@@ -167,12 +206,13 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
     <div class="page-head">
       <div>
         <h1>Estadísticas</h1>
-        <p class="lede">Dónde estás fuerte, qué te cuesta y cuánto trabajo tienes por delante. Los datos salen de tu progreso y de tus simulacros.</p>
+        <p class="lede">Dónde estás fuerte, qué te cuesta y cuánto trabajo tienes por delante. Los datos salen de tus respuestas y de tus simulacros.</p>
       </div>
       <div class="row"><a class="btn primary" href="/">Hacer test</a><a class="btn" href="/simulacro">Simulacro</a></div>
     </div>
 
     ${aviso ? html`<div class="note">${aviso}</div>` : ""}
+    ${examen && examen.fecha ? html`<div class="note">${textoExamen(examen)}</div>` : ""}
 
     <section class="kpis" aria-label="Resumen">
       ${kpi(fmt(global.total), "preguntas")}
@@ -180,6 +220,8 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
       ${kpi(fmt(global.dominadas), "dominadas")}
       ${kpi(precision(global.aciertos, global.fallos), "precisión")}
       ${kpi(fmt(global.repaso), "repasos hoy")}
+      ${kpi(fmt(racha), racha === 1 ? "día de racha" : "días de racha")}
+      ${kpi(tiempo.ms != null ? (tiempo.ms / 1000).toFixed(1) + " s" : "—", "por pregunta")}
       ${kpi(fmt(totalSimulacros), "simulacros")}
     </section>
 
@@ -194,14 +236,24 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
     </section>
 
     <section class="stack">
+      <h2>Precisión por semana</h2>
+      ${tablaSemanas(semanas)}
+    </section>
+
+    <section class="stack">
       <h2>Preguntas que más fallas</h2>
-      <p class="hint">Suma los fallos de los tests y de los simulacros. La caja solo existe en las preguntas practicadas en test; «—» indica que solo han salido en simulacros.</p>
+      <p class="hint">Suma los fallos de los tests y de los simulacros. La caja muestra el estado de repaso en que ha quedado cada pregunta.</p>
       ${tablaFalladas(falladas)}
     </section>
 
     <section class="stack">
       <h2>Actividad</h2>
       <div class="card">${actividad(act, hoy)}</div>
+    </section>
+
+    <section class="stack">
+      <h2>Evolución de los simulacros</h2>
+      <div class="card">${evolucionSimulacros(simulacros)}</div>
     </section>
 
     <section class="stack">

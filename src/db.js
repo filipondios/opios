@@ -1,9 +1,9 @@
 import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { DB_PATH } from "./config.js";
+import { DB_PATH, CUPO_NUEVAS, FRENO_ATRASO } from "./config.js";
 import { ErrorApi } from "./errores.js";
-import { sumarDias } from "./fechas.js";
+import { hoyIso, sumarDias } from "./fechas.js";
 import { claveDe } from "./validar.js";
 
 const MIGRACIONES = [
@@ -94,6 +94,68 @@ const MIGRACIONES = [
   /* v5 */ `
   ALTER TABLE bloques ADD COLUMN gestionado INTEGER NOT NULL DEFAULT 0 CHECK (gestionado IN (0, 1));
   `,
+
+  /* v6: normaliza `temas`: bloque obligatorio e id AUTOINCREMENT (el número deja de ser el id). */
+  /* v6 */ `
+  INSERT INTO bloques (numero, nombre, orden)
+    SELECT 1, 'Bloque 1', 0 WHERE NOT EXISTS (SELECT 1 FROM bloques);
+  UPDATE temas SET bloque_id = (SELECT id FROM bloques ORDER BY orden, id LIMIT 1) WHERE bloque_id IS NULL;
+  UPDATE temas SET numero = id WHERE numero IS NULL;
+
+  /* Si hubiera números repetidos dentro de un bloque, los duplicados pasan al final. */
+  WITH pendientes AS (
+    SELECT id, bloque_id,
+           ROW_NUMBER() OVER (PARTITION BY bloque_id, numero ORDER BY id) AS dup,
+           ROW_NUMBER() OVER (PARTITION BY bloque_id ORDER BY id) AS orden
+    FROM temas
+  )
+  UPDATE temas SET numero = (
+    SELECT COALESCE(MAX(t2.numero), 0) FROM temas t2 WHERE t2.bloque_id = temas.bloque_id
+  ) + (SELECT orden FROM pendientes p WHERE p.id = temas.id)
+  WHERE id IN (SELECT id FROM pendientes WHERE dup > 1);
+
+  CREATE TABLE temas_nuevo (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    bloque_id INTEGER NOT NULL REFERENCES bloques(id) ON UPDATE CASCADE,
+    numero    INTEGER NOT NULL CHECK (numero >= 0),
+    nombre    TEXT,
+    UNIQUE (bloque_id, numero)
+  );
+  INSERT INTO temas_nuevo (id, bloque_id, numero, nombre)
+    SELECT id, bloque_id, numero, nombre FROM temas;
+  DROP TABLE temas;
+  ALTER TABLE temas_nuevo RENAME TO temas;
+  CREATE INDEX idx_temas_bloque ON temas(bloque_id);
+  `,
+
+  /* v7: clave de idempotencia para no duplicar un simulacro si el cliente reintenta el POST. */
+  /* v7 */ `
+  ALTER TABLE simulacros ADD COLUMN clave_idempotencia TEXT;
+  CREATE UNIQUE INDEX ux_simulacros_clave
+    ON simulacros(clave_idempotencia) WHERE clave_idempotencia IS NOT NULL;
+  `,
+
+  /* v8: una fila por respuesta (test o simulacro) para estadísticas y cupos diarios. */
+  /* v8 */ `
+  CREATE TABLE respuestas (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    pregunta_id INTEGER NOT NULL REFERENCES preguntas(id) ON DELETE CASCADE,
+    fecha       TEXT    NOT NULL CHECK (fecha GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
+    acierto     INTEGER NOT NULL CHECK (acierto IN (0, 1)),
+    origen      TEXT    NOT NULL CHECK (origen IN ('test', 'simulacro')),
+    ms          INTEGER CHECK (ms IS NULL OR (ms BETWEEN 0 AND 3600000))
+  );
+  CREATE INDEX idx_respuestas_fecha ON respuestas(fecha);
+  CREATE INDEX idx_respuestas_pregunta ON respuestas(pregunta_id);
+  `,
+
+  /* v9: ajustes simples de la instancia (por ahora, la fecha de examen). */
+  /* v9 */ `
+  CREATE TABLE ajustes (
+    clave TEXT PRIMARY KEY,
+    valor TEXT
+  );
+  `,
 ];
 
 /** Convierte una fila de `simulacros` en el objeto que consume la app. */
@@ -106,11 +168,20 @@ function normalizarSimulacro(fila) {
 
 function migrar(db) {
   const actual = db.query("PRAGMA user_version").get().user_version;
-  for (let v = actual; v < MIGRACIONES.length; v++) {
-    db.transaction(() => {
-      db.run(MIGRACIONES[v]);
-      db.run(`PRAGMA user_version = ${v + 1}`);
-    })();
+  if (actual >= MIGRACIONES.length) return;
+  /* Las reconstrucciones de tablas (v6) necesitan desactivar las FK fuera de la transacción. */
+  db.run("PRAGMA foreign_keys = OFF");
+  try {
+    for (let v = actual; v < MIGRACIONES.length; v++) {
+      db.transaction(() => {
+        db.run(MIGRACIONES[v]);
+        const roto = db.query("PRAGMA foreign_key_check").all();
+        if (roto.length) throw new Error(`La migración v${v + 1} deja referencias rotas.`);
+        db.run(`PRAGMA user_version = ${v + 1}`);
+      })();
+    }
+  } finally {
+    db.run("PRAGMA foreign_keys = ON");
   }
 }
 
@@ -127,10 +198,10 @@ export function abrirDb(ruta = DB_PATH) {
   const q = {
     temaPorId: db.query("SELECT id FROM temas WHERE id = ?"),
     temaPorBloqueNumero: db.query("SELECT id FROM temas WHERE bloque_id = ? AND numero = ?"),
-    maxNumeroTema: db.query("SELECT COALESCE(MAX(numero), -1) AS n FROM temas WHERE bloque_id = ?"),
-    insertarTema: db.query("INSERT INTO temas (id, bloque_id, numero, nombre) VALUES (?, ?, ?, ?)"),
+    insertarTema: db.query("INSERT INTO temas (bloque_id, numero, nombre) VALUES (?, ?, ?)"),
     porClave: db.query("SELECT id, tema_id AS tema FROM preguntas WHERE clave = ?"),
-    insertarPregunta: db.query("INSERT INTO preguntas (tema_id, enunciado, clave, explicacion) VALUES (?, ?, ?, ?)"),    actualizarPregunta: db.query(
+    insertarPregunta: db.query("INSERT INTO preguntas (tema_id, enunciado, clave, explicacion) VALUES (?, ?, ?, ?)"),
+    actualizarPregunta: db.query(
       "UPDATE preguntas SET tema_id = ?, enunciado = ?, clave = ?, explicacion = ?, modificada = datetime('now') WHERE id = ?"),
     insertarOpcion: db.query("INSERT INTO opciones (pregunta_id, posicion, texto, es_correcta) VALUES (?, ?, ?, ?)"),
     borrarOpciones: db.query("DELETE FROM opciones WHERE pregunta_id = ?"),
@@ -142,7 +213,22 @@ export function abrirDb(ruta = DB_PATH) {
       ON CONFLICT (pregunta_id) DO UPDATE SET
         caja = excluded.caja, vence = excluded.vence, aciertos = excluded.aciertos,
         fallos = excluded.fallos, actualizado = datetime('now')`),
+    /* Un fallo de simulacro baja 2 cajas (mínimo 1) y deja la pregunta vencida hoy. */
+    falloSimulacro: db.query(`
+      INSERT INTO progreso (pregunta_id, caja, vence, aciertos, fallos)
+      VALUES (?1, 1, ?2, 0, 1)
+      ON CONFLICT (pregunta_id) DO UPDATE SET
+        caja = MAX(1, caja - 2), vence = excluded.vence,
+        fallos = fallos + 1, actualizado = datetime('now')`),
+    /* Un acierto de simulacro solo suma al contador; no mueve caja ni fecha. */
+    aciertoSimulacro: db.query(`
+      UPDATE progreso SET aciertos = aciertos + 1, actualizado = datetime('now')
+      WHERE pregunta_id = ?`),
     borrarProgreso: db.query("DELETE FROM progreso"),
+    /* Registra una respuesta solo si la pregunta existe (si no, 0 filas). */
+    insertarRespuesta: db.query(`
+      INSERT INTO respuestas (pregunta_id, fecha, acierto, origen, ms)
+      SELECT ?1, ?2, ?3, ?4, ?5 WHERE EXISTS (SELECT 1 FROM preguntas WHERE id = ?1)`),
   };
 
   /* Une filas de preguntas con sus opciones y los datos de su tema/bloque. */
@@ -199,18 +285,12 @@ export function abrirDb(ruta = DB_PATH) {
     return Number(db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)").run(numero, nombre || `Bloque ${numero}`, orden).lastInsertRowid);
   }
 
-  /* Número libre dentro de un bloque: el preferido si está libre, si no el siguiente. */
-  function numeroLibre(bloque, preferido) {
-    if (!q.temaPorBloqueNumero.get(bloque, preferido)) return preferido;
-    return q.maxNumeroTema.get(bloque).n + 1;
-  }
-
-  /* Garantiza que existe el tema con ese id (datos antiguos sin bloque). */
-  function asegurarTema(tema) {
-    if (q.temaPorId.get(tema)) return tema;
+  /* Resuelve un tema del formato antiguo (sin bloque): su `tema` es el número dentro del bloque por defecto. */
+  function temaLegacy(numero) {
     const bloque = bloquePorDefecto();
-    q.insertarTema.run(tema, bloque, numeroLibre(bloque, tema), null);
-    return tema;
+    const existente = q.temaPorBloqueNumero.get(bloque, numero);
+    if (existente) return existente.id;
+    return Number(q.insertarTema.run(bloque, numero, null).lastInsertRowid);
   }
 
   /* Garantiza que existe el tema `numero` dentro del bloque (por número estable o, si falta, por nombre). */
@@ -218,7 +298,7 @@ export function abrirDb(ruta = DB_PATH) {
     const bloque = bloqueNumero != null ? asegurarBloque(bloqueNumero, bloqueNombre) : bloquePorNombre(bloqueNombre);
     const existente = q.temaPorBloqueNumero.get(bloque, numero);
     if (existente) return existente.id;
-    return Number(q.insertarTema.run(null, bloque, numero, null).lastInsertRowid);
+    return Number(q.insertarTema.run(bloque, numero, null).lastInsertRowid);
   }
 
   /* Inserta o actualiza una pregunta con sus opciones. Debe llamarse dentro de una transacción. */
@@ -230,7 +310,8 @@ export function abrirDb(ruta = DB_PATH) {
     }
     const tema = v.bloque
       ? asegurarTemaEnBloque(v.bloque_numero ?? null, v.bloque, v.tema_numero ?? v.tema)
-      : asegurarTema(v.tema);
+      : q.temaPorId.get(v.tema)?.id;
+    if (!tema) throw new ErrorApi(404, "El tema no existe. Créalo desde Temario.");
     if (id == null) {
       id = Number(q.insertarPregunta.run(tema, v.pregunta, clave, v.explicacion).lastInsertRowid);
     } else {
@@ -319,7 +400,7 @@ export function abrirDb(ruta = DB_PATH) {
       for (const t of info.temas) {
         const existente = q.temaPorBloqueNumero.get(id, t.numero);
         if (existente) db.query("UPDATE temas SET nombre = ? WHERE id = ?").run(t.titulo, existente.id);
-        else q.insertarTema.run(null, id, t.numero, t.titulo);
+        else q.insertarTema.run(id, t.numero, t.titulo);
       }
       return { id, numero, nombre: info.nombre, temas: info.temas.length };
     }),
@@ -372,7 +453,7 @@ export function abrirDb(ruta = DB_PATH) {
       if (!b) throw new ErrorApi(404, "El bloque no existe.");
       if (b.gestionado) throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
       if (q.temaPorBloqueNumero.get(bloque, numero)) throw new ErrorApi(409, `Ya hay un tema ${numero} en ese bloque.`);
-      const id = Number(q.insertarTema.run(null, bloque, numero, nombre || null).lastInsertRowid);
+      const id = Number(q.insertarTema.run(bloque, numero, nombre || null).lastInsertRowid);
       return temaConPreguntas(id);
     }),
 
@@ -418,7 +499,14 @@ export function abrirDb(ruta = DB_PATH) {
     guardarProgreso: db.transaction((entradas) => {
       for (const e of entradas) q.upsertProgreso.run(e.id, e.caja, e.vence, e.aciertos, e.fallos);
     }),
-    reiniciarProgreso: () => { q.borrarProgreso.run(); },
+    reiniciarProgreso: () => { q.borrarProgreso.run(); db.run("DELETE FROM respuestas"); },
+
+    /** Registra un lote de respuestas del test. Devuelve cuántas se han insertado. */
+    registrarRespuestas: db.transaction((entradas, hoy, origen = "test") => {
+      let n = 0;
+      for (const e of entradas) n += q.insertarRespuesta.run(e.id, hoy, e.acierto, origen, e.ms ?? null).changes;
+      return n;
+    }),
 
     /** Totales globales de progreso, para la cabecera de la página de estadísticas. */
     estadisticasGlobales(hoy, cajaDominada) {
@@ -441,47 +529,112 @@ export function abrirDb(ruta = DB_PATH) {
         WHERE vence <= ? GROUP BY vence ORDER BY vence`).all(hasta);
     },
 
-    /** Preguntas con más fallos, sumando los tests y los simulacros. */
+    /** Preguntas con más fallos. Los fallos de test y de simulacro viven todos en `progreso`. */
     preguntasMasFalladas(limite = 20) {
       return db.query(`
-        WITH sim AS (
-          SELECT CAST(json_extract(j.value, '$.id') AS INTEGER) AS pregunta_id,
-                 SUM(CASE WHEN json_extract(j.value, '$.elegida') IS NOT NULL
-                           AND json_extract(j.value, '$.elegida') <> json_extract(j.value, '$.correcta')
-                      THEN 1 ELSE 0 END) AS fallos,
-                 SUM(CASE WHEN json_extract(j.value, '$.elegida') = json_extract(j.value, '$.correcta')
-                      THEN 1 ELSE 0 END) AS aciertos
-          FROM simulacros s, json_each(s.detalle) j
-          GROUP BY pregunta_id
-        )
         SELECT p.id, p.enunciado, t.numero AS tema_numero, t.nombre AS tema_nombre,
                b.nombre AS bloque_nombre,
-               COALESCE(pr.fallos, 0) + COALESCE(sim.fallos, 0)   AS fallos,
-               COALESCE(pr.aciertos, 0) + COALESCE(sim.aciertos, 0) AS aciertos,
+               COALESCE(pr.fallos, 0)   AS fallos,
+               COALESCE(pr.aciertos, 0) AS aciertos,
                pr.caja
         FROM preguntas p
         JOIN temas t ON t.id = p.tema_id
         LEFT JOIN bloques b ON b.id = t.bloque_id
         LEFT JOIN progreso pr ON pr.pregunta_id = p.id
-        LEFT JOIN sim ON sim.pregunta_id = p.id
-        WHERE COALESCE(pr.fallos, 0) + COALESCE(sim.fallos, 0) > 0
+        WHERE COALESCE(pr.fallos, 0) > 0
         ORDER BY fallos DESC, aciertos ASC, p.id
         LIMIT ?`).all(limite);
     },
 
-    /** Preguntas actualizadas por día desde `desde` (AAAA-MM-DD). */
+    /** Respuestas por día desde `desde` (AAAA-MM-DD), con el desglose acierto/fallo. */
     actividadReciente(desde) {
       return db.query(`
-        SELECT date(actualizado, 'localtime') AS dia, COUNT(*) AS n
-        FROM progreso
-        WHERE date(actualizado, 'localtime') >= ?
-        GROUP BY dia ORDER BY dia`).all(desde);
+        SELECT fecha AS dia, COUNT(*) AS n,
+               COALESCE(SUM(acierto = 1), 0) AS aciertos,
+               COALESCE(SUM(acierto = 0), 0) AS fallos
+        FROM respuestas
+        WHERE fecha >= ?
+        GROUP BY fecha ORDER BY fecha`).all(desde);
     },
+
+    /**
+     * Carga del día para los límites de Fase 3:
+     * `nuevasHoy` cuenta las preguntas cuya primera respuesta registrada es de hoy y vino de un test
+     * (los simulacros no consumen cupo). `bloqueadoPorAtraso` frena las nuevas si hay demasiados repasos atrasados.
+     */
+    cargaDiaria(hoy) {
+      const nuevasHoy = db.query(`
+        SELECT COUNT(*) AS n FROM respuestas r
+        WHERE r.origen = 'test' AND r.fecha = ?
+          AND NOT EXISTS (SELECT 1 FROM respuestas r2 WHERE r2.pregunta_id = r.pregunta_id AND r2.id < r.id)`).get(hoy).n;
+      const repasosPendientes = db.query("SELECT COUNT(*) AS n FROM progreso WHERE vence <= ?").get(hoy).n;
+      const repasosAtrasados = db.query("SELECT COUNT(*) AS n FROM progreso WHERE vence < ?").get(hoy).n;
+      return {
+        nuevasHoy,
+        cupoNuevas: CUPO_NUEVAS,
+        repasosPendientes,
+        repasosAtrasados,
+        bloqueadoPorAtraso: repasosAtrasados > FRENO_ATRASO * CUPO_NUEVAS,
+      };
+    },
+
+    /** Días consecutivos con al menos una respuesta, terminando hoy (o ayer si hoy aún no hay actividad). */
+    rachaDias(hoy) {
+      const fechas = new Set(db.query("SELECT DISTINCT fecha FROM respuestas").all().map((r) => r.fecha));
+      let dia = fechas.has(hoy) ? hoy : sumarDias(hoy, -1);
+      let racha = 0;
+      while (fechas.has(dia)) { racha++; dia = sumarDias(dia, -1); }
+      return racha;
+    },
+
+    /** Precisión agrupada por semanas (de lunes a domingo) de las últimas `semanas`. */
+    precisionSemanal(hoy, semanas = 8) {
+      const desde = sumarDias(hoy, -(Math.max(1, semanas) * 7 - 1));
+      const filas = db.query(
+        `SELECT fecha, COUNT(*) AS n, COALESCE(SUM(acierto), 0) AS aciertos
+         FROM respuestas WHERE fecha >= ? GROUP BY fecha`).all(desde);
+      const inicioSemana = (fecha) => sumarDias(fecha, -((new Date(fecha + "T12:00:00").getDay() + 6) % 7));
+      const mapa = new Map();
+      for (const f of filas) {
+        const s = inicioSemana(f.fecha);
+        const g = mapa.get(s) ?? { desde: s, hasta: sumarDias(s, 6), aciertos: 0, fallos: 0 };
+        g.aciertos += f.aciertos; g.fallos += f.n - f.aciertos;
+        mapa.set(s, g);
+      }
+      return [...mapa.values()].sort((a, b) => (a.desde < b.desde ? -1 : a.desde > b.desde ? 1 : 0));
+    },
+
+    /** Tiempo medio de respuesta en ms (solo tests, que sí miden `ms`). */
+    tiempoMedio() {
+      const r = db.query("SELECT AVG(ms) AS ms, COUNT(*) AS n FROM respuestas WHERE ms IS NOT NULL").get();
+      return { ms: r.n ? Math.round(r.ms) : null, n: r.n };
+    },
+
+    /** Ajustes de la instancia como objeto clave/valor (por ahora, `fecha_examen`). */
+    ajustes() {
+      const filas = db.query("SELECT clave, valor FROM ajustes").all();
+      return Object.fromEntries(filas.map((f) => [f.clave, f.valor]));
+    },
+
+    /** Guarda (o borra, con valor vacío) un ajuste. */
+    guardarAjuste: db.transaction((clave, valor) => {
+      if (valor == null || valor === "") db.query("DELETE FROM ajustes WHERE clave = ?").run(clave);
+      else db.query(`INSERT INTO ajustes (clave, valor) VALUES (?, ?)
+                     ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor`).run(clave, valor);
+    }),
 
     contarSimulacros: () => db.query("SELECT COUNT(*) AS n FROM simulacros").get().n,
 
-    /** Guarda un simulacro. Los aciertos se recalculan aquí desde las opciones correctas. */
-    crearSimulacro: db.transaction(({ temas, segundos, penalizacion, respuestas }) => {
+    /**
+     * Guarda un simulacro. Los aciertos se recalculan aquí desde las opciones correctas.
+     * Los fallos entran en `progreso` (caja -2, vence hoy); los aciertos solo suman contador.
+     * Con `clave_idempotencia`, repetir el POST devuelve el simulacro ya guardado.
+     */
+    crearSimulacro: db.transaction(({ temas, segundos, penalizacion, respuestas, clave_idempotencia = null }, hoy = hoyIso()) => {
+      if (clave_idempotencia) {
+        const existente = db.query("SELECT * FROM simulacros WHERE clave_idempotencia = ?").get(clave_idempotencia);
+        if (existente) return normalizarSimulacro(existente);
+      }
       const ids = respuestas.map((r) => r.id);
       const filas = db.query(
         `SELECT pregunta_id, posicion FROM opciones
@@ -494,16 +647,24 @@ export function abrirDb(ruta = DB_PATH) {
         if (correcta == null) throw new ErrorApi(400, `La pregunta ${r.id} no existe.`);
         const blanco = r.elegida == null || r.elegida < 0;
         if (blanco) enBlanco++;
-        else if (r.elegida === correcta) aciertos++;
-        else fallos++;
+        else if (r.elegida === correcta) {
+          aciertos++;
+          q.aciertoSimulacro.run(r.id);
+          q.insertarRespuesta.run(r.id, hoy, 1, "simulacro", null);
+        } else {
+          fallos++;
+          q.falloSimulacro.run(r.id, hoy);
+          q.insertarRespuesta.run(r.id, hoy, 0, "simulacro", null);
+        }
         detalle.push({ id: r.id, elegida: blanco ? null : r.elegida, correcta });
       }
       const total = respuestas.length;
       const puntos = Math.round((aciertos - fallos * penalizacion) * 100) / 100;
       const info = db.query(`
-        INSERT INTO simulacros (temas, total, aciertos, fallos, en_blanco, penalizacion, puntos, segundos, detalle)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-          JSON.stringify(temas), total, aciertos, fallos, enBlanco, penalizacion, puntos, segundos, JSON.stringify(detalle));
+        INSERT INTO simulacros (temas, total, aciertos, fallos, en_blanco, penalizacion, puntos, segundos, detalle, clave_idempotencia)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+          JSON.stringify(temas), total, aciertos, fallos, enBlanco, penalizacion, puntos, segundos,
+          JSON.stringify(detalle), clave_idempotencia);
       return normalizarSimulacro(db.query("SELECT * FROM simulacros WHERE id = ?").get(Number(info.lastInsertRowid)));
     }),
 
@@ -564,8 +725,10 @@ export function abrirDb(ruta = DB_PATH) {
     /** Importa preguntas ya validadas; las que ya existen (mismo enunciado) se omiten. */
     importar: db.transaction((lista) => {
       let nuevas = 0, duplicadas = 0;
-      for (const v of lista) {
-        if (q.porClave.get(claveDe(v.pregunta))) { duplicadas++; continue; }
+      for (const original of lista) {
+        if (q.porClave.get(claveDe(original.pregunta))) { duplicadas++; continue; }
+        /* Formato antiguo sin bloque: `tema` es el número dentro del bloque por defecto. */
+        const v = original.bloque ? original : { ...original, tema: temaLegacy(original.tema) };
         guardar(null, v); nuevas++;
       }
       return { nuevas, duplicadas };

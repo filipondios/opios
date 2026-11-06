@@ -47,6 +47,64 @@ let preguntas = [], respuestas = [], cur = 0, cursor = 0;
 let temas = [], penalizacion = 0, minutos = 60;
 let inicio = 0, fin = 0, timer = null, finalizado = false;
 
+/* ---------- Persistencia (localStorage) ---------- */
+const CLAVE_CURSO = "opios.simulacro.curso";
+const CLAVE_PENDIENTE = "opios.simulacro.pendiente";
+const leer = (clave) => { try { return JSON.parse(localStorage.getItem(clave) || "null"); } catch { return null; } };
+const escribir = (clave, valor) => { try { localStorage.setItem(clave, JSON.stringify(valor)); } catch {} };
+const borrar = (clave) => { try { localStorage.removeItem(clave); } catch {} };
+const claveNueva = () => (globalThis.crypto?.randomUUID
+  ? globalThis.crypto.randomUUID()
+  : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2));
+
+function guardarCurso(){
+  if (pantalla !== "exam" || finalizado) return;
+  escribir(CLAVE_CURSO, {
+    version: 1, preguntas, respuestas, temas, penalizacion, minutos, cur, inicio, fin,
+  });
+}
+
+function mostrarReanudar(){
+  const curso = leer(CLAVE_CURSO);
+  const caja = $("#reanudar");
+  if (!caja) return;
+  const valido = curso && Array.isArray(curso.preguntas) && curso.preguntas.length
+    && Array.isArray(curso.respuestas);
+  caja.hidden = !valido;
+  if (!valido) return;
+  const hechas = curso.respuestas.filter((r) => r != null).length;
+  const restante = Number.isFinite(curso.fin)
+    ? Math.max(0, Math.round((curso.fin - Date.now()) / 1000))
+    : Math.max(0, Number(curso.minutos) || 0) * 60;
+  $("#reanudar-info").textContent = `${curso.preguntas.length} preguntas · ${hechas} respondidas · `
+    + (restante > 0 ? `quedan ${mmss(restante)}` : "tiempo agotado (se corregirá al reanudar)");
+}
+
+function reanudar(){
+  const curso = leer(CLAVE_CURSO);
+  if (!curso || !Array.isArray(curso.preguntas) || !curso.preguntas.length) return;
+  preguntas = curso.preguntas; respuestas = curso.respuestas;
+  temas = curso.temas; penalizacion = curso.penalizacion; minutos = curso.minutos;
+  cur = curso.cur ?? 0;
+  inicio = Number.isFinite(curso.inicio) ? curso.inicio : Date.now();
+  fin = Number.isFinite(curso.fin) ? curso.fin : Date.now() + minutos * 60_000;
+  finalizado = false; pantalla = "exam";
+  $("#screen-setup").hidden = true; $("#screen-results").hidden = true; $("#screen-exam").hidden = false;
+  pintarPregunta();
+  clearInterval(timer);
+  timer = setInterval(actualizarReloj, 1000);
+  actualizarReloj();
+  setStatus("ok", "Simulacro reanudado");
+  window.scrollTo(0, 0);
+}
+
+function descartar(){
+  if (!window.confirm("¿Descartar el simulacro en curso? Se perderán las respuestas.")) return;
+  borrar(CLAVE_CURSO);
+  const caja = $("#reanudar");
+  if (caja) caja.hidden = true;
+}
+
 /* ---------- Configuración ---------- */
 const checks = () => [...document.querySelectorAll('input[name="tema"]')];
 const marcados = () => checks().filter((c) => c.checked);
@@ -133,6 +191,9 @@ async function empezar(){
     pintarPregunta();
     iniciarReloj(min);
     setStatus("ok", "Simulacro en curso");
+    const caja = $("#reanudar");
+    if (caja) caja.hidden = true;
+    guardarCurso();
     window.scrollTo(0, 0);
   } catch (e){
     setStatus("warn", "No se pudo empezar: " + msgError(e));
@@ -184,6 +245,7 @@ function elegir(k){
   pintarPaleta();
   const sr = $("#sr");
   if (sr) sr.textContent = `Opción ${LETRAS[k]} seleccionada.`;
+  guardarCurso();
 }
 
 function pintarPaleta(){
@@ -202,6 +264,7 @@ function irA(i){
   if (pantalla !== "exam" || finalizado) return;
   cur = Math.max(0, Math.min(preguntas.length - 1, i));
   pintarPregunta();
+  guardarCurso();
   window.scrollTo(0, 0);
 }
 
@@ -217,6 +280,7 @@ function finalizar(forzado = false){
   if (!forzado && blancos > 0 && !window.confirm(`Quedan ${blancos} pregunta(s) sin responder. ¿Finalizar igualmente?`)) return;
   finalizado = true;
   clearInterval(timer);
+  borrar(CLAVE_CURSO);
   const segundos = Math.min(Math.round((Date.now() - inicio) / 1000), minutos * 60);
   const res = calcularResultado(preguntas, respuestas, penalizacion, segundos);
   pantalla = "results";
@@ -229,14 +293,24 @@ function finalizar(forzado = false){
 
 function salir(){
   if (pantalla !== "exam") return;
-  if (!window.confirm("¿Salir del simulacro? Las respuestas no se guardarán.")) return;
+  if (!window.confirm("¿Salir del simulacro? Podrás reanudarlo desde esta página.")) return;
   clearInterval(timer);
   pantalla = "setup";
   $("#screen-exam").hidden = true; $("#screen-setup").hidden = false;
-  setStatus("ok", "Guardado en la base de datos");
+  setStatus("ok", "Simulacro en pausa");
+  mostrarReanudar();
   actualizarResumen();
   window.scrollTo(0, 0);
 }
+
+const ETIQUETAS_PEN = new Map([
+  [0, "sin penalización"],
+  [0.25, "1/4 por fallo"],
+  [1 / 3, "1/3 por fallo"],
+  [0.5, "1/2 por fallo"],
+]);
+const textoPenalizacion = (p) => ETIQUETAS_PEN.get(p)
+  ?? `${p.toLocaleString("es-ES", { maximumFractionDigits: 3 })} por fallo`;
 
 /* ---------- Resultado ---------- */
 function kpi(valor, etiqueta){
@@ -246,9 +320,7 @@ function kpi(valor, etiqueta){
 }
 
 function pintarResultado(res){
-  const pen = penalizacion === 0
-    ? "sin penalización"
-    : `${penalizacion.toLocaleString("es-ES", { maximumFractionDigits: 3 })} por fallo`;
+  const pen = textoPenalizacion(penalizacion);
   $("#res-sub").textContent = `${res.total} preguntas · ${minutos} min · ${pen}`;
   $("#res-kpis").replaceChildren(
     kpi(res.puntos.toFixed(2), "puntos"),
@@ -308,26 +380,61 @@ function aplicarFiltroRevision(){
   });
 }
 
-async function guardarResultado(res){
+function cuerpoSimulacro(res){
+  return {
+    temas,
+    segundos: res.segundos,
+    penalizacion,
+    respuestas: preguntas.map((q, i) => ({
+      id: q.id,
+      elegida: respuestas[i] == null ? -1 : q.originales[respuestas[i]],
+    })),
+  };
+}
+
+const pendientes = () => {
+  const lista = leer(CLAVE_PENDIENTE);
+  return Array.isArray(lista) ? lista : [];
+};
+let enviando = false;
+
+/** Envía los resultados pendientes. Si falla, se quedan guardados para el próximo intento. */
+async function enviarPendientes(){
+  if (enviando) return;
+  if (!pendientes().length) return;
+  enviando = true;
+  let fallos = 0;
   try {
-    const r = await api("/api/simulacros", "POST", {
-      temas,
-      segundos: res.segundos,
-      penalizacion,
-      respuestas: preguntas.map((q, i) => ({
-        id: q.id,
-        elegida: respuestas[i] == null ? -1 : q.originales[respuestas[i]],
-      })),
-    });
-    if (!r.ok){
-      const d = await r.json().catch(() => ({}));
-      throw new Error(d.error || ("El servidor respondió " + r.status + "."));
+    while (true){
+      const item = pendientes()[0];
+      if (!item) break;
+      try {
+        const r = await api("/api/simulacros", "POST", item.cuerpo);
+        if (!r.ok){
+          const d = await r.json().catch(() => ({}));
+          throw new Error(d.error || ("El servidor respondió " + r.status + "."));
+        }
+        await r.json();
+        escribir(CLAVE_PENDIENTE, pendientes().filter((x) => x.clave !== item.clave));
+      } catch (e){
+        fallos++;
+        console.warn("Simulacro pendiente: " + msgError(e));
+        break; // se reintenta en la próxima visita
+      }
     }
-    await r.json();
-    setStatus("ok", "Resultado guardado");
-  } catch (e){
-    setStatus("warn", "No se pudo guardar el resultado: " + msgError(e));
+  } finally {
+    enviando = false;
   }
+  setStatus(fallos ? "warn" : "ok",
+    fallos ? "No se pudo guardar el resultado; se reintentará al volver a esta página."
+      : "Resultado guardado");
+}
+
+function guardarResultado(res){
+  const clave = claveNueva();
+  const cuerpo = { ...cuerpoSimulacro(res), clave_idempotencia: clave };
+  escribir(CLAVE_PENDIENTE, [...pendientes(), { clave, cuerpo }]);
+  return enviarPendientes();
 }
 
 function repetir(){
@@ -336,12 +443,15 @@ function repetir(){
   preguntas = []; respuestas = []; cur = 0;
   $("#screen-results").hidden = true; $("#screen-exam").hidden = true; $("#screen-setup").hidden = false;
   setStatus("ok", "Guardado en la base de datos");
+  mostrarReanudar();
   actualizarResumen();
   window.scrollTo(0, 0);
 }
 
 /* ---------- Eventos ---------- */
 $("#btn-empezar")?.addEventListener("click", empezar);
+$("#btn-reanudar")?.addEventListener("click", reanudar);
+$("#btn-descartar")?.addEventListener("click", descartar);
 $("#btn-prev")?.addEventListener("click", () => irA(cur - 1));
 $("#btn-next")?.addEventListener("click", () => irA(cur + 1));
 $("#btn-finish")?.addEventListener("click", () => finalizar(false));
@@ -369,5 +479,10 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-actualizarResumen();
+async function arrancar(){
+  await enviarPendientes();
+  mostrarReanudar();
+  actualizarResumen();
+}
+arrancar();
 })();

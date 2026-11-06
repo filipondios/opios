@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
 import { exportarPorBloques } from "../src/exportar.js";
 import { importarDirectorio } from "../src/seed.js";
-import { DIR_PREGUNTAS } from "../src/config.js";
-import { hoyIso } from "../src/fechas.js";
+import { DIR_PREGUNTAS, CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
+import { hoyIso, sumarDias } from "../src/fechas.js";
+import { copiaSeguridad } from "../src/backup.js";
 
 const DIR_FIXTURE = join(import.meta.dir, "fixtures");
 const DIR_BLOQUES = join(import.meta.dir, "fixtures-bloques");
@@ -17,7 +20,12 @@ let repo, app;
 const JSON_H = { "Content-Type": "application/json" };
 const pet = (ruta, metodo = "GET", cuerpo) =>
   app(new Request("http://localhost" + ruta, { method: metodo, headers: cuerpo !== undefined ? JSON_H : {}, body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined }));
-const nueva = (o = {}) => ({ tema: 3, pregunta: "¿Capital de Francia?", respuestas: ["París", "Roma", "Lisboa"], correcta: 0, explicacion: "", ...o });
+const nueva = (o = {}) => ({ tema: 1, pregunta: "¿Capital de Francia?", respuestas: ["París", "Roma", "Lisboa"], correcta: 0, explicacion: "", ...o });
+/** Crea un tema en el primer bloque (la migración v2 ya deja «Bloque 1»). Devuelve su id. */
+const crearTemaPrueba = (numero = 1, nombre = null) => {
+  const bloque = repo.temario().find((b) => b.id != null) ?? repo.crearBloque({ nombre: "Bloque 1" });
+  return repo.crearTema({ bloque: bloque.id, numero, nombre }).id;
+};
 
 beforeEach(() => { repo = abrirDb(":memory:"); app = crearApp(repo); });
 
@@ -154,11 +162,16 @@ describe("importación por bloques", () => {
 });
 
 describe("API de preguntas", () => {
+  beforeEach(() => {
+    crearTemaPrueba(1);
+    crearTemaPrueba(2);
+  });
+
   test("crear, leer, editar y borrar", async () => {
     const c = await pet("/api/preguntas", "POST", nueva());
     expect(c.status).toBe(201);
     const p = await c.json();
-    expect(p).toMatchObject({ tema: 3, correcta: 0, respuestas: ["París", "Roma", "Lisboa"] });
+    expect(p).toMatchObject({ tema: 1, correcta: 0, respuestas: ["París", "Roma", "Lisboa"] });
     const e = await pet("/api/preguntas/" + p.id, "PUT", nueva({ respuestas: ["Roma", "París"], correcta: 1, explicacion: "x" }));
     expect((await e.json())).toMatchObject({ respuestas: ["Roma", "París"], correcta: 1, explicacion: "x" });
     expect((await pet("/api/preguntas/" + p.id, "DELETE")).status).toBe(204);
@@ -183,13 +196,19 @@ describe("API de preguntas", () => {
     expect(r2.status).toBe(400);
   });
   test("listado con filtro, búsqueda y paginación", async () => {
-    for (let i = 0; i < 5; i++) await pet("/api/preguntas", "POST", nueva({ tema: i % 2, pregunta: "Pregunta número " + i }));
-    expect((await (await pet("/api/preguntas?tema=0")).json()).total).toBe(3);
+    for (let i = 0; i < 5; i++) await pet("/api/preguntas", "POST", nueva({ tema: (i % 2) + 1, pregunta: "Pregunta número " + i }));
+    expect((await (await pet("/api/preguntas?tema=1")).json()).total).toBe(3);
     expect((await (await pet("/api/preguntas?q=NÚMERO 4")).json()).items.length).toBe(1);
     const pag = await (await pet("/api/preguntas?limite=2&desde=2")).json();
     expect(pag.items.length).toBe(2); expect(pag.total).toBe(5);
     expect((await pet("/api/preguntas?limite=0")).status).toBe(400);
   });
+  test("no crea temas implícitamente al guardar una pregunta", async () => {
+    const r = await pet("/api/preguntas", "POST", nueva({ tema: 999 }));
+    expect(r.status).toBe(404);
+    expect(repo.db.query("SELECT COUNT(*) n FROM temas").get().n).toBe(2);
+  });
+
   test("una sola opción correcta por pregunta (índice único parcial)", async () => {
     const p = await (await pet("/api/preguntas", "POST", nueva())).json();
     expect(() => repo.db.query("UPDATE opciones SET es_correcta = 1 WHERE pregunta_id = ?").run(p.id)).toThrow();
@@ -258,14 +277,15 @@ describe("páginas y estáticos", () => {
     expect((await pet("/fragmentos/temas")).status).toBe(200);
   });
   test("las plantillas escapan HTML", async () => {
-    repo.db.query("INSERT INTO temas (id, nombre) VALUES (7, ?)").run('<script>alert(1)</script>');
-    await pet("/api/preguntas", "POST", nueva({ tema: 7 }));
+    const b = await (await pet("/api/bloques", "POST", { nombre: "Bloque X" })).json();
+    const t = await (await pet("/api/temas", "POST", { bloque: b.id, numero: 1, nombre: "<script>alert(1)</script>" })).json();
+    await pet("/api/preguntas", "POST", nueva({ tema: t.id }));
     const html = await (await pet("/")).text();
     expect(html).not.toContain("<script>alert(1)");
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/etiquetas.js", "/js/resultado.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);
@@ -274,6 +294,7 @@ describe("páginas y estáticos", () => {
 
 describe("fecha inyectada", () => {
   test("crearApp usa `ahora` para calcular los repasos de hoy", async () => {
+    crearTemaPrueba(1);
     const p = await (await pet("/api/preguntas", "POST", nueva({ tema: 1, pregunta: "Pregunta con fecha inyectada" }))).json();
     await pet("/api/progreso", "POST", [{ id: p.id, caja: 4, vence: "2000-01-01", aciertos: 0, fallos: 0 }]);
 
@@ -285,6 +306,22 @@ describe("fecha inyectada", () => {
     const antes = crearApp(repo, { ahora: () => new Date(1999, 11, 31) });
     const htmlAntes = await (await antes(new Request("http://localhost/"))).text();
     expect(htmlAntes).toContain('data-repaso="0"');
+  });
+
+  test("la zona APP_TZ decide el día aunque el servidor esté en UTC", async () => {
+    crearTemaPrueba(1);
+    const p = await (await pet("/api/preguntas", "POST", nueva({ tema: 1, pregunta: "Pregunta de medianoche" }))).json();
+    await pet("/api/progreso", "POST", [{ id: p.id, caja: 2, vence: "2026-03-11", aciertos: 0, fallos: 0 }]);
+
+    // 23:30 UTC del día 10 = 00:30 del día 11 en Madrid.
+    const ahora = () => new Date("2026-03-10T23:30:00Z");
+    const madrid = crearApp(repo, { ahora, zona: "Europe/Madrid" });
+    const htmlMadrid = await (await madrid(new Request("http://localhost/"))).text();
+    expect(htmlMadrid).toContain('data-repaso="1"');
+
+    const utc = crearApp(repo, { ahora, zona: "UTC" });
+    const htmlUtc = await (await utc(new Request("http://localhost/"))).text();
+    expect(htmlUtc).toContain('data-repaso="0"');
   });
 });
 
@@ -373,6 +410,7 @@ describe("temario por bloques", () => {
 
 describe("estadísticas y simulacros", () => {
   beforeEach(async () => {
+    crearTemaPrueba(1);
     for (let i = 0; i < 3; i++)
       await pet("/api/preguntas", "POST", nueva({ tema: 1, pregunta: "Pregunta simulacro " + i, respuestas: ["A", "B", "C", "D"], correcta: i % 4 }));
   });
@@ -419,6 +457,23 @@ describe("estadísticas y simulacros", () => {
     expect(html).toContain('id="btn-empezar"');
     expect(html).toContain('id="cfg-pen"');
     expect(html).toContain("/js/simulacro.js");
+  });
+
+  test("la opción de penalización usa 1/3 exacto", async () => {
+    const html = await (await pet("/simulacro")).text();
+    expect(html).toContain('value="0.3333333333333333"');
+    expect(html).not.toContain('value="0.3333"');
+  });
+
+  test("el simulacro se guarda en localStorage y se puede reanudar", async () => {
+    const html = await (await pet("/simulacro")).text();
+    expect(html).toContain('id="btn-reanudar"');
+    expect(html).toContain('id="btn-descartar"');
+    const js = await (await pet("/js/simulacro.js")).text();
+    expect(js).toContain("opios.simulacro.curso");
+    expect(js).toContain("opios.simulacro.pendiente");
+    expect(js).toContain("crypto?.randomUUID");
+    expect(js).toContain("clave_idempotencia");
   });
 
   test("la tabla de simulacros resuelve el id del tema a su número y bloque", async () => {
@@ -476,8 +531,65 @@ describe("estadísticas y simulacros", () => {
     expect(html).not.toContain(bank[1].pregunta); // acertada: no entra en la tabla
     expect(html).not.toContain(bank[2].pregunta); // en blanco: tampoco
     expect(repo.preguntasMasFalladas(20)).toEqual([
-      expect.objectContaining({ id: bank[0].id, fallos: 1, aciertos: 0, caja: null }),
+      expect.objectContaining({ id: bank[0].id, fallos: 1, aciertos: 0, caja: 1 }),
     ]);
+  });
+
+  test("los fallos del simulacro bajan 2 cajas; los aciertos solo suman y los blancos no tocan", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    await pet("/api/progreso", "POST", [
+      { id: bank[0].id, caja: 6, vence: "2999-01-01", aciertos: 5, fallos: 0 },
+    ]);
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 20, penalizacion: 0,
+      respuestas: [
+        { id: bank[0].id, elegida: (bank[0].correcta + 1) % bank[0].respuestas.length }, // fallo
+        { id: bank[1].id, elegida: bank[1].correcta }, // acierto sin progreso
+        { id: bank[2].id, elegida: -1 }, // en blanco
+      ],
+    });
+    const progreso = repo.paraTest([1]).progreso;
+    expect(progreso[bank[0].id]).toEqual([4, hoyIso(), 5, 1]);
+    expect(progreso[bank[1].id]).toBeUndefined();
+    expect(progreso[bank[2].id]).toBeUndefined();
+  });
+
+  test("el acierto de simulacro suma el contador sin mover caja ni fecha", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    await pet("/api/progreso", "POST", [
+      { id: bank[0].id, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 },
+    ]);
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 20, penalizacion: 0,
+      respuestas: [{ id: bank[0].id, elegida: bank[0].correcta }],
+    });
+    expect(repo.paraTest([1]).progreso[bank[0].id]).toEqual([3, "2999-01-01", 3, 1]);
+  });
+
+  test("el POST de simulacro es idempotente con la misma clave", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    const cuerpo = {
+      temas: [1], segundos: 20, penalizacion: 0, clave_idempotencia: "prueba-idempotente-1",
+      respuestas: [{ id: bank[0].id, elegida: (bank[0].correcta + 1) % bank[0].respuestas.length }],
+    };
+    const a = await (await pet("/api/simulacros", "POST", cuerpo)).json();
+    const b = await (await pet("/api/simulacros", "POST", cuerpo)).json();
+    expect(b.id).toBe(a.id);
+    expect(repo.contarSimulacros()).toBe(1);
+    expect(repo.paraTest([1]).progreso[bank[0].id][3]).toBe(1); // no se cuenta dos veces
+  });
+
+  test("la penalización de 1/3 resta exactamente un punto por cada tres fallos", async () => {
+    const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+    const r = await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 20, penalizacion: 1 / 3,
+      respuestas: bank.slice(0, 3).map((q) => ({
+        id: q.id, elegida: (q.correcta + 1) % q.respuestas.length,
+      })),
+    });
+    const s = await r.json();
+    expect(s).toMatchObject({ aciertos: 0, fallos: 3 });
+    expect(s.puntos).toBe(-1);
   });
 
   test("los fallos de test y simulacro se suman en la misma pregunta", async () => {
@@ -487,7 +599,7 @@ describe("estadísticas y simulacros", () => {
       respuestas: [{ id: bank[1].id, elegida: (bank[1].correcta + 1) % bank[1].respuestas.length }],
     });
     const fila = repo.preguntasMasFalladas(20).find((p) => p.id === bank[1].id);
-    expect(fila).toMatchObject({ fallos: 4, aciertos: 0, caja: 0 }); // 3 del test + 1 del simulacro
+    expect(fila).toMatchObject({ fallos: 4, aciertos: 0, caja: 1 }); // 3 del test + 1 del simulacro
   });
 
   test("simulacro inválido o con preguntas inexistentes", async () => {
@@ -543,6 +655,14 @@ describe("etiquetas y resultados del cliente", () => {
     ]);
   });
 
+  test("tres fallos con penalización 1/3 restan exactamente un punto", async () => {
+    const { calcularResultado } = await evaluarCliente("resultado.js");
+    const preguntas = [0, 1, 2].map(() => ({ tema: 1, temaNumero: 1, correcta: 0 }));
+    const res = calcularResultado(preguntas, [1, 1, 1], 1 / 3, 10);
+    expect(res.fallos).toBe(3);
+    expect(res.puntos).toBe(-1);
+  });
+
   test("los límites de la interfaz salen de la configuración, no van escritos a mano", async () => {
     const html = await (await pet("/temario")).text();
     expect(html).toContain('data-max-bloque="120"');
@@ -552,6 +672,184 @@ describe("etiquetas y resultados del cliente", () => {
     expect(js).toContain("maxlength: MAX_TEMA_NOMBRE");
     expect(js).not.toContain("maxlength: 120");
     expect(js).not.toContain("maxlength: 200");
+  });
+});
+
+describe("copia de seguridad", () => {
+  test("VACUUM INTO conserva preguntas, progreso y simulacros", async () => {
+    crearTemaPrueba(1);
+    const p = await (await pet("/api/preguntas", "POST", nueva({ tema: 1 }))).json();
+    await pet("/api/progreso", "POST", [{ id: p.id, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 10, penalizacion: 0,
+      respuestas: [{ id: p.id, elegida: p.correcta }],
+    });
+
+    const dir = mkdtempSync(join(tmpdir(), "opios-backup-"));
+    const destino = join(dir, "copia.db");
+    try {
+      copiaSeguridad(repo.db, destino);
+      const otra = abrirDb(destino);
+      expect(otra.contarPreguntas()).toBe(1);
+      expect(otra.contarSimulacros()).toBe(1);
+      expect(otra.paraTest([1]).progreso[p.id]).toEqual([3, "2999-01-01", 3, 1]);
+      otra.close();
+      expect(() => copiaSeguridad(repo.db, destino)).toThrow(/Ya existe/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("registro de respuestas, estadísticas y carga diaria", () => {
+  beforeEach(async () => { await importarDirectorio(repo, DIR_FIXTURE); });
+  const ids = async (tema = 1) => (await (await pet("/api/test?temas=" + tema)).json()).preguntas.map((p) => p.id);
+  const carga = async () => (await pet("/api/carga")).json();
+
+  test("la migración crea la tabla respuestas con sus índices", () => {
+    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(9);
+    expect(repo.db.query("SELECT name FROM sqlite_master WHERE type='table' AND name='respuestas'").get()).toBeTruthy();
+    const indices = repo.db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='respuestas'").all().map((r) => r.name);
+    expect(indices).toContain("idx_respuestas_fecha");
+    expect(indices).toContain("idx_respuestas_pregunta");
+    expect(repo.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
+  });
+
+  test("POST /api/respuestas guarda el lote y alimenta la actividad", async () => {
+    const [a, b] = await ids();
+    const r = await pet("/api/respuestas", "POST", { respuestas: [
+      { id: a, acierto: true, ms: 1500 },
+      { id: b, acierto: false, ms: 2500 },
+    ] });
+    expect(r.status).toBe(201);
+    expect((await r.json()).registradas).toBe(2);
+    const act = await repo.actividadReciente(sumarDias(hoyIso(), -13));
+    expect(act.at(-1)).toMatchObject({ dia: hoyIso(), n: 2, aciertos: 1, fallos: 1 });
+    expect(repo.tiempoMedio()).toEqual({ ms: 2000, n: 2 });
+  });
+
+  test("el lote se valida y admite también un array directo", async () => {
+    const [a] = await ids();
+    for (const malo of [
+      {}, { respuestas: [] }, { respuestas: [{ id: 0, acierto: true }] },
+      { respuestas: [{ id: a, acierto: "sí" }] }, { respuestas: [{ id: a, acierto: true, ms: -5 }] },
+      { respuestas: [{ id: a, acierto: true, ms: 99999999 }] },
+    ]) expect((await pet("/api/respuestas", "POST", malo)).status).toBe(400);
+    expect((await pet("/api/respuestas", "POST", [{ id: a, acierto: true }])).status).toBe(201);
+  });
+
+  test("las respuestas de preguntas inexistentes se ignoran", async () => {
+    const r = await pet("/api/respuestas", "POST", { respuestas: [{ id: 99999, acierto: true }] });
+    expect((await r.json()).registradas).toBe(0);
+    expect(repo.db.query("SELECT COUNT(*) n FROM respuestas").get().n).toBe(0);
+  });
+
+  test("el cupo de nuevas cuenta primeras respuestas de test y no las de simulacro", async () => {
+    const bank = await ids();
+    await pet("/api/respuestas", "POST", { respuestas: [
+      { id: bank[0], acierto: true }, { id: bank[0], acierto: false }, { id: bank[1], acierto: true },
+    ] });
+    let c = await carga();
+    expect(c).toMatchObject({ nuevasHoy: 2, cupoNuevas: CUPO_NUEVAS, repasosPendientes: 0, bloqueadoPorAtraso: false });
+
+    await pet("/api/simulacros", "POST", {
+      temas: [1], segundos: 5, penalizacion: 0, respuestas: [{ id: bank[2], elegida: 0 }],
+    });
+    c = await carga();
+    expect(c.nuevasHoy).toBe(2); // el simulacro no consume cupo
+
+    const d = await (await pet("/api/test?temas=1")).json();
+    expect(d.carga).toMatchObject({ nuevasHoy: 2, cupoNuevas: CUPO_NUEVAS });
+  });
+
+  test("el freno de atraso bloquea las nuevas cuando hay demasiados repasos vencidos", async () => {
+    const tema = repo.temario()[0].temas[0].id;
+    const objetivo = FRENO_ATRASO * CUPO_NUEVAS + 1;
+    for (let i = TOTAL_TEMA_1; i < objetivo; i++)
+      repo.crear(nueva({ tema, pregunta: "Pregunta atraso " + i }));
+    const preguntas = repo.paraTest([tema]).preguntas;
+    expect(preguntas).toHaveLength(objetivo);
+    const ayer = sumarDias(hoyIso(), -1);
+    repo.guardarProgreso(preguntas.map((p) => ({ id: p.id, caja: 1, vence: ayer, aciertos: 0, fallos: 1 })));
+
+    const c = await carga();
+    expect(c.repasosAtrasados).toBe(objetivo);
+    expect(c.bloqueadoPorAtraso).toBe(true);
+    // Un repaso vencido hoy no cuenta como atraso.
+    repo.guardarProgreso([{ id: preguntas[0].id, caja: 1, vence: hoyIso(), aciertos: 0, fallos: 1 }]);
+    expect((await carga()).repasosAtrasados).toBe(objetivo - 1);
+  });
+
+  test("la racha cuenta días consecutivos con respuestas (hoy o ayer como extremo)", async () => {
+    const [a] = await ids();
+    const hoy = hoyIso();
+    for (const d of [hoy, sumarDias(hoy, -1), sumarDias(hoy, -2)]) repo.registrarRespuestas([{ id: a, acierto: 1, ms: null }], d);
+    repo.registrarRespuestas([{ id: a, acierto: 1, ms: null }], sumarDias(hoy, -4)); // hueco
+    expect(repo.rachaDias(hoy)).toBe(3);
+    expect(repo.rachaDias(sumarDias(hoy, 1))).toBe(3); // sin actividad hoy, sigue viva ayer
+    expect(repo.rachaDias(sumarDias(hoy, 10))).toBe(0);
+  });
+
+  test("la precisión semanal agrupa de lunes a domingo", async () => {
+    const [a] = await ids();
+    repo.registrarRespuestas([{ id: a, acierto: 1, ms: null }], "2026-03-09"); // lunes
+    repo.registrarRespuestas([{ id: a, acierto: 0, ms: null }], "2026-03-15"); // domingo
+    repo.registrarRespuestas([{ id: a, acierto: 1, ms: null }], "2026-03-16"); // lunes siguiente
+    expect(repo.precisionSemanal("2026-03-22", 8)).toEqual([
+      { desde: "2026-03-09", hasta: "2026-03-15", aciertos: 1, fallos: 1 },
+      { desde: "2026-03-16", hasta: "2026-03-22", aciertos: 1, fallos: 0 },
+    ]);
+  });
+
+  test("el simulacro registra sus respuestas con origen simulacro (sin blancos)", async () => {
+    const bank = await ids();
+    await pet("/api/simulacros", "POST", { temas: [1], segundos: 5, penalizacion: 0, respuestas: [
+      { id: bank[0], elegida: 0 }, { id: bank[1], elegida: -1 },
+    ] });
+    expect(repo.db.query("SELECT pregunta_id, origen FROM respuestas ORDER BY id").all()).toEqual([
+      { pregunta_id: bank[0], origen: "simulacro" },
+    ]);
+  });
+
+  test("reiniciar el progreso también limpia las respuestas y la racha", async () => {
+    const [a] = await ids();
+    await pet("/api/respuestas", "POST", { respuestas: [{ id: a, acierto: true, ms: 1000 }] });
+    expect((await carga()).nuevasHoy).toBe(1);
+    await pet("/api/progreso", "DELETE");
+    expect((await carga()).nuevasHoy).toBe(0);
+    expect(repo.rachaDias(hoyIso())).toBe(0);
+  });
+
+  test("la página de estadísticas muestra racha, precisión semanal y tiempo medio", async () => {
+    const [a, b] = await ids();
+    await pet("/api/respuestas", "POST", { respuestas: [
+      { id: a, acierto: true, ms: 1000 }, { id: b, acierto: false, ms: 3000 },
+    ] });
+    const html = await (await pet("/estadisticas")).text();
+    expect(html).toContain("racha");
+    expect(html).toContain("2.0 s");
+    expect(html).toContain("Precisión por semana");
+    expect(html).toContain("Evolución de los simulacros");
+  });
+
+  test("la fecha de examen se guarda, se valida y acorta el intervalo (Fase 3.6)", async () => {
+    expect((await pet("/api/ajustes", "PUT", { fecha_examen: "2026-13-40" })).status).toBe(400);
+    expect((await pet("/api/ajustes", "PUT", { fecha_examen: "2026-02-30" })).status).toBe(400);
+
+    const examen = sumarDias(hoyIso(), 100);
+    const r = await pet("/api/ajustes", "PUT", { fecha_examen: examen });
+    expect(r.status).toBe(200);
+    expect((await r.json()).examen).toMatchObject({ fecha: examen, dias: 100, topeDias: 15 });
+
+    const d = await (await pet("/api/test?temas=1")).json();
+    expect(d.examen).toMatchObject({ fecha: examen, topeDias: 15 });
+
+    const html = await (await pet("/")).text();
+    expect(html).toContain('id="cfg-examen"');
+    expect(html).toContain("100 días hasta el examen");
+
+    await pet("/api/ajustes", "PUT", { fecha_examen: null });
+    expect((await (await pet("/api/ajustes")).json()).fecha_examen).toBeUndefined();
   });
 });
 
