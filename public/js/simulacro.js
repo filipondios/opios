@@ -57,6 +57,24 @@ const claveNueva = () => (globalThis.crypto?.randomUUID
   ? globalThis.crypto.randomUUID()
   : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2));
 
+/** Diálogo de confirmación propio (sustituye a window.confirm en el simulacro). */
+function confirmarAccion({ titulo, mensaje, textoOk = "Aceptar", peligro = true }){
+  const dlg = $("#dlg-confirm");
+  if (!dlg || dlg.open) return Promise.resolve(false);
+  $("#dlg-confirm-title").textContent = titulo;
+  $("#dlg-confirm-msg").textContent = mensaje;
+  const cancelar = $("#dlg-confirm-cancel");
+  const aceptar = $("#dlg-confirm-ok");
+  if (cancelar) cancelar.textContent = "Cancelar";
+  if (aceptar){ aceptar.textContent = textoOk; aceptar.className = "btn " + (peligro ? "danger" : "primary"); }
+  return new Promise((resolve) => {
+    dlg.addEventListener("close", () => resolve(dlg.returnValue === "ok"), { once: true });
+    dlg.returnValue = "cancel";
+    dlg.showModal();
+    cancelar?.focus();
+  });
+}
+
 function guardarCurso(){
   if (pantalla !== "exam" || finalizado) return;
   escribir(CLAVE_CURSO, {
@@ -98,8 +116,12 @@ function reanudar(){
   window.scrollTo(0, 0);
 }
 
-function descartar(){
-  if (!window.confirm("¿Descartar el simulacro en curso? Se perderán las respuestas.")) return;
+async function descartar(){
+  if (!(await confirmarAccion({
+    titulo: "Descartar el simulacro",
+    mensaje: "Se perderán las respuestas de este simulacro en curso.",
+    textoOk: "Descartar",
+  }))) return;
   borrar(CLAVE_CURSO);
   const caja = $("#reanudar");
   if (caja) caja.hidden = true;
@@ -208,11 +230,17 @@ function pintarPregunta(){
   cursor = respuestas[cur] ?? 0;
   $("#exam-tema").textContent = etiquetaTema({ tema: q.tema, tema_numero: q.temaNumero, bloque_nombre: q.bloque, nombre: q.temaNombre });
   $("#exam-text").textContent = q.pregunta;
-  $("#exam-opts").replaceChildren(...q.opciones.map((texto, k) => h("button", {
-    type: "button", class: "opt", "aria-pressed": String(respuestas[cur] === k),
+  $("#exam-opts").replaceChildren(...q.opciones.map((texto, k) => h("label", {
+    class: "opt",
+    "data-k": String(k),
     "data-cursor": k === cursor ? "true" : null,
-    onclick: () => elegir(k),
-  }, h("span", { class: "bubble", text: LETRAS[k] }), h("span", { class: "otext", text: texto }))));
+  },
+    h("input", {
+      type: "radio", name: "exam-opcion", value: String(k), checked: respuestas[cur] === k,
+      "aria-label": "Opción " + LETRAS[k], onchange: () => elegir(k),
+    }),
+    h("span", { class: "bubble", text: LETRAS[k] }),
+    h("span", { class: "otext", text: texto }))));
   $("#exam-progress").textContent = `Pregunta ${cur + 1} de ${preguntas.length}`;
   $("#exam-answered").textContent = `${respuestas.filter((r) => r != null).length} respondidas`;
   $("#btn-prev").disabled = cur === 0;
@@ -233,14 +261,19 @@ function moverOpcion(d){
   if (!n) return;
   cursor = (cursor + d + n) % n;
   pintarCursor();
+  [...document.querySelectorAll("#exam-opts .opt")][cursor]?.querySelector("input")?.focus({ preventScroll: true });
 }
 
 function elegir(k){
   if (pantalla !== "exam" || finalizado) return;
   cursor = k;
   respuestas[cur] = k;
-  [...document.querySelectorAll("#exam-opts .opt")].forEach((o, i) => o.setAttribute("aria-pressed", String(i === k)));
-  pintarCursor();
+  [...document.querySelectorAll("#exam-opts .opt")].forEach((o, i) => {
+    if (i === k) o.setAttribute("data-cursor", "true");
+    else o.removeAttribute("data-cursor");
+    const inp = o.querySelector("input");
+    if (inp) inp.checked = i === k;
+  });
   $("#exam-answered").textContent = `${respuestas.filter((r) => r != null).length} respondidas`;
   pintarPaleta();
   const sr = $("#sr");
@@ -274,10 +307,15 @@ function responderYAvanzar(){
   if (cur < preguntas.length - 1) irA(cur + 1);
 }
 
-function finalizar(forzado = false){
+async function finalizar(forzado = false){
   if (pantalla !== "exam" || finalizado) return;
   const blancos = respuestas.filter((r) => r == null).length;
-  if (!forzado && blancos > 0 && !window.confirm(`Quedan ${blancos} pregunta(s) sin responder. ¿Finalizar igualmente?`)) return;
+  if (!forzado && blancos > 0 && !(await confirmarAccion({
+    titulo: "Finalizar el simulacro",
+    mensaje: `Quedan ${blancos} pregunta(s) sin responder. ¿Finalizar igualmente?`,
+    textoOk: "Finalizar",
+  }))) return;
+  if (pantalla !== "exam" || finalizado) return;
   finalizado = true;
   clearInterval(timer);
   borrar(CLAVE_CURSO);
@@ -291,9 +329,14 @@ function finalizar(forzado = false){
   window.scrollTo(0, 0);
 }
 
-function salir(){
+async function salir(){
   if (pantalla !== "exam") return;
-  if (!window.confirm("¿Salir del simulacro? Podrás reanudarlo desde esta página.")) return;
+  if (!(await confirmarAccion({
+    titulo: "Salir del simulacro",
+    mensaje: "El simulacro quedará en pausa y podrás reanudarlo desde esta página.",
+    textoOk: "Salir",
+  }))) return;
+  if (pantalla !== "exam") return;
   clearInterval(timer);
   pantalla = "setup";
   $("#screen-exam").hidden = true; $("#screen-setup").hidden = false;
@@ -463,7 +506,8 @@ document.addEventListener("keydown", (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
   if (pantalla !== "exam" || finalizado) return;
   const tag = (e.target && e.target.tagName || "").toLowerCase();
-  if (["input", "select", "textarea"].includes(tag)) return;
+  const enOpcion = e.target && e.target.closest && e.target.closest("#exam-opts .opt");
+  if (["input", "select", "textarea"].includes(tag) && !enOpcion) return;
   const k = e.key;
   if (k === "Escape"){ e.preventDefault(); salir(); return; }
   if (k === "ArrowUp"){ e.preventDefault(); moverOpcion(-1); return; }
@@ -471,7 +515,6 @@ document.addEventListener("keydown", (e) => {
   if (k === "ArrowLeft"){ e.preventDefault(); irA(cur - 1); return; }
   if (k === "ArrowRight"){ e.preventDefault(); irA(cur + 1); return; }
   if (k === "Enter"){
-    const enOpcion = e.target && e.target.closest && e.target.closest("#exam-opts .opt");
     if (tag === "button" && !enOpcion) return;
     e.preventDefault();
     responderYAvanzar();

@@ -1,13 +1,20 @@
 import { html } from "./html.js";
 
+/** Menú único de la aplicación. `actual` marca la página activa con aria-current. */
+const PAGINAS = [
+  { id: "test", href: "/", texto: "Test" },
+  { id: "simulacro", href: "/simulacro", texto: "Simulacro" },
+  { id: "estadisticas", href: "/estadisticas", texto: "Estadísticas" },
+  { id: "maker", href: "/maker", texto: "Maker" },
+  { id: "temario", href: "/temario", texto: "Temario" },
+];
+
 /**
  * Plantilla base de todas las páginas.
- * `enlace` es el botón de cabecera hacia la otra página: { href, texto }.
- * `enlaces` permite varios botones; si se indica, tiene prioridad sobre `enlace`.
+ * `actual` es el id de la página en el menú (test, simulacro, estadisticas, maker, temario).
  * `jsModulo` carga los scripts con `type="module"` (necesario si usan `import`).
  */
-export function layout({ titulo, marca, enlace, enlaces, estado, ancho = false, css = [], js = [], jsModulo = false, cuerpo }) {
-  const botones = enlaces ?? (enlace ? [enlace] : []);
+export function layout({ titulo, marca = "Test infinito", actual = null, estado, estadoTipo = "ok", ancho = false, css = [], js = [], jsModulo = false, cuerpo }) {
   return html`<!doctype html>
 <html lang="es">
 <head>
@@ -15,16 +22,23 @@ export function layout({ titulo, marca, enlace, enlaces, estado, ancho = false, 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>${titulo}</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/css/base.css">
 ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
+<script>try{var t=localStorage.getItem("opios.tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
 <div class="wrap${ancho ? " wide" : ""}">
   <header class="top">
-    <span class="brand">${marca}</span>
+    <a class="brand" href="/">${marca}</a>
+    <nav class="top-nav" aria-label="Principal">
+      ${PAGINAS.map((p) => html`<a href="${p.href}"${p.id === actual ? html` aria-current="page"` : ""}>${p.texto}</a>`)}
+    </nav>
     <div class="top-right">
-      ${botones.map((b) => html`<a class="btn small" href="${b.href}">${b.texto}</a>`)}
-      <span class="status" id="status" data-state="ok" role="status">${estado}</span>
+      <button class="btn small theme" type="button" id="btn-tema" aria-label="Cambiar a tema oscuro" aria-pressed="false" title="Cambiar tema claro/oscuro">
+        <span aria-hidden="true" id="tema-icono">◐</span><span id="tema-texto">Oscuro</span>
+      </button>
+      <span class="status" id="status" data-state="${estadoTipo}" role="status">${estado}</span>
     </div>
   </header>
 ${cuerpo}
@@ -32,6 +46,7 @@ ${cuerpo}
 ${js.map((s) => jsModulo
   ? html`<script type="module" src="/js/${s}"></script>`
   : html`<script src="/js/${s}" defer></script>`)}
+<script src="/js/tema.js" defer></script>
 </body>
 </html>
 `;

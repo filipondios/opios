@@ -96,6 +96,10 @@ export function paginaHome({ temas, carga = null, examen = null }) {
         <span class="hint" id="examen-info">${textoExamen(examen)}</span>
       </div>
       <div class="row">
+        <label class="check-inline"><input type="checkbox" id="cfg-un-toque"> Responder al primer toque</label>
+        <span class="hint">En móvil, tocar una opción la confirma sin pulsar «Confirmar».</span>
+      </div>
+      <div class="row">
         <button class="btn primary" type="button" id="btn-start">Empezar <kbd>Enter</kbd></button>
         <button class="btn" type="button" id="btn-all">Todos</button>
         <button class="btn" type="button" id="btn-none">Ninguno</button>
@@ -125,7 +129,7 @@ export function paginaHome({ temas, carga = null, examen = null }) {
     </div>
     <p class="keys">
       <span><kbd>↑</kbd><kbd>↓</kbd> elegir</span>
-      <span><kbd>A</kbd>–<kbd>D</kbd> o <kbd>1</kbd>–<kbd>4</kbd> saltar a una opción</span>
+      <span id="keys-opts">Las letras y los números saltan a una opción</span>
       <span><kbd>Enter</kbd> confirmar y continuar</span>
     </p>
     <div class="sr" id="sr" aria-live="polite"></div>
@@ -133,12 +137,7 @@ export function paginaHome({ temas, carga = null, examen = null }) {
 
   return layout({
     titulo: "Test infinito",
-    marca: "Test infinito",
-    enlaces: [
-      { href: "/simulacro", texto: "Simulacro" },
-      { href: "/estadisticas", texto: "Estadísticas" },
-      { href: "/maker", texto: "Añadir preguntas" },
-    ],
+    actual: "test",
     estado: "Guardado en la base de datos",
     css: ["test.css"],
     js: vacio ? [] : ["etiquetas.js", "test.js"],

@@ -271,7 +271,7 @@ describe("páginas y estáticos", () => {
     expect(html).toContain('href="/maker"'); expect(html).toContain("/js/test.js");
     expect(html).toContain('type="module"');
     const m = await (await pet("/maker")).text();
-    expect(m).toContain('href="/"'); expect(m).toContain("Hacer test"); expect(m).toContain("/js/maker.js");
+    expect(m).toContain('href="/"'); expect(m).toContain("Test"); expect(m).toContain("/js/maker.js");
     const t = await (await pet("/temario")).text();
     expect(t).toContain("/js/temario.js"); expect(t).toContain("Nuevo bloque");
     expect((await pet("/fragmentos/temas")).status).toBe(200);
@@ -285,10 +285,92 @@ describe("páginas y estáticos", () => {
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/etiquetas.js", "/js/resultado.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/etiquetas.js", "/js/resultado.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js", "/js/tema.js", "/favicon.svg"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);
+  });
+});
+
+describe("interfaz, accesibilidad y tema", () => {
+  test("todas las páginas comparten el mismo menú y marcan la activa", async () => {
+    await importarDirectorio(repo, DIR_FIXTURE);
+    const casos = [
+      ["/", "Test"],
+      ["/simulacro", "Simulacro"],
+      ["/estadisticas", "Estadísticas"],
+      ["/maker", "Maker"],
+      ["/temario", "Temario"],
+    ];
+    for (const [ruta, texto] of casos) {
+      const r = await pet(ruta);
+      expect(r.status).toBe(200);
+      const html = await r.text();
+      expect(html).toContain('aria-label="Principal"');
+      expect(html).toContain(`<a href="${ruta}" aria-current="page">${texto}</a>`);
+      for (const href of ["/", "/simulacro", "/estadisticas", "/maker", "/temario"]) {
+        expect(html).toContain(`href="${href}"`);
+      }
+    }
+  });
+
+  test("conmutador de tema: botón, persistencia y CSS de modo oscuro", async () => {
+    const html = await (await pet("/")).text();
+    expect(html).toContain('id="btn-tema"');
+    expect(html).toContain("/js/tema.js");
+    expect(html).toContain('localStorage.getItem("opios.tema")');
+    const js = await (await pet("/js/tema.js")).text();
+    expect(js).toContain('localStorage.setItem(CLAVE');
+    expect(js).toContain("prefers-color-scheme: dark");
+    const css = await (await pet("/css/base.css")).text();
+    expect(css).toContain(':root[data-theme="dark"]');
+  });
+
+  test("favicon y 404 HTML", async () => {
+    const home = await (await pet("/")).text();
+    expect(home).toContain('href="/favicon.svg"');
+    const fav = await pet("/favicon.svg");
+    expect(fav.status).toBe(200);
+    expect(fav.headers.get("content-type")).toContain("image/svg+xml");
+
+    const r = await pet("/ruta-que-no-existe");
+    expect(r.status).toBe(404);
+    expect(r.headers.get("content-type")).toContain("text/html");
+    const html = await r.text();
+    expect(html).toContain("Página no encontrada");
+    expect(html).toContain("ruta-que-no-existe");
+    expect(html).toContain('href="/temario"');
+  });
+
+  test("opciones con radios reales y sin diálogos nativos", async () => {
+    const testJs = await (await pet("/js/test.js")).text();
+    expect(testJs).toContain('type: "radio"');
+    expect(testJs).toContain('name: "opcion"');
+    expect(testJs).not.toContain('role: "radio"');
+
+    const simJs = await (await pet("/js/simulacro.js")).text();
+    expect(simJs).toContain('type: "radio"');
+    expect(simJs).toContain('name: "exam-opcion"');
+    expect(simJs).not.toContain('aria-pressed');
+    expect(simJs).not.toContain("window.confirm(");
+    expect(simJs).toContain("confirmarAccion");
+
+    const simHtml = await (await pet("/simulacro")).text();
+    expect(simHtml).toContain('role="radiogroup"');
+    expect(simHtml).toContain('id="dlg-confirm"');
+    expect(simHtml).toContain('id="dlg-confirm-msg"');
+  });
+
+  test("primer toque configurable y ayuda de teclas dinámica", async () => {
+    await importarDirectorio(repo, DIR_FIXTURE);
+    const html = await (await pet("/")).text();
+    expect(html).toContain('id="cfg-un-toque"');
+    expect(html).toContain('id="keys-opts"');
+    expect(html).not.toContain("<kbd>A</kbd>–<kbd>D</kbd>");
+    const js = await (await pet("/js/test.js")).text();
+    expect(js).toContain("ti.una-pulsacion");
+    expect(js).toContain("unaPulsacion");
+    expect(js).toContain("pintarAyudaTeclas");
   });
 });
 

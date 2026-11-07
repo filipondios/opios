@@ -264,13 +264,7 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
 
   return layout({
     titulo: "Estadísticas",
-    marca: "Estadísticas",
-    enlaces: [
-      { href: "/", texto: "Hacer test" },
-      { href: "/simulacro", texto: "Simulacro" },
-      { href: "/temario", texto: "Temario" },
-      { href: "/maker", texto: "Añadir preguntas" },
-    ],
+    actual: "estadisticas",
     estado: "Guardado en la base de datos",
     ancho: true,
     css: ["estadisticas.css"],

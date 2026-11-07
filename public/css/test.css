@@ -46,9 +46,10 @@
 .opts{display:flex;flex-direction:column;gap:8px;margin-top:22px}
 .opt{
   display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);
-  border-radius:8px;background:var(--card);cursor:pointer;
+  border-radius:8px;background:var(--card);cursor:pointer;position:relative;
   font:400 clamp(16px,2.6vw,18px)/1.45 var(--f-read); transition:border-color .1s,background .1s,opacity .1s;
 }
+.opt input{position:absolute;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
 .opt:hover{border-color:var(--ink-2)}
 .otext{flex:1;min-width:0;overflow-wrap:break-word;padding-top:2px}
 .bubble{
@@ -57,8 +58,9 @@
 }
 .mark{flex:none;width:22px;height:22px;margin-top:4px}
 .mark svg{display:block;width:22px;height:22px}
-.opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
-.opt[aria-checked="true"] .bubble{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt:has(input:checked) .bubble{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 .opt.ok{border-color:var(--ok);background:var(--ok-soft);box-shadow:inset 0 0 0 1px var(--ok)}
 .opt.ok .bubble{background:var(--ok);border-color:var(--ok);color:var(--on-sem)}
 .opt.ok .mark{color:var(--ok)}

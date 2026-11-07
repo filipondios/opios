@@ -52,6 +52,9 @@ let carga = null;            // cupo diario que devuelve el servidor
 let examenInfo = null;       // fecha de examen y tope de intervalo (Fase 3.6)
 let respuestasCola = [];     // respuestas pendientes de enviar a /api/respuestas
 let timerRespuestas = null;
+let unaPulsacion = false;    // responder al primer toque (móvil)
+let selAntesPuntero = null;  // opción marcada antes del puntero, para distinguir el primer toque
+const CLAVE_UN_TOQUE = "ti.una-pulsacion";
 
 function setStatus(kind, text){ const s = $("#status"); s.dataset.state = kind; s.textContent = text; }
 function nota(texto, lineas){
@@ -139,6 +142,25 @@ function nuevasPermitidas(){
 const chips = () => [...document.querySelectorAll("#grid .chip")];
 function guardarSeleccion(){ try { localStorage.setItem("ti.sel", JSON.stringify([...seleccion])); } catch (e) {} }
 function leerSeleccion(){ try { const v = JSON.parse(localStorage.getItem("ti.sel")); return Array.isArray(v) ? v : null; } catch (e) { return null; } }
+
+/* Responder al primer toque: activado por defecto en pantallas táctiles si no hay preferencia guardada. */
+function leerUnaPulsacion(){
+  try {
+    const v = localStorage.getItem(CLAVE_UN_TOQUE);
+    unaPulsacion = v === null
+      ? !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches)
+      : v === "1";
+  } catch (e) { unaPulsacion = false; }
+  const el = $("#cfg-un-toque");
+  if (el) el.checked = unaPulsacion;
+}
+$("#cfg-un-toque")?.addEventListener("change", (e) => {
+  unaPulsacion = e.target.checked;
+  try { localStorage.setItem(CLAVE_UN_TOQUE, unaPulsacion ? "1" : "0"); } catch (err) {}
+});
+
+/* Distingue puntero de teclado para que «primer toque» no dispare al navegar con flechas. */
+document.addEventListener("pointerdown", () => { selAntesPuntero = null; }, true);
 
 /* Refleja `seleccion` en las fichas y actualiza el resumen. Si no queda ningún tema válido, marca todos. */
 function sincronizarSeleccion(previa){
@@ -277,16 +299,34 @@ function preguntar(){
   const kind = $("#q-kind"); kind.textContent = tipo; kind.dataset.kind = tipo;
   $("#q-text").textContent = q.p;
   $("#q-opts").replaceChildren(...orden.map((oi, k) =>
-    h("div", { class: "opt", role: "radio", "aria-checked": "false", onclick: () => clicOpcion(k) },
+    h("label", { class: "opt", "data-k": String(k) },
+      h("input", { type: "radio", name: "opcion", value: String(k), "aria-label": "Opción " + LETRAS[k],
+        onchange: () => { if (cur && cur.fase === "elegir"){ cur.sel = k; pintarSeleccion(); } } }),
       h("span", { class: "bubble", text: LETRAS[k] }),
       h("span", { class: "otext", text: q.o[oi] }),
       h("span", { class: "mark", "aria-hidden": "true" }))));
+  pintarAyudaTeclas(orden.length);
   $("#q-fb").hidden = true;
   pintarSeleccion(); pintarMarcador(); botonPrincipal();
+  enfocarOpcion(0);
   window.scrollTo(0, 0);
 }
 function opciones(){ return [...document.querySelectorAll("#q-opts .opt")]; }
-function pintarSeleccion(){ opciones().forEach((o, k) => o.setAttribute("aria-checked", String(k === cur.sel && cur.fase === "elegir"))); }
+function enfocarOpcion(k){ opciones()[k]?.querySelector("input")?.focus({ preventScroll: true }); }
+function pintarAyudaTeclas(n){
+  const el = $("#keys-opts"); if (!el) return;
+  if (n < 1){ el.textContent = ""; return; }
+  el.replaceChildren(
+    h("kbd", { text: "A" }), "–", h("kbd", { text: LETRAS[n - 1] }), " o ",
+    h("kbd", { text: "1" }), "–", h("kbd", { text: String(n) }), " saltar a una opción",
+  );
+}
+function pintarSeleccion(){
+  opciones().forEach((o, k) => {
+    const inp = o.querySelector("input");
+    if (inp) inp.checked = k === cur.sel && cur.fase === "elegir";
+  });
+}
 function pintarMarcador(){
   $("#q-score").textContent = sesion.aciertos + " de " + sesion.n + " acertadas";
   const { rep, nue } = sesion.pendientes();
@@ -296,9 +336,26 @@ function botonPrincipal(){
   const b = $("#btn-main");
   b.replaceChildren(cur.fase === "elegir" ? "Confirmar " : "Continuar ", h("kbd", { text: "Enter" }));
 }
-function mover(d){ const n = cur.orden.length; cur.sel = (cur.sel + d + n) % n; pintarSeleccion(); }
-function seleccionar(k){ cur.sel = k; pintarSeleccion(); }
-function clicOpcion(k){ if (cur.fase !== "elegir") return; if (cur.sel === k) confirmar(); else seleccionar(k); }
+function mover(d){ const n = cur.orden.length; cur.sel = (cur.sel + d + n) % n; pintarSeleccion(); enfocarOpcion(cur.sel); }
+function seleccionar(k){ cur.sel = k; pintarSeleccion(); enfocarOpcion(k); }
+
+/* Con puntero, el primer clic selecciona (o confirma si ya estaba marcada) y con «primer toque» confirma siempre.
+   Con teclado, el cambio nativo del radio solo mueve la selección; Enter confirma. */
+$("#q-opts").addEventListener("pointerdown", (e) => {
+  if (!cur || cur.fase !== "elegir") return;
+  const opt = e.target.closest(".opt");
+  if (opt) selAntesPuntero = cur.sel;
+});
+$("#q-opts").addEventListener("click", (e) => {
+  if (!cur || cur.fase !== "elegir") return;
+  const opt = e.target.closest(".opt");
+  if (!opt || e.detail === 0) return; // teclado o lector de pantalla: comportamiento nativo
+  e.preventDefault();
+  const k = Number(opt.dataset.k);
+  const yaEstaba = selAntesPuntero === k;
+  seleccionar(k);
+  if (unaPulsacion || yaEstaba) confirmar();
+});
 
 function confirmar(){
   if (!cur || cur.fase !== "elegir") return;
@@ -306,7 +363,10 @@ function confirmar(){
   sesion.registrar(cur.q, ok);
   encolarRespuesta(cur.q.i, ok, Math.max(0, Date.now() - cur.t0));
   const ops = opciones();
-  ops.forEach((o) => o.setAttribute("aria-checked", "false"));
+  ops.forEach((o) => {
+    const inp = o.querySelector("input");
+    if (inp) { inp.disabled = true; inp.checked = false; }
+  });
   ops[cur.corr].classList.add("ok"); ops[cur.corr].querySelector(".mark").innerHTML = ICO_OK;
   const letra = LETRAS[cur.corr];
   if (ok){
@@ -362,6 +422,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ---------- Arranque ---------- */
+leerUnaPulsacion();
 sincronizarSeleccion(leerSeleccion() || []);
 leerCarga();
 pintarCarga();

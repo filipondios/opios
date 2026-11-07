@@ -150,16 +150,23 @@ export function paginaSimulacro({ temario }) {
       <a class="btn" href="/simulacro">Nuevo simulacro</a>
       <a class="btn" href="/estadisticas">Ver estadísticas</a>
     </div>
-  </main>`;
+  </main>
+
+  <dialog id="dlg-confirm" class="dlg" aria-labelledby="dlg-confirm-title">
+    <form method="dialog">
+      <h2 id="dlg-confirm-title"></h2>
+      <p id="dlg-confirm-msg"></p>
+      <div class="row">
+        <button class="btn" type="submit" value="cancel" id="dlg-confirm-cancel">Cancelar</button>
+        <span class="spacer"></span>
+        <button class="btn danger" type="submit" value="ok" id="dlg-confirm-ok">Aceptar</button>
+      </div>
+    </form>
+  </dialog>`;
 
   return layout({
     titulo: "Simulacro",
-    marca: "Simulacro",
-    enlaces: [
-      { href: "/", texto: "Hacer test" },
-      { href: "/estadisticas", texto: "Estadísticas" },
-      { href: "/temario", texto: "Temario" },
-    ],
+    actual: "simulacro",
     estado: "Guardado en la base de datos",
     css: ["test.css", "estadisticas.css", "simulacro.css"],
     js: ["etiquetas.js", "resultado.js", "simulacro.js"],

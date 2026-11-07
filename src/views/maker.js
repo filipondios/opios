@@ -103,12 +103,7 @@ export function paginaMaker({ temario }) {
 
   return layout({
     titulo: "Creador de preguntas",
-    marca: "Creador de preguntas",
-    enlaces: [
-      { href: "/", texto: "Hacer test" },
-      { href: "/simulacro", texto: "Simulacro" },
-      { href: "/estadisticas", texto: "Estadísticas" },
-    ],
+    actual: "maker",
     estado: "Guardado en la base de datos",
     ancho: true,
     css: ["maker.css"],

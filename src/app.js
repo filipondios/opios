@@ -11,9 +11,10 @@ import { paginaMaker } from "./views/maker.js";
 import { paginaTemario } from "./views/temario.js";
 import { paginaEstadisticas } from "./views/estadisticas.js";
 import { paginaSimulacro } from "./views/simulacro.js";
+import { paginaNoEncontrada } from "./views/error.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
-const pagina = (r) => new Response(aTexto(r), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+const pagina = (r, status = 200) => new Response(aTexto(r), { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
 
 /** Cuerpo JSON de una petición de escritura. Exigir application/json impide los envíos cruzados desde formularios de otras webs. */
 async function cuerpoJson(req) {
@@ -248,9 +249,9 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
 
   async function estatico(ruta) {
     const archivo = join(PUBLIC_DIR, normalize(ruta));
-    if (!archivo.startsWith(PUBLIC_DIR + sep)) return new Response("No encontrado", { status: 404 });
+    if (!archivo.startsWith(PUBLIC_DIR + sep)) return null;
     const f = Bun.file(archivo);
-    if (!(await f.exists())) return new Response("No encontrado", { status: 404 });
+    if (!(await f.exists())) return null;
     /* Fuentes e imágenes no cambian: se cachean para siempre. El resto se revalida (los nombres no llevan hash). */
     const cache = /\.(woff2?|ttf|otf|png|jpe?g|gif|svg|ico)$/i.test(archivo)
       ? "public, max-age=31536000, immutable" : "no-cache";
@@ -291,7 +292,8 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
         }));
       }
       if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas(), repo.cargaDiaria(fechaHoy())));
-      return await estatico(ruta);
+      const recurso = await estatico(ruta);
+      return recurso ?? pagina(paginaNoEncontrada(ruta), 404);
     }
     return new Response("Método no permitido", { status: 405 });
   }
