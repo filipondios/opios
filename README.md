@@ -121,32 +121,32 @@ Los repasos usan un **sistema Leitner simplificado de dos capas**: cada pregunta
 - Los simulacros están cronometrados y admiten puntuación con penalización. Fallar también baja dos cajas; acertar solo actualiza contadores. Un simulacro se puede reanudar si cierras la pestaña, y el guardado es idempotente.
 - Las estadísticas muestran el estado por tema, la previsión de repasos, el acierto semanal, la racha, el tiempo medio, las preguntas que más fallas y la evolución de tus simulacros.
 
-La estrategia se apoya en el efecto de espaciado y en el recuerdo activo (testing), no en una validación científica de los intervalos concretos: son una elección práctica.
+La estrategia se apoya en el efecto de espaciado y en el recuerdo activo (testing). Los tramos 1/7/16/35 coinciden con el algoritmo SM-0 de Wozniak, pero la secuencia exacta (con el paso de 3 días y el de 90) es una elección práctica, no una recomendación científica.
 
 ## Bibliografía
 
-Estado: **verificado** = el registro se comprobó contra una fuente; **por verificar** = localizado por el título, sin leer el registro completo.
+Estado: todas las entradas se han **verificado** contra una fuente (PubMed, CrossRef/DOI, catálogo editorial o sitio oficial).
 
 **Fundamentos**
 
-1. Ebbinghaus, H. (1885). *Über das Gedächtnis.* Leipzig: Duncker & Humblot. - *Por verificar* (referencia clásica del efecto de espaciado).
-2. Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin, 132*(3), 354-380. doi:10.1037/0033-2909.132.3.354. - *Verificado.*
-3. Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. *Psychological Science, 17*(3), 249-255. doi:10.1111/j.1467-9280.2006.01693.x. - *Verificado.*
-4. Butler, A. C., & Roediger, H. L. (2008). Feedback enhances the positive effects and reduces the negative effects of multiple-choice testing. *Memory & Cognition, 36*(3), 604-616. - *Por verificar.*
-5. Cepeda, N. J., Vul, E., Rohrer, D., Wixted, J. T., & Pashler, H. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. *Psychological Science, 19*(11), 1095-1102. - *Verificado.*
+1. Ebbinghaus, H. (1885). *Über das Gedächtnis: Untersuchungen zur experimentellen Psychologie.* Leipzig: Duncker & Humblot. - *Verificado* (Duncker & Humblot, Leipzig, 1885; obra fundacional sobre la memoria y el olvido, precursora del repaso espaciado).
+2. Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin, 132*(3), 354-380. doi:10.1037/0033-2909.132.3.354. - *Verificado* (PubMed PMID 16719566).
+3. Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. *Psychological Science, 17*(3), 249-255. doi:10.1111/j.1467-9280.2006.01693.x. - *Verificado* (PubMed PMID 16507066).
+4. Butler, A. C., & Roediger, H. L. (2008). Feedback enhances the positive effects and reduces the negative effects of multiple-choice testing. *Memory & Cognition, 36*(3), 604-616. doi:10.3758/MC.36.3.604. - *Verificado* (PubMed PMID 18491500).
+5. Cepeda, N. J., Vul, E., Rohrer, D., Wixted, J. T., & Pashler, H. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. *Psychological Science, 19*(11), 1095-1102. doi:10.1111/j.1467-9280.2008.02209.x. - *Verificado* (PubMed PMID 19076480).
 
 **Algoritmos**
 
-6. Leitner, S. (1972). *So lernt man lernen.* Freiburg: Herder. - *Por verificar* (origen del sistema de cajas).
-7. Wozniak, P. A. (1990). SM-2 algorithm, SuperMemo. - *Por verificar* la fuente exacta.
-8. Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. *Proceedings of the 28th ACM SIGKDD Conference.* - *Por verificar* (base de FSRS).
+6. Leitner, S. (1972). *So lernt man lernen.* Freiburg im Breisgau: Herder. ISBN 3-451-05060-9. - *Verificado* (origen del sistema de cajas).
+7. Wozniak, P. A. (1990). *Optimization of learning* (tesis de máster). Universidad de Tecnología de Poznań. - *Verificado* (algoritmos SM-0 y SM-2; el SM-0 fija los intervalos 1/7/16/35 días; origen de SuperMemo).
+8. Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. *KDD 2022: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining*, 4381-4390. doi:10.1145/3534678.3539081. - *Verificado* (base del modelo DHP/DSR de FSRS).
 
 **Fuentes prácticas**
 
-9. Manual de Anki, "Deck options" (https://docs.ankiweb.net/deck-options.html). - Guía práctica.
-10. Hilo del foro de Anki sobre la regla "new cards < 1/10 of the review limit" y las simulaciones de FSRS. - Opinión de usuarios, no evidencia controlada.
+9. Manual de Anki, "Deck options" (https://docs.ankiweb.net/deck-options.html). - *Verificado*; guía práctica.
+10. Hilo del foro de Anki "Which guideline should I follow: FSRS simulation results or the new card/review limit ratio rule?" (https://forums.ankiweb.net/t/which-guideline-should-i-follow-fsrs-simulation-results-or-the-new-card-review-limit-ratio-rule/70470). - *Verificado*; opinión de usuarios, no evidencia controlada.
 
-Ninguna de las referencias valida los intervalos concretos 1/3/7/16/35/90: son una elección práctica basada en los principios anteriores.
+Los tramos 1/7/16/35 de la secuencia coinciden con los del algoritmo SM-0 descrito por Wozniak (referencia 7), una aproximación práctica basada en sus experimentos de 1985; el paso de 3 días y el de 90 son ajustes propios de la app. Ninguna referencia valida la secuencia exacta 1/3/7/16/35/90 como óptima.
 
 ## Licencia
 
