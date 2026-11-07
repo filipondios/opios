@@ -285,7 +285,7 @@ describe("páginas y estáticos", () => {
     expect(html).toContain("&lt;script&gt;");
   });
   test("estáticos y path traversal", async () => {
-    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/etiquetas.js", "/js/resultado.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js", "/js/tema.js", "/favicon.svg"]) expect((await pet(f)).status).toBe(200);
+    for (const f of ["/css/base.css", "/css/test.css", "/css/maker.css", "/css/temario.css", "/css/estadisticas.css", "/css/simulacro.css", "/js/test.js", "/js/repaso.js", "/js/etiquetas.js", "/js/resultado.js", "/js/maker.js", "/js/temario.js", "/js/simulacro.js", "/js/tema.js", "/logo.png"]) expect((await pet(f)).status).toBe(200);
     expect((await pet("/../server.js")).status).toBe(404);
     expect((await pet("/%2e%2e/server.js")).status).toBe(404);
     expect((await pet("/nada.js")).status).toBe(404);
@@ -328,10 +328,12 @@ describe("interfaz, accesibilidad y tema", () => {
 
   test("favicon y 404 HTML", async () => {
     const home = await (await pet("/")).text();
-    expect(home).toContain('href="/favicon.svg"');
-    const fav = await pet("/favicon.svg");
+    expect(home).toContain('href="/logo.png"');
+    const fav = await pet("/logo.png");
     expect(fav.status).toBe(200);
-    expect(fav.headers.get("content-type")).toContain("image/svg+xml");
+    expect(fav.headers.get("content-type")).toContain("image/png");
+    const firma = new Uint8Array(await fav.arrayBuffer()).slice(0, 8);
+    expect([...firma]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
 
     const r = await pet("/ruta-que-no-existe");
     expect(r.status).toBe(404);

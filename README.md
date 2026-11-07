@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="opios" width="240">
+  <img src="logo.png" alt="opios" width="180">
 </p>
 
 <h1 align="center">opios</h1>
@@ -14,6 +14,7 @@ Actualmente incluye el banco de preguntas de las oposiciones al [Cuerpo de Técn
 - Simulacros cronometrados con penalización opcional y posibilidad de reanudarlos.
 - Programación con repaso espaciado y un cupo diario de preguntas nuevas.
 - Estadísticas: progreso por tema, previsión de repasos, acierto semanal, racha, tiempo medio y preguntas más falladas.
+- Interfaz accesible y cómoda en móvil: menú común, tema claro/oscuro, opciones con radios reales y respuesta al primer toque.
 - Todo en local: tu banco y tu progreso viven en un único archivo SQLite.
 
 ## Inicio rápido

@@ -22,7 +22,7 @@ export function layout({ titulo, marca = "Test infinito", actual = null, estado,
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>${titulo}</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/logo.png" type="image/png">
 <link rel="stylesheet" href="/css/base.css">
 ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
 <script>try{var t=localStorage.getItem("opios.tema");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
