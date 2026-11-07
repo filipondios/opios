@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="opios" width="200">
+  <img src="logo.png" alt="opios" width="180">
 </p>
 
 <h1 align="center">opios</h1>
