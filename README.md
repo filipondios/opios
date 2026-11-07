@@ -144,8 +144,6 @@ La estrategia se apoya en el efecto de espaciado y en el recuerdo activo (testin
 9. Anki. (s.f.). *Deck options*. Manual de Anki. https://docs.ankiweb.net/deck-options.html
 10. *Which guideline should I follow: FSRS simulation results or the new card/review limit ratio rule?* (s.f.). [Hilo de foro]. Anki Forums. https://forums.ankiweb.net/t/which-guideline-should-i-follow-fsrs-simulation-results-or-the-new-card-review-limit-ratio-rule/70470
 
-Los tramos 1/7/16/35 de la secuencia coinciden con los del algoritmo SM-0 descrito por Wozniak (referencia 7), una aproximación práctica basada en sus experimentos de 1985; el paso de 3 días y el de 90 son ajustes propios de la app. Ninguna referencia valida la secuencia exacta 1/3/7/16/35/90 como óptima.
-
 ## Licencia
 
 MIT © 2026 filipondios. Consulta [`LICENSE`](LICENSE).
