@@ -7,6 +7,7 @@ import { crearApp } from "../src/app.js";
 import { exportarPorBloques } from "../src/exportar.js";
 import { importarDirectorio } from "../src/seed.js";
 import { DIR_EJEMPLO, CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
+import { MIGRACIONES } from "../src/db/esquema.js";
 import { hoyIso, sumarDias } from "../src/fechas.js";
 import { copiaSeguridad } from "../src/backup.js";
 
@@ -848,7 +849,7 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
   const carga = async () => (await pet("/api/carga")).json();
 
   test("la migración crea la tabla respuestas con sus índices", () => {
-    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(11);
+    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(MIGRACIONES.length);
     expect(repo.db.query("SELECT name FROM sqlite_master WHERE type='table' AND name='respuestas'").get()).toBeTruthy();
     const indices = repo.db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='respuestas'").all().map((r) => r.name);
     expect(indices).toContain("idx_respuestas_fecha");

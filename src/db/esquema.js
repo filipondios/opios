@@ -1,4 +1,5 @@
 /* Esquema, migraciones y utilidades comunes de SQLite. */
+import { claveDe } from "../validar.js";
 
 export const MIGRACIONES = [
   /* v1 */ `
@@ -183,6 +184,20 @@ export const MIGRACIONES = [
   CREATE UNIQUE INDEX ux_preguntas_id_externo
     ON preguntas(id_externo) WHERE id_externo IS NOT NULL;
   `,
+
+  /* v12: bases creadas antes del renombrado usan la columna `clave`, con un enunciado normalizado
+     antiguo. Se pasa a `clave_norm` y se recalculan los valores con la normalización actual, para
+     que la deduplicación del seed reconozca las preguntas ya importadas. */
+  (db) => {
+    const columnas = db.query("PRAGMA table_info(preguntas)").all().map((c) => c.name);
+    if (!columnas.includes("clave")) return "SELECT 1";
+    db.run("DROP INDEX IF EXISTS ux_preguntas_clave_norm");
+    db.run("ALTER TABLE preguntas RENAME COLUMN clave TO clave_norm");
+    const actualizar = db.query("UPDATE preguntas SET clave_norm = ? WHERE id = ?");
+    for (const p of db.query("SELECT id, enunciado FROM preguntas").all()) actualizar.run(claveDe(p.enunciado), p.id);
+    db.run("CREATE UNIQUE INDEX IF NOT EXISTS ux_preguntas_clave_norm ON preguntas(clave_norm)");
+    return "SELECT 1";
+  },
 ];
 
 /** Comprueba si el SQLite de este build incluye FTS5. */
