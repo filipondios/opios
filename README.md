@@ -43,17 +43,17 @@ bun run seed --actualizar       # actualiza preguntas editadas conservando su id
 
 ## Usar tu propio banco
 
-La app lee las preguntas de un directorio externo, así que tu banco puede vivir en su propio repositorio (por ejemplo, `opios-preguntas`) sin arrastrar el código de la aplicación.
+La app lee las preguntas de un directorio externo, así que tu banco puede vivir en su propio repositorio (por ejemplo, `opios-bank`) sin arrastrar el código de la aplicación.
 
 - **`OPIOS_PREGUNTAS`**: ruta del banco. Si no la defines, se usa `./preguntas` cuando existe y, si no, el ejemplo `./ejemplo/`. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
 - **`OPIOS_SEED`**: cuándo importar al arrancar. `vacia` (por defecto) solo importa si la base de datos no tiene preguntas; `auto` importa en cada arranque (actualizando por `id_externo` para no duplicar); `no` no importa nunca.
-- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=../opios-preguntas`.
+- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=./opios-bank`.
 
 Flujo típico:
 
 ```bash
-git clone https://github.com/<usuario>/opios-preguntas ../opios-preguntas
-echo "OPIOS_PREGUNTAS=../opios-preguntas" > .env
+git clone https://github.com/<usuario>/opios-bank opios-bank
+echo "OPIOS_PREGUNTAS=./opios-bank" > .env
 bun run seed      # importa tu banco
 bun start
 ```

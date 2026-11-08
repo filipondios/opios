@@ -79,7 +79,7 @@ Notas:
 
 ```bash
 bun run validar                 # valida ./preguntas (o ./ejemplo si no existe)
-bun run validar ../opios-preguntas
+bun run validar ./opios-bank
 ```
 
 El comando importa el banco en una base de datos en memoria, así que no toca tu progreso. Lista los errores que invalidan el banco y los avisos que conviene revisar (temas sin archivo, duplicados, sesgo de longitud). Sale con código 1 si hay errores, lo que permite usarlo en integración continua.

@@ -13,3 +13,7 @@ data/*.db-wal
 .env
 .env.*
 !.env.example
+
+# Banco de preguntas local (clon de opios-bank) y formato antiguo
+opios-bank/
+preguntas/

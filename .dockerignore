@@ -1,10 +1,13 @@
 .git
 .gitignore
+.env
+.env.*
 node_modules
 data
 test
 .github
 README.md
+opios-bank
 **/generated
 **/generated/**
 Dockerfile

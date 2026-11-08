@@ -1,6 +1,6 @@
 # App genérica + banco de preguntas separado (Fase 8.5).
 # El contenedor no lleva tu banco dentro: monta el repo del banco como volumen de solo lectura.
-# Coloca este archivo junto a la app y el clon del banco en el directorio hermano `opios-preguntas`.
+# Coloca este archivo junto a la app y el clon del banco en el directorio `opios-bank`.
 services:
   opios:
     build: .
@@ -10,7 +10,7 @@ services:
       OPIOS_PREGUNTAS: /preguntas
       OPIOS_SEED: vacia      # cambia a `auto` para volver a importar en cada arranque (ver 8.2)
     volumes:
-      - ../opios-preguntas:/preguntas:ro
+      - ./opios-bank:/preguntas:ro
       - opios-data:/data
 
 volumes:
