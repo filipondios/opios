@@ -6,6 +6,14 @@
 
 <p align="center"><em>Un entrenador en local para exámenes tipo test, con repaso espaciado.</em></p>
 
+<p align="center">
+  <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/main?label=tests&style=flat-square" alt="Estado de los tests"></a>
+  <a href="https://github.com/filipondios/opios/blob/main/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
+  <a href="https://github.com/filipondios/opios/commits/main"><img src="https://badgen.net/github/last-commit/filipondios/opios/main?label=%C3%BAltimo%20commit&style=flat-square" alt="Último commit"></a>
+  <img src="https://badgen.net/badge/Bun/1.4.3?icon=bun&style=flat-square" alt="Bun 1.4.3">
+  <a href="https://github.com/filipondios/opios/blob/main/package.json"><img src="https://badgen.net/badge/dependencias/0/green?style=flat-square" alt="Sin dependencias"></a>
+</p>
+
 **Opios** es una pequeña aplicación autoalojada para estudiar bancos de preguntas. Organizas las preguntas por bloques y temas, y luego practicas con tests libres, simulacros cronometrados y repasos programados en tu máquina con [Bun](https://bun.com/) y [SQLite](https://www.sqlite.org/): sin cuentas, sin nube y sin dependencias externas.
 
 La aplicación es una herramienta genérica: no incluye ningún banco de preguntas, aunque esta app la creé para prepararme las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España). Lee un directorio configurable (por defecto `./preguntas`, o el banco de ejemplo `./ejemplo/` si no existe) y trae ese ejemplo para que puedas probarla nada más clonarla. Algunas de las funcionalidades de esta app son:
