@@ -577,8 +577,9 @@ describe("estadísticas y simulacros", () => {
   });
 
   test("el cliente envía el índice original al guardar (opciones barajadas)", async () => {
-    const js = await (await pet("/js/simulacro.js")).text();
-    expect(js).toContain("q.originales[respuestas[i]]");
+    const { respuestasParaGuardar } = await import("../public/js/simulacro-logica.js");
+    expect(respuestasParaGuardar([{ id: 7, originales: [2, 0, 1] }], [2]))
+      .toEqual([{ id: 7, elegida: 1 }]);
   });
 
   test("el aviso distingue entre sin actividad y solo simulacros", async () => {
@@ -758,16 +759,9 @@ describe("estadísticas y simulacros", () => {
 });
 
 describe("etiquetas y resultados del cliente", () => {
-  const evaluarCliente = async (archivo) => {
-    const codigo = await Bun.file(join(import.meta.dir, "..", "public", "js", archivo)).text();
-    const global = {};
-    new Function("window", codigo)(global);
-    return global;
-  };
-
   test("la etiqueta de tema es la misma en servidor y cliente", async () => {
     const { etiquetaTema } = await import("../src/etiquetas.js");
-    const { etiquetaTema: enCliente } = await evaluarCliente("etiquetas.js");
+    const { etiquetaTema: enCliente } = await import("../public/js/etiquetas.js");
     const casos = [
       { numero: 3, nombre: "Redes", bloque_nombre: "Bloque II" },
       { tema: 5, tema_numero: 2, tema_nombre: "Hardware", bloque_nombre: "Bloque I" },
@@ -781,7 +775,7 @@ describe("etiquetas y resultados del cliente", () => {
   });
 
   test("el desglose del simulacro agrupa por id de tema, no por número", async () => {
-    const { calcularResultado } = await evaluarCliente("resultado.js");
+    const { calcularResultado } = await import("../public/js/resultado.js");
     const preguntas = [
       { tema: 10, temaNumero: 1, temaNombre: "Uno del bloque I", bloque: "Bloque I", correcta: 0 },
       { tema: 20, temaNumero: 1, temaNombre: "Uno del bloque II", bloque: "Bloque II", correcta: 1 },
@@ -797,7 +791,7 @@ describe("etiquetas y resultados del cliente", () => {
   });
 
   test("tres fallos con penalización 1/3 restan exactamente un punto", async () => {
-    const { calcularResultado } = await evaluarCliente("resultado.js");
+    const { calcularResultado } = await import("../public/js/resultado.js");
     const preguntas = [0, 1, 2].map(() => ({ tema: 1, temaNumero: 1, correcta: 0 }));
     const res = calcularResultado(preguntas, [1, 1, 1], 1 / 3, 10);
     expect(res.fallos).toBe(3);

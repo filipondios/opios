@@ -12,5 +12,18 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.3
+      - name: Linter
+        run: bunx @biomejs/biome@2.6.6 lint src test scripts server.js public/js
+      - name: Formato de los módulos nuevos
+        run: >-
+          bunx @biomejs/biome@2.6.6 format
+          src/db
+          src/db.js
+          public/js/comun.js
+          public/js/simulacro-logica.js
+          public/js/resultado.js
+          public/js/etiquetas.js
+          test/cliente.test.js
+          test/migraciones.test.js
       - name: Ejecutar tests
         run: bun test

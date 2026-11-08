@@ -1,37 +1,16 @@
+import { api, h, msgError as msg } from "./comun.js";
+import { etiquetaTema } from "./etiquetas.js";
+
 /* Página del temario (cliente): gestiona bloques y temas contra /api/temario, /api/bloques y /api/temas. */
 (() => {
 "use strict";
 
 const $ = (s) => document.querySelector(s);
-function h(tag, props, ...kids){
-  const e = document.createElement(tag);
-  if (props) for (const [k, v] of Object.entries(props)){
-    if (k === "class") e.className = v;
-    else if (k === "text") e.textContent = v;
-    else if (k === "disabled") e.disabled = !!v;
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
-  }
-  for (const c of kids.flat()) if (c != null) e.append(c);
-  return e;
-}
-const msg = (e) => (e && e.message) ? e.message : String(e);
 function setStatus(kind, text){ const s = $("#status"); s.dataset.state = kind; s.textContent = text; }
 function nota(texto){
   const n = $("#note");
   if (!texto){ n.hidden = true; n.replaceChildren(); return; }
   n.textContent = texto; n.hidden = false;
-}
-
-/* ---------- API ---------- */
-async function api(url, metodo, cuerpo){
-  const opc = { method: metodo || "GET" };
-  if (cuerpo !== undefined){ opc.headers = { "Content-Type": "application/json" }; opc.body = JSON.stringify(cuerpo); }
-  const r = await fetch(url, opc);
-  if (r.status === 204) return null;
-  let datos = {}; try { datos = await r.json(); } catch (e) {}
-  if (!r.ok) throw new Error(datos.error || "El servidor respondió " + r.status + ".");
-  return datos;
 }
 
 /* ---------- Estado ---------- */
@@ -110,17 +89,17 @@ async function moverBloque(i, delta){
   const j = i + delta;
   if (j < 0 || j >= reales.length) return;
   [reales[i], reales[j]] = [reales[j], reales[i]];
-  try { await api("/api/bloques/reordenar", "POST", { ids: reales.map((b) => b.id) }); }
+  try { await api("/api/bloques/reordenar", { metodo: "POST", cuerpo: { ids: reales.map((b) => b.id) } }); }
   catch (e) { nota(msg(e)); setStatus("warn", msg(e)); }
   await cargar();
 }
 async function borrarBloque(b){
-  await api("/api/bloques/" + b.id, "DELETE");
+  await api("/api/bloques/" + b.id, { metodo: "DELETE" });
   await cargar();
   nota("Bloque «" + b.nombre + "» borrado.");
 }
 async function borrarTema(t){
-  await api("/api/temas/" + t.id, "DELETE");
+  await api("/api/temas/" + t.id, { metodo: "DELETE" });
   await cargar();
   nota("Tema " + (t.numero ?? t.id) + " borrado.");
 }
@@ -176,16 +155,16 @@ $("#dlg-form").addEventListener("submit", async (e) => {
     if (modo.tipo === "bloque"){
       const nombre = $("#d-nombre").value.trim();
       if (!nombre) throw new Error("Escribe el nombre del bloque.");
-      if (modo.id) await api("/api/bloques/" + modo.id, "PUT", { nombre });
-      else await api("/api/bloques", "POST", { nombre });
+      if (modo.id) await api("/api/bloques/" + modo.id, { metodo: "PUT", cuerpo: { nombre } });
+      else await api("/api/bloques", { metodo: "POST", cuerpo: { nombre } });
     } else {
       const bloque = Number($("#d-bloque").value);
       const numero = Number($("#d-numero").value);
       const nombre = $("#d-tnombre").value.trim();
       if (!Number.isInteger(bloque) || bloque <= 0) throw new Error("Elige un bloque.");
       if (!Number.isInteger(numero) || numero < 0) throw new Error("El número de tema debe ser un entero (0 o más).");
-      if (modo.id) await api("/api/temas/" + modo.id, "PUT", { bloque, numero, nombre });
-      else await api("/api/temas", "POST", { bloque, numero, nombre });
+      if (modo.id) await api("/api/temas/" + modo.id, { metodo: "PUT", cuerpo: { bloque, numero, nombre } });
+      else await api("/api/temas", { metodo: "POST", cuerpo: { bloque, numero, nombre } });
     }
     $("#dlg").close();
     await cargar();

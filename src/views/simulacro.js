@@ -169,7 +169,7 @@ export function paginaSimulacro({ temario }) {
     actual: "simulacro",
     estado: "Guardado en la base de datos",
     css: ["test.css", "estadisticas.css", "simulacro.css"],
-    js: ["etiquetas.js", "resultado.js", "simulacro.js"],
+    js: ["simulacro.js"],
     cuerpo,
   });
 }

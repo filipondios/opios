@@ -1,46 +1,16 @@
+import { api, h, LETRAS, msgError } from "./comun.js";
+import { calcularResultado } from "./resultado.js";
+import { estadoReloj, mmss, prepararPreguntas, respuestasParaGuardar } from "./simulacro-logica.js";
+import { etiquetaTema } from "./etiquetas.js";
+
 /* Simulacro (cliente): configuración, examen cronometrado y revisión final.
    Las preguntas se piden a /api/test y el resultado se guarda en /api/simulacros. */
 (() => {
 "use strict";
 
-const LETRAS = "ABCDEFGH";
 const $ = (s) => document.querySelector(s);
-
-function h(tag, props, ...kids){
-  const e = document.createElement(tag);
-  if (props) for (const [k, v] of Object.entries(props)){
-    if (v == null || v === false) continue;
-    if (k === "class") e.className = v;
-    else if (k === "text") e.textContent = v;
-    else if (k === "open") e.open = !!v;
-    else if (k === "checked") e.checked = !!v;
-    else if (k === "disabled") e.disabled = !!v;
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
-  }
-  for (const c of kids.flat()) if (c != null && c !== false) e.append(c);
-  return e;
-}
-
-const msgError = (e) => (e && e.message) ? e.message : String(e);
-const setStatus = (kind, text) => { const s = $("#status"); s.dataset.state = kind; s.textContent = text; };
 const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
-const mmss = (segundos) => {
-  const s = Math.max(0, Math.round(segundos));
-  return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
-};
-const barajar = (a) => {
-  for (let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-async function api(url, metodo = "GET", cuerpo){
-  const opc = { method: metodo, headers: {} };
-  if (cuerpo !== undefined){ opc.headers["Content-Type"] = "application/json"; opc.body = JSON.stringify(cuerpo); }
-  return fetch(url, opc);
-}
+const setStatus = (kind, text) => { const s = $("#status"); s.dataset.state = kind; s.textContent = text; };
 
 let pantalla = "setup";
 let preguntas = [], respuestas = [], cur = 0, cursor = 0;
@@ -91,9 +61,10 @@ function mostrarReanudar(){
   caja.hidden = !valido;
   if (!valido) return;
   const hechas = curso.respuestas.filter((r) => r != null).length;
-  const restante = Number.isFinite(curso.fin)
-    ? Math.max(0, Math.round((curso.fin - Date.now()) / 1000))
-    : Math.max(0, Number(curso.minutos) || 0) * 60;
+  const finCurso = Number.isFinite(curso.fin)
+    ? curso.fin
+    : Date.now() + (Number(curso.minutos) || 0) * 60_000;
+  const { segundos: restante } = estadoReloj(finCurso);
   $("#reanudar-info").textContent = `${curso.preguntas.length} preguntas · ${hechas} respondidas · `
     + (restante > 0 ? `quedan ${mmss(restante)}` : "tiempo agotado (se corregirá al reanudar)");
 }
@@ -170,11 +141,10 @@ function iniciarReloj(min){
   timer = setInterval(actualizarReloj, 1000);
 }
 function actualizarReloj(){
-  const restante = Math.max(0, fin - Date.now());
-  const segundos = Math.ceil(restante / 1000);
+  const { segundos, agotado, bajo } = estadoReloj(fin);
   const el = $("#exam-timer");
-  if (el){ el.textContent = mmss(segundos); el.dataset.low = String(segundos <= 300); }
-  if (restante <= 0){ clearInterval(timer); finalizar(true); }
+  if (el){ el.textContent = mmss(segundos); el.dataset.low = String(bajo); }
+  if (agotado){ clearInterval(timer); finalizar(true); }
 }
 
 async function empezar(){
@@ -189,22 +159,9 @@ async function empezar(){
   boton.disabled = true;
   setStatus("busy", "Cargando preguntas…");
   try {
-    const r = await api("/api/test?temas=" + seleccion.sort((a, b) => a - b).join(","));
-    if (!r.ok) throw new Error("El servidor respondió " + r.status + ".");
-    const d = await r.json();
+    const d = await api("/api/test?temas=" + seleccion.sort((a, b) => a - b).join(","));
     if (!d.preguntas.length) throw new Error("Los temas elegidos no tienen preguntas.");
-    preguntas = barajar(d.preguntas).slice(0, n).map((q) => {
-      const orden = barajar(q.respuestas.map((_, k) => k));
-      return {
-        id: q.id, tema: q.tema, temaNumero: q.tema_numero ?? q.tema,
-        bloque: q.bloque_nombre ?? "", temaNombre: q.tema_nombre ?? "",
-        pregunta: q.pregunta,
-        opciones: orden.map((k) => q.respuestas[k]),
-        originales: orden,
-        correcta: orden.indexOf(q.correcta),
-        explicacion: q.explicacion,
-      };
-    });
+    preguntas = prepararPreguntas(d.preguntas, { n });
     respuestas = new Array(preguntas.length).fill(null);
     temas = seleccion; penalizacion = pen; minutos = min; cur = 0;
     finalizado = false; inicio = Date.now();
@@ -428,10 +385,7 @@ function cuerpoSimulacro(res){
     temas,
     segundos: res.segundos,
     penalizacion,
-    respuestas: preguntas.map((q, i) => ({
-      id: q.id,
-      elegida: respuestas[i] == null ? -1 : q.originales[respuestas[i]],
-    })),
+    respuestas: respuestasParaGuardar(preguntas, respuestas),
   };
 }
 
@@ -452,12 +406,7 @@ async function enviarPendientes(){
       const item = pendientes()[0];
       if (!item) break;
       try {
-        const r = await api("/api/simulacros", "POST", item.cuerpo);
-        if (!r.ok){
-          const d = await r.json().catch(() => ({}));
-          throw new Error(d.error || ("El servidor respondió " + r.status + "."));
-        }
-        await r.json();
+        await api("/api/simulacros", { metodo: "POST", cuerpo: item.cuerpo });
         escribir(CLAVE_PENDIENTE, pendientes().filter((x) => x.clave !== item.clave));
       } catch (e){
         fallos++;

@@ -38,7 +38,7 @@ export function paginaTemario() {
     actual: "temario",
     estado: "Guardado en la base de datos",
     css: ["maker.css", "temario.css"],
-    js: ["etiquetas.js", "temario.js"],
+    js: ["temario.js"],
     cuerpo,
   });
 }

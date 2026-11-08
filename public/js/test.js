@@ -1,4 +1,6 @@
 import { Sesion } from "./repaso.js";
+import { api, barajar, h, LETRAS, msgError } from "./comun.js";
+import { etiquetaTema } from "./etiquetas.js";
 
 /* Test infinito (cliente): UI del test. El planificador vive en ./repaso.js.
    Los datos viven en el servidor (SQLite): preguntas por /api/test y progreso por /api/progreso. */
@@ -8,35 +10,9 @@ import { Sesion } from "./repaso.js";
 /* ---------- Parámetros de la UI ---------- */
 const PAUSA_ACIERTO_MS  = 450;     // pausa tras un acierto antes de pasar a la siguiente
 const ETIQUETA          = "Guardado en la base de datos";
-const LETRAS = "ABCDEFGH";
 
 /* ---------- Utilidades ---------- */
 const $ = (s) => document.querySelector(s);
-function h(tag, props, ...kids){
-  const e = document.createElement(tag);
-  if (props) for (const [k, v] of Object.entries(props)){
-    if (k === "class") e.className = v;
-    else if (k === "text") e.textContent = v;
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
-  }
-  for (const c of kids.flat()) if (c != null) e.append(c);
-  return e;
-}
-function barajar(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-const msgError = (e) => (e && e.message) ? e.message : String(e);
-
-/* ---------- API ---------- */
-async function api(url, opciones){
-  const r = await fetch(url, opciones);
-  if (!r.ok){
-    let m = "El servidor respondió " + r.status + ".";
-    try { const d = await r.json(); if (d && d.error) m = d.error; } catch (e) {}
-    throw new Error(m);
-  }
-  return r;
-}
-const JSON_HEAD = { "Content-Type": "application/json" };
 
 /* ---------- Estado ---------- */
 let bank = [];          // preguntas de la sesión: {i,t,p,o,c,e}
@@ -79,8 +55,8 @@ async function guardarProgreso(){
   setStatus("busy", "Guardando…");
   try {
     await api("/api/progreso", {
-      method: "POST", headers: JSON_HEAD, keepalive: true,
-      body: JSON.stringify(ids.map((id) => { const p = progress[id]; return { id, caja: p[0], vence: p[1], aciertos: p[2], fallos: p[3] }; })),
+      metodo: "POST", keepalive: true,
+      cuerpo: ids.map((id) => { const p = progress[id]; return { id, caja: p[0], vence: p[1], aciertos: p[2], fallos: p[3] }; }),
     });
     setStatus("ok", ETIQUETA);
   } catch (e) { ids.forEach((id) => sucios.add(id)); setStatus("warn", "No se pudo guardar: " + msgError(e)); }
@@ -100,8 +76,8 @@ async function guardarRespuestas(){
   const lote = respuestasCola; respuestasCola = [];
   try {
     await api("/api/respuestas", {
-      method: "POST", headers: JSON_HEAD, keepalive: true,
-      body: JSON.stringify({ respuestas: lote }),
+      metodo: "POST", keepalive: true,
+      cuerpo: { respuestas: lote },
     });
   } catch (e) {
     respuestasCola = lote.concat(respuestasCola);
@@ -189,7 +165,7 @@ function actualizarResumen(){
 /* Pide al servidor la rejilla actualizada (estadísticas tras una sesión o un reinicio). */
 async function refrescarTemas(){
   try {
-    $("#grid").innerHTML = await (await api("/fragmentos/temas")).text();
+    $("#grid").innerHTML = await (await api("/fragmentos/temas", { bruto: true })).text();
     leerCarga();
     sincronizarSeleccion();
     pintarCarga();
@@ -231,7 +207,7 @@ function conConfirmacion(btn, texto, accion){
 conConfirmacion($("#btn-clear-prog"), "Progreso reiniciado: todas las preguntas vuelven a ser nuevas.", async () => {
   clearTimeout(timerGuardado); sucios.clear();
   clearTimeout(timerRespuestas); respuestasCola = [];
-  await api("/api/progreso", { method: "DELETE" });
+  await api("/api/progreso", { metodo: "DELETE" });
   progress = {};
   await refrescarTemas();
 });
@@ -252,7 +228,7 @@ async function guardarExamen(){
   const input = $("#cfg-examen"); if (!input) return;
   setStatus("busy", "Guardando...");
   try {
-    const d = await (await api("/api/ajustes", { method: "PUT", headers: JSON_HEAD, body: JSON.stringify({ fecha_examen: input.value || null }) })).json();
+    const d = await api("/api/ajustes", { metodo: "PUT", cuerpo: { fecha_examen: input.value || null } });
     examenInfo = d.examen; pintarExamen(); setStatus("ok", ETIQUETA);
   } catch (e) { setStatus("warn", "No se pudo guardar la fecha: " + msgError(e)); }
 }
@@ -269,7 +245,7 @@ async function empezar(){
   try {
     await guardarProgreso();
     await guardarRespuestas();
-    const d = await (await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","))).json();
+    const d = await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","));
     bank = d.preguntas.map((q) => ({
       i: q.id, t: q.tema, tn: q.tema_numero ?? q.tema, bn: q.bloque_nombre ?? "", nb: q.tema_nombre ?? "",
       p: q.pregunta, o: q.respuestas, c: q.correcta, e: q.explicacion,

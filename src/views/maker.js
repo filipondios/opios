@@ -107,7 +107,7 @@ export function paginaMaker({ temario }) {
     estado: "Guardado en la base de datos",
     ancho: true,
     css: ["maker.css"],
-    js: ["etiquetas.js", "maker.js"],
+    js: ["maker.js"],
     cuerpo,
   });
 }

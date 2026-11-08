@@ -140,8 +140,7 @@ export function paginaHome({ temas, carga = null, examen = null }) {
     actual: "test",
     estado: "Guardado en la base de datos",
     css: ["test.css"],
-    js: vacio ? [] : ["etiquetas.js", "test.js"],
-    jsModulo: !vacio,
+    js: vacio ? [] : ["test.js"],
     cuerpo,
   });
 }

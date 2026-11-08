@@ -12,9 +12,9 @@ const PAGINAS = [
 /**
  * Plantilla base de todas las páginas.
  * `actual` es el id de la página en el menú (test, simulacro, estadisticas, maker, temario).
- * `jsModulo` carga los scripts con `type="module"` (necesario si usan `import`).
+ * Los scripts indicados en `js` se cargan como módulos ESM.
  */
-export function layout({ titulo, marca = "Test infinito", actual = null, estado, estadoTipo = "ok", ancho = false, css = [], js = [], jsModulo = false, cuerpo }) {
+export function layout({ titulo, marca = "Test infinito", actual = null, estado, estadoTipo = "ok", ancho = false, css = [], js = [], cuerpo }) {
   return html`<!doctype html>
 <html lang="es">
 <head>
@@ -43,9 +43,7 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
   </header>
 ${cuerpo}
 </div>
-${js.map((s) => jsModulo
-  ? html`<script type="module" src="/js/${s}"></script>`
-  : html`<script src="/js/${s}" defer></script>`)}
+${js.map((s) => html`<script type="module" src="/js/${s}"></script>`)}
 <script src="/js/tema.js" defer></script>
 </body>
 </html>

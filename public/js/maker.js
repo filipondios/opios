@@ -1,34 +1,12 @@
+import { api, h, LETRAS, MAX_OPC, MIN_OPC, msgError as msg } from "./comun.js";
+import { etiquetaTema } from "./etiquetas.js";
+
 /* Creador de preguntas (cliente): edita directamente la base de datos a través de /api/preguntas. */
 (() => {
 "use strict";
 
-const LETRAS = "ABCDEFGH";
-const MAX_OPC = 8, MIN_OPC = 2, OPC_INICIALES = 4, PAGINA = 50, MAX_ETIQUETA = 60;
+const OPC_INICIALES = 4, PAGINA = 50, MAX_ETIQUETA = 60;
 const $ = (s) => document.querySelector(s);
-function h(tag, props, ...kids){
-  const e = document.createElement(tag);
-  if (props) for (const [k, v] of Object.entries(props)){
-    if (k === "class") e.className = v;
-    else if (k === "text") e.textContent = v;
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
-  }
-  for (const c of kids.flat()) if (c != null) e.append(c);
-  return e;
-}
-const msg = (e) => (e && e.message) ? e.message : String(e);
-
-/* ---------- API ---------- */
-class ErrorHttp extends Error { constructor(status, datos){ super(datos.error || "El servidor respondió " + status + "."); this.status = status; this.datos = datos; } }
-async function api(url, metodo, cuerpo){
-  const opc = { method: metodo || "GET" };
-  if (cuerpo !== undefined){ opc.headers = { "Content-Type": "application/json" }; opc.body = JSON.stringify(cuerpo); }
-  const r = await fetch(url, opc);
-  if (r.status === 204) return null;
-  let datos = {}; try { datos = await r.json(); } catch (e) {}
-  if (!r.ok) throw new ErrorHttp(r.status, datos);
-  return datos;
-}
 
 /* ---------- Estado ---------- */
 let items = [];         // página(s) cargadas: { id, tema, pregunta, respuestas[], correcta, explicacion }
@@ -155,8 +133,11 @@ async function persistir(q, id, reemplazo){
   const edicion = id !== null;
   setStatus("busy", "Guardando…");
   try {
-    await (edicion ? api("/api/preguntas/" + id, "PUT", cuerpoDe(q)) : api("/api/preguntas", "POST", cuerpoDe(q)));
-    if (reemplazo && editando !== null && editando !== id) await api("/api/preguntas/" + editando, "DELETE");
+    await (edicion
+      ? api("/api/preguntas/" + id, { metodo: "PUT", cuerpo: cuerpoDe(q) })
+      : api("/api/preguntas", { metodo: "POST", cuerpo: cuerpoDe(q) }));
+    if (reemplazo && editando !== null && editando !== id)
+      await api("/api/preguntas/" + editando, { metodo: "DELETE" });
   } catch (e) { setStatus("warn", "No se pudo guardar"); throw e; }
   setStatus("ok", "Guardado en la base de datos");
   editando = null;
@@ -278,7 +259,7 @@ function duplicar(q){
   flash("Copia cargada: cambia el enunciado y añádela.");
 }
 async function borrar(id){
-  try { await api("/api/preguntas/" + id, "DELETE"); }
+  try { await api("/api/preguntas/" + id, { metodo: "DELETE" }); }
   catch (e) { flash("No se pudo borrar: " + msg(e), "warn"); return; }
   if (editando === id){ editando = null; draft = nuevoBorrador(draft.tema); pintarEditor(); }
   await recargar();
