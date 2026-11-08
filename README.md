@@ -9,7 +9,6 @@
 <p align="center">
   <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/main?label=tests&style=flat-square" alt="Estado de los tests"></a>
   <a href="https://github.com/filipondios/opios/blob/main/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
-  <a href="https://github.com/filipondios/opios/commits/main"><img src="https://badgen.net/github/last-commit/filipondios/opios/main?label=%C3%BAltimo%20commit&style=flat-square" alt="Último commit"></a>
   <img src="https://badgen.net/badge/Bun/1.4.3?icon=bun&style=flat-square" alt="Bun 1.4.3">
   <a href="https://github.com/filipondios/opios/blob/main/package.json"><img src="https://badgen.net/badge/dependencias/0/green?style=flat-square" alt="Sin dependencias"></a>
 </p>
