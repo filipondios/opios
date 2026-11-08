@@ -1,0 +1,7 @@
+{
+  "nombre": "Bloque 2. Cultura general",
+  "temas": [
+    { "numero": 1, "titulo": "Ciencia y naturaleza" },
+    { "numero": 2, "titulo": "Arte y literatura" }
+  ]
+}

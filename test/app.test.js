@@ -6,7 +6,7 @@ import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
 import { exportarPorBloques } from "../src/exportar.js";
 import { importarDirectorio } from "../src/seed.js";
-import { DIR_PREGUNTAS, CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
+import { DIR_EJEMPLO, CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
 import { hoyIso, sumarDias } from "../src/fechas.js";
 import { copiaSeguridad } from "../src/backup.js";
 
@@ -96,13 +96,16 @@ describe("importación de JSON", () => {
     expect(r.avisos.filter((a) => a.includes("depender del orden")).length).toBe(1);
   });
 
-  test("el banco real importa sin errores (smoke)", async () => {
-    const r = await importarDirectorio(repo, DIR_PREGUNTAS);
+  test("el banco de ejemplo importa sin errores (smoke)", async () => {
+    const r = await importarDirectorio(repo, DIR_EJEMPLO);
     expect(r.errores).toEqual([]);
-    expect(r.nuevas).toBeGreaterThan(0);
+    expect(r.nuevas).toBe(26);
     const t = repo.temario();
-    expect(t[0]).toMatchObject({ numero: 1, gestionado: true });
-    expect(t[0].temas.length).toBeGreaterThanOrEqual(3);
+    expect(t.map((b) => [b.numero, b.nombre, b.gestionado])).toEqual([
+      [1, "Bloque 1. Geografía", true],
+      [2, "Bloque 2. Cultura general", true],
+    ]);
+    expect(t[0].temas.map((x) => x.numero)).toEqual([1, 2]);
   });
 
   test("exportar y reimportar da el mismo banco", async () => {
@@ -321,7 +324,10 @@ describe("páginas y estáticos", () => {
   test("home vacía y con datos; navegación entre páginas", async () => {
     let html = await (await pet("/")).text();
     expect(html).toContain("Todavía no hay preguntas");
+    expect(html).toContain("OPIOS_PREGUNTAS");
+    expect(html).toContain("bun run seed");
     expect(html).toContain('href="/maker"');
+    expect(await (await pet("/temario")).text()).toContain("OPIOS_PREGUNTAS");
     await importarDirectorio(repo, DIR_FIXTURE);
     html = await (await pet("/")).text();
     expect(html).toContain('data-tema="1"'); expect(html).toContain('data-tema="2"');

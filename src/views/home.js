@@ -78,7 +78,7 @@ export function paginaHome({ temas, carga = null, examen = null }) {
     ${vacio ? html`
     <section id="empty" class="stack">
       <h1>Todavía no hay preguntas</h1>
-      <p class="lede">La base de datos está vacía. Añade preguntas desde el creador o copia archivos JSON en <code>preguntas/</code> y ejecuta <code>bun run seed</code>.</p>
+      <p class="lede">La base de datos está vacía. Apunta <code>OPIOS_PREGUNTAS</code> a la carpeta de tu banco y ejecuta <code>bun run seed</code>, o crea preguntas desde el creador. Sin configurar nada, la app usa el banco de ejemplo de <code>ejemplo/</code>.</p>
       <div class="row"><a class="btn primary" href="/maker">Añadir preguntas</a><a class="btn" href="/temario">Organizar temario</a></div>
     </section>` : html`
     <section id="ready" class="stack">

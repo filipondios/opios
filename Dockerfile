@@ -6,7 +6,7 @@ COPY package.json server.js ./
 COPY src ./src
 COPY public ./public
 COPY scripts ./scripts
-COPY preguntas ./preguntas
+COPY ejemplo ./ejemplo
 ENV HOST=0.0.0.0 \
     PORT=10000 \
     OPIOS_DB=/data/opios.db \

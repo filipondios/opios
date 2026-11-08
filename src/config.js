@@ -1,8 +1,31 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 export const ROOT = join(import.meta.dir, "..");
 export const PUBLIC_DIR = join(ROOT, "public");
-export const DIR_PREGUNTAS = join(ROOT, "preguntas");
+
+/* Banco de preguntas (Fase 8.1). `preguntas/` es el banco propio (o el clon del repo del banco);
+   `ejemplo/` es la muestra que trae la app para que arranque sin configurar nada. */
+export const DIR_PREGUNTAS_POR_DEFECTO = join(ROOT, "preguntas");
+export const DIR_EJEMPLO = join(ROOT, "ejemplo");
+
+/**
+ * Decide qué directorio de preguntas usar. Función pura: recibe las variables de entorno y un
+ * comprobador de existencia, de modo que se puede probar sin tocar el sistema de archivos.
+ * - Si `OPIOS_PREGUNTAS` está definida, manda: si la carpeta no existe, se lanza un error claro.
+ * - Si no, se usa `preguntas/` cuando existe y `ejemplo/` en caso contrario.
+ */
+export function resolverDirPreguntas(env = {}, existe = () => false) {
+  const indicado = String(env.OPIOS_PREGUNTAS ?? "").trim();
+  if (indicado) {
+    if (!existe(indicado))
+      throw new Error(`OPIOS_PREGUNTAS apunta a «${indicado}», que no existe. Corrige la ruta o quita la variable.`);
+    return indicado;
+  }
+  return existe(DIR_PREGUNTAS_POR_DEFECTO) ? DIR_PREGUNTAS_POR_DEFECTO : DIR_EJEMPLO;
+}
+
+export const DIR_PREGUNTAS = resolverDirPreguntas(process.env, (p) => existsSync(p));
 
 export const PORT = Number(process.env.PORT ?? 8000);
 // Solo accesible desde esta máquina.
@@ -21,6 +44,22 @@ export const AUTH = process.env.AUTH_USER && process.env.AUTH_PASS
 export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
 // Zona horaria para calcular «hoy» en el servidor (p. ej. Europe/Madrid). Vacío = zona del sistema.
 export const APP_TZ = process.env.APP_TZ ?? null;
+
+/* Modo de importación al arrancar (Fase 8.2): `vacia` (solo si la BD no tiene preguntas),
+   `auto` (en cada arranque, con --actualizar) o `no` (nunca). */
+export const OPIOS_SEED = String(process.env.OPIOS_SEED ?? "vacia").trim().toLowerCase();
+
+/**
+ * Decide si hay que importar el banco al arrancar. Función pura.
+ * Con `auto` y sin `OPIOS_PREGUNTAS`, solo importa si la BD está vacía: evita meter el banco de
+ * ejemplo en una BD real por haber olvidado la variable.
+ */
+export function debeImportar(modo, bdVacia, hayVariable) {
+  if (modo === "no") return false;
+  if (modo === "vacia") return bdVacia;
+  if (modo === "auto") return hayVariable || bdVacia;
+  throw new Error(`OPIOS_SEED no válido: «${modo}» (valores admitidos: vacia, auto, no).`);
+}
 
 /* Reglas compartidas */
 export const MIN_OPC = 2;

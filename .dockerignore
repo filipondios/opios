@@ -5,11 +5,11 @@ data
 test
 .github
 README.md
+CONTEXT.md
 INSPECCION.md
 TODO.md
-CONTEXT.md
 apuntes
-preguntas/examenes
+preguntas
 **/generated
 **/generated/**
 Dockerfile

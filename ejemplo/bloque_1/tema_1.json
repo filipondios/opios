@@ -1,0 +1,58 @@
+[
+  {
+    "pregunta": "¿Cuál es el río más caudaloso del mundo?",
+    "respuestas": ["El Amazonas", "El Misisipi", "El Nilo", "El Volga"],
+    "respuesta_correcta": "a",
+    "explicacion": "El Amazonas es el río con mayor caudal del planeta, muy por delante del siguiente.",
+    "id_externo": "ejemplo-b1t1-01"
+  },
+  {
+    "pregunta": "¿Cuál es el océano más extenso del planeta?",
+    "respuestas": ["El Atlántico", "El Índico", "El Pacífico", "El Ártico"],
+    "respuesta_correcta": "c",
+    "explicacion": "El Pacífico es el océano de mayor superficie, seguido del Atlántico.",
+    "id_externo": "ejemplo-b1t1-02"
+  },
+  {
+    "pregunta": "¿Qué instrumento se usa para medir la presión atmosférica?",
+    "respuestas": ["El termómetro", "El barómetro", "El anemómetro", "El higrómetro"],
+    "respuesta_correcta": "b",
+    "explicacion": "El barómetro mide la presión atmosférica; el anemómetro mide el viento y el higrómetro, la humedad.",
+    "id_externo": "ejemplo-b1t1-03"
+  },
+  {
+    "pregunta": "¿Cuál es el desierto cálido más extenso del mundo?",
+    "respuestas": ["El Gobi", "El Kalahari", "El Sahara", "El Atacama"],
+    "respuesta_correcta": "c",
+    "explicacion": "El Sahara es el mayor desierto cálido; el Gobi y el Kalahari son más pequeños y el Atacama es muy árido pero estrecho.",
+    "id_externo": "ejemplo-b1t1-04"
+  },
+  {
+    "pregunta": "¿Cuál es el pico más alto de África?",
+    "respuestas": ["El Everest", "El Kilimanjaro", "El Aconcagua", "El Elbrús"],
+    "respuesta_correcta": "b",
+    "explicacion": "El Kilimanjaro, en Tanzania, es el pico más alto de África; el Everest y el Aconcagua están en Asia y América.",
+    "id_externo": "ejemplo-b1t1-05"
+  },
+  {
+    "pregunta": "¿En qué capa de la atmósfera se concentra la capa de ozono?",
+    "respuestas": ["La troposfera", "La mesosfera", "La estratosfera", "La termosfera"],
+    "respuesta_correcta": "c",
+    "explicacion": "La mayor parte del ozono atmosférico se encuentra en la estratosfera.",
+    "id_externo": "ejemplo-b1t1-06"
+  },
+  {
+    "pregunta": "¿Cómo se llama la línea imaginaria que divide la Tierra en dos hemisferios?",
+    "respuestas": ["El ecuador", "El meridiano", "El trópico", "La eclíptica"],
+    "respuesta_correcta": "a",
+    "explicacion": "El ecuador divide el planeta en los hemisferios norte y sur.",
+    "id_externo": "ejemplo-b1t1-07"
+  },
+  {
+    "pregunta": "¿Qué astro origina principalmente las mareas?",
+    "respuestas": ["El Sol", "La Luna", "Marte", "Venus"],
+    "respuesta_correcta": "b",
+    "explicacion": "La atracción gravitatoria de la Luna es la causa principal de las mareas, con un efecto menor del Sol.",
+    "id_externo": "ejemplo-b1t1-08"
+  }
+]

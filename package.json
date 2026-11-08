@@ -10,6 +10,7 @@
     "export": "bun scripts/export.js",
     "backup": "bun scripts/backup.js",
     "calidad": "bun scripts/calidad.js",
+    "validar": "bun scripts/validar.js",
     "ids": "bun scripts/ids.js",
     "test": "bun test"
   }

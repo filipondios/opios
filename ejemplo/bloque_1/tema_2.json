@@ -1,0 +1,44 @@
+[
+  {
+    "pregunta": "¿Cuál es la capital de Australia?",
+    "respuestas": ["Sídney", "Melbourne", "Canberra", "Perth"],
+    "respuesta_correcta": "c",
+    "explicacion": "Canberra es la capital federal; Sídney y Melbourne son las ciudades más pobladas.",
+    "id_externo": "ejemplo-b1t2-01"
+  },
+  {
+    "pregunta": "¿Cuál de estos países no tiene salida al mar?",
+    "respuestas": ["Bolivia", "Chile", "Perú", "Ecuador"],
+    "respuesta_correcta": "a",
+    "explicacion": "Bolivia perdió su litoral en el siglo XIX; los otros tres tienen costa en el Pacífico.",
+    "id_externo": "ejemplo-b1t2-02"
+  },
+  {
+    "pregunta": "¿Cuál es el país más extenso del mundo?",
+    "respuestas": ["Rusia", "Canadá", "China", "Brasil"],
+    "respuesta_correcta": "a",
+    "explicacion": "Rusia es el país con mayor superficie del planeta, seguido de Canadá.",
+    "id_externo": "ejemplo-b1t2-03"
+  },
+  {
+    "pregunta": "¿En qué continente se encuentra Egipto?",
+    "respuestas": ["Asia", "África", "Europa", "Oceanía"],
+    "respuesta_correcta": "b",
+    "explicacion": "Egipto está en el nordeste de África, aunque la península del Sinaí se considera Asia.",
+    "id_externo": "ejemplo-b1t2-04"
+  },
+  {
+    "pregunta": "¿Cuál es la moneda oficial de Japón?",
+    "respuestas": ["El won", "El yuan", "El yen", "El ringgit"],
+    "respuesta_correcta": "c",
+    "explicacion": "El yen es la moneda japonesa; el won es coreano y el yuan, chino.",
+    "id_externo": "ejemplo-b1t2-05"
+  },
+  {
+    "pregunta": "¿Qué país es conocido como el país del Sol Naciente?",
+    "respuestas": ["China", "Corea del Sur", "Japón", "Tailandia"],
+    "respuesta_correcta": "c",
+    "explicacion": "«País del Sol Naciente» es un apelativo tradicional de Japón.",
+    "id_externo": "ejemplo-b1t2-06"
+  }
+]

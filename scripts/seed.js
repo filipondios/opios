@@ -10,6 +10,7 @@ const actualizar = args.includes("--actualizar");
 const dir = args.find((a) => !a.startsWith("--")) ?? DIR_PREGUNTAS;
 
 const repo = abrirDb();
+console.log(`Banco de preguntas: ${dir}`);
 const r = await importarDirectorio(repo, dir, { actualizar });
 console.log(`${r.archivos} archivo(s): ${r.nuevas} nuevas, ${r.duplicadas} ya existentes, ${r.actualizadas ?? 0} actualizadas.`);
 for (const e of r.errores) console.error("error:", e);

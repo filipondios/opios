@@ -16,7 +16,7 @@ export function paginaTemario() {
       <button class="btn primary" type="button" id="btn-nuevo-bloque">Nuevo bloque</button>
     </div>
 
-    <p class="empty" id="vacio" hidden>Todavía no hay bloques. Crea el primero para empezar a organizar los temas.</p>
+    <p class="empty" id="vacio" hidden>Todavía no hay bloques. Si tienes un banco de preguntas, apunta <code>OPIOS_PREGUNTAS</code> a su carpeta y ejecuta <code>bun run seed</code>; si no, crea el primer bloque aquí.</p>
     <div id="bloques" class="stack"></div>
   </main>
 
