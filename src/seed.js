@@ -1,6 +1,6 @@
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { desdeJsonAntiguo, validarInfoBloque } from "./validar.js";
+import { desdeJsonAntiguo, validarInfoBloque, opcionDependiente } from "./validar.js";
 
 const RE_BLOQUE = /^bloque_(\d+)$/;
 const RE_TEMA = /^tema_(\d+)\.json$/i;
@@ -31,7 +31,12 @@ async function leerPlanos(dir, nombres, { avisar = false } = {}) {
     try { datos = await leerLista(join(dir, nombre)); }
     catch (e) { errores.push(`${nombre}: ${e.message}`); continue; }
     datos.forEach((p, i) => {
-      try { validas.push(desdeJsonAntiguo(p)); }
+      try {
+        const v = desdeJsonAntiguo(p);
+        const dep = opcionDependiente(v.respuestas);
+        if (dep) avisos.push(`${nombre} #${i + 1}: la opción «${dep}» parece depender del orden de las opciones.`);
+        validas.push(v);
+      }
       catch (e) { errores.push(`${nombre} #${i + 1}: ${e.message}`); }
     });
   }
@@ -64,7 +69,7 @@ function desdeJsonDeBloque(p, { bloqueNumero, bloqueNombre, temaNumero, archivo,
  * Importa una estructura `preguntas/bloque_X/info.json` + `preguntas/bloque_X/tema_N.json`.
  * `generated/` y `examenes/` no se recorren. Los JSON sueltos de la raíz se siguen aceptando.
  */
-async function importarPorBloques(repo, dir, nombres) {
+async function importarPorBloques(repo, dir, nombres, opciones) {
   const carpetas = nombres.filter((n) => RE_BLOQUE.test(n)).sort((a, b) => numeroDe(RE_BLOQUE, a) - numeroDe(RE_BLOQUE, b));
   const validas = [], errores = [], avisos = [], gestionados = [];
   let archivos = 0;
@@ -118,11 +123,14 @@ async function importarPorBloques(repo, dir, nombres) {
       catch (e) { errores.push(`${carpeta}/${nombre}: ${e.message}`); continue; }
       datos.forEach((p, i) => {
         try {
-          validas.push(desdeJsonDeBloque(p, {
+          const v = desdeJsonDeBloque(p, {
             bloqueNumero, bloqueNombre, temaNumero,
             archivo: `${carpeta}/${nombre} #${i + 1}`,
             indice: i,
-          }));
+          });
+          const dep = opcionDependiente(v.respuestas);
+          if (dep) avisos.push(`${carpeta}/${nombre} #${i + 1}: la opción «${dep}» parece depender del orden de las opciones.`);
+          validas.push(v);
         } catch (e) { errores.push(`${carpeta}/${nombre} #${i + 1}: ${e.message}`); }
       });
     }
@@ -137,19 +145,19 @@ async function importarPorBloques(repo, dir, nombres) {
   errores.push(...planos.errores);
   avisos.push(...planos.avisos);
 
-  const { nuevas, duplicadas } = repo.importar(validas);
-  return { archivos, nuevas, duplicadas, errores, avisos };
+  const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
+  return { archivos, nuevas, duplicadas, actualizadas, errores, avisos };
 }
 
 /** Importa un directorio: detecta `bloque_X/` o cae al formato antiguo de JSON sueltos. */
-export async function importarDirectorio(repo, dir) {
+export async function importarDirectorio(repo, dir, opciones = {}) {
   let nombres = [];
   try { nombres = await readdir(dir); }
-  catch { return { archivos: 0, nuevas: 0, duplicadas: 0, errores: [`No existe el directorio ${dir}`], avisos: [] }; }
+  catch { return { archivos: 0, nuevas: 0, duplicadas: 0, actualizadas: 0, errores: [`No existe el directorio ${dir}`], avisos: [] }; }
 
-  if (nombres.some((n) => RE_BLOQUE.test(n))) return importarPorBloques(repo, dir, nombres);
+  if (nombres.some((n) => RE_BLOQUE.test(n))) return importarPorBloques(repo, dir, nombres, opciones);
 
   const planos = await leerPlanos(dir, nombres);
-  const { nuevas, duplicadas } = repo.importar(planos.validas);
-  return { archivos: planos.archivos, nuevas, duplicadas, errores: planos.errores, avisos: planos.avisos };
+  const { nuevas, duplicadas, actualizadas } = repo.importar(planos.validas, opciones);
+  return { archivos: planos.archivos, nuevas, duplicadas, actualizadas, errores: planos.errores, avisos: planos.avisos };
 }

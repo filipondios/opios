@@ -9,6 +9,8 @@
     "seed": "bun scripts/seed.js",
     "export": "bun scripts/export.js",
     "backup": "bun scripts/backup.js",
+    "calidad": "bun scripts/calidad.js",
+    "ids": "bun scripts/ids.js",
     "test": "bun test"
   }
 }

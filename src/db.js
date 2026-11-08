@@ -17,12 +17,13 @@ const MIGRACIONES = [
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     tema_id     INTEGER NOT NULL REFERENCES temas(id) ON UPDATE CASCADE,
     enunciado   TEXT    NOT NULL CHECK (length(trim(enunciado)) > 0),
-    clave       TEXT    NOT NULL UNIQUE,            -- enunciado sin espacios repetidos: evita duplicados
+    clave_norm  TEXT    NOT NULL,                   -- enunciado normalizado: evita duplicados
     explicacion TEXT    NOT NULL DEFAULT '',
     creada      TEXT    NOT NULL DEFAULT (datetime('now')),
     modificada  TEXT    NOT NULL DEFAULT (datetime('now'))
   );
   CREATE INDEX idx_preguntas_tema ON preguntas(tema_id);
+  CREATE UNIQUE INDEX ux_preguntas_clave_norm ON preguntas(clave_norm);
 
   CREATE TABLE opciones (
     id          INTEGER PRIMARY KEY,
@@ -181,6 +182,13 @@ const MIGRACIONES = [
     INSERT INTO preguntas_fts(preguntas_fts) VALUES ('rebuild');
     `;
   },
+
+  /* v11: `id_externo` para actualizar preguntas desde el banco sin cambiar su id interno. */
+  /* v11 */ `
+  ALTER TABLE preguntas ADD COLUMN id_externo TEXT;
+  CREATE UNIQUE INDEX ux_preguntas_id_externo
+    ON preguntas(id_externo) WHERE id_externo IS NOT NULL;
+  `,
 ];
 
 /** Comprueba si el SQLite de este build incluye FTS5. */
@@ -245,10 +253,12 @@ export function abrirDb(ruta = DB_PATH) {
     temaPorId: db.query("SELECT id FROM temas WHERE id = ?"),
     temaPorBloqueNumero: db.query("SELECT id FROM temas WHERE bloque_id = ? AND numero = ?"),
     insertarTema: db.query("INSERT INTO temas (bloque_id, numero, nombre) VALUES (?, ?, ?)"),
-    porClave: db.query("SELECT id, tema_id AS tema FROM preguntas WHERE clave = ?"),
-    insertarPregunta: db.query("INSERT INTO preguntas (tema_id, enunciado, clave, explicacion) VALUES (?, ?, ?, ?)"),
+    porClaveNorm: db.query("SELECT id, tema_id AS tema FROM preguntas WHERE clave_norm = ?"),
+    porIdExterno: db.query("SELECT id, tema_id AS tema FROM preguntas WHERE id_externo = ?"),
+    insertarPregunta: db.query(
+      "INSERT INTO preguntas (tema_id, enunciado, clave_norm, explicacion, id_externo) VALUES (?, ?, ?, ?, ?)"),
     actualizarPregunta: db.query(
-      "UPDATE preguntas SET tema_id = ?, enunciado = ?, clave = ?, explicacion = ?, modificada = datetime('now') WHERE id = ?"),
+      "UPDATE preguntas SET tema_id = ?, enunciado = ?, clave_norm = ?, explicacion = ?, id_externo = ?, modificada = datetime('now') WHERE id = ?"),
     insertarOpcion: db.query("INSERT INTO opciones (pregunta_id, posicion, texto, es_correcta) VALUES (?, ?, ?, ?)"),
     borrarOpciones: db.query("DELETE FROM opciones WHERE pregunta_id = ?"),
     borrarPregunta: db.query("DELETE FROM preguntas WHERE id = ?"),
@@ -289,6 +299,7 @@ export function abrirDb(ruta = DB_PATH) {
         bloque_numero: p.bloque_numero ?? null,
         bloque_nombre: p.bloque_nombre ?? "Sin bloque",
         pregunta: p.enunciado, respuestas: [], correcta: 0, explicacion: p.explicacion,
+        id_externo: p.id_externo ?? null,
       });
     }
     for (const o of filasOpciones) {
@@ -358,19 +369,26 @@ export function abrirDb(ruta = DB_PATH) {
 
   /* Inserta o actualiza una pregunta con sus opciones. Debe llamarse dentro de una transacción. */
   function guardar(id, v) {
-    const clave = claveDe(v.pregunta);
-    const otra = q.porClave.get(clave);
+    const claveNorm = claveDe(v.pregunta);
+    const otra = q.porClaveNorm.get(claveNorm);
     if (otra && otra.id !== id) {
       throw new ErrorApi(409, `Ya hay una pregunta con este mismo enunciado (nº ${otra.id}, tema ${otra.tema}).`, { existente: { id: otra.id, tema: otra.tema } });
+    }
+    const idExterno = v.id_externo ?? null;
+    if (idExterno != null) {
+      const porExterno = q.porIdExterno.get(idExterno);
+      if (porExterno && porExterno.id !== id) {
+        throw new ErrorApi(409, `Ya hay una pregunta con el identificador externo «${idExterno}» (nº ${porExterno.id}, tema ${porExterno.tema}).`, { existente: { id: porExterno.id, tema: porExterno.tema } });
+      }
     }
     const tema = v.bloque
       ? asegurarTemaEnBloque(v.bloque_numero ?? null, v.bloque, v.tema_numero ?? v.tema)
       : q.temaPorId.get(v.tema)?.id;
     if (!tema) throw new ErrorApi(404, "El tema no existe. Créalo desde Temario.");
     if (id == null) {
-      id = Number(q.insertarPregunta.run(tema, v.pregunta, clave, v.explicacion).lastInsertRowid);
+      id = Number(q.insertarPregunta.run(tema, v.pregunta, claveNorm, v.explicacion, idExterno).lastInsertRowid);
     } else {
-      q.actualizarPregunta.run(tema, v.pregunta, clave, v.explicacion, id);
+      q.actualizarPregunta.run(tema, v.pregunta, claveNorm, v.explicacion, idExterno, id);
       q.borrarOpciones.run(id);
     }
     v.respuestas.forEach((texto, k) => q.insertarOpcion.run(id, k, texto, k === v.correcta ? 1 : 0));
@@ -380,7 +398,8 @@ export function abrirDb(ruta = DB_PATH) {
   /* Consulta base que añade el tema y el bloque a cada pregunta. */
   const CAMPOS_PREGUNTA = `
     p.id, p.tema_id AS tema, t.numero AS tema_numero, t.nombre AS tema_nombre,
-    t.bloque_id AS bloque, b.numero AS bloque_numero, b.nombre AS bloque_nombre, p.enunciado, p.explicacion`;
+    t.bloque_id AS bloque, b.numero AS bloque_numero, b.nombre AS bloque_nombre,
+    p.enunciado, p.explicacion, p.id_externo`;
   const JOINS_PREGUNTA = `
     FROM preguntas p
     JOIN temas t ON t.id = p.tema_id
@@ -772,8 +791,10 @@ export function abrirDb(ruta = DB_PATH) {
     crear: db.transaction((v) => guardar(null, v)),
 
     actualizar: db.transaction((id, v) => {
-      if (!db.query("SELECT 1 FROM preguntas WHERE id = ?").get(id)) return false;
-      guardar(id, v);
+      const actual = db.query("SELECT id_externo FROM preguntas WHERE id = ?").get(id);
+      if (!actual) return false;
+      /* La API no envía id_externo: conserva el que ya tuviera la pregunta. */
+      guardar(id, v.id_externo === undefined ? { ...v, id_externo: actual.id_externo } : v);
       return true;
     }),
 
@@ -786,16 +807,21 @@ export function abrirDb(ruta = DB_PATH) {
       return ensamblar(filas, ops);
     },
 
-    /** Importa preguntas ya validadas; las que ya existen (mismo enunciado) se omiten. */
-    importar: db.transaction((lista) => {
-      let nuevas = 0, duplicadas = 0;
+    /** Importa preguntas ya validadas; las que ya existen (mismo enunciado normalizado) se omiten.
+        Con `actualizar`, las que traen `id_externo` y ya existen se actualizan conservando su id. */
+    importar: db.transaction((lista, { actualizar = false } = {}) => {
+      let nuevas = 0, duplicadas = 0, actualizadas = 0;
       for (const original of lista) {
-        if (q.porClave.get(claveDe(original.pregunta))) { duplicadas++; continue; }
         /* Formato antiguo sin bloque: `tema` es el número dentro del bloque por defecto. */
         const v = original.bloque ? original : { ...original, tema: temaLegacy(original.tema) };
+        if (actualizar && v.id_externo != null) {
+          const existente = q.porIdExterno.get(v.id_externo);
+          if (existente) { guardar(existente.id, v); actualizadas++; continue; }
+        }
+        if (q.porClaveNorm.get(claveDe(v.pregunta))) { duplicadas++; continue; }
         guardar(null, v); nuevas++;
       }
-      return { nuevas, duplicadas };
+      return { nuevas, duplicadas, actualizadas };
     }),
   };
   return repo;

@@ -14,8 +14,9 @@ function lineasPregunta(q, { conTemario }) {
       lineas.push('    "tema_numero": ' + (q.tema_numero ?? q.tema) + ",");
     }
   }
+  lineas.push('    "pregunta": ' + JSON.stringify(q.pregunta) + ",");
+  if (q.id_externo) lineas.push('    "id_externo": ' + JSON.stringify(q.id_externo) + ",");
   lineas.push(
-    '    "pregunta": ' + JSON.stringify(q.pregunta) + ",",
     '    "respuestas": [' + q.respuestas.map((r) => JSON.stringify(r)).join(", ") + "],",
     '    "respuesta_correcta": "' + LETRAS[q.correcta] + '",',
     '    "explicacion": ' + JSON.stringify(q.explicacion),

@@ -29,6 +29,17 @@ bun test
 
 En el primer arranque, si la base de datos está vacía, el banco se importa automáticamente. `bun run dev` arranca el servidor en modo vigilancia.
 
+Para mantener el banco:
+
+```bash
+bun run calidad                 # sesgo de la opción más larga y posición de la correcta
+bun run calidad --lista         # muestra las preguntas sesgadas con sus opciones
+bun run ids                     # asigna id_externo estable a las preguntas que no lo tengan
+bun run seed --actualizar       # actualiza preguntas editadas conservando su id y progreso
+```
+
+`bun run calidad` incluye `generated/` (marcado con `*`), aunque esas preguntas no se importan: solo dejan constancia de su procedencia. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
+
 ## Copias de seguridad
 
 ```bash
@@ -60,6 +71,7 @@ preguntas/
 - `info.json` contiene el nombre del bloque y los títulos de sus temas.
 - Cada `tema_N.json` contiene las preguntas del tema `N` de ese bloque.
 - Los directorios `generated/` y `examenes/` se ignoran; solo se importan los archivos `bloque_N/tema_N.json`.
+- `generated/` conserva las preguntas creadas por IA para saber de dónde salieron; su contenido ya está añadido a los `tema_N.json`.
 
 `info.json`:
 
@@ -80,10 +92,13 @@ Cada `tema_N.json` es un array de preguntas:
     "pregunta": "¿Qué Título de la Constitución regula el Gobierno?",
     "respuestas": ["Título V", "Título IV", "Título VI", "Título III"],
     "respuesta_correcta": "b",
-    "explicacion": "Título IV, artículos 97 a 107."
+    "explicacion": "Título IV, artículos 97 a 107.",
+    "id_externo": "6f0c2f0e-..."
   }
 ]
 ```
+
+`id_externo` es opcional pero recomendable: permite editar una pregunta y ejecutar `bun run seed --actualizar` sin duplicarla ni perder su progreso. `bun run ids` lo añade automáticamente.
 
 El número del directorio fija el bloque y el nombre del archivo fija el número del tema. Para ampliar el banco, añade más directorios `bloque_N/` con sus archivos `info.json` y `tema_N.json`.
 

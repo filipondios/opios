@@ -43,6 +43,59 @@ describe("importación de JSON", () => {
     expect(p.correcta).toBe("abcdefgh".indexOf(orig.respuesta_correcta));
   });
 
+  test("la deduplicación normaliza tildes, mayúsculas y puntuación", async () => {
+    const dir = (await import("node:os")).tmpdir() + "/opios-dedupe-" + Date.now();
+    const base = { tema: 1, pregunta: "¿Cuál es la capital de Francia?", respuestas: ["París", "Roma", "Lisboa"], respuesta_correcta: "a" };
+    await Bun.write(join(dir, "tema_1.json"), JSON.stringify([
+      base,
+      { ...base, pregunta: "cual es la CAPITAL de francia" },
+    ]));
+    const r = await importarDirectorio(repo, dir);
+    expect(r).toMatchObject({ nuevas: 1, duplicadas: 1 });
+  });
+
+  test("id_externo permite actualizar una pregunta conservando id y progreso", async () => {
+    const dir = (await import("node:os")).tmpdir() + "/opios-id-externo-" + Date.now();
+    const base = {
+      pregunta: "Versión uno", respuestas: ["A", "B", "C"],
+      respuesta_correcta: "b", explicacion: "vieja", id_externo: "ext-1",
+    };
+    await Bun.write(join(dir, "bloque_1/info.json"), JSON.stringify({ nombre: "Bloque de prueba", temas: [{ numero: 1, titulo: "Tema" }] }));
+    await Bun.write(join(dir, "bloque_1/tema_1.json"), JSON.stringify([base]));
+
+    const r1 = await importarDirectorio(repo, dir);
+    expect(r1).toMatchObject({ nuevas: 1, actualizadas: 0 });
+    const original = repo.todas()[0];
+    repo.guardarProgreso([{ id: original.id, caja: 2, vence: "2999-01-01", aciertos: 1, fallos: 0 }]);
+
+    await Bun.write(join(dir, "bloque_1/tema_1.json"), JSON.stringify([{
+      ...base, pregunta: "Versión dos", respuestas: ["X", "Y", "Z"],
+      respuesta_correcta: "c", explicacion: "nueva",
+    }]));
+    const r2 = await importarDirectorio(repo, dir, { actualizar: true });
+    expect(r2).toMatchObject({ nuevas: 0, duplicadas: 0, actualizadas: 1 });
+
+    const actualizada = repo.obtener(original.id);
+    expect(actualizada).toMatchObject({
+      id: original.id, pregunta: "Versión dos", respuestas: ["X", "Y", "Z"],
+      correcta: 2, explicacion: "nueva", id_externo: "ext-1",
+    });
+    expect(repo.db.query("SELECT caja FROM progreso WHERE pregunta_id = ?").get(original.id).caja).toBe(2);
+    expect(await (await pet("/api/exportar")).text()).toContain('"id_externo": "ext-1"');
+  });
+
+  test("avisa de opciones que dependen del orden al importar", async () => {
+    const dir = (await import("node:os")).tmpdir() + "/opios-orden-" + Date.now();
+    await Bun.write(join(dir, "bloque_1/info.json"), JSON.stringify({ nombre: "Bloque de prueba", temas: [{ numero: 1, titulo: "Tema" }] }));
+    await Bun.write(join(dir, "bloque_1/tema_1.json"), JSON.stringify([
+      { pregunta: "¿Cuál es correcta?", respuestas: ["Uno", "Dos", "Todas las anteriores"], respuesta_correcta: "c" },
+      { pregunta: "¿Cuál no depende del orden?", respuestas: ["Todas las provincias", "Solo una", "Ninguna provincia"], respuesta_correcta: "a" },
+    ]));
+    const r = await importarDirectorio(repo, dir);
+    expect(r.errores).toEqual([]);
+    expect(r.avisos.filter((a) => a.includes("depender del orden")).length).toBe(1);
+  });
+
   test("el banco real importa sin errores (smoke)", async () => {
     const r = await importarDirectorio(repo, DIR_PREGUNTAS);
     expect(r.errores).toEqual([]);
@@ -183,6 +236,10 @@ describe("API de preguntas", () => {
     const r = await pet("/api/preguntas", "POST", nueva({ pregunta: "  ¿Capital   de Francia? " }));
     expect(r.status).toBe(409);
     expect((await r.json()).existente.id).toBe(p.id);
+    /* La clave ignora tildes, mayúsculas y puntuación. */
+    const r2 = await pet("/api/preguntas", "POST", nueva({ pregunta: "capital de francia" }));
+    expect(r2.status).toBe(409);
+    expect((await r2.json()).existente.id).toBe(p.id);
   });
   test("validación", async () => {
     for (const mala of [nueva({ tema: -1 }), nueva({ tema: "x" }), nueva({ pregunta: " " }), nueva({ respuestas: ["a"] }),
@@ -791,11 +848,18 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
   const carga = async () => (await pet("/api/carga")).json();
 
   test("la migración crea la tabla respuestas con sus índices", () => {
-    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(10);
+    expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(11);
     expect(repo.db.query("SELECT name FROM sqlite_master WHERE type='table' AND name='respuestas'").get()).toBeTruthy();
     const indices = repo.db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='respuestas'").all().map((r) => r.name);
     expect(indices).toContain("idx_respuestas_fecha");
     expect(indices).toContain("idx_respuestas_pregunta");
+    const columnas = repo.db.query("PRAGMA table_info(preguntas)").all().map((r) => r.name);
+    expect(columnas).toContain("clave_norm");
+    expect(columnas).toContain("id_externo");
+    expect(columnas).not.toContain("clave");
+    const indicesPreguntas = repo.db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='preguntas'").all().map((r) => r.name);
+    expect(indicesPreguntas).toContain("ux_preguntas_clave_norm");
+    expect(indicesPreguntas).toContain("ux_preguntas_id_externo");
     expect(repo.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
   });
 

@@ -2,10 +2,35 @@ import { ErrorApi } from "./errores.js";
 import { MIN_OPC, MAX_OPC, CAJA_MAX, MAX_BLOQUE, MAX_TEMA_NOMBRE } from "./config.js";
 
 const LETRAS = "abcdefgh";
-const MAX_TEMA = 9999, MAX_ENUNCIADO = 2000, MAX_OPCION = 1000, MAX_EXPLICACION = 4000;
+const MAX_TEMA = 9999, MAX_ENUNCIADO = 2000, MAX_OPCION = 1000, MAX_EXPLICACION = 4000, MAX_ID_EXTERNO = 200;
 
-/** Texto sin espacios repetidos: identifica una pregunta para detectar duplicados. */
-export const claveDe = (enunciado) => enunciado.replace(/\s+/g, " ").trim();
+const sinDiacriticos = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+/** Clave tolerante para detectar duplicados: sin tildes, mayúsculas ni puntuación. */
+export const claveDe = (enunciado) => sinDiacriticos(enunciado)
+  .toLowerCase()
+  .replace(/[^\p{L}\p{N}]+/gu, " ")
+  .trim();
+
+/* El barajado de opciones es seguro mientras no haya opciones que se refieran a otras
+   («todas las anteriores», «a y b»…). Estas se detectan al importar para avisar. */
+const PATRONES_ORDEN = [
+  /\b(todas|todos)\s+(las|los)\s+(anteriores|opciones|respuestas|afirmaciones)\b/,
+  /\bninguna\s+de\s+(las|los)\s+(anteriores|opciones|respuestas|afirmaciones)\b/,
+  /\b(ambas|los dos|las dos)\s+(anteriores|opciones|respuestas)\b/,
+  /\b(todas|ninguna)\s+(ellas|estas)\b/,
+  /\bopciones?\s+[a-h]\s*(,|y)\s*[a-h]\b/,
+  /\b[a-h]\s+y\s+[a-h]\b/,
+];
+
+/** Devuelve la primera opción que parece depender del orden/letras, o null si no hay ninguna. */
+export function opcionDependiente(respuestas = []) {
+  for (const r of respuestas) {
+    const t = sinDiacriticos(r).toLowerCase();
+    if (PATRONES_ORDEN.some((re) => re.test(t))) return String(r).trim();
+  }
+  return null;
+}
 
 const mal = (msg) => new ErrorApi(400, msg);
 const texto = (v) => (typeof v === "string" ? v.trim() : "");
@@ -42,6 +67,13 @@ export function validarPregunta(b, { estricto = true } = {}) {
   const explicacion = texto(b.explicacion);
   if (explicacion.length > MAX_EXPLICACION) throw mal("La explicación es demasiado larga.");
 
+  /* Identificador estable del banco externo, para poder actualizar sin cambiar el id interno. */
+  let idExterno = null;
+  if (b.id_externo != null && String(b.id_externo).trim() !== "") {
+    idExterno = texto(b.id_externo);
+    if (idExterno.length > MAX_ID_EXTERNO) throw mal("El identificador externo es demasiado largo.");
+  }
+
   /* Metadatos opcionales del temario (los usa la importación/exportación por bloques). */
   let bloque = null, temaNumero = null, bloqueNumero = null;
   if (b.bloque_numero != null && String(b.bloque_numero).trim() !== "") {
@@ -58,7 +90,9 @@ export function validarPregunta(b, { estricto = true } = {}) {
     if (!Number.isInteger(temaNumero) || temaNumero < 0 || temaNumero > MAX_TEMA)
       throw mal("El número de tema no es válido.");
   }
-  return { tema, bloque, bloque_numero: bloqueNumero, tema_numero: temaNumero, pregunta, respuestas, correcta, explicacion };
+  const salida = { tema, bloque, bloque_numero: bloqueNumero, tema_numero: temaNumero, pregunta, respuestas, correcta, explicacion };
+  if (idExterno != null) salida.id_externo = idExterno;
+  return salida;
 }
 
 /** Convierte una pregunta del formato JSON antiguo (`respuesta_correcta` = letra) al formato interno. */
@@ -78,6 +112,7 @@ export function desdeJsonAntiguo(p) {
   return validarPregunta({
     tema: p.tema, bloque: p.bloque, bloque_numero: p.bloque_numero, tema_numero: p.tema_numero,
     pregunta: p.pregunta, respuestas: p.respuestas, correcta, explicacion: p.explicacion,
+    id_externo: p.id_externo,
   }, { estricto: false });
 }
 
