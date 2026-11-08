@@ -6,16 +6,15 @@
 
 <p align="center"><em>Un entrenador en local para exámenes tipo test, con repaso espaciado.</em></p>
 
-opios es una pequeña aplicación autoalojada para estudiar bancos de preguntas de oposiciones. Organizas las preguntas por bloques y temas, y luego practicas con tests libres, simulacros cronometrados y repasos programados. Funciona íntegramente en tu máquina con Bun y SQLite: sin cuentas, sin nube y sin dependencias externas.
+**Opios** es una pequeña aplicación autoalojada para estudiar bancos de preguntas. Organizas las preguntas por bloques y temas, y luego practicas con tests libres, simulacros cronometrados y repasos programados en tu máquina con [Bun](https://bun.com/) y [SQLite](https://www.sqlite.org/): sin cuentas, sin nube y sin dependencias externas.
 
-La aplicación es una herramienta genérica: no incluye ningún banco de preguntas. Lee un directorio configurable (por defecto `./preguntas`, o el banco de ejemplo `./ejemplo/` si no existe) y trae ese ejemplo para que puedas probarla nada más clonarla. Se creó para preparar las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España), cuyo banco vive en un repositorio aparte; la estructura de bloques y temas sirve para cualquier otro temario.
+La aplicación es una herramienta genérica: no incluye ningún banco de preguntas, aunque esta app la creé para prepararme las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España). Lee un directorio configurable (por defecto `./preguntas`, o el banco de ejemplo `./ejemplo/` si no existe) y trae ese ejemplo para que puedas probarla nada más clonarla. Algunas de las funcionalidades de esta app son:
 
 - Tests libres que combinan preguntas nuevas con repasos pendientes.
 - Simulacros cronometrados con penalización opcional y posibilidad de reanudarlos.
 - Programación con repaso espaciado y un cupo diario de preguntas nuevas.
 - Estadísticas: progreso por tema, previsión de repasos, acierto semanal, racha, tiempo medio y preguntas más falladas.
-- Interfaz accesible y cómoda en móvil: menú común, tema claro/oscuro, opciones con radios reales y respuesta al primer toque.
-- Todo en local: tu banco y tu progreso viven en un único archivo SQLite.
+- Todo en local: tu banco y tu progreso se almancenan en un único archivo SQLite.
 
 ## Inicio rápido
 
@@ -27,9 +26,7 @@ bun start      # abre http://127.0.0.1:8000
 bun test
 ```
 
-En el primer arranque, si la base de datos está vacía, el banco se importa automáticamente. `bun run dev` arranca el servidor en modo vigilancia.
-
-Para mantener el banco:
+En el primer arranque, si la base de datos está vacía, el banco se importa automáticamente. `bun run dev` arranca el servidor en modo vigilancia. Para realizar mantenimiento en del banco de preguntas, hay disponibles algunos comandos útiles:
 
 ```bash
 bun run validar                 # comprueba un banco (formato, avisos, sesgo) sin tocar tu base de datos
@@ -39,23 +36,25 @@ bun run ids                     # asigna id_externo estable a las preguntas que 
 bun run seed --actualizar       # actualiza preguntas editadas conservando su id y progreso
 ```
 
-`bun run calidad` incluye `generated/` (marcado con `*`), aunque esas preguntas no se importan: solo dejan constancia de su procedencia. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
+La carpeta `generated/` de cada bloque conserva las preguntas creadas con un modelo de lenguaje tal como se generaron. No forma parte del banco importable: su contenido ya está incorporado a los `tema_N.json` y solo queda como registro de su procedencia.
 
-## Usar tu propio banco
+`bun run calidad` incluye `generated/` (marcado con `*`) para revisar también ese material, aunque no se importe. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
 
-La app lee las preguntas de un directorio externo, así que tu banco puede vivir en su propio repositorio (por ejemplo, `opios-bank`) sin arrastrar el código de la aplicación.
+## Usa tu propio banco
+
+La app lee las preguntas de un directorio externo, así que tu banco puede estar almacenado en cualquier otro lugar sin arrastrar el código de la aplicación. Para ello, has de conocer algunas variables que te ayudarán a definir tu banco de preguntas persinalizado:
 
 - **`OPIOS_PREGUNTAS`**: ruta del banco. Si no la defines, se usa `./preguntas` cuando existe y, si no, el ejemplo `./ejemplo/`. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
 - **`OPIOS_SEED`**: cuándo importar al arrancar. `vacia` (por defecto) solo importa si la base de datos no tiene preguntas; `auto` importa en cada arranque (actualizando por `id_externo` para no duplicar); `no` no importa nunca.
-- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=./opios-bank`.
+- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=./mi-banco`.
 
 Flujo típico:
 
 ```bash
-git clone https://github.com/<usuario>/opios-bank opios-bank
-echo "OPIOS_PREGUNTAS=./opios-bank" > .env
-bun run seed      # importa tu banco
-bun start
+git clone https://github.com/tu-usuario/tu-banco tu-banco
+echo "OPIOS_PREGUNTAS=./tu-banco" > .env
+bun run seed # importa tu banco
+bun start    # arranca la aplicación
 ```
 
 Con Docker, `docker-compose.yml` monta el banco como volumen de solo lectura y publica el puerto solo en loopback:
