@@ -8,7 +8,7 @@
 
 opios es una pequeña aplicación autoalojada para estudiar bancos de preguntas de oposiciones. Organizas las preguntas por bloques y temas, y luego practicas con tests libres, simulacros cronometrados y repasos programados. Funciona íntegramente en tu máquina con Bun y SQLite: sin cuentas, sin nube y sin dependencias externas.
 
-Actualmente incluye el banco de preguntas de las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España), que es para lo que se creó, aunque la estructura de bloques y temas permite añadir cualquier otro temario.
+La aplicación es una herramienta genérica: no incluye ningún banco de preguntas. Lee un directorio configurable (por defecto `./preguntas`, o el banco de ejemplo `./ejemplo/` si no existe) y trae ese ejemplo para que puedas probarla nada más clonarla. Se creó para preparar las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España), cuyo banco vive en un repositorio aparte; la estructura de bloques y temas sirve para cualquier otro temario.
 
 - Tests libres que combinan preguntas nuevas con repasos pendientes.
 - Simulacros cronometrados con penalización opcional y posibilidad de reanudarlos.
@@ -22,7 +22,7 @@ Actualmente incluye el banco de preguntas de las oposiciones al [Cuerpo de Técn
 Solo necesitas [Bun](https://bun.sh); no hay paquetes que instalar.
 
 ```bash
-bun run seed   # importa el banco de preguntas en data/opios.db (puede repetirse sin problema)
+bun run seed   # importa el banco (./preguntas si existe; si no, ./ejemplo) en data/opios.db
 bun start      # abre http://127.0.0.1:8000
 bun test
 ```
@@ -32,6 +32,7 @@ En el primer arranque, si la base de datos está vacía, el banco se importa aut
 Para mantener el banco:
 
 ```bash
+bun run validar                 # comprueba un banco (formato, avisos, sesgo) sin tocar tu base de datos
 bun run calidad                 # sesgo de la opción más larga y posición de la correcta
 bun run calidad --lista         # muestra las preguntas sesgadas con sus opciones
 bun run ids                     # asigna id_externo estable a las preguntas que no lo tengan
@@ -39,6 +40,31 @@ bun run seed --actualizar       # actualiza preguntas editadas conservando su id
 ```
 
 `bun run calidad` incluye `generated/` (marcado con `*`), aunque esas preguntas no se importan: solo dejan constancia de su procedencia. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
+
+## Usar tu propio banco
+
+La app lee las preguntas de un directorio externo, así que tu banco puede vivir en su propio repositorio (por ejemplo, `opios-preguntas`) sin arrastrar el código de la aplicación.
+
+- **`OPIOS_PREGUNTAS`**: ruta del banco. Si no la defines, se usa `./preguntas` cuando existe y, si no, el ejemplo `./ejemplo/`. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
+- **`OPIOS_SEED`**: cuándo importar al arrancar. `vacia` (por defecto) solo importa si la base de datos no tiene preguntas; `auto` importa en cada arranque (actualizando por `id_externo` para no duplicar); `no` no importa nunca.
+- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=../opios-preguntas`.
+
+Flujo típico:
+
+```bash
+git clone https://github.com/<usuario>/opios-preguntas ../opios-preguntas
+echo "OPIOS_PREGUNTAS=../opios-preguntas" > .env
+bun run seed      # importa tu banco
+bun start
+```
+
+Con Docker, `docker-compose.yml` monta el banco como volumen de solo lectura y publica el puerto solo en loopback:
+
+```bash
+docker compose up --build
+```
+
+El formato de los archivos se detalla en [`docs/formato-preguntas.md`](docs/formato-preguntas.md), que incluye un prompt de ejemplo para generar preguntas con un modelo de lenguaje.
 
 ## Copias de seguridad
 
@@ -53,7 +79,7 @@ Para restaurar una copia, para la aplicación y copia el archivo sobre `data/opi
 
 ## Estructura del banco de preguntas
 
-El banco vive en el directorio `preguntas/`, con un subdirectorio por bloque:
+El banco es un directorio con un subdirectorio por bloque (por defecto `./preguntas`, o `./ejemplo/` si no existe):
 
 ```
 preguntas/
@@ -64,14 +90,14 @@ preguntas/
     ...
   bloque_2/
     ...
-  examenes/        material oficial y extractos; no se importa
+  examenes/        material propio que no se importa (opcional)
 ```
 
 - Cada directorio `bloque_N/` define un bloque, y `N` es su número estable.
 - `info.json` contiene el nombre del bloque y los títulos de sus temas.
 - Cada `tema_N.json` contiene las preguntas del tema `N` de ese bloque.
 - Los directorios `generated/` y `examenes/` se ignoran; solo se importan los archivos `bloque_N/tema_N.json`.
-- `generated/` conserva las preguntas creadas por IA para saber de dónde salieron; su contenido ya está añadido a los `tema_N.json`.
+- `generated/` puede conservar las preguntas creadas con un modelo para saber de dónde salieron; su contenido no se importa.
 
 `info.json`:
 
@@ -100,12 +126,14 @@ Cada `tema_N.json` es un array de preguntas:
 
 `id_externo` es opcional pero recomendable: permite editar una pregunta y ejecutar `bun run seed --actualizar` sin duplicarla ni perder su progreso. `bun run ids` lo añade automáticamente.
 
-El número del directorio fija el bloque y el nombre del archivo fija el número del tema. Para ampliar el banco, añade más directorios `bloque_N/` con sus archivos `info.json` y `tema_N.json`.
+El número del directorio fija el bloque y el nombre del archivo fija el número del tema. Para ampliar el banco, añade más directorios `bloque_N/` con sus archivos `info.json` y `tema_N.json`. Los límites de validación y un prompt de ejemplo para generar preguntas están en [`docs/formato-preguntas.md`](docs/formato-preguntas.md).
 
 ## Configuración
 
 | Variable | Por defecto | Para qué sirve |
 |---|---|---|
+| `OPIOS_PREGUNTAS` | `./preguntas` si existe, si no `./ejemplo` | Directorio del banco de preguntas |
+| `OPIOS_SEED` | `vacia` | Cuándo importar al arrancar: `vacia`, `auto` o `no` |
 | `PORT` | `8000` | Puerto |
 | `HOST` | `127.0.0.1` | Interfaz en la que escuchar |
 | `OPIOS_DB` | `data/opios.db` | Ruta de la base de datos |
@@ -122,6 +150,8 @@ docker build -t opios .
 docker run -d -p 10000:10000 -v opios-data:/data \
   -e AUTH_USER=usuario -e AUTH_PASS=clave opios
 ```
+
+La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback.
 
 El contenedor se ejecuta con el usuario `bun` y, por defecto, solo acepta cabeceras `Host` de loopback. Si accedes a él por la LAN, añade tu dirección con `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
 
