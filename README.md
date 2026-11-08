@@ -76,7 +76,7 @@ Para restaurar una copia, para la aplicación y copia el archivo sobre `data/opi
 
 ## Formato y estructura del banco
 
-Para conocer el formato de las preguntas, la estructura del banco de preguntas y otras cuestiones relacionadas (incluido un prompt de ejemplo para generar preguntas con un modelo de lenguaje), consulta la [wiki del proyecto](https://github.com/filipondios/opios/wiki).
+Para conocer el formato de las preguntas, la estructura del banco de preguntas y otras cuestiones relacionadas, consulta la [wiki del proyecto](https://github.com/filipondios/opios/wiki).
 
 ## Configuración
 
