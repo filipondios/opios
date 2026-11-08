@@ -2,11 +2,11 @@ import { html } from "./html.js";
 
 /** Menú único de la aplicación. `actual` marca la página activa con aria-current. */
 const PAGINAS = [
-  { id: "test", href: "/", texto: "Test" },
-  { id: "simulacro", href: "/simulacro", texto: "Simulacro" },
-  { id: "estadisticas", href: "/estadisticas", texto: "Estadísticas" },
-  { id: "maker", href: "/maker", texto: "Maker" },
-  { id: "temario", href: "/temario", texto: "Temario" },
+    { id: "test", href: "/", texto: "Test" },
+    { id: "simulacro", href: "/simulacro", texto: "Simulacro" },
+    { id: "estadisticas", href: "/estadisticas", texto: "Estadísticas" },
+    { id: "maker", href: "/maker", texto: "Maker" },
+    { id: "temario", href: "/temario", texto: "Temario" },
 ];
 
 /**
@@ -14,8 +14,18 @@ const PAGINAS = [
  * `actual` es el id de la página en el menú (test, simulacro, estadisticas, maker, temario).
  * Los scripts indicados en `js` se cargan como módulos ESM.
  */
-export function layout({ titulo, marca = "Test infinito", actual = null, estado, estadoTipo = "ok", ancho = false, css = [], js = [], cuerpo }) {
-  return html`<!doctype html>
+export function layout({
+    titulo,
+    marca = "Test infinito",
+    actual = null,
+    estado,
+    estadoTipo = "ok",
+    ancho = false,
+    css = [],
+    js = [],
+    cuerpo,
+}) {
+    return html`<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">

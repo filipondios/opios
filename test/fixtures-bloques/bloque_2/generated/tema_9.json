@@ -1,8 +1,8 @@
 [
-  {
-    "pregunta": "No debe importarse: está en generated/",
-    "respuestas": ["Sí", "No"],
-    "respuesta_correcta": "b",
-    "explicacion": "generated/ no se recorre."
-  }
+    {
+        "pregunta": "No debe importarse: está en generated/",
+        "respuestas": ["Sí", "No"],
+        "respuesta_correcta": "b",
+        "explicacion": "generated/ no se recorre."
+    }
 ]

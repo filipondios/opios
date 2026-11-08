@@ -1,17 +1,17 @@
 {
-  "name": "opios",
-  "private": true,
-  "type": "module",
-  "description": "Test infinito: preguntas tipo test por temas con repaso espaciado (Bun + SQLite).",
-  "scripts": {
-    "start": "bun server.js",
-    "dev": "bun --watch server.js",
-    "seed": "bun scripts/seed.js",
-    "export": "bun scripts/export.js",
-    "backup": "bun scripts/backup.js",
-    "calidad": "bun scripts/calidad.js",
-    "validar": "bun scripts/validar.js",
-    "ids": "bun scripts/ids.js",
-    "test": "bun test"
-  }
+    "name": "opios",
+    "private": true,
+    "type": "module",
+    "description": "Test infinito: preguntas tipo test por temas con repaso espaciado (Bun + SQLite).",
+    "scripts": {
+        "start": "bun server.js",
+        "dev": "bun --watch server.js",
+        "seed": "bun scripts/seed.js",
+        "export": "bun scripts/export.js",
+        "backup": "bun scripts/backup.js",
+        "calidad": "bun scripts/calidad.js",
+        "validar": "bun scripts/validar.js",
+        "ids": "bun scripts/ids.js",
+        "test": "bun test"
+    }
 }

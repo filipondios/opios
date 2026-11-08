@@ -1,8 +1,8 @@
 [
-  {
-    "pregunta": "Bloque II: ¿Cuál es el océano más grande?",
-    "respuestas": ["Atlántico", "Pacífico", "Índico"],
-    "respuesta_correcta": "b",
-    "explicacion": "El Pacífico es el océano más grande."
-  }
+    {
+        "pregunta": "Bloque II: ¿Cuál es el océano más grande?",
+        "respuestas": ["Atlántico", "Pacífico", "Índico"],
+        "respuesta_correcta": "b",
+        "explicacion": "El Pacífico es el océano más grande."
+    }
 ]

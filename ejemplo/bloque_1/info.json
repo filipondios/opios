@@ -1,7 +1,4 @@
 {
-  "nombre": "Bloque 1. Geografía",
-  "temas": [
-    { "numero": 1, "titulo": "Geografía física" },
-    { "numero": 2, "titulo": "Geografía política" }
-  ]
+    "nombre": "Bloque 1. Geografía",
+    "temas": [{ "numero": 1, "titulo": "Geografía física" }, { "numero": 2, "titulo": "Geografía política" }]
 }

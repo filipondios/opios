@@ -1,30 +1,30 @@
 [
-  {
-    "tema": 1,
-    "pregunta": "Fixture: ¿Cuál es la capital de Francia?",
-    "respuestas": ["París", "Roma", "Lisboa"],
-    "respuesta_correcta": "a",
-    "explicacion": "París es la capital de Francia."
-  },
-  {
-    "tema": 1,
-    "pregunta": "Fixture: ¿Cuántos lados tiene un triángulo?",
-    "respuestas": ["Dos", "Tres", "Cuatro"],
-    "respuesta_correcta": "b",
-    "explicacion": "Un triángulo tiene tres lados."
-  },
-  {
-    "tema": 1,
-    "pregunta": "Fixture: ¿Qué planeta es el más cercano al Sol?",
-    "respuestas": ["Mercurio", "Venus", "Marte"],
-    "respuesta_correcta": "a",
-    "explicacion": "Mercurio es el planeta más cercano al Sol."
-  },
-  {
-    "tema": 1,
-    "pregunta": "Fixture: ¿En qué año se aprobó la Constitución Española?",
-    "respuestas": ["1978", "1982", "1975"],
-    "respuesta_correcta": "a",
-    "explicacion": "La Constitución Española se aprobó en 1978."
-  }
+    {
+        "tema": 1,
+        "pregunta": "Fixture: ¿Cuál es la capital de Francia?",
+        "respuestas": ["París", "Roma", "Lisboa"],
+        "respuesta_correcta": "a",
+        "explicacion": "París es la capital de Francia."
+    },
+    {
+        "tema": 1,
+        "pregunta": "Fixture: ¿Cuántos lados tiene un triángulo?",
+        "respuestas": ["Dos", "Tres", "Cuatro"],
+        "respuesta_correcta": "b",
+        "explicacion": "Un triángulo tiene tres lados."
+    },
+    {
+        "tema": 1,
+        "pregunta": "Fixture: ¿Qué planeta es el más cercano al Sol?",
+        "respuestas": ["Mercurio", "Venus", "Marte"],
+        "respuesta_correcta": "a",
+        "explicacion": "Mercurio es el planeta más cercano al Sol."
+    },
+    {
+        "tema": 1,
+        "pregunta": "Fixture: ¿En qué año se aprobó la Constitución Española?",
+        "respuestas": ["1978", "1982", "1975"],
+        "respuesta_correcta": "a",
+        "explicacion": "La Constitución Española se aprobó en 1978."
+    }
 ]

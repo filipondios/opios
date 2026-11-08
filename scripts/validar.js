@@ -12,12 +12,14 @@ const r = await validarBanco(repo, dir);
 repo.close();
 
 console.log(`Validando el banco: ${dir}`);
-console.log(`  ${r.archivos} archivo(s): ${r.nuevas} preguntas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas.`);
+console.log(
+    `  ${r.archivos} archivo(s): ${r.nuevas} preguntas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas.`,
+);
 for (const a of r.avisos) console.warn("aviso:", a);
 for (const e of r.errores) console.error("error:", e);
 
 if (r.errores.length) {
-  console.error(`\n${r.errores.length} error(es): el banco no es válido.`);
-  process.exit(1);
+    console.error(`\n${r.errores.length} error(es): el banco no es válido.`);
+    process.exit(1);
 }
 console.log(`\nSin errores${r.avisos.length ? ` (${r.avisos.length} aviso(s))` : ""}.`);

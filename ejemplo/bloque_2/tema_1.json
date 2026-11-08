@@ -1,44 +1,44 @@
 [
-  {
-    "pregunta": "¿Qué metal es líquido a temperatura ambiente?",
-    "respuestas": ["El mercurio", "El plomo", "El aluminio", "El estaño"],
-    "respuesta_correcta": "a",
-    "explicacion": "El mercurio es el único metal que se encuentra en estado líquido a temperatura ambiente.",
-    "id_externo": "ejemplo-b2t1-01"
-  },
-  {
-    "pregunta": "¿Qué gas toman las plantas del aire para la fotosíntesis?",
-    "respuestas": ["El oxígeno", "El dióxido de carbono", "El nitrógeno", "El metano"],
-    "respuesta_correcta": "b",
-    "explicacion": "En la fotosíntesis las plantas absorben dióxido de carbono y liberan oxígeno.",
-    "id_externo": "ejemplo-b2t1-02"
-  },
-  {
-    "pregunta": "¿Cuántos huesos tiene aproximadamente un ser humano adulto?",
-    "respuestas": ["406", "106", "206", "306"],
-    "respuesta_correcta": "c",
-    "explicacion": "El esqueleto adulto tiene unos 206 huesos; al nacer hay más, pero algunos se fusionan.",
-    "id_externo": "ejemplo-b2t1-03"
-  },
-  {
-    "pregunta": "¿Qué planeta del sistema solar es famoso por sus anillos visibles?",
-    "respuestas": ["Marte", "Venus", "Mercurio", "Saturno"],
-    "respuesta_correcta": "d",
-    "explicacion": "Saturno es conocido por su amplio sistema de anillos, aunque otros planetas también los tienen.",
-    "id_externo": "ejemplo-b2t1-04"
-  },
-  {
-    "pregunta": "¿Cuál es la unidad básica de los seres vivos?",
-    "respuestas": ["El átomo", "La célula", "La molécula", "El tejido"],
-    "respuesta_correcta": "b",
-    "explicacion": "La célula es la unidad estructural y funcional más pequeña de los seres vivos.",
-    "id_externo": "ejemplo-b2t1-05"
-  },
-  {
-    "pregunta": "¿Quién formuló la teoría de la relatividad?",
-    "respuestas": ["Newton", "Galileo", "Einstein", "Bohr"],
-    "respuesta_correcta": "c",
-    "explicacion": "Albert Einstein formuló la teoría de la relatividad especial y general.",
-    "id_externo": "ejemplo-b2t1-06"
-  }
+    {
+        "pregunta": "¿Qué metal es líquido a temperatura ambiente?",
+        "respuestas": ["El mercurio", "El plomo", "El aluminio", "El estaño"],
+        "respuesta_correcta": "a",
+        "explicacion": "El mercurio es el único metal que se encuentra en estado líquido a temperatura ambiente.",
+        "id_externo": "ejemplo-b2t1-01"
+    },
+    {
+        "pregunta": "¿Qué gas toman las plantas del aire para la fotosíntesis?",
+        "respuestas": ["El oxígeno", "El dióxido de carbono", "El nitrógeno", "El metano"],
+        "respuesta_correcta": "b",
+        "explicacion": "En la fotosíntesis las plantas absorben dióxido de carbono y liberan oxígeno.",
+        "id_externo": "ejemplo-b2t1-02"
+    },
+    {
+        "pregunta": "¿Cuántos huesos tiene aproximadamente un ser humano adulto?",
+        "respuestas": ["406", "106", "206", "306"],
+        "respuesta_correcta": "c",
+        "explicacion": "El esqueleto adulto tiene unos 206 huesos; al nacer hay más, pero algunos se fusionan.",
+        "id_externo": "ejemplo-b2t1-03"
+    },
+    {
+        "pregunta": "¿Qué planeta del sistema solar es famoso por sus anillos visibles?",
+        "respuestas": ["Marte", "Venus", "Mercurio", "Saturno"],
+        "respuesta_correcta": "d",
+        "explicacion": "Saturno es conocido por su amplio sistema de anillos, aunque otros planetas también los tienen.",
+        "id_externo": "ejemplo-b2t1-04"
+    },
+    {
+        "pregunta": "¿Cuál es la unidad básica de los seres vivos?",
+        "respuestas": ["El átomo", "La célula", "La molécula", "El tejido"],
+        "respuesta_correcta": "b",
+        "explicacion": "La célula es la unidad estructural y funcional más pequeña de los seres vivos.",
+        "id_externo": "ejemplo-b2t1-05"
+    },
+    {
+        "pregunta": "¿Quién formuló la teoría de la relatividad?",
+        "respuestas": ["Newton", "Galileo", "Einstein", "Bohr"],
+        "respuesta_correcta": "c",
+        "explicacion": "Albert Einstein formuló la teoría de la relatividad especial y general.",
+        "id_externo": "ejemplo-b2t1-06"
+    }
 ]

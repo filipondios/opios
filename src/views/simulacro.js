@@ -3,26 +3,31 @@ import { layout } from "./layout.js";
 import { etiquetaTema } from "../etiquetas.js";
 
 function selectorTemas(temario) {
-  const bloques = temario.filter((b) => b.temas.length);
-  if (!bloques.length) return html`<p class="empty">Todavía no hay temas con preguntas. Añade preguntas o importa un banco.</p>`;
-  return bloques.map((b) => html`
+    const bloques = temario.filter((b) => b.temas.length);
+    if (!bloques.length)
+        return html`<p class="empty">Todavía no hay temas con preguntas. Añade preguntas o importa un banco.</p>`;
+    return bloques.map(
+        (b) => html`
     <section class="bloque-sel" data-bloque="${b.id}">
       <div class="bloque-sel-head">
         <h3>${b.nombre}</h3>
         <button class="btn small" type="button" data-bloque="${b.id}">Todo el bloque</button>
       </div>
-      <div class="temas-checks">${b.temas.map((t) => html`
+      <div class="temas-checks">${b.temas.map(
+          (t) => html`
         <label class="tema-check">
           <input type="checkbox" name="tema" value="${t.id}" data-total="${t.preguntas}" checked>
           <span class="tema-check-name">${etiquetaTema(t, { bloque: false })}</span>
           <span class="tema-check-n">${t.preguntas}</span>
-        </label>`)}</div>
-    </section>`);
+        </label>`,
+      )}</div>
+    </section>`,
+    );
 }
 
 export function paginaSimulacro({ temario }) {
-  const hayTemas = temario.some((b) => b.temas.length);
-  const cuerpo = html`
+    const hayTemas = temario.some((b) => b.temas.length);
+    const cuerpo = html`
   <div id="note" class="note" hidden></div>
 
   <!-- ============ PANTALLA: preparar ============ -->
@@ -44,7 +49,9 @@ export function paginaSimulacro({ temario }) {
       </div>
     </section>
 
-    ${hayTemas ? html`
+    ${
+        hayTemas
+            ? html`
     <section class="card stack">
       <div class="row">
         <h2>Temas</h2>
@@ -75,10 +82,12 @@ export function paginaSimulacro({ temario }) {
     <div class="row">
       <button class="btn primary" type="button" id="btn-empezar">Empezar simulacro</button>
       <span class="hint">Las respuestas no se corrigen hasta el final.</span>
-    </div>` : html`
+    </div>`
+            : html`
     <section class="stack">
       <p class="empty">No hay preguntas para simular. <a href="/maker">Añade preguntas</a> o <a href="/temario">revisa el temario</a>.</p>
-    </section>`}
+    </section>`
+    }
   </main>
 
   <!-- ============ PANTALLA: examen ============ -->
@@ -164,12 +173,12 @@ export function paginaSimulacro({ temario }) {
     </form>
   </dialog>`;
 
-  return layout({
-    titulo: "Simulacro",
-    actual: "simulacro",
-    estado: "Guardado en la base de datos",
-    css: ["test.css", "estadisticas.css", "simulacro.css"],
-    js: ["simulacro.js"],
-    cuerpo,
-  });
+    return layout({
+        titulo: "Simulacro",
+        actual: "simulacro",
+        estado: "Guardado en la base de datos",
+        css: ["test.css", "estadisticas.css", "simulacro.css"],
+        js: ["simulacro.js"],
+        cuerpo,
+    });
 }

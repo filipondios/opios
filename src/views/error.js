@@ -3,12 +3,12 @@ import { layout } from "./layout.js";
 
 /** Página HTML para rutas que no existen fuera de /api. */
 export function paginaNoEncontrada(ruta = "") {
-  return layout({
-    titulo: "Página no encontrada",
-    actual: null,
-    estado: "Error 404",
-    estadoTipo: "warn",
-    cuerpo: html`<main class="stack">
+    return layout({
+        titulo: "Página no encontrada",
+        actual: null,
+        estado: "Error 404",
+        estadoTipo: "warn",
+        cuerpo: html`<main class="stack">
       <div class="page-head">
         <div>
           <h1>Página no encontrada</h1>
@@ -21,5 +21,5 @@ export function paginaNoEncontrada(ruta = "") {
         <a class="btn" href="/estadisticas">Estadísticas</a>
       </div>
     </main>`,
-  });
+    });
 }

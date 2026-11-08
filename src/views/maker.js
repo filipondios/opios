@@ -9,20 +9,28 @@ const tituloBloque = (b) => recortar(b.nombre);
 
 /** Opciones del filtro de la lista, agrupadas por bloque. */
 export function opcionesFiltro(temario, total) {
-  return html`<option value="">Todos los temas (${total})</option>${temario.filter((b) => b.temas.length).map((b) => html`
-    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}">${recortar(etiquetaTema(t, { bloque: false }) + ` (${t.preguntas})`)}</option>`)}</optgroup>`)}`;
+    return html`<option value="">Todos los temas (${total})</option>${temario
+        .filter((b) => b.temas.length)
+        .map(
+            (b) => html`
+    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}">${recortar(etiquetaTema(t, { bloque: false }) + ` (${t.preguntas})`)}</option>`)}</optgroup>`,
+        )}`;
 }
 
 /** Opciones del selector de tema del editor, agrupadas por bloque. */
 export function opcionesTema(temario, seleccionado = "") {
-  if (!temario.some((b) => b.temas.length)) return html`<option value="">No hay temas todavía</option>`;
-  return html`${temario.filter((b) => b.temas.length).map((b) => html`
-    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}"${String(t.id) === String(seleccionado) ? " selected" : ""}>${recortar(etiquetaTema(t, { bloque: false }) + (t.preguntas === 0 ? " (sin preguntas)" : ""))}</option>`)}</optgroup>`)}`;
+    if (!temario.some((b) => b.temas.length)) return html`<option value="">No hay temas todavía</option>`;
+    return html`${temario
+        .filter((b) => b.temas.length)
+        .map(
+            (b) => html`
+    <optgroup label="${tituloBloque(b)}">${b.temas.map((t) => html`<option value="${t.id}"${String(t.id) === String(seleccionado) ? " selected" : ""}>${recortar(etiquetaTema(t, { bloque: false }) + (t.preguntas === 0 ? " (sin preguntas)" : ""))}</option>`)}</optgroup>`,
+        )}`;
 }
 
 export function paginaMaker({ temario }) {
-  const total = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
-  const cuerpo = html`
+    const total = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
+    const cuerpo = html`
   <div class="cols">
     <!-- ============ Editor ============ -->
     <section class="card" aria-labelledby="ed-title">
@@ -101,13 +109,13 @@ export function paginaMaker({ temario }) {
     </div>
   </div>`;
 
-  return layout({
-    titulo: "Creador de preguntas",
-    actual: "maker",
-    estado: "Guardado en la base de datos",
-    ancho: true,
-    css: ["maker.css"],
-    js: ["maker.js"],
-    cuerpo,
-  });
+    return layout({
+        titulo: "Creador de preguntas",
+        actual: "maker",
+        estado: "Guardado en la base de datos",
+        ancho: true,
+        css: ["maker.css"],
+        js: ["maker.js"],
+        cuerpo,
+    });
 }

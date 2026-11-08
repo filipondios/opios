@@ -1,23 +1,23 @@
 [
-  {
-    "tema": 2,
-    "pregunta": "Fixture: ¿Cuál es el océano más grande?",
-    "respuestas": ["Atlántico", "Pacífico", "Índico"],
-    "respuesta_correcta": "b",
-    "explicacion": "El Pacífico es el océano más grande."
-  },
-  {
-    "tema": 2,
-    "pregunta": "Fixture: ¿Cuántos continentes hay?",
-    "respuestas": ["Cinco", "Seis", "Siete"],
-    "respuesta_correcta": "b",
-    "explicacion": "Se suelen contar seis continentes."
-  },
-  {
-    "tema": 2,
-    "pregunta": "Fixture: ¿Qué gas respiramos principalmente?",
-    "respuestas": ["Oxígeno", "Nitrógeno", "Dióxido de carbono"],
-    "respuesta_correcta": "b",
-    "explicacion": "El aire es principalmente nitrógeno."
-  }
+    {
+        "tema": 2,
+        "pregunta": "Fixture: ¿Cuál es el océano más grande?",
+        "respuestas": ["Atlántico", "Pacífico", "Índico"],
+        "respuesta_correcta": "b",
+        "explicacion": "El Pacífico es el océano más grande."
+    },
+    {
+        "tema": 2,
+        "pregunta": "Fixture: ¿Cuántos continentes hay?",
+        "respuestas": ["Cinco", "Seis", "Siete"],
+        "respuesta_correcta": "b",
+        "explicacion": "Se suelen contar seis continentes."
+    },
+    {
+        "tema": 2,
+        "pregunta": "Fixture: ¿Qué gas respiramos principalmente?",
+        "respuestas": ["Oxígeno", "Nitrógeno", "Dióxido de carbono"],
+        "respuesta_correcta": "b",
+        "explicacion": "El aire es principalmente nitrógeno."
+    }
 ]

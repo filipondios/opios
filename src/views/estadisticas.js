@@ -8,42 +8,43 @@ const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
 const pct = (n, d) => (d > 0 ? Math.round((n / d) * 100) + " %" : "—");
 const precision = (aciertos, fallos) => (aciertos + fallos > 0 ? pct(aciertos, aciertos + fallos) : "—");
 const fechaCorta = (fecha) => {
-  const [f] = String(fecha).split(" ");
-  const [a, m, d] = f.split("-");
-  return `${d}/${m}/${a}`;
+    const [f] = String(fecha).split(" ");
+    const [a, m, d] = f.split("-");
+    return `${d}/${m}/${a}`;
 };
 const tiempo = (segundos) => {
-  const s = Math.max(0, Number(segundos) || 0);
-  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    const s = Math.max(0, Number(segundos) || 0);
+    return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 };
 const etiquetaDia = (fecha, hoy) => {
-  if (fecha === hoy) return "Hoy";
-  if (fecha === sumarDias(hoy, 1)) return "Mañana";
-  return new Date(fecha + "T12:00:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
+    if (fecha === hoy) return "Hoy";
+    if (fecha === sumarDias(hoy, 1)) return "Mañana";
+    return new Date(fecha + "T12:00:00").toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
 };
 
 /** Agrupa las filas de estadísticas por bloque, conservando el orden que devuelve SQLite. */
 function porBloque(temas) {
-  const grupos = [];
-  const vistos = new Map();
-  for (const t of temas) {
-    const clave = t.bloque ?? "sin";
-    if (!vistos.has(clave)) {
-      const g = { nombre: t.bloque_nombre || "Sin bloque", temas: [] };
-      vistos.set(clave, g);
-      grupos.push(g);
+    const grupos = [];
+    const vistos = new Map();
+    for (const t of temas) {
+        const clave = t.bloque ?? "sin";
+        if (!vistos.has(clave)) {
+            const g = { nombre: t.bloque_nombre || "Sin bloque", temas: [] };
+            vistos.set(clave, g);
+            grupos.push(g);
+        }
+        vistos.get(clave).temas.push(t);
     }
-    vistos.get(clave).temas.push(t);
-  }
-  return grupos;
+    return grupos;
 }
 
 function kpi(valor, etiqueta) {
-  return html`<div class="kpi"><span class="kpi-n">${valor}</span><span class="kpi-l">${etiqueta}</span></div>`;
+    return html`<div class="kpi"><span class="kpi-n">${valor}</span><span class="kpi-l">${etiqueta}</span></div>`;
 }
 
 function tablaTemas(temas) {
-  return porBloque(temas).map((b) => html`
+    return porBloque(temas).map(
+        (b) => html`
     <section class="stats-bloque">
       <h2>${b.nombre}</h2>
       <div class="tabla-wrap">
@@ -52,7 +53,8 @@ function tablaTemas(temas) {
             <th>Tema</th><th>Total</th><th>Vistas</th><th>Dominadas</th><th>Aprendiendo</th>
             <th>Hoy</th><th>Aciertos</th><th>Fallos</th><th>Precisión</th>
           </tr></thead>
-          <tbody>${b.temas.map((t) => html`
+          <tbody>${b.temas.map(
+              (t) => html`
             <tr class="${t.repaso > 0 ? "fila-hoy" : ""}">
               <td><b>${etiquetaTema(t, { bloque: false, nombre: false })}</b>${t.tema_nombre ? html`<span class="tema-nombre">${t.tema_nombre}</span>` : ""}</td>
               <td>${fmt(t.total)}</td>
@@ -63,122 +65,148 @@ function tablaTemas(temas) {
               <td>${fmt(t.aciertos)}</td>
               <td>${fmt(t.fallos)}</td>
               <td>${precision(t.aciertos, t.fallos)}</td>
-            </tr>`)}</tbody>
+            </tr>`,
+          )}</tbody>
         </table>
       </div>
-    </section>`);
+    </section>`,
+    );
 }
 
 function previsionRepasos(prevision, hoy) {
-  const porFecha = new Map(prevision.map((f) => [f.vence, f.n]));
-  const vencidas = prevision.filter((f) => f.vence < hoy).reduce((s, f) => s + f.n, 0);
-  const dias = Array.from({ length: 7 }, (_, i) => {
-    const fecha = sumarDias(hoy, i);
-    return { fecha, n: porFecha.get(fecha) ?? 0 };
-  });
-  const max = Math.max(1, vencidas, ...dias.map((d) => d.n));
-  return html`
-    ${vencidas ? html`<div class="forecast-row vencidas">
+    const porFecha = new Map(prevision.map((f) => [f.vence, f.n]));
+    const vencidas = prevision.filter((f) => f.vence < hoy).reduce((s, f) => s + f.n, 0);
+    const dias = Array.from({ length: 7 }, (_, i) => {
+        const fecha = sumarDias(hoy, i);
+        return { fecha, n: porFecha.get(fecha) ?? 0 };
+    });
+    const max = Math.max(1, vencidas, ...dias.map((d) => d.n));
+    return html`
+    ${
+        vencidas
+            ? html`<div class="forecast-row vencidas">
       <span>Vencidas</span><span class="forecast-bar"><i style="width:${Math.round((vencidas / max) * 100)}%"></i></span><b>${fmt(vencidas)}</b>
-    </div>` : ""}
-    ${dias.map((d) => html`
+    </div>`
+            : ""
+    }
+    ${dias.map(
+        (d) => html`
       <div class="forecast-row">
         <span>${etiquetaDia(d.fecha, hoy)}</span>
         <span class="forecast-bar"><i style="width:${Math.round((d.n / max) * 100)}%"></i></span>
         <b>${fmt(d.n)}</b>
-      </div>`)}`;
+      </div>`,
+    )}`;
 }
 
 function actividad(actividad, hoy) {
-  const porDia = new Map(actividad.map((a) => [a.dia, a]));
-  const dias = Array.from({ length: 14 }, (_, i) => {
-    const fecha = sumarDias(hoy, i - 13);
-    const a = porDia.get(fecha);
-    return { fecha, n: a?.n ?? 0, aciertos: a?.aciertos ?? 0, fallos: a?.fallos ?? 0 };
-  });
-  const max = Math.max(1, ...dias.map((d) => d.n));
-  const alto = (n) => (n ? Math.max(2, Math.round((n / max) * 100)) : 0);
-  return html`
+    const porDia = new Map(actividad.map((a) => [a.dia, a]));
+    const dias = Array.from({ length: 14 }, (_, i) => {
+        const fecha = sumarDias(hoy, i - 13);
+        const a = porDia.get(fecha);
+        return { fecha, n: a?.n ?? 0, aciertos: a?.aciertos ?? 0, fallos: a?.fallos ?? 0 };
+    });
+    const max = Math.max(1, ...dias.map((d) => d.n));
+    const alto = (n) => (n ? Math.max(2, Math.round((n / max) * 100)) : 0);
+    return html`
     <div class="actividad" role="img" aria-label="Respuestas por día en los últimos 14 días (aciertos y fallos)">
-      ${dias.map((d) => html`<span class="actividad-dia" title="${fechaCorta(d.fecha)}: ${fmt(d.n)} respuestas · ${fmt(d.aciertos)} aciertos, ${fmt(d.fallos)} fallos">
+      ${dias.map(
+          (
+              d,
+          ) => html`<span class="actividad-dia" title="${fechaCorta(d.fecha)}: ${fmt(d.n)} respuestas · ${fmt(d.aciertos)} aciertos, ${fmt(d.fallos)} fallos">
         <i class="actividad-barra ok" style="height:${alto(d.aciertos)}%"></i><i class="actividad-barra bad" style="height:${alto(d.fallos)}%"></i>
-      </span>`)}
+      </span>`,
+      )}
     </div>
     <p class="hint">Del ${fechaCorta(dias[0].fecha)} al ${fechaCorta(dias[dias.length - 1].fecha)} · respuestas por día (arriba aciertos, abajo fallos)</p>`;
 }
 
 /** Precisión agrupada por semana natural (lunes a domingo). */
 function tablaSemanas(semanas) {
-  if (!semanas.length) return html`<p class="empty">Todavía no hay respuestas registradas. Haz un test para empezar.</p>`;
-  return html`<div class="tabla-wrap">
+    if (!semanas.length)
+        return html`<p class="empty">Todavía no hay respuestas registradas. Haz un test para empezar.</p>`;
+    return html`<div class="tabla-wrap">
     <table class="tabla">
       <thead><tr><th>Semana</th><th>Respuestas</th><th>Aciertos</th><th>Fallos</th><th>Precisión</th></tr></thead>
-      <tbody>${semanas.map((s) => html`
+      <tbody>${semanas.map(
+          (s) => html`
         <tr>
           <td>${fechaCorta(s.desde)} – ${fechaCorta(s.hasta)}</td>
           <td>${fmt(s.aciertos + s.fallos)}</td>
           <td>${fmt(s.aciertos)}</td>
           <td>${fmt(s.fallos)}</td>
           <td><b>${precision(s.aciertos, s.fallos)}</b></td>
-        </tr>`)}</tbody>
+        </tr>`,
+      )}</tbody>
     </table>
   </div>`;
 }
 
 /** Evolución de la nota de los simulacros (aciertos / total × 10). */
 function evolucionSimulacros(simulacros) {
-  if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro.</p>`;
-  const serie = [...simulacros].reverse().map((s) => ({
-    fecha: s.fecha, nota: (s.aciertos / s.total) * 10, puntos: Number(s.puntos),
-  }));
-  const max = Math.max(1, ...serie.map((x) => x.nota));
-  return html`
+    if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro.</p>`;
+    const serie = [...simulacros].reverse().map((s) => ({
+        fecha: s.fecha,
+        nota: (s.aciertos / s.total) * 10,
+        puntos: Number(s.puntos),
+    }));
+    const max = Math.max(1, ...serie.map((x) => x.nota));
+    return html`
     <div class="evolucion" role="img" aria-label="Evolución de la nota de los últimos simulacros">
-      ${serie.map((x) => html`<span class="evol-dia" title="${fechaCorta(x.fecha)}: nota ${x.nota.toFixed(2)}/10 · ${x.puntos.toFixed(2)} puntos">
+      ${serie.map(
+          (
+              x,
+          ) => html`<span class="evol-dia" title="${fechaCorta(x.fecha)}: nota ${x.nota.toFixed(2)}/10 · ${x.puntos.toFixed(2)} puntos">
         <i class="evol-barra" style="height:${Math.max(2, Math.round((x.nota / max) * 100))}%"></i><b>${x.nota.toFixed(1)}</b>
-      </span>`)}
+      </span>`,
+      )}
     </div>
     <p class="hint">Nota sobre 10 de cada simulacro, del más antiguo al más reciente. La penalización se aplica en «Puntos».</p>`;
 }
 
 function tablaFalladas(falladas) {
-  if (!falladas.length) return html`<p class="empty">Todavía no hay fallos registrados. Haz un test o un simulacro para empezar.</p>`;
-  return html`<div class="tabla-wrap">
+    if (!falladas.length)
+        return html`<p class="empty">Todavía no hay fallos registrados. Haz un test o un simulacro para empezar.</p>`;
+    return html`<div class="tabla-wrap">
     <table class="tabla">
       <thead><tr><th>Tema</th><th>Pregunta</th><th>Fallos</th><th>Aciertos</th><th>Caja</th></tr></thead>
-      <tbody>${falladas.map((p) => html`
+      <tbody>${falladas.map(
+          (p) => html`
         <tr>
           <td>${p.bloque_nombre ? html`<span class="tema-nombre">${p.bloque_nombre}</span>` : ""}<b>${etiquetaTema(p, { bloque: false, nombre: false })}</b></td>
           <td class="pregunta-cell">${p.enunciado}</td>
           <td><b>${fmt(p.fallos)}</b></td>
           <td>${fmt(p.aciertos)}</td>
           <td>${p.caja ?? "—"}</td>
-        </tr>`)}</tbody>
+        </tr>`,
+      )}</tbody>
     </table>
   </div>`;
 }
 
 /** Índice id de tema → tema con el nombre de su bloque, para resolver `simulacros.temas`. */
 function indiceTemas(temario) {
-  const indice = new Map();
-  for (const b of temario) for (const t of b.temas) indice.set(t.id, { ...t, bloque_nombre: b.nombre });
-  return indice;
+    const indice = new Map();
+    for (const b of temario) for (const t of b.temas) indice.set(t.id, { ...t, bloque_nombre: b.nombre });
+    return indice;
 }
 
 function etiquetaTemasSimulacro(s, indice) {
-  const temas = s.temas.map((id) => indice.get(id)).filter(Boolean);
-  if (temas.length === 1) return etiquetaTema(temas[0]);
-  if (temas.length > 1) return `${temas.length} temas`;
-  return `${s.temas.length} tema${s.temas.length === 1 ? "" : "s"}`;
+    const temas = s.temas.map((id) => indice.get(id)).filter(Boolean);
+    if (temas.length === 1) return etiquetaTema(temas[0]);
+    if (temas.length > 1) return `${temas.length} temas`;
+    return `${s.temas.length} tema${s.temas.length === 1 ? "" : "s"}`;
 }
 
 function tablaSimulacros(simulacros, temario) {
-  if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro. <a href="/simulacro">Empieza uno</a>.</p>`;
-  const indice = indiceTemas(temario);
-  return html`<div class="tabla-wrap">
+    if (!simulacros.length)
+        return html`<p class="empty">Todavía no has hecho ningún simulacro. <a href="/simulacro">Empieza uno</a>.</p>`;
+    const indice = indiceTemas(temario);
+    return html`<div class="tabla-wrap">
     <table class="tabla">
       <thead><tr><th>Fecha</th><th>Temas</th><th>Preguntas</th><th>Aciertos</th><th>Fallos</th><th>Blancos</th><th>Puntos</th><th>Tiempo</th></tr></thead>
-      <tbody>${simulacros.map((s) => html`
+      <tbody>${simulacros.map(
+          (s) => html`
         <tr>
           <td>${fechaCorta(s.fecha)}</td>
           <td>${etiquetaTemasSimulacro(s, indice)}</td>
@@ -188,20 +216,35 @@ function tablaSimulacros(simulacros, temario) {
           <td>${fmt(s.en_blanco)}</td>
           <td><b>${Number(s.puntos).toFixed(2)}</b></td>
           <td>${tiempo(s.segundos)}</td>
-        </tr>`)}</tbody>
+        </tr>`,
+      )}</tbody>
     </table>
   </div>`;
 }
 
-export function paginaEstadisticas({ global, temas, prevision, falladas, actividad: act, racha = 0, semanas = [], tiempo = { ms: null, n: 0 }, simulacros, totalSimulacros, temario = [], hoy, examen = null }) {
-  const vistas = global.total - global.nuevas;
-  const sinProgreso = global.nuevas === global.total;
-  const aviso = !sinProgreso
-    ? ""
-    : totalSimulacros > 0
-      ? `Todavía no has hecho ningún test, pero ya tienes ${fmt(totalSimulacros)} simulacro${totalSimulacros === 1 ? "" : "s"} registrado${totalSimulacros === 1 ? "" : "s"}. Abajo se muestran sus resultados; haz un test para empezar a registrar progreso de repaso.`
-      : "Todavía no hay actividad registrada. Haz un test o un simulacro para empezar a ver datos.";
-  const cuerpo = html`
+export function paginaEstadisticas({
+    global,
+    temas,
+    prevision,
+    falladas,
+    actividad: act,
+    racha = 0,
+    semanas = [],
+    tiempo = { ms: null, n: 0 },
+    simulacros,
+    totalSimulacros,
+    temario = [],
+    hoy,
+    examen = null,
+}) {
+    const vistas = global.total - global.nuevas;
+    const sinProgreso = global.nuevas === global.total;
+    const aviso = !sinProgreso
+        ? ""
+        : totalSimulacros > 0
+          ? `Todavía no has hecho ningún test, pero ya tienes ${fmt(totalSimulacros)} simulacro${totalSimulacros === 1 ? "" : "s"} registrado${totalSimulacros === 1 ? "" : "s"}. Abajo se muestran sus resultados; haz un test para empezar a registrar progreso de repaso.`
+          : "Todavía no hay actividad registrada. Haz un test o un simulacro para empezar a ver datos.";
+    const cuerpo = html`
   <main class="stack">
     <div class="page-head">
       <div>
@@ -262,12 +305,12 @@ export function paginaEstadisticas({ global, temas, prevision, falladas, activid
     </section>
   </main>`;
 
-  return layout({
-    titulo: "Estadísticas",
-    actual: "estadisticas",
-    estado: "Guardado en la base de datos",
-    ancho: true,
-    css: ["estadisticas.css"],
-    cuerpo,
-  });
+    return layout({
+        titulo: "Estadísticas",
+        actual: "estadisticas",
+        estado: "Guardado en la base de datos",
+        ancho: true,
+        css: ["estadisticas.css"],
+        cuerpo,
+    });
 }

@@ -1,44 +1,44 @@
 [
-  {
-    "pregunta": "¿Quién escribió «Don Quijote de la Mancha»?",
-    "respuestas": ["Lope de Vega", "Miguel de Cervantes", "Federico García Lorca", "Calderón de la Barca"],
-    "respuesta_correcta": "b",
-    "explicacion": "Miguel de Cervantes publicó la primera parte del Quijote en 1605 y la segunda en 1615.",
-    "id_externo": "ejemplo-b2t2-01"
-  },
-  {
-    "pregunta": "¿Quién pintó «La noche estrellada»?",
-    "respuestas": ["Vincent van Gogh", "Pablo Picasso", "Claude Monet", "Salvador Dalí"],
-    "respuesta_correcta": "a",
-    "explicacion": "Vincent van Gogh pintó «La noche estrellada» en 1889.",
-    "id_externo": "ejemplo-b2t2-02"
-  },
-  {
-    "pregunta": "¿En qué museo se expone «La Gioconda»?",
-    "respuestas": ["El Museo del Prado", "El Museo Británico", "El Museo del Louvre", "La Galería Uffizi"],
-    "respuesta_correcta": "c",
-    "explicacion": "«La Gioconda», de Leonardo da Vinci, se expone en el Museo del Louvre de París.",
-    "id_externo": "ejemplo-b2t2-03"
-  },
-  {
-    "pregunta": "¿Quién compuso «La flauta mágica»?",
-    "respuestas": ["Beethoven", "Mozart", "Bach", "Vivaldi"],
-    "respuesta_correcta": "b",
-    "explicacion": "Wolfgang Amadeus Mozart compuso la ópera «La flauta mágica» en 1791.",
-    "id_externo": "ejemplo-b2t2-04"
-  },
-  {
-    "pregunta": "¿Quién escribió «Cien años de soledad»?",
-    "respuestas": ["Jorge Luis Borges", "Julio Cortázar", "Mario Vargas Llosa", "Gabriel García Márquez"],
-    "respuesta_correcta": "d",
-    "explicacion": "Gabriel García Márquez publicó «Cien años de soledad» en 1967.",
-    "id_externo": "ejemplo-b2t2-05"
-  },
-  {
-    "pregunta": "¿A qué autor se atribuye «La Odisea»?",
-    "respuestas": ["Sófocles", "Homero", "Virgilio", "Esquilo"],
-    "respuesta_correcta": "b",
-    "explicacion": "«La Odisea» se atribuye al poeta griego Homero, igual que «La Ilíada».",
-    "id_externo": "ejemplo-b2t2-06"
-  }
+    {
+        "pregunta": "¿Quién escribió «Don Quijote de la Mancha»?",
+        "respuestas": ["Lope de Vega", "Miguel de Cervantes", "Federico García Lorca", "Calderón de la Barca"],
+        "respuesta_correcta": "b",
+        "explicacion": "Miguel de Cervantes publicó la primera parte del Quijote en 1605 y la segunda en 1615.",
+        "id_externo": "ejemplo-b2t2-01"
+    },
+    {
+        "pregunta": "¿Quién pintó «La noche estrellada»?",
+        "respuestas": ["Vincent van Gogh", "Pablo Picasso", "Claude Monet", "Salvador Dalí"],
+        "respuesta_correcta": "a",
+        "explicacion": "Vincent van Gogh pintó «La noche estrellada» en 1889.",
+        "id_externo": "ejemplo-b2t2-02"
+    },
+    {
+        "pregunta": "¿En qué museo se expone «La Gioconda»?",
+        "respuestas": ["El Museo del Prado", "El Museo Británico", "El Museo del Louvre", "La Galería Uffizi"],
+        "respuesta_correcta": "c",
+        "explicacion": "«La Gioconda», de Leonardo da Vinci, se expone en el Museo del Louvre de París.",
+        "id_externo": "ejemplo-b2t2-03"
+    },
+    {
+        "pregunta": "¿Quién compuso «La flauta mágica»?",
+        "respuestas": ["Beethoven", "Mozart", "Bach", "Vivaldi"],
+        "respuesta_correcta": "b",
+        "explicacion": "Wolfgang Amadeus Mozart compuso la ópera «La flauta mágica» en 1791.",
+        "id_externo": "ejemplo-b2t2-04"
+    },
+    {
+        "pregunta": "¿Quién escribió «Cien años de soledad»?",
+        "respuestas": ["Jorge Luis Borges", "Julio Cortázar", "Mario Vargas Llosa", "Gabriel García Márquez"],
+        "respuesta_correcta": "d",
+        "explicacion": "Gabriel García Márquez publicó «Cien años de soledad» en 1967.",
+        "id_externo": "ejemplo-b2t2-05"
+    },
+    {
+        "pregunta": "¿A qué autor se atribuye «La Odisea»?",
+        "respuestas": ["Sófocles", "Homero", "Virgilio", "Esquilo"],
+        "respuesta_correcta": "b",
+        "explicacion": "«La Odisea» se atribuye al poeta griego Homero, igual que «La Ilíada».",
+        "id_externo": "ejemplo-b2t2-06"
+    }
 ]

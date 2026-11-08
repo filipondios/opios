@@ -3,9 +3,9 @@ import { layout } from "./layout.js";
 
 /** Una ficha por tema, con barra de progreso. Los data-* los usa el cliente para el resumen. */
 function chip(t) {
-  const pct = (n) => (n / t.total * 100).toFixed(2);
-  const numero = t.tema_numero ?? t.tema;
-  return html`<button class="chip" type="button" role="checkbox" aria-checked="false"
+    const pct = (n) => ((n / t.total) * 100).toFixed(2);
+    const numero = t.tema_numero ?? t.tema;
+    return html`<button class="chip" type="button" role="checkbox" aria-checked="false"
       data-tema="${t.tema}" data-total="${t.total}" data-nuevas="${t.nuevas}" data-repaso="${t.repaso}"
       ${t.tema_nombre ? html`title="${t.tema_nombre}"` : ""}>
     <span class="chip-top"><span class="chip-label">Tema</span><span class="chip-num">${numero}</span></span>
@@ -20,44 +20,47 @@ function chip(t) {
 
 /** Atributos de datos con la carga del día; el cliente los lee para mostrar el cupo y limitar las nuevas. */
 function datosCarga(carga) {
-  if (!carga) return "";
-  return `data-nuevas-hoy="${carga.nuevasHoy}" data-cupo-nuevas="${carga.cupoNuevas}" `
-    + `data-repasos="${carga.repasosPendientes}" data-atrasados="${carga.repasosAtrasados}" `
-    + `data-bloqueado="${carga.bloqueadoPorAtraso ? 1 : 0}"`;
+    if (!carga) return "";
+    return (
+        `data-nuevas-hoy="${carga.nuevasHoy}" data-cupo-nuevas="${carga.cupoNuevas}" ` +
+        `data-repasos="${carga.repasosPendientes}" data-atrasados="${carga.repasosAtrasados}" ` +
+        `data-bloqueado="${carga.bloqueadoPorAtraso ? 1 : 0}"`
+    );
 }
 
 /** Texto del cupo diario; el mismo resumen lo recalcula el cliente al refrescar los temas. */
 export function textoCarga(carga) {
-  if (!carga) return "";
-  const restantes = Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
-  const partes = [`Nuevas hoy: ${carga.nuevasHoy}/${carga.cupoNuevas}`];
-  if (carga.repasosPendientes) partes.push(`${carga.repasosPendientes} por repasar`);
-  if (carga.bloqueadoPorAtraso) partes.push(`frenado: ${carga.repasosAtrasados} repasos atrasados`);
-  else if (restantes === 0) partes.push("cupo de nuevas agotado hoy");
-  return partes.join(" · ");
+    if (!carga) return "";
+    const restantes = Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
+    const partes = [`Nuevas hoy: ${carga.nuevasHoy}/${carga.cupoNuevas}`];
+    if (carga.repasosPendientes) partes.push(`${carga.repasosPendientes} por repasar`);
+    if (carga.bloqueadoPorAtraso) partes.push(`frenado: ${carga.repasosAtrasados} repasos atrasados`);
+    else if (restantes === 0) partes.push("cupo de nuevas agotado hoy");
+    return partes.join(" · ");
 }
 
 /** Texto con los días que quedan y el tope de intervalo derivado (Fase 3.6). */
 export function textoExamen(examen) {
-  if (!examen || !examen.fecha) return "";
-  if (examen.dias == null || examen.dias <= 0) return "La fecha de examen ya ha pasado.";
-  return `${examen.dias} día${examen.dias === 1 ? "" : "s"} hasta el examen · los repasos se acortan a ${examen.topeDias} día${examen.topeDias === 1 ? "" : "s"}`;
+    if (!examen || !examen.fecha) return "";
+    if (examen.dias == null || examen.dias <= 0) return "La fecha de examen ya ha pasado.";
+    return `${examen.dias} día${examen.dias === 1 ? "" : "s"} hasta el examen · los repasos se acortan a ${examen.topeDias} día${examen.topeDias === 1 ? "" : "s"}`;
 }
 
 /** Rejilla de temas agrupada por bloques del temario. */
 export function temasGrid(temas, carga = null) {
-  const bloques = [];
-  const porBloque = new Map();
-  for (const t of temas) {
-    const clave = t.bloque ?? "sin";
-    if (!porBloque.has(clave)) {
-      const g = { id: t.bloque ?? null, nombre: t.bloque_nombre || "Sin bloque", temas: [] };
-      porBloque.set(clave, g);
-      bloques.push(g);
+    const bloques = [];
+    const porBloque = new Map();
+    for (const t of temas) {
+        const clave = t.bloque ?? "sin";
+        if (!porBloque.has(clave)) {
+            const g = { id: t.bloque ?? null, nombre: t.bloque_nombre || "Sin bloque", temas: [] };
+            porBloque.set(clave, g);
+            bloques.push(g);
+        }
+        porBloque.get(clave).temas.push(t);
     }
-    porBloque.get(clave).temas.push(t);
-  }
-  return html`<div class="carga" hidden ${raw(datosCarga(carga))}></div>${bloques.map((b) => html`
+    return html`<div class="carga" hidden ${raw(datosCarga(carga))}></div>${bloques.map(
+        (b) => html`
     <section class="bloque" data-bloque="${b.id ?? ""}">
       <div class="bloque-head">
         <h2>${b.nombre}</h2>
@@ -65,22 +68,26 @@ export function temasGrid(temas, carga = null) {
         <button class="btn small sel-bloque" type="button" data-bloque="${b.id ?? ""}">Todo el bloque</button>
       </div>
       <div class="grid">${b.temas.map(chip)}</div>
-    </section>`)}`;
+    </section>`,
+    )}`;
 }
 
 export function paginaHome({ temas, carga = null, examen = null }) {
-  const vacio = temas.length === 0;
-  const cuerpo = html`
+    const vacio = temas.length === 0;
+    const cuerpo = html`
   <div id="note" class="note" hidden></div>
 
   <!-- ============ PANTALLA: preparar ============ -->
   <main id="screen-setup" class="stack">
-    ${vacio ? html`
+    ${
+        vacio
+            ? html`
     <section id="empty" class="stack">
       <h1>Todavía no hay preguntas</h1>
       <p class="lede">La base de datos está vacía. Apunta <code>OPIOS_PREGUNTAS</code> a la carpeta de tu banco y ejecuta <code>bun run seed</code>, o crea preguntas desde el creador. Sin configurar nada, la app usa el banco de ejemplo de <code>ejemplo/</code>.</p>
       <div class="row"><a class="btn primary" href="/maker">Añadir preguntas</a><a class="btn" href="/temario">Organizar temario</a></div>
-    </section>` : html`
+    </section>`
+            : html`
     <section id="ready" class="stack">
       <h1>Elige los temas</h1>
       <p class="sum" id="sum"></p>
@@ -106,7 +113,8 @@ export function paginaHome({ temas, carga = null, examen = null }) {
         <span class="spacer"></span>
         <button class="btn danger" type="button" id="btn-clear-prog">Reiniciar progreso</button>
       </div>
-    </section>`}
+    </section>`
+    }
   </main>
 
   <!-- ============ PANTALLA: test ============ -->
@@ -135,12 +143,12 @@ export function paginaHome({ temas, carga = null, examen = null }) {
     <div class="sr" id="sr" aria-live="polite"></div>
   </main>`;
 
-  return layout({
-    titulo: "Test infinito",
-    actual: "test",
-    estado: "Guardado en la base de datos",
-    css: ["test.css"],
-    js: vacio ? [] : ["test.js"],
-    cuerpo,
-  });
+    return layout({
+        titulo: "Test infinito",
+        actual: "test",
+        estado: "Guardado en la base de datos",
+        css: ["test.css"],
+        js: vacio ? [] : ["test.js"],
+        cuerpo,
+    });
 }
