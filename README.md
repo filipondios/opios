@@ -43,9 +43,7 @@ bun run ids                     # asigna id_externo estable a las preguntas que 
 bun run seed --actualizar       # actualiza preguntas editadas conservando su id y progreso
 ```
 
-La carpeta `generated/` de cada bloque conserva las preguntas creadas con un modelo de lenguaje tal como se generaron. No forma parte del banco importable: su contenido ya está incorporado a los `tema_N.json` y solo queda como registro de su procedencia.
-
-`bun run calidad` incluye `generated/` (marcado con `*`) para revisar también ese material, aunque no se importe. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
+`bun run calidad` analiza solo lo que la app importa. Con `--incluir <carpeta>` (repetible) añade otras carpetas del bloque. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
 
 ## Usa tu propio banco
 
@@ -83,7 +81,7 @@ Para restaurar una copia, para la aplicación y copia el archivo sobre `data/opi
 
 ## Formato y estructura del banco
 
-Para conocer el formato de las preguntas, la estructura del banco de preguntas y otras cuestiones relacionadas, consulta la [wiki del proyecto](https://github.com/filipondios/opios/wiki).
+Se importan únicamente `bloque_N/info.json` y `bloque_N/tema_N.json`, de manera que cualquier otro archivo o carpeta se ignora. Los nombres son estrictos, ya que por ejemplo `Bloque_1/`, `bloque_01/`, `TEMA_1.json` y `tema_01.json` se ignoran con un aviso. Para conocer el formato de las preguntas, la estructura del banco de preguntas y otras cuestiones relacionadas, consulta la [wiki del proyecto](https://github.com/filipondios/opios/wiki).
 
 ## Configuración
 

@@ -7,8 +7,5 @@ data
 test
 .github
 README.md
-opios-bank
-**/generated
-**/generated/**
 Dockerfile
 .dockerignore
