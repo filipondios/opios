@@ -8,7 +8,7 @@
     },
     {
         "pregunta": "¿Quién pintó «La noche estrellada»?",
-        "respuestas": ["Vincent van Gogh", "Pablo Picasso", "Claude Monet", "Salvador Dalí"],
+        "respuestas": ["Vincent van Gogh", "Pablo Ruiz Picasso", "Claude Monet", "Salvador Dalí"],
         "respuesta_correcta": "a",
         "explicacion": "Vincent van Gogh pintó «La noche estrellada» en 1889.",
         "id_externo": "ejemplo-b2t2-02"

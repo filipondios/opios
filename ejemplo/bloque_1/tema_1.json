@@ -29,14 +29,14 @@
     },
     {
         "pregunta": "¿Cuál es el pico más alto de África?",
-        "respuestas": ["El Everest", "El Kilimanjaro", "El Aconcagua", "El Elbrús"],
+        "respuestas": ["El Everest, en Asia", "El Kilimanjaro", "El Aconcagua", "El Elbrús"],
         "respuesta_correcta": "b",
         "explicacion": "El Kilimanjaro, en Tanzania, es el pico más alto de África; el Everest y el Aconcagua están en Asia y América.",
         "id_externo": "ejemplo-b1t1-05"
     },
     {
         "pregunta": "¿En qué capa de la atmósfera se concentra la capa de ozono?",
-        "respuestas": ["La troposfera", "La mesosfera", "La estratosfera", "La termosfera"],
+        "respuestas": ["La troposfera inferior", "La mesosfera", "La estratosfera", "La termosfera"],
         "respuesta_correcta": "c",
         "explicacion": "La mayor parte del ozono atmosférico se encuentra en la estratosfera.",
         "id_externo": "ejemplo-b1t1-06"
@@ -50,7 +50,7 @@
     },
     {
         "pregunta": "¿Qué astro origina principalmente las mareas?",
-        "respuestas": ["El Sol", "La Luna", "Marte", "Venus"],
+        "respuestas": ["El Sol", "La Luna", "El planeta Marte", "Venus"],
         "respuesta_correcta": "b",
         "explicacion": "La atracción gravitatoria de la Luna es la causa principal de las mareas, con un efecto menor del Sol.",
         "id_externo": "ejemplo-b1t1-08"
