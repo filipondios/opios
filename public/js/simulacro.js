@@ -1,6 +1,6 @@
 import { api, h, LETRAS, msgError } from "./comun.js";
 import { calcularResultado } from "./resultado.js";
-import { estadoReloj, mmss, prepararPreguntas, respuestasParaGuardar } from "./simulacro-logica.js";
+import { estadoReloj, mmss, prepararPreguntas, respuestasParaGuardar, temasDebiles } from "./simulacro-logica.js";
 import { etiquetaTema } from "./etiquetas.js";
 
 /* Simulacro (cliente): configuración, examen cronometrado y revisión final.
@@ -13,7 +13,9 @@ import { etiquetaTema } from "./etiquetas.js";
     const setStatus = (kind, text) => {
         const s = $("#status");
         s.dataset.state = kind;
-        s.textContent = text;
+        s.title = text;
+        const visible = s.querySelector(".status-text");
+        if (visible) visible.textContent = text;
     };
 
     let pantalla = "setup";
@@ -192,6 +194,42 @@ import { etiquetaTema } from "./etiquetas.js";
     });
     $("#cfg-n")?.addEventListener("input", actualizarResumen);
 
+    /* Perfiles de preparación: los mismos valores por defecto, un simulacro corto o los temas más flojos. */
+    function marcarTemas(ids) {
+        const elegidos = new Set(ids.map(Number));
+        checks().forEach((c) => {
+            c.checked = ids.length === 0 ? true : elegidos.has(Number(c.value));
+        });
+        actualizarResumen();
+    }
+    function aplicarPerfil(tipo) {
+        if (tipo === "rapido") {
+            $("#cfg-n").value = "20";
+            $("#cfg-min").value = "20";
+            $("#cfg-pen").value = "0";
+            marcarTemas([]);
+        } else if (tipo === "debiles") {
+            const lista = checks().map((c) => ({
+                id: Number(c.value),
+                precision: Number(c.dataset.precision ?? -1),
+            }));
+            const ids = temasDebiles(lista, 5);
+            marcarTemas(ids);
+            $("#cfg-n").value = String(Math.min(20, Math.max(5, totalDisponible())));
+            $("#cfg-min").value = "30";
+            $("#cfg-pen").value = "0";
+            actualizarResumen();
+        } else {
+            $("#cfg-n").value = "50";
+            $("#cfg-min").value = "60";
+            $("#cfg-pen").value = "0.3333333333333333";
+            marcarTemas([]);
+        }
+    }
+    $("#btn-perfil-examen")?.addEventListener("click", () => aplicarPerfil("examen"));
+    $("#btn-perfil-rapido")?.addEventListener("click", () => aplicarPerfil("rapido"));
+    $("#btn-perfil-debiles")?.addEventListener("click", () => aplicarPerfil("debiles"));
+
     /* ---------- Examen ---------- */
     function iniciarReloj(min) {
         clearInterval(timer);
@@ -337,9 +375,9 @@ import { etiquetaTema } from "./etiquetas.js";
                     {
                         type: "button",
                         class: "pal",
-                        "data-estado": respuestas[i] != null ? "ok" : "",
+                        "data-estado": respuestas[i] != null ? "ok" : "blank",
                         "aria-current": i === cur ? "true" : null,
-                        "aria-label": `Pregunta ${i + 1}${respuestas[i] != null ? ", respondida" : ""}`,
+                        "aria-label": `Pregunta ${i + 1}${respuestas[i] != null ? ", respondida" : ", en blanco"}`,
                         onclick: () => irA(i),
                     },
                     String(i + 1),
@@ -432,14 +470,20 @@ import { etiquetaTema } from "./etiquetas.js";
 
     function pintarResultado(res) {
         const pen = textoPenalizacion(penalizacion);
+        $("#res-nota").textContent = `${res.nota.toFixed(2)} / 10`;
         $("#res-sub").textContent = `${res.total} preguntas · ${minutos} min · ${pen}`;
+        const anillo = $("#res-anillo");
+        if (anillo) {
+            anillo.style.setProperty("--nota", String(Math.max(0, Math.min(100, res.nota * 10))));
+            anillo.textContent = res.nota.toFixed(1);
+            anillo.setAttribute("role", "img");
+            anillo.setAttribute("aria-label", `Nota ${res.nota.toFixed(2)} sobre 10`);
+        }
         $("#res-kpis").replaceChildren(
-            kpi(res.puntos.toFixed(2), "puntos"),
-            kpi(res.nota.toFixed(2) + " / 10", "nota"),
             kpi(String(res.aciertos), "aciertos"),
             kpi(String(res.fallos), "fallos"),
             kpi(String(res.blancos), "en blanco"),
-            kpi(mmss(res.segundos), "tiempo"),
+            kpi(`${res.puntos.toFixed(2)} · ${mmss(res.segundos)}`, "puntos · tiempo"),
         );
 
         const tabla = $("#res-temas");
@@ -458,8 +502,16 @@ import { etiquetaTema } from "./etiquetas.js";
             h(
                 "tbody",
                 null,
-                res.porTema.map((t) =>
-                    h(
+                res.porTema.map((t) => {
+                    const total = t.aciertos + t.fallos;
+                    const pr = total ? Math.round((t.aciertos / total) * 100) : 0;
+                    const celda = h("td", null, h("span", { class: "precision-celda" }));
+                    const barra = h("span", { class: "bar" });
+                    barra.append(h("i", { class: "b-ok" }), h("i", { class: "b-bad" }));
+                    barra.firstChild.style.width = pr + "%";
+                    barra.lastChild.style.width = total ? 100 - pr + "%" : "0";
+                    celda.firstChild.append(barra, h("span", { text: total ? pr + " %" : "—" }));
+                    return h(
                         "tr",
                         null,
                         h(
@@ -478,14 +530,9 @@ import { etiquetaTema } from "./etiquetas.js";
                         h("td", { text: String(t.aciertos) }),
                         h("td", { text: String(t.fallos) }),
                         h("td", { text: String(t.blancos) }),
-                        h("td", {
-                            text:
-                                t.aciertos + t.fallos
-                                    ? Math.round((t.aciertos / (t.aciertos + t.fallos)) * 100) + " %"
-                                    : "—",
-                        }),
-                    ),
-                ),
+                        celda,
+                    );
+                }),
             ),
         );
 
@@ -541,9 +588,10 @@ import { etiquetaTema } from "./etiquetas.js";
     }
 
     function aplicarFiltroRevision() {
-        const soloFallos = $("#res-solo-fallos")?.checked ?? true;
+        const modo = $("#res-filtro")?.value ?? "fallos";
         [...document.querySelectorAll("#res-revision .review")].forEach((el) => {
-            el.hidden = soloFallos && el.dataset.estado === "acierto";
+            const estado = el.dataset.estado;
+            el.hidden = modo === "fallos" ? estado === "acierto" : modo === "blancos" ? estado !== "blanco" : false;
         });
     }
 
@@ -624,7 +672,7 @@ import { etiquetaTema } from "./etiquetas.js";
     $("#btn-finish")?.addEventListener("click", () => finalizar(false));
     $("#btn-salir")?.addEventListener("click", salir);
     $("#btn-repetir")?.addEventListener("click", repetir);
-    $("#res-solo-fallos")?.addEventListener("change", aplicarFiltroRevision);
+    $("#res-filtro")?.addEventListener("change", aplicarFiltroRevision);
 
     document.addEventListener("keydown", (e) => {
         if (e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;

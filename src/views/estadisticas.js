@@ -3,10 +3,12 @@ import { layout } from "./layout.js";
 import { sumarDias } from "../fechas.js";
 import { etiquetaTema } from "../etiquetas.js";
 import { textoExamen } from "./home.js";
+import { anillo, barraApilada, columnas, linea, mapaCalor } from "./graficos.js";
 
 const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
 const pct = (n, d) => (d > 0 ? Math.round((n / d) * 100) + " %" : "—");
 const precision = (aciertos, fallos) => (aciertos + fallos > 0 ? pct(aciertos, aciertos + fallos) : "—");
+const precisionNum = (aciertos, fallos) => (aciertos + fallos > 0 ? (100 * aciertos) / (aciertos + fallos) : null);
 const fechaCorta = (fecha) => {
     const [f] = String(fecha).split(" ");
     const [a, m, d] = f.split("-");
@@ -38,37 +40,41 @@ function porBloque(temas) {
     return grupos;
 }
 
-function kpi(valor, etiqueta) {
-    return html`<div class="kpi"><span class="kpi-n">${valor}</span><span class="kpi-l">${etiqueta}</span></div>`;
+function kpiPrincipal({ valor, etiqueta, detalle = "", extra = null }) {
+    return html`<div class="kpi-principal">
+    <div class="kpi-principal-dato">${extra ?? html`<span class="kpi-n">${valor}</span>`}</div>
+    <span class="kpi-l">${etiqueta}</span>
+    ${detalle ? html`<span class="kpi-detalle">${detalle}</span>` : ""}
+  </div>`;
+}
+
+function filaTema(t) {
+    const vistas = t.total - t.nuevas;
+    const pr = precision(t.aciertos, t.fallos);
+    return html`<details class="tema-fila">
+    <summary>
+      <span class="tema-fila-nombre"><b>${etiquetaTema(t, { bloque: false, nombre: false })}</b>${t.tema_nombre ? html`<span>${t.tema_nombre}</span>` : ""}</span>
+      <span class="tema-fila-barra">${barraApilada({ dominadas: t.dominadas, aprendiendo: t.aprendiendo, nuevas: t.nuevas, total: t.total, etiqueta: "Progreso del tema" })}</span>
+      <span class="tema-fila-pct">${pr}</span>
+    </summary>
+    <div class="tema-fila-cifras">
+      <span><b>${fmt(t.total)}</b> preguntas</span>
+      <span><b>${fmt(vistas)}</b> vistas</span>
+      <span><b>${fmt(t.dominadas)}</b> dominadas</span>
+      <span><b>${fmt(t.aprendiendo)}</b> aprendiendo</span>
+      <span><b>${fmt(t.repaso)}</b> hoy</span>
+      <span><b>${fmt(t.aciertos)}</b> aciertos</span>
+      <span><b>${fmt(t.fallos)}</b> fallos</span>
+    </div>
+  </details>`;
 }
 
 function tablaTemas(temas) {
     return porBloque(temas).map(
         (b) => html`
     <section class="stats-bloque">
-      <h2>${b.nombre}</h2>
-      <div class="tabla-wrap">
-        <table class="tabla">
-          <thead><tr>
-            <th>Tema</th><th>Total</th><th>Vistas</th><th>Dominadas</th><th>Aprendiendo</th>
-            <th>Hoy</th><th>Aciertos</th><th>Fallos</th><th>Precisión</th>
-          </tr></thead>
-          <tbody>${b.temas.map(
-              (t) => html`
-            <tr class="${t.repaso > 0 ? "fila-hoy" : ""}">
-              <td><b>${etiquetaTema(t, { bloque: false, nombre: false })}</b>${t.tema_nombre ? html`<span class="tema-nombre">${t.tema_nombre}</span>` : ""}</td>
-              <td>${fmt(t.total)}</td>
-              <td>${fmt(t.total - t.nuevas)}</td>
-              <td>${fmt(t.dominadas)}</td>
-              <td>${fmt(t.aprendiendo)}</td>
-              <td>${fmt(t.repaso)}</td>
-              <td>${fmt(t.aciertos)}</td>
-              <td>${fmt(t.fallos)}</td>
-              <td>${precision(t.aciertos, t.fallos)}</td>
-            </tr>`,
-          )}</tbody>
-        </table>
-      </div>
+      <div class="stats-bloque-head"><h3>${b.nombre}</h3><span>${b.temas.length} ${b.temas.length === 1 ? "tema" : "temas"}</span></div>
+      <div class="temas-filas">${b.temas.map(filaTema)}</div>
     </section>`,
     );
 }
@@ -76,112 +82,52 @@ function tablaTemas(temas) {
 function previsionRepasos(prevision, hoy) {
     const porFecha = new Map(prevision.map((f) => [f.vence, f.n]));
     const vencidas = prevision.filter((f) => f.vence < hoy).reduce((s, f) => s + f.n, 0);
-    const dias = Array.from({ length: 7 }, (_, i) => {
+    const datos = Array.from({ length: 7 }, (_, i) => {
         const fecha = sumarDias(hoy, i);
-        return { fecha, n: porFecha.get(fecha) ?? 0 };
+        return { etiqueta: etiquetaDia(fecha, hoy), valor: porFecha.get(fecha) ?? 0, hoy: i === 0 };
     });
-    const max = Math.max(1, vencidas, ...dias.map((d) => d.n));
     return html`
-    ${
-        vencidas
-            ? html`<div class="forecast-row vencidas">
-      <span>Vencidas</span><span class="forecast-bar"><i style="width:${Math.round((vencidas / max) * 100)}%"></i></span><b>${fmt(vencidas)}</b>
-    </div>`
-            : ""
-    }
-    ${dias.map(
-        (d) => html`
-      <div class="forecast-row">
-        <span>${etiquetaDia(d.fecha, hoy)}</span>
-        <span class="forecast-bar"><i style="width:${Math.round((d.n / max) * 100)}%"></i></span>
-        <b>${fmt(d.n)}</b>
-      </div>`,
-    )}`;
+    ${vencidas ? html`<p class="vencidas"><b>${fmt(vencidas)}</b> vencidas de días anteriores</p>` : ""}
+    ${columnas({ datos, titulo: "Previsión de repasos", descripcion: "Repasos que vencen cada uno de los próximos 7 días", id: "prevision" })}
+    <p class="hint">Hoy se resalta en la primera columna. Las vencidas se cuentan aparte.</p>`;
 }
 
-function actividad(actividad, hoy) {
-    const porDia = new Map(actividad.map((a) => [a.dia, a]));
-    const dias = Array.from({ length: 14 }, (_, i) => {
-        const fecha = sumarDias(hoy, i - 13);
-        const a = porDia.get(fecha);
-        return { fecha, n: a?.n ?? 0, aciertos: a?.aciertos ?? 0, fallos: a?.fallos ?? 0 };
-    });
-    const max = Math.max(1, ...dias.map((d) => d.n));
-    const alto = (n) => (n ? Math.max(2, Math.round((n / max) * 100)) : 0);
+function bloqueActividad(actividad, hoy, racha) {
+    const datos = actividad.map((d) => ({ fecha: d.dia, valor: d.n }));
     return html`
-    <div class="actividad" role="img" aria-label="Respuestas por día en los últimos 14 días (aciertos y fallos)">
-      ${dias.map(
-          (
-              d,
-          ) => html`<span class="actividad-dia" title="${fechaCorta(d.fecha)}: ${fmt(d.n)} respuestas · ${fmt(d.aciertos)} aciertos, ${fmt(d.fallos)} fallos">
-        <i class="actividad-barra ok" style="height:${alto(d.aciertos)}%"></i><i class="actividad-barra bad" style="height:${alto(d.fallos)}%"></i>
-      </span>`,
-      )}
-    </div>
-    <p class="hint">Del ${fechaCorta(dias[0].fecha)} al ${fechaCorta(dias[dias.length - 1].fecha)} · respuestas por día (arriba aciertos, abajo fallos)</p>`;
+    ${mapaCalor({ datos, hoy, semanas: 12, titulo: "Actividad de las últimas 12 semanas", descripcion: "Respuestas registradas por día", id: "actividad" })}
+    <p class="hint">Cada celda es un día; cuanto más oscura, más respuestas. Racha actual: <b>${fmt(racha)}</b> ${racha === 1 ? "día" : "días"}.</p>`;
 }
 
-/** Precisión agrupada por semana natural (lunes a domingo). */
-function tablaSemanas(semanas) {
+function precisionSemanal(semanas) {
     if (!semanas.length)
         return html`<p class="empty">Todavía no hay respuestas registradas. Haz un test para empezar.</p>`;
-    return html`<div class="tabla-wrap">
-    <table class="tabla">
-      <thead><tr><th>Semana</th><th>Respuestas</th><th>Aciertos</th><th>Fallos</th><th>Precisión</th></tr></thead>
-      <tbody>${semanas.map(
-          (s) => html`
-        <tr>
-          <td>${fechaCorta(s.desde)} – ${fechaCorta(s.hasta)}</td>
-          <td>${fmt(s.aciertos + s.fallos)}</td>
-          <td>${fmt(s.aciertos)}</td>
-          <td>${fmt(s.fallos)}</td>
-          <td><b>${precision(s.aciertos, s.fallos)}</b></td>
-        </tr>`,
-      )}</tbody>
-    </table>
-  </div>`;
+    const puntos = semanas.map((s) => ({
+        etiqueta: fechaCorta(s.desde),
+        valor: s.aciertos + s.fallos ? Math.round((100 * s.aciertos) / (s.aciertos + s.fallos)) : 0,
+    }));
+    const ultima = puntos[puntos.length - 1];
+    const anterior = puntos.length > 1 ? puntos[puntos.length - 2] : null;
+    const variacion = anterior ? ultima.valor - anterior.valor : null;
+    return html`
+    ${linea({ puntos, maximo: 100, titulo: "Precisión por semana", descripcion: "Porcentaje de aciertos en las últimas semanas", id: "semanas" })}
+    <p class="hint">${anterior ? html`${variacion >= 0 ? "+" : ""}${variacion} puntos respecto a la semana anterior.` : "Primera semana con respuestas."}</p>`;
 }
 
-/** Evolución de la nota de los simulacros (aciertos / total × 10). */
 function evolucionSimulacros(simulacros) {
-    if (!simulacros.length) return html`<p class="empty">Todavía no has hecho ningún simulacro.</p>`;
+    if (!simulacros.length)
+        return html`<p class="empty">Todavía no has hecho ningún simulacro. <a href="/simulacro">Empieza uno</a>.</p>`;
     const serie = [...simulacros].reverse().map((s) => ({
         fecha: s.fecha,
         nota: (s.aciertos / s.total) * 10,
         puntos: Number(s.puntos),
     }));
-    const max = Math.max(1, ...serie.map((x) => x.nota));
+    const media = serie.reduce((s, x) => s + x.nota, 0) / serie.length;
+    const mejor = Math.max(...serie.map((x) => x.nota));
     return html`
-    <div class="evolucion" role="img" aria-label="Evolución de la nota de los últimos simulacros">
-      ${serie.map(
-          (
-              x,
-          ) => html`<span class="evol-dia" title="${fechaCorta(x.fecha)}: nota ${x.nota.toFixed(2)}/10 · ${x.puntos.toFixed(2)} puntos">
-        <i class="evol-barra" style="height:${Math.max(2, Math.round((x.nota / max) * 100))}%"></i><b>${x.nota.toFixed(1)}</b>
-      </span>`,
-      )}
-    </div>
-    <p class="hint">Nota sobre 10 de cada simulacro, del más antiguo al más reciente. La penalización se aplica en «Puntos».</p>`;
-}
-
-function tablaFalladas(falladas) {
-    if (!falladas.length)
-        return html`<p class="empty">Todavía no hay fallos registrados. Haz un test o un simulacro para empezar.</p>`;
-    return html`<div class="tabla-wrap">
-    <table class="tabla">
-      <thead><tr><th>Tema</th><th>Pregunta</th><th>Fallos</th><th>Aciertos</th><th>Caja</th></tr></thead>
-      <tbody>${falladas.map(
-          (p) => html`
-        <tr>
-          <td>${p.bloque_nombre ? html`<span class="tema-nombre">${p.bloque_nombre}</span>` : ""}<b>${etiquetaTema(p, { bloque: false, nombre: false })}</b></td>
-          <td class="pregunta-cell">${p.enunciado}</td>
-          <td><b>${fmt(p.fallos)}</b></td>
-          <td>${fmt(p.aciertos)}</td>
-          <td>${p.caja ?? "—"}</td>
-        </tr>`,
-      )}</tbody>
-    </table>
-  </div>`;
+    <div class="simulacro-resumen"><span><b>${media.toFixed(1)}</b> media</span><span><b>${mejor.toFixed(1)}</b> mejor</span></div>
+    ${linea({ puntos: serie.map((x) => ({ etiqueta: fechaCorta(x.fecha), valor: x.nota })), maximo: 10, titulo: "Notas de los simulacros", descripcion: "Nota sobre 10 de cada simulacro", id: "simulacros" })}
+    <p class="hint">Nota sobre 10; la penalización se aplica en los puntos de cada simulacro.</p>`;
 }
 
 /** Índice id de tema → tema con el nombre de su bloque, para resolver `simulacros.temas`. */
@@ -198,28 +144,39 @@ function etiquetaTemasSimulacro(s, indice) {
     return `${s.temas.length} tema${s.temas.length === 1 ? "" : "s"}`;
 }
 
-function tablaSimulacros(simulacros, temario) {
+function tarjetasSimulacros(simulacros, temario) {
     if (!simulacros.length)
         return html`<p class="empty">Todavía no has hecho ningún simulacro. <a href="/simulacro">Empieza uno</a>.</p>`;
     const indice = indiceTemas(temario);
-    return html`<div class="tabla-wrap">
-    <table class="tabla">
-      <thead><tr><th>Fecha</th><th>Temas</th><th>Preguntas</th><th>Aciertos</th><th>Fallos</th><th>Blancos</th><th>Puntos</th><th>Tiempo</th></tr></thead>
-      <tbody>${simulacros.map(
-          (s) => html`
-        <tr>
-          <td>${fechaCorta(s.fecha)}</td>
-          <td>${etiquetaTemasSimulacro(s, indice)}</td>
-          <td>${fmt(s.total)}</td>
-          <td>${fmt(s.aciertos)}</td>
-          <td>${fmt(s.fallos)}</td>
-          <td>${fmt(s.en_blanco)}</td>
-          <td><b>${Number(s.puntos).toFixed(2)}</b></td>
-          <td>${tiempo(s.segundos)}</td>
-        </tr>`,
-      )}</tbody>
-    </table>
-  </div>`;
+    return html`<div class="simulacros-cards">${simulacros.map((s) => {
+        const nota = (s.aciertos / s.total) * 10;
+        return html`<article class="simulacro-card">
+      <div class="simulacro-card-head"><span>${fechaCorta(s.fecha)}</span><b>${nota.toFixed(1)} / 10</b></div>
+      <p class="hint">${etiquetaTemasSimulacro(s, indice)} · ${fmt(s.total)} preguntas</p>
+      <p class="simulacro-card-datos"><span>${fmt(s.aciertos)} aciertos</span><span>${fmt(s.fallos)} fallos</span><span>${fmt(s.en_blanco)} blancos</span><span>${tiempo(s.segundos)}</span></p>
+      <p class="hint">${Number(s.puntos).toFixed(2)} puntos</p>
+    </article>`;
+    })}</div>`;
+}
+
+function filaFallada(p) {
+    const total = p.fallos + p.aciertos;
+    return html`<a class="fallada" href="/maker?editar=${p.id}" title="Editar esta pregunta en el creador">
+    <span class="fallada-tema">${etiquetaTema(p, { bloque: false, nombre: false })}${p.bloque_nombre ? html`<span>${p.bloque_nombre}</span>` : ""}</span>
+    <span class="fallada-texto">${p.enunciado}</span>
+    <span class="fallada-barra"><span class="bar" aria-hidden="true"><i class="b-bad" style="width:${total ? (p.fallos / total) * 100 : 0}%"></i><i class="b-ok" style="width:${total ? (p.aciertos / total) * 100 : 0}%"></i></span></span>
+    <span class="fallada-cifras">${p.fallos} fallos · ${p.aciertos} aciertos</span>
+  </a>`;
+}
+
+function bloqueFalladas(falladas) {
+    if (!falladas.length)
+        return html`<p class="empty">Todavía no hay fallos registrados. Haz un test o un simulacro para empezar.</p>`;
+    const primeras = falladas.slice(0, 5);
+    const resto = falladas.slice(5);
+    return html`
+    <div class="falladas-lista">${primeras.map(filaFallada)}</div>
+    ${resto.length ? html`<details class="mini-tabla"><summary>Ver todas (${falladas.length})</summary><div class="falladas-lista">${resto.map(filaFallada)}</div></details>` : ""}`;
 }
 
 export function paginaEstadisticas({
@@ -230,7 +187,7 @@ export function paginaEstadisticas({
     actividad: act,
     racha = 0,
     semanas = [],
-    tiempo = { ms: null, n: 0 },
+    tiempo: tiempoMedio = { ms: null, n: 0 },
     simulacros,
     totalSimulacros,
     temario = [],
@@ -244,6 +201,7 @@ export function paginaEstadisticas({
         : totalSimulacros > 0
           ? `Todavía no has hecho ningún test, pero ya tienes ${fmt(totalSimulacros)} simulacro${totalSimulacros === 1 ? "" : "s"} registrado${totalSimulacros === 1 ? "" : "s"}. Abajo se muestran sus resultados; haz un test para empezar a registrar progreso de repaso.`
           : "Todavía no hay actividad registrada. Haz un test o un simulacro para empezar a ver datos.";
+    const dominio = global.total ? Math.round((100 * global.dominadas) / global.total) : 0;
     const cuerpo = html`
   <main class="stack">
     <div class="page-head">
@@ -257,52 +215,74 @@ export function paginaEstadisticas({
     ${aviso ? html`<div class="note">${aviso}</div>` : ""}
     ${examen && examen.fecha ? html`<div class="note">${textoExamen(examen)}</div>` : ""}
 
-    <section class="kpis" aria-label="Resumen">
-      ${kpi(fmt(global.total), "preguntas")}
-      ${kpi(`${fmt(vistas)} · ${pct(vistas, global.total)}`, "vistas")}
-      ${kpi(fmt(global.dominadas), "dominadas")}
-      ${kpi(precision(global.aciertos, global.fallos), "precisión")}
-      ${kpi(fmt(global.repaso), "repasos hoy")}
-      ${kpi(fmt(racha), racha === 1 ? "día de racha" : "días de racha")}
-      ${kpi(tiempo.ms != null ? (tiempo.ms / 1000).toFixed(1) + " s" : "—", "por pregunta")}
-      ${kpi(fmt(totalSimulacros), "simulacros")}
+    <section class="kpis-principales" aria-label="Resumen principal">
+      ${kpiPrincipal({
+          etiqueta: "dominio",
+          detalle: `${fmt(global.dominadas)} de ${fmt(global.total)} dominadas`,
+          extra: global.total
+              ? anillo({
+                    valor: global.dominadas,
+                    total: global.total,
+                    titulo: "Dominio del banco",
+                    texto: dominio + " %",
+                    id: "dominio",
+                })
+              : html`<span class="kpi-n">—</span>`,
+      })}
+      ${kpiPrincipal({ valor: precision(global.aciertos, global.fallos), etiqueta: "precisión", detalle: `${fmt(global.aciertos)} aciertos · ${fmt(global.fallos)} fallos` })}
+      ${kpiPrincipal({ valor: fmt(racha), etiqueta: racha === 1 ? "día de racha" : "días de racha", detalle: racha ? "días seguidos con respuestas" : "haz un test hoy para empezar" })}
+      ${kpiPrincipal({ valor: fmt(global.repaso), etiqueta: "repasos hoy", detalle: global.repaso ? "preguntas vencidas o de hoy" : "nada pendiente por hoy" })}
     </section>
 
-    <section class="stack">
-      <h2>Por tema</h2>
-      ${temas.length ? tablaTemas(temas) : html`<p class="empty">Todavía no hay temas con preguntas.</p>`}
+    <section class="kpis-secundarios" aria-label="Resumen secundario">
+      <span><b>${fmt(vistas)} de ${fmt(global.total)}</b> vistas</span>
+      <span><b>${tiempoMedio.ms != null ? (tiempoMedio.ms / 1000).toFixed(1) + " s" : "—"}</b> por pregunta</span>
+      <span><b>${fmt(totalSimulacros)}</b> simulacros</span>
+      <span><b>${fmt(global.total)}</b> preguntas</span>
     </section>
 
-    <section class="stack">
-      <h2>Previsión de repasos</h2>
-      <div class="card">${previsionRepasos(prevision, hoy)}</div>
-    </section>
+    <div class="stats-grid">
+      <div class="stats-main stack">
+        <section class="stack">
+          <h2>Por tema</h2>
+          <p class="hint">Pulsa una fila para ver sus cifras. La barra usa los mismos colores que las fichas de inicio.</p>
+          ${temas.length ? tablaTemas(temas) : html`<p class="empty">Todavía no hay temas con preguntas.</p>`}
+        </section>
 
-    <section class="stack">
-      <h2>Precisión por semana</h2>
-      ${tablaSemanas(semanas)}
-    </section>
+        <section class="stack">
+          <h2>Previsión de repasos</h2>
+          <div class="card">${previsionRepasos(prevision, hoy)}</div>
+        </section>
 
-    <section class="stack">
-      <h2>Preguntas que más fallas</h2>
-      <p class="hint">Suma los fallos de los tests y de los simulacros. La caja muestra el estado de repaso en que ha quedado cada pregunta.</p>
-      ${tablaFalladas(falladas)}
-    </section>
+        <section class="stack">
+          <h2>Actividad</h2>
+          <div class="card">${bloqueActividad(act, hoy, racha)}</div>
+        </section>
 
-    <section class="stack">
-      <h2>Actividad</h2>
-      <div class="card">${actividad(act, hoy)}</div>
-    </section>
+        <section class="stack">
+          <h2>Preguntas que más fallas</h2>
+          <p class="hint">Suma los fallos de los tests y de los simulacros. Pulsa una fila para editarla en el creador.</p>
+          ${bloqueFalladas(falladas)}
+        </section>
+      </div>
 
-    <section class="stack">
-      <h2>Evolución de los simulacros</h2>
-      <div class="card">${evolucionSimulacros(simulacros)}</div>
-    </section>
+      <aside class="stats-side stack">
+        <section class="stack">
+          <h2>Precisión por semana</h2>
+          <div class="card">${precisionSemanal(semanas)}</div>
+        </section>
 
-    <section class="stack">
-      <h2>Últimos simulacros</h2>
-      ${tablaSimulacros(simulacros, temario)}
-    </section>
+        <section class="stack">
+          <h2>Evolución de los simulacros</h2>
+          <div class="card">${evolucionSimulacros(simulacros)}</div>
+        </section>
+
+        <section class="stack">
+          <h2>Últimos simulacros</h2>
+          ${tarjetasSimulacros(simulacros, temario)}
+        </section>
+      </aside>
+    </div>
   </main>`;
 
     return layout({

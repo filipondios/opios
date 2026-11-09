@@ -32,8 +32,34 @@ export function paginaMaker({ temario }) {
     const total = temario.reduce((s, b) => s + b.temas.reduce((x, t) => x + t.preguntas, 0), 0);
     const cuerpo = html`
   <div class="cols">
+    <!-- ============ Lista ============ -->
+    <aside class="stack col-lista">
+      <section class="card" aria-labelledby="list-title">
+        <div class="list-head">
+          <h2 id="list-title">Preguntas <span class="mono" id="count" style="font-size:15px;color:var(--text-2)"></span></h2>
+          <div class="filters">
+            <input id="f-buscar" type="search" placeholder="Buscar en el enunciado" aria-label="Buscar en el enunciado" autocomplete="off">
+            <select id="f-filtro" aria-label="Filtrar por tema">${opcionesFiltro(temario, total)}</select>
+          </div>
+        </div>
+        <p class="empty" id="empty" hidden>No hay preguntas con ese filtro.</p>
+        <ul class="items" id="list"></ul>
+        <div class="row">
+          <button class="btn small" type="button" id="btn-more" hidden>Mostrar más</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="exp-title">
+        <h2 id="exp-title">Copia de seguridad</h2>
+        <p class="hint">Las preguntas se guardan directamente en la base de datos (<span class="mono">data/opios.db</span>). Si quieres una copia en el formato JSON de siempre, puedes descargarla aquí.</p>
+        <div class="row">
+          <a class="btn" href="/api/exportar" download="preguntas.json">Descargar preguntas (JSON)</a>
+        </div>
+      </section>
+    </aside>
+
     <!-- ============ Editor ============ -->
-    <section class="card" aria-labelledby="ed-title">
+    <section class="card col-editor" aria-labelledby="ed-title">
       <div class="card-head">
         <h1 id="ed-title">Nueva pregunta</h1>
         <span class="tagline" id="ed-mode"></span>
@@ -74,40 +100,27 @@ export function paginaMaker({ temario }) {
 
       <div class="err" id="f-error" role="alert" hidden></div>
 
-      <div class="row">
+      <div class="savebar">
         <button class="btn primary" type="button" id="btn-save"></button>
         <button class="btn" type="button" id="btn-cancel" hidden>Cancelar edición</button>
         <button class="btn" type="button" id="btn-clear">Limpiar</button>
+        <span class="save-state" id="save-state">Sin guardar</span>
         <span class="flash" id="flash" role="status" aria-live="polite"></span>
       </div>
     </section>
+  </div>
 
-    <!-- ============ Lista ============ -->
-    <div class="stack">
-      <section class="card" aria-labelledby="list-title">
-        <div class="list-head">
-          <h2 id="list-title">Preguntas <span class="mono" id="count" style="font-size:15px;color:var(--ink-2)"></span></h2>
-          <div class="filters">
-            <input id="f-buscar" type="search" placeholder="Buscar en el enunciado" aria-label="Buscar en el enunciado" autocomplete="off">
-            <select id="f-filtro" aria-label="Filtrar por tema">${opcionesFiltro(temario, total)}</select>
-          </div>
-        </div>
-        <p class="empty" id="empty" hidden>No hay preguntas con ese filtro.</p>
-        <ul class="items" id="list"></ul>
-        <div class="row">
-          <button class="btn small" type="button" id="btn-more" hidden>Mostrar más</button>
-        </div>
-      </section>
-
-      <section class="card" aria-labelledby="exp-title">
-        <h2 id="exp-title">Copia de seguridad</h2>
-        <p class="hint">Las preguntas se guardan directamente en la base de datos (<span class="mono">data/opios.db</span>). Si quieres una copia en el formato JSON de siempre, puedes descargarla aquí.</p>
-        <div class="row">
-          <a class="btn" href="/api/exportar" download="preguntas.json">Descargar preguntas (JSON)</a>
-        </div>
-      </section>
-    </div>
-  </div>`;
+  <dialog id="dlg-duplicado" class="dlg" aria-labelledby="dup-title">
+    <form method="dialog">
+      <h2 id="dup-title">Pregunta duplicada</h2>
+      <p id="dup-msg"></p>
+      <div class="row">
+        <button class="btn" type="submit" value="cancel">Cancelar</button>
+        <span class="spacer"></span>
+        <button class="btn primary" type="submit" value="ok" id="dup-reemplazar">Reemplazar</button>
+      </div>
+    </form>
+  </dialog>`;
 
     return layout({
         titulo: "Creador de preguntas",

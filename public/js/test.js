@@ -35,7 +35,9 @@ import { etiquetaTema } from "./etiquetas.js";
     function setStatus(kind, text) {
         const s = $("#status");
         s.dataset.state = kind;
-        s.textContent = text;
+        s.title = text;
+        const visible = s.querySelector(".status-text");
+        if (visible) visible.textContent = text;
     }
     function nota(texto, lineas) {
         const n = $("#note");
@@ -145,6 +147,14 @@ import { etiquetaTema } from "./etiquetas.js";
         if (carga.bloqueadoPorAtraso) partes.push("frenado: " + carga.repasosAtrasados + " repasos atrasados");
         else if (restantes === 0) partes.push("cupo de nuevas agotado hoy");
         el.textContent = partes.join(" · ");
+        const repasos = $("#hoy-repasos");
+        const nuevas = $("#hoy-nuevas");
+        const barra = $("#hoy-barra");
+        if (repasos) repasos.textContent = String(carga.repasosPendientes);
+        if (nuevas) nuevas.textContent = String(Math.min(carga.nuevasHoy, carga.cupoNuevas));
+        if (barra) barra.style.width = Math.min(100, (carga.nuevasHoy / carga.cupoNuevas) * 100) + "%";
+        const aviso = $("#hoy-aviso");
+        if (aviso) aviso.hidden = !carga.bloqueadoPorAtraso;
     }
     /** Nuevas que aún se pueden introducir en esta sesión, según el cupo del servidor. */
     function nuevasPermitidas() {
@@ -235,6 +245,32 @@ import { etiquetaTema } from "./etiquetas.js";
                 " nuevas",
             );
         $("#btn-start").disabled = !seleccion.size;
+        document.querySelectorAll("#grid .bloque").forEach((b) => {
+            const cs = [...b.querySelectorAll(".chip")];
+            const n = cs.filter((c) => seleccion.has(Number(c.dataset.tema))).length;
+            const cuenta = b.querySelector(".bloque-sel-count");
+            if (cuenta) cuenta.textContent = n + " de " + cs.length;
+        });
+    }
+
+    /* Filtra la rejilla por número o nombre de tema. No altera la selección. */
+    function filtrarTemas() {
+        const input = $("#buscar-temas");
+        const q = (input?.value ?? "").trim().toLowerCase();
+        let visibles = 0;
+        document.querySelectorAll("#grid .bloque").forEach((b) => {
+            let alguno = false;
+            for (const c of b.querySelectorAll(".chip")) {
+                const texto = (c.textContent + " " + (c.title || "")).toLowerCase();
+                const coincide = !q || texto.includes(q);
+                c.hidden = !coincide;
+                if (coincide) alguno = true;
+            }
+            b.hidden = !alguno;
+            if (alguno) visibles++;
+        });
+        const vacio = $("#sin-resultados");
+        if (vacio) vacio.hidden = visibles > 0 || !q;
     }
     /* Pide al servidor la rejilla actualizada (estadísticas tras una sesión o un reinicio). */
     async function refrescarTemas() {
@@ -243,6 +279,7 @@ import { etiquetaTema } from "./etiquetas.js";
             leerCarga();
             sincronizarSeleccion();
             pintarCarga();
+            filtrarTemas();
         } catch (e) {
             setStatus("warn", "No se pudieron actualizar los temas: " + msgError(e));
         }
@@ -318,6 +355,7 @@ import { etiquetaTema } from "./etiquetas.js";
     $("#btn-all").addEventListener("click", () => fijarSeleccion(true));
     $("#btn-none").addEventListener("click", () => fijarSeleccion(false));
     $("#btn-start").addEventListener("click", empezar);
+    $("#buscar-temas")?.addEventListener("input", filtrarTemas);
 
     /* ---------- Fecha de examen (Fase 3.6): acorta los intervalos de repaso ---------- */
     function pintarExamen() {
@@ -437,6 +475,8 @@ import { etiquetaTema } from "./etiquetas.js";
         );
         pintarAyudaTeclas(orden.length);
         $("#q-fb").hidden = true;
+        const correcta = $("#q-correcta");
+        if (correcta) correcta.hidden = true;
         pintarSeleccion();
         pintarMarcador();
         botonPrincipal();
@@ -474,9 +514,12 @@ import { etiquetaTema } from "./etiquetas.js";
         });
     }
     function pintarMarcador() {
-        $("#q-score").textContent = sesion.aciertos + " de " + sesion.n + " acertadas";
+        const pct = sesion.n ? Math.round((100 * sesion.aciertos) / sesion.n) : 0;
+        $("#q-score").textContent = sesion.n + " respondidas · " + pct + " % de aciertos";
         const { rep, nue } = sesion.pendientes();
         $("#q-left").textContent = "por repasar " + rep + " · nuevas " + nue;
+        const barra = $("#q-progress");
+        if (barra) barra.style.width = pct + "%";
     }
     function botonPrincipal() {
         const b = $("#btn-main");
@@ -539,7 +582,13 @@ import { etiquetaTema } from "./etiquetas.js";
             ops.forEach((o, k) => {
                 if (k !== cur.sel && k !== cur.corr) o.classList.add("dim");
             });
-            $("#q-verdict").textContent = "Incorrecta. La respuesta correcta es la " + letra + ".";
+            $("#q-verdict").textContent = "Incorrecta";
+            const correcta = $("#q-correcta");
+            correcta.replaceChildren(
+                document.createTextNode("Respuesta correcta: "),
+                h("b", { text: letra + ") " + cur.q.o[cur.orden[cur.corr]] }),
+            );
+            correcta.hidden = false;
             const ex = $("#q-expl");
             ex.textContent = cur.q.e;
             ex.hidden = !cur.q.e;
@@ -631,6 +680,7 @@ import { etiquetaTema } from "./etiquetas.js";
     /* ---------- Arranque ---------- */
     leerUnaPulsacion();
     sincronizarSeleccion(leerSeleccion() || []);
+    filtrarTemas();
     leerCarga();
     pintarCarga();
     setStatus("ok", ETIQUETA);

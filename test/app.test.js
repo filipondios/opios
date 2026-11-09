@@ -285,7 +285,8 @@ describe("importación por bloques", () => {
         const js = await (await pet("/js/temario.js")).text();
         expect(js).toContain("bloque.gestionado");
         expect(js).toContain("Solo lectura");
-        expect(js).toContain("Definido en preguntas/bloque_");
+        expect(js).toContain("solo lectura"); // el bloque se marca como de solo lectura en la cabecera
+        expect(js).not.toContain("Definido en preguntas/bloque_");
     });
 
     test("un bloque gestionado por info.json es de solo lectura en la API", async () => {
@@ -1346,6 +1347,125 @@ describe("compresión gzip de las respuestas (Fase 4.4)", () => {
         );
         expect(pequena.headers.get("content-encoding")).toBe(null);
         expect(pequena.headers.get("vary")).toContain("Accept-Encoding");
+    });
+});
+
+describe("rediseño de la interfaz (Fase 1)", () => {
+    test("la tarjeta Hoy y el estado de guardado accesible", async () => {
+        let html = await (await pet("/")).text();
+        expect(html).toContain("hoy-vacio");
+        expect(html).not.toContain("/js/test.js");
+        expect(html).toContain('role="status"');
+        expect(html).toContain('class="status-text"');
+        expect(html).toContain('title="Guardado en la base de datos"');
+
+        await importarDirectorio(repo, DIR_FIXTURE);
+        html = await (await pet("/")).text();
+        expect(html).toContain('class="card hoy"');
+        expect(html).toContain('id="hoy-repasos"');
+        expect(html).toContain('id="hoy-nuevas"');
+        expect(html).toContain('id="btn-start"');
+        expect(html).toContain("Empezar");
+        const cupo = html.match(/data-cupo-nuevas="(\d+)"/);
+        expect(cupo).not.toBeNull();
+        expect(Number(cupo[1])).toBeLessThanOrEqual(CUPO_NUEVAS);
+        const nuevas = html.match(/id="hoy-nuevas">(\d+)</);
+        expect(nuevas).not.toBeNull();
+        expect(Number(nuevas[1])).toBeLessThanOrEqual(Number(cupo[1]));
+        expect(html).toContain('id="buscar-temas"');
+        expect(html).toContain('class="bloque-sel-count"');
+    });
+
+    test("estadísticas: 4 KPIs fijos, filas por tema y estados con y sin datos", async () => {
+        let html = await (await pet("/estadisticas")).text();
+        expect(html).toContain('class="kpis-principales"');
+        expect(html).toContain('class="kpis-secundarios"');
+        expect((html.match(/class="kpi-principal"/g) ?? []).length).toBe(4);
+        expect(html).toContain('href="/simulacro"');
+
+        const tema = crearTemaPrueba(1);
+        const ids = [];
+        for (let i = 0; i < 6; i++) {
+            const p = await (await pet("/api/preguntas", "POST", nueva({ tema, pregunta: "Pregunta " + i }))).json();
+            ids.push(p.id);
+        }
+        await pet(
+            "/api/progreso",
+            "POST",
+            ids.map((id, i) => ({ id, caja: i % 2 ? 5 : 0, vence: hoyIso(), aciertos: i, fallos: i + 1 })),
+        );
+        const s = await (
+            await pet("/api/simulacros", "POST", {
+                temas: [tema],
+                segundos: 60,
+                penalizacion: 0,
+                respuestas: [{ id: ids[0], elegida: 0 }],
+            })
+        ).json();
+        expect(s).toMatchObject({ aciertos: 1, total: 1 });
+
+        html = await (await pet("/estadisticas")).text();
+        expect((html.match(/class="kpi-principal"/g) ?? []).length).toBe(4);
+        expect(html).toContain("Por tema");
+        expect(html).toContain('class="tema-fila"');
+        expect(html).toContain("Previsión de repasos");
+        expect(html).toContain("Actividad de las últimas 12 semanas");
+        expect(html).toContain('class="calor-celda"');
+        expect(html).not.toContain("Sin respuestas registradas todavía.");
+        expect(html).toContain("Precisión por semana");
+        expect(html).toContain("Evolución de los simulacros");
+        expect(html).toContain("simulacro-card");
+        expect(html).toContain("Ver todas (6)");
+        expect(html).toContain(`href="/maker?editar=${ids[0]}"`);
+        expect(html.match(/class="fallada"/g)?.length).toBe(6);
+    });
+
+    test("/simulacro ofrece perfiles, precisión por tema, anillo y filtros de revisión", async () => {
+        await importarDirectorio(repo, DIR_FIXTURE);
+        const html = await (await pet("/simulacro")).text();
+        for (const id of ["btn-perfil-examen", "btn-perfil-rapido", "btn-perfil-debiles"]) {
+            expect(html).toContain(`id="${id}"`);
+        }
+        expect(html).toContain('data-precision="');
+        expect(html).toContain('id="res-anillo"');
+        expect(html).toContain('id="res-filtro"');
+        const js = await (await pet("/js/simulacro.js")).text();
+        expect(js).toContain("aplicarPerfil");
+        expect(js).toContain("temasDebiles");
+    });
+
+    test("/maker incluye barra de guardado, duplicado y ?editar", async () => {
+        await importarDirectorio(repo, DIR_FIXTURE);
+        const html = await (await pet("/maker")).text();
+        expect(html).not.toContain('id="preview-question"');
+        expect(html).not.toContain("Vista previa");
+        expect(html).toContain('id="save-state"');
+        expect(html).toContain('id="dlg-duplicado"');
+        expect(html).toContain('class="dlg"');
+        const js = await (await pet("/js/maker.js")).text();
+        expect(js).not.toContain("pintarPreview");
+        expect(js).toContain('URLSearchParams(location.search).get("editar")');
+        expect(js).toContain("showModal");
+    });
+
+    test("/api/temario incluye progreso y el temario usa bloques plegables", async () => {
+        await importarDirectorio(repo, DIR_FIXTURE);
+        const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+        await pet("/api/progreso", "POST", [{ id: bank[0].id, caja: 5, vence: "2999-01-01", aciertos: 4, fallos: 1 }]);
+        const temario = await (await pet("/api/temario")).json();
+        const t1 = temario.flatMap((b) => b.temas).find((t) => t.numero === 1);
+        expect(t1).toMatchObject({ total: TOTAL_TEMA_1, dominadas: 1, nuevas: TOTAL_TEMA_1 - 1 });
+
+        const html = await (await pet("/temario")).text();
+        expect(html).toContain('id="bloques"');
+        const js = await (await pet("/js/temario.js")).text();
+        expect(js).toContain('"details"');
+        expect(js).toContain("bloque-barra");
+        expect(js).toContain("Solo lectura");
+        expect(js).not.toContain("Definido en preguntas/bloque_");
+        const css = await (await pet("/css/temario.css")).text();
+        expect(css).toContain("details.bloque");
+        expect(css).toContain(".bloque-barra");
     });
 });
 

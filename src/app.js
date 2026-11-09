@@ -110,6 +110,14 @@ async function comprimir(req, res) {
 export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = APP_TZ } = {}) {
     const fechaHoy = () => hoyIso(ahora(), zona);
     const estadisticas = () => repo.estadisticasTemas(fechaHoy(), CAJA_DOMINADA);
+    /** Temario con las cifras de repaso de cada tema (para barras y bloques plegables). */
+    const temarioConProgreso = () => {
+        const porTema = new Map(estadisticas().map((e) => [e.tema, e]));
+        return repo.temario().map((b) => ({
+            ...b,
+            temas: b.temas.map((t) => ({ ...t, ...(porTema.get(t.id) ?? {}) })),
+        }));
+    };
 
     /**
      * Fecha de examen y tope de intervalo asociado (Fase 3.6): el intervalo de repaso no debe
@@ -131,7 +139,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
         }
 
         /* --- Temario: bloques y temas --- */
-        if (ruta === "/api/temario" && m === "GET") return json(repo.temario());
+        if (ruta === "/api/temario" && m === "GET") return json(temarioConProgreso());
 
         if (ruta === "/api/bloques" && m === "POST")
             return json(repo.crearBloque(validarBloque(await cuerpoJson(req))), 201);
@@ -310,7 +318,8 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
                 );
             if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
             if (ruta === "/temario") return pagina(paginaTemario());
-            if (ruta === "/simulacro") return pagina(paginaSimulacro({ temario: repo.temario() }));
+            if (ruta === "/simulacro")
+                return pagina(paginaSimulacro({ temario: repo.temario(), estadisticas: estadisticas() }));
             if (ruta === "/estadisticas") {
                 const hoy = fechaHoy();
                 return pagina(
@@ -319,7 +328,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
                         temas: estadisticas(),
                         prevision: repo.previsionRepasos(hoy, 7),
                         falladas: repo.preguntasMasFalladas(20),
-                        actividad: repo.actividadReciente(sumarDias(hoy, -13)),
+                        actividad: repo.actividadReciente(sumarDias(hoy, -83)),
                         racha: repo.rachaDias(hoy),
                         semanas: repo.precisionSemanal(hoy, 8),
                         tiempo: repo.tiempoMedio(),

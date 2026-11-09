@@ -53,3 +53,15 @@ export function mmss(segundos) {
     const s = Math.max(0, Math.round(segundos));
     return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
 }
+
+/**
+ * Elige los temas con menor precisión conocida (aciertos / respuestas) para el perfil
+ * «Temas débiles». Los temas sin datos no se preseleccionan: no hay evidencia de debilidad.
+ */
+export function temasDebiles(temas, limite = 5) {
+    return temas
+        .filter((t) => Number(t.precision) >= 0)
+        .sort((a, b) => Number(a.precision) - Number(b.precision) || Number(a.id) - Number(b.id))
+        .slice(0, Math.max(1, limite))
+        .map((t) => Number(t.id));
+}

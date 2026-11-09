@@ -9,7 +9,9 @@ import { etiquetaTema } from "./etiquetas.js";
     function setStatus(kind, text) {
         const s = $("#status");
         s.dataset.state = kind;
-        s.textContent = text;
+        s.title = text;
+        const visible = s.querySelector(".status-text");
+        if (visible) visible.textContent = text;
     }
     function nota(texto) {
         const n = $("#note");
@@ -93,14 +95,18 @@ import { etiquetaTema } from "./etiquetas.js";
         $("#vacio").hidden = bloques.length > 0;
         $("#bloques").replaceChildren(
             ...bloques.map((b) => {
-                const total = b.temas.reduce((s, t) => s + t.preguntas, 0);
+                const total = b.temas.reduce((s, t) => s + Number(t.total ?? t.preguntas ?? 0), 0);
+                const dominadas = b.temas.reduce((s, t) => s + Number(t.dominadas ?? 0), 0);
+                const aprendiendo = b.temas.reduce((s, t) => s + Number(t.aprendiendo ?? 0), 0);
+                const nuevas = b.temas.reduce((s, t) => s + Number(t.nuevas ?? 0), 0);
+                const pct = (n) => (total > 0 ? (n / total) * 100 : 0);
                 const i = reales.indexOf(b);
                 const gestionado = !!b.gestionado;
                 return h(
-                    "section",
-                    { class: "card bloque", "data-bloque": b.id ?? "" },
+                    "details",
+                    { class: "card bloque", open: true, "data-bloque": b.id ?? "" },
                     h(
-                        "div",
+                        "summary",
                         { class: "bloque-head" },
                         h(
                             "div",
@@ -111,18 +117,26 @@ import { etiquetaTema } from "./etiquetas.js";
                                     b.temas.length +
                                     (b.temas.length === 1 ? " tema · " : " temas · ") +
                                     total +
-                                    (total === 1 ? " pregunta" : " preguntas"),
+                                    (total === 1 ? " pregunta" : " preguntas") +
+                                    (gestionado ? " · solo lectura" : ""),
                             }),
-                            gestionado
-                                ? h("span", {
-                                      class: "hint",
-                                      text: "Definido en preguntas/bloque_" + b.numero + "/info.json · solo lectura",
-                                  })
+                            total
+                                ? h(
+                                      "span",
+                                      { class: "bar bloque-barra", "aria-hidden": "true" },
+                                      h("i", { class: "b-ok", style: `width:${pct(dominadas)}%` }),
+                                      h("i", { class: "b-mid", style: `width:${pct(aprendiendo)}%` }),
+                                      h("i", { class: "b-new", style: `width:${pct(nuevas)}%` }),
+                                  )
                                 : null,
                             b.id == null
                                 ? h("span", { class: "hint", text: "Temas sin bloque: edítalos para asignarles uno." })
                                 : null,
                         ),
+                    ),
+                    h(
+                        "div",
+                        { class: "bloque-cuerpo" },
                         h(
                             "div",
                             { class: "bloque-acciones" },
@@ -166,17 +180,17 @@ import { etiquetaTema } from "./etiquetas.js";
                                   })
                                 : null,
                         ),
-                    ),
-                    h(
-                        "ul",
-                        { class: "temas" },
-                        b.temas.length
-                            ? b.temas.map((t) => filaTema(t, b))
-                            : h(
-                                  "li",
-                                  { class: "tema-item" },
-                                  h("span", { class: "tmeta", text: "Sin temas todavía." }),
-                              ),
+                        h(
+                            "ul",
+                            { class: "temas" },
+                            b.temas.length
+                                ? b.temas.map((t) => filaTema(t, b))
+                                : h(
+                                      "li",
+                                      { class: "tema-item" },
+                                      h("span", { class: "tmeta", text: "Sin temas todavía." }),
+                                  ),
+                        ),
                     ),
                 );
             }),

@@ -51,7 +51,25 @@ import { etiquetaTema } from "./etiquetas.js";
     function setStatus(kind, text) {
         const s = $("#status");
         s.dataset.state = kind;
-        s.textContent = text;
+        s.title = text;
+        const visible = s.querySelector(".status-text");
+        if (visible) visible.textContent = text;
+    }
+
+    /* ---------- Estado de guardado ---------- */
+    function marcarSucio() {
+        const s = $("#save-state");
+        if (s) {
+            s.textContent = "Sin guardar";
+            s.dataset.state = "dirty";
+        }
+    }
+    function marcarGuardado() {
+        const s = $("#save-state");
+        if (s) {
+            s.textContent = "Guardado";
+            s.dataset.state = "ok";
+        }
     }
 
     /* ---------- Editor ---------- */
@@ -96,6 +114,7 @@ import { etiquetaTema } from "./etiquetas.js";
                         autocomplete: "off",
                         oninput: (e) => {
                             draft.opciones[k] = e.target.value;
+                            marcarSucio();
                         },
                         onkeydown: (e) => {
                             if (e.key !== "Enter" || e.ctrlKey || e.metaKey) return;
@@ -137,6 +156,7 @@ import { etiquetaTema } from "./etiquetas.js";
             document.querySelectorAll("#f-correct input").forEach((r, i) => {
                 r.checked = i === k;
             });
+        marcarSucio();
     }
     function anadirOpcion() {
         if (draft.opciones.length >= MAX_OPC) return;
@@ -197,6 +217,20 @@ import { etiquetaTema } from "./etiquetas.js";
         };
     }
 
+    /** Diálogo para reemplazar una pregunta duplicada, con el mismo estilo que el resto. */
+    function preguntarDuplicado(mensaje) {
+        const dlg = $("#dlg-duplicado");
+        if (!dlg) return Promise.resolve(false);
+        $("#dup-msg").textContent = mensaje;
+        $("#dup-reemplazar").className = "btn danger";
+        $("#dup-reemplazar").textContent = "Reemplazarla";
+        return new Promise((resolve) => {
+            dlg.addEventListener("close", () => resolve(dlg.returnValue === "ok"), { once: true });
+            dlg.returnValue = "cancel";
+            dlg.showModal();
+        });
+    }
+
     async function guardarPregunta() {
         const r = validarBorrador();
         if (r.msg) {
@@ -210,10 +244,8 @@ import { etiquetaTema } from "./etiquetas.js";
         } catch (e) {
             if (e.status === 409 && e.datos.existente) {
                 const ex = e.datos.existente;
-                mostrarError(e.message, {
-                    texto: "Reemplazarla",
-                    fn: () => persistir(r.q, ex.id, true).catch((e2) => mostrarError(msg(e2))),
-                });
+                const reemplazar = await preguntarDuplicado(e.message);
+                if (reemplazar) await persistir(r.q, ex.id, true).catch((e2) => mostrarError(msg(e2)));
             } else mostrarError(msg(e));
         }
     }
@@ -235,6 +267,7 @@ import { etiquetaTema } from "./etiquetas.js";
         editando = null;
         draft = nuevoBorrador(String(q.tema));
         pintarEditor();
+        marcarGuardado();
         await recargar();
         flash((edicion ? "Cambios guardados" : "Pregunta añadida") + " · " + total + " en la lista");
         $("#f-preg").focus();
@@ -244,6 +277,7 @@ import { etiquetaTema } from "./etiquetas.js";
         draft = nuevoBorrador(draft.tema);
         pintarEditor();
         pintarLista();
+        marcarSucio();
         $("#f-preg").focus();
     }
 
@@ -445,12 +479,15 @@ import { etiquetaTema } from "./etiquetas.js";
     /* ---------- Eventos ---------- */
     $("#f-tema").addEventListener("change", (e) => {
         draft.tema = e.target.value;
+        marcarSucio();
     });
     $("#f-preg").addEventListener("input", (e) => {
         draft.pregunta = e.target.value;
+        marcarSucio();
     });
     $("#f-expl").addEventListener("input", (e) => {
         draft.expl = e.target.value;
+        marcarSucio();
     });
     $("#f-filtro").addEventListener("change", recargar);
     let tBuscar = null;
@@ -472,6 +509,15 @@ import { etiquetaTema } from "./etiquetas.js";
 
     /* ---------- Arranque ---------- */
     pintarEditor();
-    recargar();
     $("#f-preg").focus();
+    (async () => {
+        await recargar();
+        const id = Number(new URLSearchParams(location.search).get("editar"));
+        if (!Number.isInteger(id) || id <= 0) return;
+        try {
+            editar(await api("/api/preguntas/" + id));
+        } catch (e) {
+            flash("No se pudo abrir la pregunta: " + msg(e), "warn");
+        }
+    })();
 })();

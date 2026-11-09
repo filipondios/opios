@@ -9,6 +9,7 @@ import {
     mmss,
     prepararPreguntas,
     respuestasParaGuardar,
+    temasDebiles,
 } from "../public/js/simulacro-logica.js";
 
 import { etiquetaTema as etiquetaServidor } from "../src/etiquetas.js";
@@ -161,6 +162,30 @@ describe("índice original y respuestas", () => {
             { id: 7, elegida: 1 },
             { id: 8, elegida: -1 },
         ]);
+    });
+});
+
+describe("temas débiles del simulacro (Fase 1.8)", () => {
+    test("elige los de menor precisión y desempata por id", () => {
+        const temas = [
+            { id: 4, precision: 80 },
+            { id: 2, precision: 40 },
+            { id: 9, precision: 40 },
+            { id: 3, precision: 10 },
+            { id: 5, precision: 65 },
+        ];
+        expect(temasDebiles(temas, 3)).toEqual([3, 2, 9]);
+    });
+
+    test("no preselecciona temas sin intentos y respeta el límite", () => {
+        const temas = [
+            { id: 1, precision: -1 },
+            { id: 2, precision: 90 },
+            { id: 3, precision: -1 },
+        ];
+        expect(temasDebiles(temas)).toEqual([2]);
+        expect(temasDebiles([], 5)).toEqual([]);
+        expect(temasDebiles([{ id: 2, precision: 50 }], 0)).toEqual([2]);
     });
 });
 

@@ -2,7 +2,8 @@ import { html } from "./html.js";
 import { layout } from "./layout.js";
 import { etiquetaTema } from "../etiquetas.js";
 
-function selectorTemas(temario) {
+function selectorTemas(temario, estadisticas = []) {
+    const porTema = new Map(estadisticas.map((e) => [e.tema, e]));
     const bloques = temario.filter((b) => b.temas.length);
     if (!bloques.length)
         return html`<p class="empty">Todavía no hay temas con preguntas. Añade preguntas o importa un banco.</p>`;
@@ -13,19 +14,22 @@ function selectorTemas(temario) {
         <h3>${b.nombre}</h3>
         <button class="btn small" type="button" data-bloque="${b.id}">Todo el bloque</button>
       </div>
-      <div class="temas-checks">${b.temas.map(
-          (t) => html`
+      <div class="temas-checks">${b.temas.map((t) => {
+          const e = porTema.get(t.id);
+          const intentos = e ? e.aciertos + e.fallos : 0;
+          const precision = intentos ? Math.round((100 * e.aciertos) / intentos) : -1;
+          return html`
         <label class="tema-check">
-          <input type="checkbox" name="tema" value="${t.id}" data-total="${t.preguntas}" checked>
+          <input type="checkbox" name="tema" value="${t.id}" data-total="${t.preguntas}" data-precision="${precision}" checked>
           <span class="tema-check-name">${etiquetaTema(t, { bloque: false })}</span>
           <span class="tema-check-n">${t.preguntas}</span>
-        </label>`,
-      )}</div>
+        </label>`;
+      })}</div>
     </section>`,
     );
 }
 
-export function paginaSimulacro({ temario }) {
+export function paginaSimulacro({ temario, estadisticas = [] }) {
     const hayTemas = temario.some((b) => b.temas.length);
     const cuerpo = html`
   <div id="note" class="note" hidden></div>
@@ -59,11 +63,16 @@ export function paginaSimulacro({ temario }) {
         <button class="btn small" type="button" id="btn-todos">Todos</button>
         <button class="btn small" type="button" id="btn-ninguno">Ninguno</button>
       </div>
-      <div id="temas" class="temas-sel">${selectorTemas(temario)}</div>
+      <div id="temas" class="temas-sel">${selectorTemas(temario, estadisticas)}</div>
     </section>
 
     <section class="card stack">
       <h2>Condiciones</h2>
+      <div class="perfiles" role="group" aria-label="Perfiles de simulacro">
+        <button class="btn small" type="button" id="btn-perfil-examen">Examen</button>
+        <button class="btn small" type="button" id="btn-perfil-rapido">Rápido (20)</button>
+        <button class="btn small" type="button" id="btn-perfil-debiles">Temas débiles</button>
+      </div>
       <div class="exam-config">
         <label class="field"><span>Preguntas</span><input id="cfg-n" type="number" min="5" max="200" value="50" inputmode="numeric"></label>
         <label class="field"><span>Minutos</span><input id="cfg-min" type="number" min="1" max="300" value="60" inputmode="numeric"></label>
@@ -138,6 +147,14 @@ export function paginaSimulacro({ temario }) {
       <a class="btn" href="/">Volver al test</a>
     </div>
 
+    <section id="res-cabecera" class="resultado-cabecera" aria-label="Nota del simulacro">
+      <div id="res-anillo" class="res-anillo"></div>
+      <div class="resultado-texto">
+        <p class="res-nota" id="res-nota"></p>
+        <p class="lede" id="res-sub"></p>
+      </div>
+    </section>
+
     <section id="res-kpis" class="kpis" aria-label="Resumen del simulacro"></section>
 
     <section class="card stack">
@@ -149,7 +166,13 @@ export function paginaSimulacro({ temario }) {
       <div class="row">
         <h2>Revisión</h2>
         <span class="spacer"></span>
-        <label class="hint check-inline"><input type="checkbox" id="res-solo-fallos" checked> Solo fallos y blancos</label>
+        <label class="check-inline" for="res-filtro">Mostrar
+          <select id="res-filtro">
+            <option value="fallos" selected>Fallos y blancos</option>
+            <option value="blancos">Solo blancos</option>
+            <option value="todas">Todas</option>
+          </select>
+        </label>
       </div>
       <div id="res-revision" class="stack"></div>
     </section>

@@ -16,7 +16,7 @@ const PAGINAS = [
  */
 export function layout({
     titulo,
-    marca = "Test infinito",
+    marca = "Opios",
     actual = null,
     estado,
     estadoTipo = "ok",
@@ -31,7 +31,7 @@ export function layout({
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>${titulo}</title>
+<title>Opios: ${titulo}</title>
 <link rel="icon" href="/logo.png" type="image/png">
 <link rel="stylesheet" href="/css/base.css">
 ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
@@ -48,7 +48,7 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
       <button class="btn small theme" type="button" id="btn-tema" aria-label="Cambiar a tema oscuro" aria-pressed="false" title="Cambiar tema claro/oscuro">
         <span aria-hidden="true" id="tema-icono">◐</span><span id="tema-texto">Oscuro</span>
       </button>
-      <span class="status" id="status" data-state="${estadoTipo}" role="status">${estado}</span>
+      <span class="status" id="status" data-state="${estadoTipo}" role="status" title="${estado}"><span class="status-text">${estado}</span></span>
     </div>
   </header>
 ${cuerpo}
