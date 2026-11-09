@@ -1,29 +1,56 @@
-/* Página del temario: bloques y temas (se apoya en base.css y maker.css). */
-.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+/* Página del temario: bloques plegables con progreso y lista de temas.
+   Las piezas comunes (.card, .bar, .btn, .dlg) viven en base.css. */
+
 .page-head .lede{max-width:60ch}
 
-.bloque{padding:clamp(14px,2.5vw,20px)}
-.bloque-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
-.bloque-titulo{display:flex;flex-direction:column;gap:2px;min-width:0}
-.bloque-titulo h2{font:500 22px/1.2 var(--f-read);overflow-wrap:anywhere}
-.bloque-titulo span{font:500 12px var(--f-mono);color:var(--ink-2)}
-.bloque-acciones{display:flex;gap:6px;flex-wrap:wrap}
-
-.temas{list-style:none;margin:0;padding:0}
-.tema-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
-.tema-item:first-child{border-top:0}
-.tnum{
-  flex:none;min-width:34px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);
-  background:var(--paper);display:grid;place-items:center;font:600 12px var(--f-mono);color:var(--ink-2);
+/* Cada bloque es un <details>: la cabecera resume el progreso y el cuerpo
+   guarda las acciones y los temas. */
+details.bloque{padding:0;overflow:clip}
+details.bloque > summary{
+  cursor:pointer;list-style:none;display:flex;align-items:flex-start;gap:var(--sp-2) var(--sp-4);
+  padding:clamp(14px,2.5vw,20px);border-radius:var(--r-card);
 }
-.tinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+details.bloque > summary::-webkit-details-marker{display:none}
+details.bloque > summary::before{
+  content:"▸";flex:none;font-size:12px;line-height:1.9;color:var(--text-2);
+  transition:transform var(--dur-fast);
+}
+details.bloque[open] > summary::before{transform:rotate(90deg)}
+details.bloque > summary:hover{background:var(--hover)}
+details.bloque[open] > summary{border-bottom:1px solid var(--line);border-radius:var(--r-card) var(--r-card) 0 0}
+
+.bloque-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;flex:1;min-width:0}
+.bloque-titulo{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.bloque-titulo h2{font:500 22px/1.2 var(--f-read);overflow-wrap:anywhere}
+.bloque-titulo > span{font:500 12px var(--f-ui);color:var(--text-2)}
+.bloque-barra{max-width:420px;height:6px;margin-top:2px}
+
+.bloque-cuerpo{display:flex;flex-direction:column;gap:var(--sp-2);padding:var(--sp-3) clamp(14px,2.5vw,20px) clamp(14px,2.5vw,20px)}
+.bloque-acciones{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Temas */
+.temas{list-style:none;margin:0;padding:0}
+.tema-item{display:flex;align-items:center;gap:12px;padding:10px 6px;border-top:1px solid var(--line);border-radius:var(--r-control)}
+.tema-item:first-child{border-top:0}
+.tema-item:hover{background:var(--hover)}
+.tnum{
+  flex:none;min-width:38px;padding:4px 8px;border-radius:var(--r-control);border:1px solid var(--line);
+  background:var(--bg);display:grid;place-items:center;font:600 12px var(--f-mono);color:var(--text-2);
+}
+.tinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .tnombre{font:400 16px/1.35 var(--f-read);overflow-wrap:anywhere}
-.tnombre.sin{color:var(--ink-2);font-style:italic}
-.tmeta{font:500 11px var(--f-mono);color:var(--ink-2)}
+.tnombre.sin{color:var(--text-2);font-style:italic}
+.tmeta{font:500 11px var(--f-ui);color:var(--text-2)}
 .tacciones{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 
-/* Diálogo de bloques/temas (los estilos base están en base.css). */
+/* Diálogo de bloques y temas (el marco está en base.css). */
+.dlg .stack{gap:var(--sp-3)}
+
 @media (max-width:560px){
+  details.bloque > summary{gap:var(--sp-2)}
+  .bloque-head{flex-direction:column;align-items:stretch}
+  .bloque-barra{max-width:none}
+  .bloque-acciones{justify-content:flex-start}
   .tema-item{flex-wrap:wrap}
   .tacciones{width:100%;justify-content:flex-start}
 }
