@@ -1,4 +1,4 @@
-import { Sesion } from "./repaso.js";
+import { Sesion, hoyIso } from "./repaso.js";
 import { api, barajar, h, LETRAS, msgError } from "./comun.js";
 import { etiquetaTema } from "./etiquetas.js";
 
@@ -23,11 +23,12 @@ import { etiquetaTema } from "./etiquetas.js";
     let cur = null; // pregunta en pantalla
     let timerAcierto = null;
     let sucios = new Set();
-    let timerGuardado = null;
+    let timerSesion = null;
     let carga = null; // cupo diario que devuelve el servidor
+    let fechaCarga = null; // día al que corresponde `carga` (Fase 2.10)
     let examenInfo = null; // fecha de examen y tope de intervalo (Fase 3.6)
-    let respuestasCola = []; // respuestas pendientes de enviar a /api/respuestas
-    let timerRespuestas = null;
+    let respuestasCola = []; // respuestas pendientes de enviar con el progreso
+    let baseProgreso = {}; // progreso al empezar la sesión, para enviar incrementos (Fase 2.8)
     let unaPulsacion = false; // responder al primer toque (móvil)
     let selAntesPuntero = null; // opción marcada antes del puntero, para distinguir el primer toque
     const CLAVE_UN_TOQUE = "ti.una-pulsacion";
@@ -59,66 +60,55 @@ import { etiquetaTema } from "./etiquetas.js";
         n.hidden = false;
     }
 
-    /* ---------- Progreso: guardado diferido por lotes ---------- */
+    /* ---------- Sesión: respuestas y progreso en un solo lote (Fase 2.8) ---------- */
+    function programarGuardado() {
+        clearTimeout(timerSesion);
+        timerSesion = setTimeout(guardarSesion, 700);
+    }
     function marcarSucio(id) {
         sucios.add(id);
-        clearTimeout(timerGuardado);
-        timerGuardado = setTimeout(guardarProgreso, 700);
+        programarGuardado();
     }
-    async function guardarProgreso() {
-        clearTimeout(timerGuardado);
-        if (!sucios.size) return;
+    function encolarRespuesta(id, acierto, ms) {
+        respuestasCola.push({ id, acierto, ms });
+        programarGuardado();
+    }
+    /** Envía respuestas y progreso juntos; los contadores van como incrementos desde `baseProgreso`. */
+    async function guardarSesion() {
+        clearTimeout(timerSesion);
+        if (!sucios.size && !respuestasCola.length) return;
         const ids = [...sucios];
+        const lote = respuestasCola;
         sucios.clear();
+        respuestasCola = [];
         setStatus("busy", "Guardando…");
         try {
-            await api("/api/progreso", {
+            await api("/api/sesion", {
                 metodo: "POST",
                 keepalive: true,
-                cuerpo: ids.map((id) => {
-                    const p = progress[id];
-                    return { id, caja: p[0], vence: p[1], aciertos: p[2], fallos: p[3] };
-                }),
+                cuerpo: {
+                    respuestas: lote,
+                    progreso: ids
+                        .filter((id) => progress[id])
+                        .map((id) => {
+                            const p = progress[id];
+                            const b = baseProgreso[id] ?? [0, 0, 0, 0];
+                            return { id, caja: p[0], vence: p[1], aciertos: p[2] - b[2], fallos: p[3] - b[3] };
+                        }),
+                },
             });
+            for (const id of ids) if (progress[id]) baseProgreso[id] = [...progress[id]];
             setStatus("ok", ETIQUETA);
         } catch (e) {
             ids.forEach((id) => sucios.add(id));
+            respuestasCola = lote.concat(respuestasCola);
             setStatus("warn", "No se pudo guardar: " + msgError(e));
         }
     }
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") {
-            guardarProgreso();
-            guardarRespuestas();
-        }
+        if (document.visibilityState === "hidden") guardarSesion();
     });
-    window.addEventListener("pagehide", () => {
-        guardarProgreso();
-        guardarRespuestas();
-    });
-
-    /* ---------- Respuestas: un evento por pregunta, para las estadísticas y el cupo diario ---------- */
-    function encolarRespuesta(id, acierto, ms) {
-        respuestasCola.push({ id, acierto, ms });
-        clearTimeout(timerRespuestas);
-        timerRespuestas = setTimeout(guardarRespuestas, 700);
-    }
-    async function guardarRespuestas() {
-        clearTimeout(timerRespuestas);
-        if (!respuestasCola.length) return;
-        const lote = respuestasCola;
-        respuestasCola = [];
-        try {
-            await api("/api/respuestas", {
-                metodo: "POST",
-                keepalive: true,
-                cuerpo: { respuestas: lote },
-            });
-        } catch (e) {
-            respuestasCola = lote.concat(respuestasCola);
-            setStatus("warn", "No se pudieron guardar las respuestas: " + msgError(e));
-        }
-    }
+    window.addEventListener("pagehide", () => guardarSesion());
 
     /* ---------- Cupo diario (lo calcula el servidor; aquí solo se muestra) ---------- */
     function leerCarga() {
@@ -161,6 +151,20 @@ import { etiquetaTema } from "./etiquetas.js";
         if (!carga) return Infinity;
         if (carga.bloqueadoPorAtraso) return 0;
         return Math.max(0, carga.cupoNuevas - carga.nuevasHoy);
+    }
+
+    /* Si la sesión cruza la medianoche, el cupo y los repasos pendientes son de otro día (Fase 2.10). */
+    async function comprobarDia() {
+        const hoy = hoyIso();
+        if (hoy === fechaCarga) return;
+        fechaCarga = hoy;
+        try {
+            carga = await api("/api/carga");
+            pintarCarga();
+            if (sesion) sesion.actualizarCupo(nuevasPermitidas());
+        } catch (e) {
+            fechaCarga = null; // se reintenta en la próxima pregunta
+        }
     }
 
     /* ---------- Pantalla de preparación (la rejilla llega ya pintada desde el servidor) ---------- */
@@ -277,6 +281,7 @@ import { etiquetaTema } from "./etiquetas.js";
         try {
             $("#grid").innerHTML = await (await api("/fragmentos/temas", { bruto: true })).text();
             leerCarga();
+            fechaCarga = hoyIso();
             sincronizarSeleccion();
             pintarCarga();
             filtrarTemas();
@@ -343,10 +348,10 @@ import { etiquetaTema } from "./etiquetas.js";
         $("#btn-clear-prog"),
         "Progreso reiniciado: todas las preguntas vuelven a ser nuevas.",
         async () => {
-            clearTimeout(timerGuardado);
+            clearTimeout(timerSesion);
             sucios.clear();
-            clearTimeout(timerRespuestas);
             respuestasCola = [];
+            baseProgreso = {};
             await api("/api/progreso", { metodo: "DELETE" });
             progress = {};
             await refrescarTemas();
@@ -398,8 +403,7 @@ import { etiquetaTema } from "./etiquetas.js";
         boton.disabled = true;
         setStatus("busy", "Cargando preguntas…");
         try {
-            await guardarProgreso();
-            await guardarRespuestas();
+            await guardarSesion();
             const d = await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","));
             bank = d.preguntas.map((q) => ({
                 i: q.id,
@@ -413,7 +417,9 @@ import { etiquetaTema } from "./etiquetas.js";
                 e: q.explicacion,
             }));
             progress = d.progreso;
+            baseProgreso = Object.fromEntries(Object.entries(progress).map(([id, p]) => [id, [...p]]));
             if (d.carga) carga = d.carga;
+            fechaCarga = hoyIso();
             if (d.examen) {
                 examenInfo = d.examen;
                 pintarExamen();
@@ -441,6 +447,7 @@ import { etiquetaTema } from "./etiquetas.js";
         preguntar();
     }
     function preguntar() {
+        comprobarDia();
         clearTimeout(timerAcierto);
         const [q, tipo] = sesion.siguiente();
         const orden = barajar(q.o.map((_, k) => k));
@@ -628,8 +635,7 @@ import { etiquetaTema } from "./etiquetas.js";
                 : null,
         );
         window.scrollTo(0, 0);
-        await guardarProgreso();
-        await guardarRespuestas();
+        await guardarSesion();
         await refrescarTemas();
     }
 
@@ -682,6 +688,7 @@ import { etiquetaTema } from "./etiquetas.js";
     sincronizarSeleccion(leerSeleccion() || []);
     filtrarTemas();
     leerCarga();
+    fechaCarga = hoyIso();
     pintarCarga();
     setStatus("ok", ETIQUETA);
 })();

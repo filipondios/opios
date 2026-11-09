@@ -1,7 +1,17 @@
 import { abrirDb } from "./src/db.js";
 import { crearApp } from "./src/app.js";
 import { importarDirectorio } from "./src/seed.js";
-import { AUTH, DB_PATH, DIR_PREGUNTAS, HOST, PORT, ALLOWED_HOSTS, OPIOS_SEED, debeImportar } from "./src/config.js";
+import {
+    AUTH,
+    DB_PATH,
+    DIR_PREGUNTAS,
+    HOST,
+    PORT,
+    ALLOWED_HOSTS,
+    OPIOS_SEED,
+    debeImportar,
+    MAX_CUERPO,
+} from "./src/config.js";
 
 /* Registro con fecha en cada línea. */
 const log = (...a) => console.log(new Date().toISOString(), ...a);
@@ -35,7 +45,13 @@ try {
     process.exit(1);
 }
 
-const servidor = Bun.serve({ hostname: HOST, port: PORT, fetch: crearApp(repo, { auth: AUTH }) });
+const servidor = Bun.serve({
+    hostname: HOST,
+    port: PORT,
+    /* El cuerpo máximo se corta antes de leerlo entero (Fase 2.9). */
+    maxRequestBodySize: MAX_CUERPO,
+    fetch: crearApp(repo, { auth: AUTH }),
+});
 if (!AUTH && HOST !== "127.0.0.1" && HOST !== "localhost")
     log("AVISO: la app es accesible desde fuera y no tiene contraseña (define AUTH_USER y AUTH_PASS).");
 log(`Test infinito en ${servidor.url}  (base de datos: ${DB_PATH})`);

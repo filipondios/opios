@@ -78,6 +78,9 @@ export const MAX_BLOQUE = 120;
 export const MAX_TEMA_NOMBRE = 500;
 /* Longitud máxima de las etiquetas de los desplegables (se recortan con "..."). */
 export const MAX_ETIQUETA = 60;
+/* Tamaño máximo del cuerpo de una petición, en bytes (Fase 2.9). Se aplica en `Bun.serve`
+   y también en `cuerpoJson`, que mide bytes y no caracteres. */
+export const MAX_CUERPO = 2_000_000;
 
 /* Límites diarios (Fase 3). El cupo lo calcula el servidor a partir de `respuestas`. */
 export const CUPO_NUEVAS = 15; // preguntas nuevas que se introducen como máximo cada día

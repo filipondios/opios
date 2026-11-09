@@ -1482,6 +1482,129 @@ describe("fuentes autoalojadas (Fase 4.2)", () => {
     });
 });
 
+describe("estáticos con ETag y 304 (Fase 2.2)", () => {
+    test("la segunda petición condicional devuelve 304 sin cuerpo", async () => {
+        const r1 = await pet("/js/test.js");
+        expect(r1.status).toBe(200);
+        const etag = r1.headers.get("etag");
+        expect(etag).toMatch(/^W\/"/);
+
+        const r2 = await app(new Request("http://localhost/js/test.js", { headers: { "If-None-Match": etag } }));
+        expect(r2.status).toBe(304);
+        expect(await r2.text()).toBe("");
+        expect(r2.headers.get("etag")).toBe(etag);
+    });
+});
+
+describe("cabeceras de seguridad (Fase 2.3)", () => {
+    test("páginas, API y estáticos llevan X-Frame-Options, nosniff y no-referrer", async () => {
+        for (const ruta of ["/", "/api/temas", "/js/test.js"]) {
+            const r = await pet(ruta);
+            expect(r.headers.get("x-frame-options")).toBe("DENY");
+            expect(r.headers.get("x-content-type-options")).toBe("nosniff");
+            expect(r.headers.get("referrer-policy")).toBe("no-referrer");
+        }
+    });
+});
+
+describe("mensajes del temario sin preguntas/ (Fase 2.6)", () => {
+    test("los 409 de bloques y temas gestionados no mencionan preguntas/", async () => {
+        await importarDirectorio(repo, DIR_BLOQUES);
+        const bloque = repo.temario().find((b) => b.gestionado);
+        const r = await pet(`/api/bloques/${bloque.id}`, "PUT", { nombre: "Otro nombre" });
+        expect(r.status).toBe(409);
+        const texto = await r.text();
+        expect(texto).not.toContain("preguntas/");
+        expect(texto).toContain("info.json");
+
+        const tema = bloque.temas[0];
+        const rt = await pet(`/api/temas/${tema.id}`, "PUT", {
+            bloque: bloque.id,
+            numero: tema.numero,
+            nombre: "Otro título",
+        });
+        expect(rt.status).toBe(409);
+        expect(await rt.text()).not.toContain("preguntas/");
+    });
+});
+
+describe("sesión transaccional (Fase 2.8)", () => {
+    const preparar = async () => {
+        await importarDirectorio(repo, DIR_FIXTURE);
+        const bank = (await (await pet("/api/test?temas=1")).json()).preguntas;
+        return bank[0].id;
+    };
+
+    test("aplica respuestas y progreso en una sola petición", async () => {
+        const id = await preparar();
+        const r = await pet("/api/sesion", "POST", {
+            respuestas: [{ id, acierto: true, ms: 1200 }],
+            progreso: [{ id, caja: 1, vence: "2026-01-01", aciertos: 1, fallos: 0 }],
+        });
+        expect(r.status).toBe(201);
+        expect(await r.json()).toEqual({ registradas: 1, guardadas: 1 });
+        expect(repo.db.query("SELECT COUNT(*) AS n FROM respuestas").get().n).toBe(1);
+        expect(repo.db.query("SELECT caja, aciertos, fallos FROM progreso WHERE pregunta_id = ?").get(id)).toEqual({
+            caja: 1,
+            aciertos: 1,
+            fallos: 0,
+        });
+    });
+
+    test("dos lotes con datos viejos suman los contadores en vez de pisarse", async () => {
+        const id = await preparar();
+        const lote = {
+            respuestas: [{ id, acierto: true }],
+            progreso: [{ id, caja: 1, vence: "2026-01-01", aciertos: 1, fallos: 0 }],
+        };
+        await pet("/api/sesion", "POST", lote);
+        await pet("/api/sesion", "POST", lote);
+        expect(repo.db.query("SELECT aciertos, fallos FROM progreso WHERE pregunta_id = ?").get(id)).toEqual({
+            aciertos: 2,
+            fallos: 0,
+        });
+    });
+
+    test("si la transacción falla no queda nada a medias", async () => {
+        const id = await preparar();
+        expect(() =>
+            repo.aplicarSesion(
+                [{ id, acierto: true, ms: null }],
+                [{ id, caja: 99, vence: "2026-01-01", aciertos: 1, fallos: 0 }],
+                "2026-01-01",
+            ),
+        ).toThrow();
+        expect(repo.db.query("SELECT COUNT(*) AS n FROM respuestas").get().n).toBe(0);
+        expect(repo.db.query("SELECT COUNT(*) AS n FROM progreso").get().n).toBe(0);
+    });
+
+    test("mantiene /api/progreso y /api/respuestas por compatibilidad", async () => {
+        const id = await preparar();
+        expect((await pet("/api/respuestas", "POST", { respuestas: [{ id, acierto: true }] })).status).toBe(201);
+        expect(
+            (await pet("/api/progreso", "POST", [{ id, caja: 2, vence: "2026-01-01", aciertos: 3, fallos: 1 }])).status,
+        ).toBe(200);
+        expect(repo.db.query("SELECT caja, aciertos FROM progreso WHERE pregunta_id = ?").get(id)).toEqual({
+            caja: 2,
+            aciertos: 3,
+        });
+    });
+});
+
+describe("límite de cuerpo en bytes (Fase 2.9)", () => {
+    test("un cuerpo de más de 2 MB devuelve 413 aunque tenga menos caracteres", async () => {
+        const cuerpo = "á".repeat(1_000_001); // 2.000.002 bytes, 1.000.001 caracteres
+        const r = await app(
+            new Request("http://localhost/api/sesion", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: cuerpo,
+            }),
+        );
+        expect(r.status).toBe(413);
+    });
+});
+
 describe("autenticación opcional y healthz", () => {
     const basic = (u, c) => ({ Authorization: "Basic " + btoa(u + ":" + c) });
     test("con auth: 401 sin credenciales, 200 con ellas, /healthz libre", async () => {

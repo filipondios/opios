@@ -69,6 +69,11 @@ export class Sesion {
         return this.topeIntervalo > 0 ? Math.min(dias, this.topeIntervalo) : dias;
     }
 
+    /** Actualiza el cupo de nuevas a mitad de sesión (p. ej. al cambiar de día; Fase 2.10). */
+    actualizarCupo(n) {
+        this.nuevasPermitidas = n;
+    }
+
     siguiente() {
         const hoyIso = this.hoy();
         // 1) preguntas falladas cuyo turno ya llegó

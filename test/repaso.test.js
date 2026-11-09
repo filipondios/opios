@@ -238,6 +238,15 @@ describe("planificador de repaso", () => {
         expect(sesion.siguiente()[1]).not.toBe("Nueva");
     });
 
+    test("actualizarCupo cambia el cupo a mitad de sesión (Fase 2.10)", () => {
+        const pool = [q(1), q(2)];
+        const { sesion } = crear(pool, { azar: () => 0, nuevasPermitidas: 0 });
+
+        expect(sesion.siguiente()[1]).toBe("Práctica libre");
+        sesion.actualizarCupo(1);
+        expect(sesion.siguiente()[1]).toBe("Nueva");
+    });
+
     test("el tope de intervalo (fecha de examen) recorta la espera", () => {
         const pool = [q(1)];
         const { sesion, progreso } = crear(pool, { progreso: { 1: [5, "2026-03-01", 1, 0] }, topeIntervalo: 20 });

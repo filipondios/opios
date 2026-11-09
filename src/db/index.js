@@ -13,6 +13,11 @@ export function abrirDb(ruta = DB_PATH) {
     if (ruta !== ":memory:") mkdirSync(dirname(ruta), { recursive: true });
     const db = new Database(ruta, { create: true, strict: true });
     db.run("PRAGMA journal_mode = WAL");
+    /* Con WAL, NORMAL es lo habitual: suficiente consistencia y menos esperas al escribir. */
+    db.run("PRAGMA synchronous = NORMAL");
+    /* Otra conexión (el servidor, `bun run seed`, `backup`, `ids`) no debe provocar un fallo
+       inmediato: se espera hasta 5 s antes de rendirse con SQLITE_BUSY (Fase 2.1). */
+    db.run("PRAGMA busy_timeout = 5000");
     db.run("PRAGMA foreign_keys = ON");
     migrar(db);
     const ftsDisponible = tieneFts5(db);
@@ -41,6 +46,15 @@ export function abrirDb(ruta = DB_PATH) {
       ON CONFLICT (pregunta_id) DO UPDATE SET
         caja = excluded.caja, vence = excluded.vence, aciertos = excluded.aciertos,
         fallos = excluded.fallos, actualizado = datetime('now')`),
+        /* Igual que `upsertProgreso`, pero los contadores son incrementos (Fase 2.8): dos
+           pestañas con datos viejos suman sus aciertos/fallos en vez de pisarse. */
+        sumarProgreso: db.query(`
+      INSERT INTO progreso (pregunta_id, caja, vence, aciertos, fallos)
+      SELECT ?1, ?2, ?3, ?4, ?5 WHERE EXISTS (SELECT 1 FROM preguntas WHERE id = ?1)
+      ON CONFLICT (pregunta_id) DO UPDATE SET
+        caja = excluded.caja, vence = excluded.vence,
+        aciertos = aciertos + excluded.aciertos, fallos = fallos + excluded.fallos,
+        actualizado = datetime('now')`),
         /* Un fallo de simulacro baja 2 cajas (mínimo 1) y deja la pregunta vencida hoy. */
         falloSimulacro: db.query(`
       INSERT INTO progreso (pregunta_id, caja, vence, aciertos, fallos)

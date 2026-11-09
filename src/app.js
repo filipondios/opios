@@ -1,6 +1,6 @@
 import { join, normalize, sep } from "node:path";
 import { timingSafeEqual } from "node:crypto";
-import { PUBLIC_DIR, CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN, ALLOWED_HOSTS } from "./config.js";
+import { PUBLIC_DIR, CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN, ALLOWED_HOSTS, MAX_CUERPO } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import { hoyIso, sumarDias, diasEntre } from "./fechas.js";
 import {
@@ -32,13 +32,29 @@ const pagina = (r, status = 200) =>
 async function cuerpoJson(req) {
     if (!(req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json"))
         throw new ErrorApi(415, "El cuerpo debe ser application/json.");
-    const texto = await req.text();
-    if (texto.length > 2_000_000) throw new ErrorApi(413, "Cuerpo demasiado grande.");
+    /* Se mide en bytes, no en caracteres: un texto con tildes ocupa más de lo que dice `length` (Fase 2.9). */
+    const buf = await req.arrayBuffer();
+    if (buf.byteLength > MAX_CUERPO) throw new ErrorApi(413, "Cuerpo demasiado grande.");
     try {
-        return JSON.parse(texto);
+        return JSON.parse(new TextDecoder().decode(buf));
     } catch {
         throw new ErrorApi(400, "JSON no válido.");
     }
+}
+
+/** Lista de respuestas de una sesión; vacía si no se envía (Fase 2.8). */
+function listaRespuestas(v) {
+    if (v == null) return [];
+    if (!Array.isArray(v)) throw new ErrorApi(400, "«respuestas» debe ser una lista.");
+    return v.length ? validarRespuestas(v) : [];
+}
+
+/** Lista de entradas de progreso de una sesión; vacía si no se envía (Fase 2.8). */
+function listaProgreso(v) {
+    if (v == null) return [];
+    if (!Array.isArray(v) || v.length > 5000)
+        throw new ErrorApi(400, "«progreso» debe ser una lista de hasta 5000 entradas.");
+    return v.map(validarProgreso);
 }
 
 /** Entero positivo o null (para ids y parámetros opcionales). */
@@ -210,6 +226,17 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
             return json({ registradas: repo.registrarRespuestas(lista, fechaHoy()) }, 201);
         }
 
+        /* Respuestas y progreso de una sesión en una sola transacción (Fase 2.8). Los contadores
+           de `progreso` son incrementos (+aciertos, +fallos), así dos pestañas suman en vez de pisarse. */
+        if (ruta === "/api/sesion" && m === "POST") {
+            const cuerpo = await cuerpoJson(req);
+            if (!cuerpo || typeof cuerpo !== "object" || Array.isArray(cuerpo))
+                throw new ErrorApi(400, "Se esperaba un objeto con respuestas y progreso.");
+            const respuestas = listaRespuestas(cuerpo.respuestas);
+            const progreso = listaProgreso(cuerpo.progreso);
+            return json(repo.aplicarSesion(respuestas, progreso, fechaHoy()), 201);
+        }
+
         if (ruta === "/api/progreso") {
             if (m === "POST") {
                 const cuerpo = await cuerpoJson(req);
@@ -286,7 +313,7 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
         throw new ErrorApi(404, "Ruta no encontrada.");
     }
 
-    async function estatico(ruta) {
+    async function estatico(req, ruta) {
         const archivo = join(PUBLIC_DIR, normalize(ruta));
         if (!archivo.startsWith(PUBLIC_DIR + sep)) return null;
         const f = Bun.file(archivo);
@@ -295,7 +322,12 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
         const cache = /\.(woff2?|ttf|otf|png|jpe?g|gif|svg|ico)$/i.test(archivo)
             ? "public, max-age=31536000, immutable"
             : "no-cache";
-        return new Response(f, { headers: { "Cache-Control": cache } });
+        /* ETag débil con tamaño y mtime: una petición condicional ahorra el cuerpo entero (Fase 2.2). */
+        const etag = `W/"${f.size}-${Math.floor(f.lastModified)}"`;
+        const inm = req.headers.get("if-none-match");
+        if (inm && inm.split(",").some((v) => v.trim() === etag))
+            return new Response(null, { status: 304, headers: { "Cache-Control": cache, ETag: etag } });
+        return new Response(f, { headers: { "Cache-Control": cache, ETag: etag } });
     }
 
     async function responder(req, url, ruta) {
@@ -341,20 +373,34 @@ export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = A
                 );
             }
             if (ruta === "/fragmentos/temas") return pagina(temasGrid(estadisticas(), repo.cargaDiaria(fechaHoy())));
-            const recurso = await estatico(ruta);
+            const recurso = await estatico(req, ruta);
             return recurso ?? pagina(paginaNoEncontrada(ruta), 404);
         }
         return new Response("Método no permitido", { status: 405 });
     }
 
+    /* Cabeceras de seguridad en todas las respuestas (Fase 2.3): la validación de `Host` no impide
+       que otra web incruste la app en un iframe. `nosniff` y `no-referrer` son defensa en profundidad. */
+    const SEGURIDAD = {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer",
+    };
+    function conSeguridad(res) {
+        if (!res) return res;
+        const h = new Headers(res.headers);
+        for (const [k, v] of Object.entries(SEGURIDAD)) if (!h.has(k)) h.set(k, v);
+        return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+    }
+
     return async function manejar(req) {
         const url = new URL(req.url);
         try {
-            return await comprimir(req, await responder(req, url, url.pathname));
+            return conSeguridad(await comprimir(req, await responder(req, url, url.pathname)));
         } catch (e) {
-            if (e instanceof ErrorApi) return json({ error: e.message, ...e.extra }, e.status);
+            if (e instanceof ErrorApi) return conSeguridad(json({ error: e.message, ...e.extra }, e.status));
             console.error(new Date().toISOString(), e);
-            return json({ error: "Error interno del servidor." }, 500);
+            return conSeguridad(json({ error: "Error interno del servidor." }, 500));
         }
     };
 }

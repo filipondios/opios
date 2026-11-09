@@ -42,6 +42,19 @@ export function crearProgreso({ db, q }) {
             return n;
         }),
 
+        /**
+         * Aplica en una sola transacción las respuestas y el progreso de una sesión (Fase 2.8).
+         * `progreso` trae los contadores como incrementos (+aciertos, +fallos); `caja` y `vence`
+         * son el estado que ve el cliente. Si algo falla, no queda nada a medias.
+         */
+        aplicarSesion: db.transaction((respuestas, progreso, hoy, origen = "test") => {
+            let registradas = 0;
+            for (const e of respuestas)
+                registradas += q.insertarRespuesta.run(e.id, hoy, e.acierto, origen, e.ms ?? null).changes;
+            for (const e of progreso) q.sumarProgreso.run(e.id, e.caja, e.vence, e.aciertos, e.fallos);
+            return { registradas, guardadas: progreso.length };
+        }),
+
         /** Totales globales de progreso, para la cabecera de la página de estadísticas. */
         estadisticasGlobales(hoy, cajaDominada) {
             return db

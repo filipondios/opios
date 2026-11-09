@@ -1,71 +1,49 @@
-/* bun run calidad [directorio] [--umbral 30] [--lista] [--fallar]
-   Mide el sesgo de la opción más larga y la posición de la correcta. Incluye generated/.
-   `--fallar` sale con código 1 si algún archivo supera el umbral (para usarlo antes de importar). */
-import { readdir } from "node:fs/promises";
+/* bun run calidad [directorio] [--umbral 30] [--minimo 20] [--incluir <carpeta>] [--lista] [--fallar]
+   Mide el sesgo de la opción más larga y la posición de la correcta sobre lo que el banco importa.
+   Con `--incluir generated` (repetible) se analizan también otras carpetas del bloque que no se
+   importan; sin esa opción la app no necesita conocer ningún nombre concreto (Fase 2.5). */
 import { join } from "node:path";
 import { DIR_PREGUNTAS } from "../src/config.js";
-import { analizarPreguntas } from "../src/calidad.js";
+import { analizarPreguntas, MINIMO_SESGO } from "../src/calidad.js";
+import { archivosDeBanco } from "../src/estructura-banco.js";
 
-const RE_BLOQUE = /^bloque_(\d+)$/;
-const RE_TEMA = /^tema_(\d+)\.json$/i;
-const numero = (re, nombre) => Number(re.exec(nombre)[1]);
 const pct = (parte, total) => (total ? (parte / total) * 100 : 0);
 const fmtPct = (parte, total) => (total ? pct(parte, total).toFixed(1) + " %" : "—");
 
 const args = process.argv.slice(2);
 let dir = DIR_PREGUNTAS,
     umbral = 30,
+    minimo = MINIMO_SESGO,
     lista = false,
     fallar = false;
+const incluye = [];
 for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === "--umbral") umbral = Number(args[++i]);
     else if (a.startsWith("--umbral=")) umbral = Number(a.slice("--umbral=".length));
+    else if (a === "--minimo") minimo = Number(args[++i]);
+    else if (a.startsWith("--minimo=")) minimo = Number(a.slice("--minimo=".length));
+    else if (a === "--incluir") incluye.push(args[++i]);
+    else if (a.startsWith("--incluir=")) incluye.push(a.slice("--incluir=".length));
     else if (a === "--lista") lista = true;
     else if (a === "--fallar") fallar = true;
     else if (!a.startsWith("--")) dir = a;
 }
 
 async function leer(archivo) {
-    const datos = await Bun.file(archivo).json();
-    return Array.isArray(datos) ? datos : (datos?.preguntas ?? []);
-}
-
-async function archivosDe(base) {
-    const nombres = await readdir(base);
-    const salida = [];
-    const bloques = nombres
-        .filter((n) => RE_BLOQUE.test(n))
-        .sort((a, b) => numero(RE_BLOQUE, a) - numero(RE_BLOQUE, b));
-
-    if (bloques.length) {
-        for (const bloque of bloques) {
-            const ruta = join(base, bloque);
-            const dentro = await readdir(ruta);
-            for (const n of dentro
-                .filter((x) => RE_TEMA.test(x))
-                .sort((a, b) => numero(RE_TEMA, a) - numero(RE_TEMA, b)))
-                salida.push({ archivo: join(ruta, n), etiqueta: `${bloque}/${n}`, generado: false });
-
-            if (dentro.includes("generated")) {
-                const generados = (await readdir(join(ruta, "generated"))).filter((x) => x.endsWith(".json")).sort();
-                for (const n of generados)
-                    salida.push({
-                        archivo: join(ruta, "generated", n),
-                        etiqueta: `${bloque}/generated/${n}`,
-                        generado: true,
-                    });
-            }
-        }
-        return salida;
+    try {
+        const datos = await Bun.file(archivo).json();
+        return Array.isArray(datos) ? datos : (datos?.preguntas ?? []);
+    } catch {
+        return [];
     }
-
-    for (const n of nombres.filter((x) => x.endsWith(".json") && x !== "info.json").sort())
-        salida.push({ archivo: join(base, n), etiqueta: n, generado: false });
-    return salida;
 }
 
-const archivos = await archivosDe(dir);
+const { banco, archivos } = await archivosDeBanco(dir, { incluye });
+if (!banco) {
+    console.error(`No existe el directorio ${dir}.`);
+    process.exit(1);
+}
 if (!archivos.length) {
     console.error(`No hay archivos de preguntas en ${dir}.`);
     process.exit(1);
@@ -73,12 +51,13 @@ if (!archivos.length) {
 
 const filas = [];
 for (const f of archivos) {
-    const preguntas = await leer(f.archivo);
-    filas.push({ ...f, preguntas, ...analizarPreguntas(preguntas) });
+    const preguntas = await leer(f.ruta);
+    const etiqueta = f.bloque ? `${f.bloque}/${f.ruta.slice(join(dir, f.bloque).length + 1)}` : f.ruta;
+    filas.push({ etiqueta, generado: f.generado, ...analizarPreguntas(preguntas) });
 }
 
 const ancho = Math.max(20, ...filas.map((f) => f.etiqueta.length));
-console.log(`Sesgo de la opción más larga (${dir})\n`);
+console.log(`Sesgo de la opción más larga (${dir})${incluye.length ? ` · incluidas: ${incluye.join(", ")}` : ""}\n`);
 console.log(
     "archivo".padEnd(ancho) +
         "  n".padStart(5) +
@@ -118,29 +97,26 @@ resumen(
     "Importables",
     filas.filter((f) => !f.generado),
 );
-const generadas = filas.filter((f) => f.generado);
-if (generadas.length) resumen("Generadas (no se importan)", generadas);
-console.log("Nota: con 4 opciones al azar, la correcta sería la única más larga ~25 % de las veces.");
-
-if (lista) {
-    for (const f of filas) {
-        if (!f.sesgadas.length) continue;
-        console.log(`\n${f.etiqueta} (${f.sesgadas.length})`);
-        for (const s of f.sesgadas) {
-            console.log(`  #${s.indice + 1} [correcta ${"abcdefgh"[s.correcta]}] ${s.pregunta}`);
-            s.opciones.forEach((o, i) =>
-                console.log(`     ${i === s.correcta ? "*" : " "}${"abcdefgh"[i]}) ${o.length} · ${o}`),
-            );
-        }
-    }
-}
-
-const superan = filas.filter((f) => f.n >= 5 && pct(f.unicaLarga, f.n) > umbral);
-if (superan.length) {
-    console.warn(
-        `\n${superan.length} archivo(s) superan el umbral del ${umbral} %: ${superan.map((f) => f.etiqueta).join(", ")}`,
+if (filas.some((f) => f.generado))
+    resumen(
+        "Incluidos aparte",
+        filas.filter((f) => f.generado),
     );
-} else {
-    console.log(`\nNingún archivo supera el umbral del ${umbral} %.`);
+
+/* Solo se avisa con muestras suficientes: con pocas preguntas el porcentaje es ruido (Fase 2.7). */
+const sesgadas = filas.filter((f) => f.n >= minimo && pct(f.unicaLarga, f.n) > umbral);
+if (sesgadas.length) {
+    console.log(`\n${sesgadas.length} archivo(s) superan el ${umbral} % (con ${minimo} preguntas o más):`);
+    for (const f of sesgadas) console.log(`  ${f.etiqueta}: ${fmtPct(f.unicaLarga, f.n)} (${f.n} preguntas)`);
+    if (lista)
+        for (const f of filas.filter((x) => x.n >= minimo && pct(x.unicaLarga, x.n) > umbral))
+            for (const s of f.sesgadas)
+                console.log(
+                    `\n${f.etiqueta} #${s.indice + 1} · correcta ${"abcdefgh"[s.correcta]} · ${s.longitudCorrecta} caracteres\n  ${s.pregunta}\n` +
+                        s.opciones
+                            .map((o, k) => `  ${k === s.correcta ? ">" : " "} ${"abcdefgh"[k]}) ${o} (${o.length})`)
+                            .join("\n"),
+                );
 }
-if (fallar && superan.length) process.exit(1);
+
+if (fallar && sesgadas.length) process.exit(1);

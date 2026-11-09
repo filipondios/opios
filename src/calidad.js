@@ -1,8 +1,14 @@
 /* Análisis de calidad del banco: sesgo de longitud y posición de la respuesta correcta.
-   Es lógica pura (sin FS) para poder probarla; el recorrido de archivos vive en scripts/calidad.js. */
+   Es lógica pura (sin FS) para poder probarla; el recorrido de archivos vive en src/estructura-banco.js. */
 
 const LETRAS = "abcdefgh";
 const texto = (v) => String(v ?? "").trim();
+
+/**
+ * Muestra mínima para que un porcentaje de sesgo signifique algo (Fase 2.7): con 6 preguntas,
+ * 2 aciertos en «la única más larga» ya dan 33 %. Por debajo de este número el aviso es ruido.
+ */
+export const MINIMO_SESGO = 20;
 
 /**
  * Analiza una lista de preguntas en formato JSON (`respuestas`, `respuesta_correcta` o `correcta`).

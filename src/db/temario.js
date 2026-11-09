@@ -148,7 +148,7 @@ export function crearTemario({ db, q }) {
             const bloque = db.query("SELECT id, numero, gestionado FROM bloques WHERE id = ?").get(id);
             if (!bloque) return false;
             if (bloque.gestionado)
-                throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
+                throw new ErrorApi(409, "Este bloque se define en el info.json de su bloque y es de solo lectura.");
             const otro = db.query("SELECT id FROM bloques WHERE nombre = ? AND id <> ?").get(nombre, id);
             if (otro) throw new ErrorApi(409, `Ya existe el bloque «${nombre}».`);
             db.query("UPDATE bloques SET nombre = ? WHERE id = ?").run(nombre, id);
@@ -158,7 +158,7 @@ export function crearTemario({ db, q }) {
         borrarBloque(id) {
             const bloque = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(id);
             if (bloque?.gestionado)
-                throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
+                throw new ErrorApi(409, "Este bloque se define en el info.json de su bloque y es de solo lectura.");
             const n = db
                 .query(`SELECT COUNT(*) AS n FROM temas t JOIN bloques b ON b.id = t.bloque_id WHERE b.id = ?`)
                 .get(id).n;
@@ -191,7 +191,7 @@ export function crearTemario({ db, q }) {
             const b = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(bloque);
             if (!b) throw new ErrorApi(404, "El bloque no existe.");
             if (b.gestionado)
-                throw new ErrorApi(409, "Este bloque se define en preguntas/bloque_X/info.json y es de solo lectura.");
+                throw new ErrorApi(409, "Este bloque se define en el info.json de su bloque y es de solo lectura.");
             if (q.temaPorBloqueNumero.get(bloque, numero))
                 throw new ErrorApi(409, `Ya hay un tema ${numero} en ese bloque.`);
             const id = Number(q.insertarTema.run(bloque, numero, nombre || null).lastInsertRowid);
@@ -205,7 +205,7 @@ export function crearTemario({ db, q }) {
                 .get(id);
             if (!actual) return false;
             if (actual.gestionado)
-                throw new ErrorApi(409, "Este tema se define en preguntas/bloque_X/info.json y es de solo lectura.");
+                throw new ErrorApi(409, "Este tema se define en el info.json de su bloque y es de solo lectura.");
             const b = db.query("SELECT gestionado FROM bloques WHERE id = ?").get(bloque);
             if (!b) throw new ErrorApi(404, "El bloque no existe.");
             if (b.gestionado)
@@ -228,7 +228,7 @@ export function crearTemario({ db, q }) {
                 .query(`SELECT b.gestionado FROM temas t JOIN bloques b ON b.id = t.bloque_id WHERE t.id = ?`)
                 .get(id);
             if (t?.gestionado)
-                throw new ErrorApi(409, "Este tema se define en preguntas/bloque_X/info.json y es de solo lectura.");
+                throw new ErrorApi(409, "Este tema se define en el info.json de su bloque y es de solo lectura.");
             const n = db.query("SELECT COUNT(*) AS n FROM preguntas WHERE tema_id = ?").get(id).n;
             if (n) throw new ErrorApi(409, `No se puede borrar el tema: todavía tiene ${n} pregunta(s).`);
             return db.query("DELETE FROM temas WHERE id = ?").run(id).changes > 0;

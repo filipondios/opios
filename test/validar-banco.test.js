@@ -66,6 +66,35 @@ describe("validación de un banco (Fase 8.9)", () => {
         expect(r.errores.length).toBe(1);
     });
 
+    test("el aviso de sesgo exige una muestra mínima (Fase 2.7)", async () => {
+        const dir = temporal();
+        try {
+            const sesgada = (i) => ({
+                pregunta: `Pregunta ${i}`,
+                respuestas: ["Sí", "Una opción claramente más larga", "No", "Quizá"],
+                respuesta_correcta: "b",
+            });
+
+            /* 6 preguntas con el 50 % sesgadas: con una muestra tan pequeña no se avisa. */
+            await Bun.write(
+                join(dir, "bloque_1/tema_1.json"),
+                JSON.stringify(Array.from({ length: 6 }, (_, i) => sesgada(i))),
+            );
+            let r = await validarBanco(repo, dir);
+            expect(r.avisos.some((a) => a.includes("única más larga"))).toBe(false);
+
+            /* 30 preguntas con el 50 % sesgadas: ahora sí. */
+            await Bun.write(
+                join(dir, "bloque_1/tema_1.json"),
+                JSON.stringify(Array.from({ length: 30 }, (_, i) => sesgada(i))),
+            );
+            r = await validarBanco(repo, dir);
+            expect(r.avisos.some((a) => a.includes("única más larga"))).toBe(true);
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
     test("el comando `bun run validar` sale 0 con un banco válido y 1 con errores", () => {
         const bueno = Bun.spawnSync({
             cmd: ["bun", "scripts/validar.js", DIR_EJEMPLO],
