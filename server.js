@@ -1,6 +1,7 @@
 import { abrirDb } from "./src/db.js";
 import { crearApp } from "./src/app.js";
 import { importarDirectorio } from "./src/seed.js";
+import { DatabaseManager } from "./src/gestor-bancos.js";
 import {
     AUTH,
     DB_PATH,
@@ -11,13 +12,36 @@ import {
     OPIOS_SEED,
     debeImportar,
     MAX_CUERPO,
+    RUTA_CATALOGO,
 } from "./src/config.js";
 
 /* Registro con fecha en cada línea. */
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 const logErr = (...a) => console.error(new Date().toISOString(), ...a);
 
-const repo = abrirDb(DB_PATH);
+/* Modo biblioteca (task 6): con OPIOS_CATALOGO se abre el banco activo del catálogo.
+   Por defecto sigue el modo directo `OPIOS_DB` (legacy), igual que los scripts CLI. */
+let repo, gestor = null;
+try {
+    if (RUTA_CATALOGO) {
+        gestor = new DatabaseManager(RUTA_CATALOGO);
+        if (!gestor.idActivo()) {
+            logErr(
+                `El catálogo ${RUTA_CATALOGO} no tiene banco activo. ` +
+                    "Elige uno con: bun run bancos listar && bun run bancos activar <id>",
+            );
+            gestor.close();
+            process.exit(1);
+        }
+        repo = gestor.abrirActivo();
+        log(`Modo biblioteca: banco activo ${gestor.rutaActiva()} (catálogo: ${RUTA_CATALOGO})`);
+    } else {
+        repo = abrirDb(DB_PATH);
+    }
+} catch (e) {
+    logErr(`No se pudo abrir la base de datos: ${e.message}`);
+    process.exit(1);
+}
 
 /* Importación del banco al arrancar (Fase 8.2). El modo lo decide `OPIOS_SEED`. */
 const hayVariable = Boolean((process.env.OPIOS_PREGUNTAS ?? "").trim());
@@ -54,7 +78,7 @@ const servidor = Bun.serve({
 });
 if (!AUTH && HOST !== "127.0.0.1" && HOST !== "localhost")
     log("AVISO: la app es accesible desde fuera y no tiene contraseña (define AUTH_USER y AUTH_PASS).");
-log(`Test infinito en ${servidor.url}  (base de datos: ${DB_PATH})`);
+log(`Test infinito en ${servidor.url}  (base de datos: ${gestor ? gestor.rutaActiva() : DB_PATH})`);
 log(`Hosts aceptados: ${ALLOWED_HOSTS.join(", ")}`);
 
 /* Cierre ordenado: deja de aceptar conexiones y después cierra la base de datos. */
@@ -72,6 +96,13 @@ async function cerrar(senal) {
         repo.close();
     } catch (e) {
         logErr("Error al cerrar la base de datos:", e);
+    }
+    if (gestor) {
+        try {
+            gestor.close(); // cierra banco (de nuevo, si acaso) y catálogo
+        } catch (e) {
+            logErr("Error al cerrar el catálogo:", e);
+        }
     }
     log("Cerrado correctamente.");
     process.exit(0);

@@ -9,6 +9,65 @@ import { MIGRACIONES } from "../src/db/esquema.js";
 import { claveDe } from "../src/validar.js";
 
 describe("migraciones", () => {
+    test("un esquema futuro (user_version > MIGRACIONES.length) se rechaza con un error claro", () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-futuro-"));
+        const ruta = join(dir, "opios.db");
+        try {
+            const futura = new Database(ruta, { create: true, strict: true });
+            futura.run(MIGRACIONES[0]);
+            futura.run(`PRAGMA user_version = ${MIGRACIONES.length + 1}`);
+            futura.close();
+
+            /* Debe fallar al abrir, no aceptar el esquema silenciosamente. */
+            expect(() => abrirDb(ruta)).toThrow(/Esquema futuro/);
+
+            /* La base queda intacta y sigue abrillable por otra conexión. */
+            const deNuevo = new Database(ruta, { create: true, strict: true });
+            expect(deNuevo.query("PRAGMA user_version").get().user_version).toBe(MIGRACIONES.length + 1);
+            deNuevo.close();
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("si la migración falla, abrirDb lanza un error claro y no toca el esquema", () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-migrar-fallo-"));
+        const ruta = join(dir, "opios.db");
+        try {
+            /* v1 ya aplicada pero user_version a 0: reejecutar v1 choca con las tablas existentes. */
+            const rota = new Database(ruta, { create: true, strict: true });
+            rota.run(MIGRACIONES[0]);
+            rota.run("PRAGMA user_version = 0");
+            rota.close();
+
+            expect(() => abrirDb(ruta)).toThrow(/already exists/);
+
+            /* La base queda tal cual estaba: sin migrar a medias. */
+            const inspeccion = new Database(ruta, { create: true, strict: true });
+            expect(inspeccion.query("PRAGMA user_version").get().user_version).toBe(0);
+            expect(
+                inspeccion.query("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table'").get().n,
+            ).toBeGreaterThan(0);
+            inspeccion.close();
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("ante cualquier fallo al abrir (PRAGMA, migración, preparación), la conexión se cierra", () => {
+        let cerrada = false;
+        const rota = {
+            run: () => {
+                throw new Error("PRAGMA roto");
+            },
+            close: () => {
+                cerrada = true;
+            },
+        };
+        expect(() => abrirDb("/tmp/opios-test-rota.db", () => rota)).toThrow("PRAGMA roto");
+        expect(cerrada).toBe(true);
+    });
+
     test("una base v1 con datos llega a la última versión sin perder nada", () => {
         const dir = mkdtempSync(join(tmpdir(), "opios-migrar-"));
         const ruta = join(dir, "opios.db");

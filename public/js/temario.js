@@ -1,4 +1,5 @@
-import { api, h, msgError as msg } from "./comun.js";
+import * as cliente from "./cliente.js";
+import { h, msgError as msg } from "./comun.js";
 import { etiquetaTema } from "./etiquetas.js";
 
 /* Página del temario (cliente): gestiona bloques y temas contra /api/temario, /api/bloques y /api/temas. */
@@ -200,7 +201,7 @@ import { etiquetaTema } from "./etiquetas.js";
     /* ---------- Acciones ---------- */
     async function cargar() {
         try {
-            bloques = await api("/api/temario");
+            bloques = await cliente.temario();
             pintar();
             setStatus("ok", "Guardado en la base de datos");
         } catch (e) {
@@ -213,7 +214,7 @@ import { etiquetaTema } from "./etiquetas.js";
         if (j < 0 || j >= reales.length) return;
         [reales[i], reales[j]] = [reales[j], reales[i]];
         try {
-            await api("/api/bloques/reordenar", { metodo: "POST", cuerpo: { ids: reales.map((b) => b.id) } });
+            await cliente.bloquesReordenar(reales.map((b) => b.id));
         } catch (e) {
             nota(msg(e));
             setStatus("warn", msg(e));
@@ -221,12 +222,12 @@ import { etiquetaTema } from "./etiquetas.js";
         await cargar();
     }
     async function borrarBloque(b) {
-        await api("/api/bloques/" + b.id, { metodo: "DELETE" });
+        await cliente.bloqueBorrar(b.id);
         await cargar();
         nota("Bloque «" + b.nombre + "» borrado.");
     }
     async function borrarTema(t) {
-        await api("/api/temas/" + t.id, { metodo: "DELETE" });
+        await cliente.temaBorrar(t.id);
         await cargar();
         nota("Tema " + (t.numero ?? t.id) + " borrado.");
     }
@@ -320,8 +321,8 @@ import { etiquetaTema } from "./etiquetas.js";
             if (modo.tipo === "bloque") {
                 const nombre = $("#d-nombre").value.trim();
                 if (!nombre) throw new Error("Escribe el nombre del bloque.");
-                if (modo.id) await api("/api/bloques/" + modo.id, { metodo: "PUT", cuerpo: { nombre } });
-                else await api("/api/bloques", { metodo: "POST", cuerpo: { nombre } });
+                if (modo.id) await cliente.bloqueGuardar(nombre, modo.id);
+                else await cliente.bloqueGuardar(nombre);
             } else {
                 const bloque = Number($("#d-bloque").value);
                 const numero = Number($("#d-numero").value);
@@ -329,8 +330,8 @@ import { etiquetaTema } from "./etiquetas.js";
                 if (!Number.isInteger(bloque) || bloque <= 0) throw new Error("Elige un bloque.");
                 if (!Number.isInteger(numero) || numero < 0)
                     throw new Error("El número de tema debe ser un entero (0 o más).");
-                if (modo.id) await api("/api/temas/" + modo.id, { metodo: "PUT", cuerpo: { bloque, numero, nombre } });
-                else await api("/api/temas", { metodo: "POST", cuerpo: { bloque, numero, nombre } });
+                if (modo.id) await cliente.temaGuardar({ bloque, numero, nombre }, modo.id);
+                else await cliente.temaGuardar({ bloque, numero, nombre });
             }
             $("#dlg").close();
             await cargar();

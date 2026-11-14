@@ -48,6 +48,9 @@ export const AUTH =
         ? { usuario: process.env.AUTH_USER, clave: process.env.AUTH_PASS }
         : null;
 export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
+/* Modo biblioteca (task 6): con `OPIOS_CATALOGO` la app abre el banco activo del catálogo
+   (DatabaseManager) en lugar del modo directo `OPIOS_DB`. Vacío = modo directo (legacy). */
+export const RUTA_CATALOGO = (process.env.OPIOS_CATALOGO ?? "").trim();
 // Zona horaria para calcular «hoy» en el servidor (p. ej. Europe/Madrid). Vacío = zona del sistema.
 export const APP_TZ = process.env.APP_TZ ?? null;
 

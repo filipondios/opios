@@ -1,4 +1,5 @@
 /* Esquema, migraciones y utilidades comunes de SQLite. */
+import { Database } from "bun:sqlite";
 import { claveDe } from "../validar.js";
 
 export const MIGRACIONES = [
@@ -223,7 +224,11 @@ export function tieneFts5(db) {
 /** Aplica las migraciones pendientes y actualiza `user_version`. */
 export function migrar(db) {
     const actual = db.query("PRAGMA user_version").get().user_version;
-    if (actual >= MIGRACIONES.length) return;
+    if (actual === MIGRACIONES.length) return;
+    if (actual > MIGRACIONES.length)
+        throw new Error(
+            `Esquema futuro no compatible: la base está en v${actual} y esta versión de Opios solo conoce hasta v${MIGRACIONES.length}. Actualiza Opios o usa otra base de datos.`,
+        );
     /* Las reconstrucciones de tablas (v6) necesitan desactivar las FK fuera de la transacción. */
     db.run("PRAGMA foreign_keys = OFF");
     try {
@@ -242,4 +247,34 @@ export function migrar(db) {
 }
 
 const marcas = (n) => Array(n).fill("?").join(",");
+
+/** Comprueba que un archivo SQLite es un banco Opios usable: íntegro, con esquema conocido
+    (no futuro) y sus tablas. Devuelve { user_version, preguntas }; lanza con error claro si no. */
+export function validarBancoSqlite(ruta) {
+    let db;
+    try {
+        db = new Database(ruta, { readonly: true, strict: true });
+        const integridad = db.query("PRAGMA integrity_check").get()?.integrity_check;
+        if (integridad !== "ok") throw new Error(`La SQLite está dañada (${ruta}): ${integridad ?? "sin respuesta"}`);
+        const user_version = db.query("PRAGMA user_version").get().user_version;
+        if (user_version > MIGRACIONES.length)
+            throw new Error(
+                `Esquema futuro no compatible: v${user_version} y esta versión solo conoce hasta v${MIGRACIONES.length}.`,
+            );
+        const tablas = new Set(
+            db.query("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name),
+        );
+        for (const tabla of ["preguntas", "opciones", "progreso", "temas"])
+            if (!tablas.has(tabla)) throw new Error(`No es un banco Opios: falta la tabla «${tabla}».`);
+        const preguntas = db.query("SELECT COUNT(*) AS n FROM preguntas").get().n;
+        return { user_version, preguntas };
+    } catch (e) {
+        /* Mis errores ya son claros; los que vienen de SQLite se contextualizan. */
+        if (/Esquema futuro|No es un banco Opios|está dañada/.test(e.message)) throw e;
+        throw new Error(`No se pudo leer como banco Opios (${ruta}): ${e.message}`);
+    } finally {
+        db?.close();
+    }
+}
+
 export { marcas };

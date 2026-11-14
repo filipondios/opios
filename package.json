@@ -10,6 +10,8 @@
         "seed": "bun scripts/seed.js",
         "export": "bun scripts/export.js",
         "backup": "bun scripts/backup.js",
+        "bancos": "bun scripts/bancos.js",
+        "opios": "bun scripts/opios.js",
         "calidad": "bun scripts/calidad.js",
         "validar": "bun scripts/validar.js",
         "ids": "bun scripts/ids.js",
