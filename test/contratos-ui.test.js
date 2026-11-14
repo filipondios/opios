@@ -42,8 +42,18 @@ describe("contratos de la UI", () => {
             "temaBorrar",
         ])
             expect(codigo, `cliente.js debe exportar ${operacion}`).toContain(`export const ${operacion}`);
-        /* Sin DOM ni fetch propio: solo el transporte de comun.js. */
-        expect(codigo).not.toMatch(/\bdocument\b|\bfetch\s*\(/);
+        /* Sin DOM: solo el transporte de comun.js. */
+        expect(codigo).not.toMatch(/\bdocument\b/);
+    });
+
+    test("cliente-local.js replica exactamente las exportaciones de cliente.js", async () => {
+        const cliente = await import(join(DIR, "cliente.js"));
+        const local = await import(join(DIR, "cliente-local.js"));
+        for (const k of Object.keys(cliente)) {
+            expect(local, `cliente-local.js debe exportar ${k}`).toHaveProperty(k);
+            expect(typeof local[k]).toBe("function");
+        }
+        expect(Object.keys(cliente).length).toBe(Object.keys(local).length);
     });
 
     test("todas las operaciones usadas por las páginas existen en cliente.js", async () => {

@@ -5,7 +5,7 @@
    bun run bancos copiar <nombre> <ruta-origen.db>
    bun run bancos actualizar <directorio-json>
    Gestiona el catálogo del modo biblioteca. Requiere OPIOS_CATALOGO. */
-import { RUTA_CATALOGO } from "../src/config.js";
+import { RUTA_CATALOGO } from "../src/config-servidor.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
 import { ejecutarCli } from "../src/cli.js";
 

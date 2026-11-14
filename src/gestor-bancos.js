@@ -7,8 +7,8 @@
 import { Database } from "bun:sqlite";
 import { copyFileSync, existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { abrirDb } from "./db/index.js";
-import { validarBancoSqlite } from "./db/esquema.js";
+import { abrirDb } from "./db/bun.js";
+import { validarBancoSqlite } from "./db/validar-sqlite.js";
 import { importarDirectorio } from "./seed.js";
 
 const ESQUEMA = `

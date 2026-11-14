@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { DIR_EJEMPLO, DIR_PREGUNTAS_POR_DEFECTO, debeImportar, resolverDirPreguntas } from "../src/config.js";
+import { DIR_EJEMPLO, DIR_PREGUNTAS_POR_DEFECTO, debeImportar, resolverDirPreguntas } from "../src/config-servidor.js";
 
 describe("directorio del banco (Fase 8.1)", () => {
     test("OPIOS_PREGUNTAS manda cuando la carpeta existe", () => {

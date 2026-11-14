@@ -2,7 +2,7 @@
    bun run opios importar <origen.opios> [destino.db]
    Exporta o restaura un banco portable .opios (manifest + SQLite). */
 import { join } from "node:path";
-import { RUTA_CATALOGO } from "../src/config.js";
+import { RUTA_CATALOGO } from "../src/config-servidor.js";
 import { exportarBanco, importarBancoOpios } from "../src/portable.js";
 import { ejecutarCli } from "../src/cli.js";
 

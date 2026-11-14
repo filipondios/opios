@@ -3,7 +3,7 @@
    núcleo que puede tocar APIs de Bun; la capa Capacitor (Android) lo sustituirá. */
 import { join, normalize, sep } from "node:path";
 import { timingSafeEqual } from "node:crypto";
-import { ALLOWED_HOSTS, PUBLIC_DIR } from "./config.js";
+import { ALLOWED_HOSTS, PUBLIC_DIR } from "./config-servidor.js";
 import { ErrorApi } from "./errores.js";
 import { aTexto } from "./views/html.js";
 import { paginaNoEncontrada } from "./views/error.js";

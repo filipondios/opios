@@ -18,5 +18,8 @@ data/*.db-wal
 opios-bank/
 preguntas/
 
+# Web empaquetada para Capacitor (task 11)
+dist-web/
+
 # Notas locales de trabajo
 TODO.md

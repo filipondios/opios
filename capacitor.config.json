@@ -1,0 +1,8 @@
+{
+    "appId": "es.opios.app",
+    "appName": "Opios",
+    "webDir": "dist-web",
+    "android": {
+        "allowMixedContent": false
+    }
+}

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { validarBanco } from "../src/validar-banco.js";
-import { DIR_EJEMPLO } from "../src/config.js";
+import { DIR_EJEMPLO } from "../src/config-servidor.js";
 
 const RAIZ = join(import.meta.dir, "..");
 const temporal = () => mkdtempSync(join(tmpdir(), "opios-validar-"));

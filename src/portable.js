@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { dirname } from "node:path";
 import { Database } from "bun:sqlite";
 import { copiaSeguridad } from "./backup.js";
-import { validarBancoSqlite } from "./db/esquema.js";
+import { validarBancoSqlite } from "./db/validar-sqlite.js";
 
 /** Borrar una SQLite junto a sus sidecars WAL/SHM (si quedaran huérfanos). */
 function borrarBanco(ruta) {
