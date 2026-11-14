@@ -17,7 +17,9 @@ export async function arrancar() {
         /* primera ejecución: banco nuevo vacío */
     }
 
-    /* Los cambios se guardan en cadena: nunca dos writeFile a la vez sobre el mismo archivo. */
+    /* Los cambios se guardan en cadena: nunca dos writeFile a la vez sobre el mismo archivo.
+       shortcut: se reescribe el banco entero en cada escritura (simple y sin corrupción a
+       medias); pasar a escrituras incrementales/WAL si el banco crece o si se nota el coste. */
     let cadena = Promise.resolve();
     const db = await abrirAdaptadorSqlite({
         bytes,
