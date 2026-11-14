@@ -20,19 +20,15 @@ describe("adaptador sqlite wasm", () => {
     });
 
     test("run() devuelve { changes, lastInsertRowid } como Bun y ejecuta SQL múltiple", async () => {
-        const repo = abrirRepo(await abrir());
-        await importarDirectorio(repo, "./test/fixtures");
-        const temaId = repo.crearBloque({ nombre: "Bloque prueba" }).id;
-        expect(temaId).toBeGreaterThan(1); // lastInsertRowid del INSERT
+        const db = await abrir();
         /* SQL múltiple sin params (como las migraciones): no lanza y ejecuta todo. */
-        const db2 = await abrir();
-        db2.run("PRAGMA foreign_keys = OFF; CREATE TABLE t_prueba (x); PRAGMA foreign_keys = ON;");
-        expect(db2.query("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 't_prueba'").get().n).toBe(1);
-        /* UPDATE no inventa lastInsertRowid */
-        const u = db2.query("UPDATE t_prueba SET x = 1").run();
-        expect(u.changes).toBe(0);
-        expect(u.lastInsertRowid).toBeUndefined();
-        db2.close();
+        db.run("PRAGMA foreign_keys = OFF; CREATE TABLE t_prueba (x); PRAGMA foreign_keys = ON;");
+        expect(db.query("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 't_prueba'").get().n).toBe(1);
+        /* Igual que Bun: siempre { changes, lastInsertRowid }, con el rowid del último INSERT. */
+        expect(db.query("INSERT INTO t_prueba (x) VALUES (1)").run()).toEqual({ changes: 1, lastInsertRowid: 1 });
+        expect(db.query("UPDATE t_prueba SET x = 2 WHERE x = 99").run()).toEqual({ changes: 0, lastInsertRowid: 1 });
+        expect(db.query("SELECT * FROM t_prueba WHERE x = 99").get()).toBeNull(); // Bun: null, no undefined
+        db.close();
     });
 
     test("la persistencia es explícita: exportar() y reabrir con esos bytes", async () => {

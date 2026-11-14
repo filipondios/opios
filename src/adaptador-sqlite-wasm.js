@@ -40,7 +40,7 @@ export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {},
                 const s = db.prepare(sql);
                 try {
                     if (params.length) s.bind(params);
-                    return s.step() ? s.getAsObject() : undefined;
+                    return s.step() ? s.getAsObject() : null; // Bun devuelve null, no undefined
                 } finally {
                     s.free();
                 }
@@ -65,12 +65,11 @@ export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {},
                     s.free();
                 }
                 const changes = db.getRowsModified();
-                const resultado = { changes };
-                /* Solo los INSERT aportan rowid nuevo: en UPDATE sería el de otro INSERT anterior. */
-                if (changes > 0 && /^\s*INSERT/i.test(sql))
-                    resultado.lastInsertRowid = db.exec("SELECT last_insert_rowid()")[0].values[0][0];
+                /* Igual que Bun: el rowid del último INSERT de la conexión, aunque esta
+                   sentencia no fuera un INSERT. */
+                const lastInsertRowid = db.exec("SELECT last_insert_rowid()")[0]?.values[0][0] ?? 0;
                 avisar();
-                return resultado;
+                return { changes, lastInsertRowid };
             },
         };
     }
