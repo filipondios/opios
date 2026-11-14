@@ -9,9 +9,10 @@ import {
     HOST,
     PORT,
     ALLOWED_HOSTS,
+    OPIOS_SEED,
     RUTA_CATALOGO,
 } from "./src/config-servidor.js";
-import { MAX_CUERPO, debeImportar, OPIOS_SEED } from "./src/config.js";
+import { MAX_CUERPO, debeImportar } from "./src/config.js";
 
 /* Registro con fecha en cada línea. */
 const log = (...a) => console.log(new Date().toISOString(), ...a);

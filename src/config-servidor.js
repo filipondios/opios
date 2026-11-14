@@ -55,19 +55,8 @@ export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
 export const RUTA_CATALOGO = (process.env.OPIOS_CATALOGO ?? "").trim();
 
 /* Modo de importación al arrancar (Fase 8.2): `vacia` (solo si la BD no tiene preguntas),
-   `auto` (en cada arranque, con --actualizar) o `no` (nunca). */
+   `auto` (en cada arranque, con --actualizar) o `no` (nunca). La decisión pura (debeImportar)
+   vive en `src/config.js`, que también usa el núcleo local. */
 export const OPIOS_SEED = String(process.env.OPIOS_SEED ?? "vacia")
     .trim()
     .toLowerCase();
-
-/**
- * Decide si hay que importar el banco al arrancar. Función pura.
- * Con `auto` y sin `OPIOS_PREGUNTAS`, solo importa si la BD está vacía: evita meter el banco de
- * ejemplo en una BD real por haber olvidado la variable.
- */
-export function debeImportar(modo, bdVacia, hayVariable) {
-    if (modo === "no") return false;
-    if (modo === "vacia") return bdVacia;
-    if (modo === "auto") return hayVariable || bdVacia;
-    throw new Error(`OPIOS_SEED no válido: «${modo}» (valores admitidos: vacia, auto, no).`);
-}

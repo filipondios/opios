@@ -23,16 +23,14 @@ export const FACTOR_EXAMEN = 0.15; // tope de intervalo = FACTOR_EXAMEN × días
 /* Zona horaria para calcular «hoy» en el servidor (p. ej. Europe/Madrid). Vacío = zona del sistema. */
 export const APP_TZ = process.env.APP_TZ ?? null;
 
-/** Decide si hay que importar el banco al arrancar. Función pura:
-    Con `vacia` y BD vacía se importa; con `auto` se importa siempre que haya `OPIOS_PREGUNTAS` o BD vacía;
-    con `no` nunca. Cualquier otro valor lanza error. */
+/**
+ * Decide si hay que importar el banco al arrancar. Función pura.
+ * Con `auto` y sin `OPIOS_PREGUNTAS`, solo importa si la BD está vacía: evita meter el banco de
+ * ejemplo en una BD real por haber olvidado la variable.
+ */
 export function debeImportar(modo, bdVacia, hayVariable) {
     if (modo === "no") return false;
     if (modo === "vacia") return bdVacia;
     if (modo === "auto") return hayVariable || bdVacia;
     throw new Error(`OPIOS_SEED no válido: «${modo}» (valores admitidos: vacia, auto, no).`);
 }
-
-/** Modo de importación al arrancar: `vacia` (solo si la BD no tiene preguntas),
-    `auto` (en cada arranque, con --actualizar) o `no` (nunca). */
-export const OPIOS_SEED = process.env.OPIOS_SEED ?? "vacia";
