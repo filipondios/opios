@@ -1,5 +1,5 @@
 import { Sesion, hoyIso } from "./repaso.js";
-import { barajar, h, LETRAS, msgError } from "./comun.js";
+import { barajar, claveBanco, h, LETRAS, msgError } from "./comun.js";
 import * as cliente from "./cliente.js";
 import { etiquetaTema } from "./etiquetas.js";
 
@@ -33,6 +33,8 @@ import { etiquetaTema } from "./etiquetas.js";
     let unaPulsacion = false; // responder al primer toque (móvil)
     let selAntesPuntero = null; // opción marcada antes del puntero, para distinguir el primer toque
     const CLAVE_UN_TOQUE = "ti.una-pulsacion";
+    /* La selección de temas es del banco; el ajuste de un-toque es visual y global (F1.5). */
+    const CLAVE_SEL = claveBanco("ti.sel");
 
     function setStatus(kind, text) {
         const s = $("#status");
@@ -168,12 +170,12 @@ import { etiquetaTema } from "./etiquetas.js";
     const chips = () => [...document.querySelectorAll("#grid .chip")];
     function guardarSeleccion() {
         try {
-            localStorage.setItem("ti.sel", JSON.stringify([...seleccion]));
+            localStorage.setItem(CLAVE_SEL, JSON.stringify([...seleccion]));
         } catch (e) {}
     }
     function leerSeleccion() {
         try {
-            const v = JSON.parse(localStorage.getItem("ti.sel"));
+            const v = JSON.parse(localStorage.getItem(CLAVE_SEL));
             return Array.isArray(v) ? v : null;
         } catch (e) {
             return null;

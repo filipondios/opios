@@ -15,8 +15,10 @@ const RAIZ = join(import.meta.dir, "..");
 const files = [
     "src/local.js",
     "src/adaptador-sqlite-wasm.js",
+    "src/banco-id.js",
     "public/js/cliente-local.js",
     "src/android/puente.js",
+    "src/android/persistencia.js",
     "src/android/shell.js",
     "src/android/pagina.js",
 ];
@@ -55,8 +57,8 @@ async function empaquetar(nombre, opciones = {}) {
 }
 
 const bundle = await empaquetar("opios.js");
-const bundleVm = (await empaquetar("opios-vm.js", { external: ["@capacitor/filesystem"] })).replace(
-    /import\s*\{[^}]*\}\s*from\s*["']@capacitor\/filesystem["'];?/,
+const bundleVm = (await empaquetar("opios-vm.js", { external: ["@capacitor/filesystem", "@capacitor/app"] })).replace(
+    /import\s*\{[^}]*\}\s*from\s*["']@capacitor\/(?:filesystem|app)["'];?/g,
     "",
 );
 
@@ -97,17 +99,26 @@ describe("bundle del WebView (F1.2)", () => {
             TextEncoder,
             btoa,
             atob,
+            setTimeout,
+            clearTimeout,
             fetch: async () => ({ ok: true, arrayBuffer: async () => wasm }), // sirve sql-wasm.wasm
+            App: { addListener: async () => ({ remove() {} }) },
             Filesystem: {
                 readFile: async () => {
                     throw new Error("no hay banco guardado"); // primer arranque
                 },
+                stat: async () => {
+                    throw new Error("no hay banco guardado");
+                },
                 writeFile: async ({ data }) => guardados.push(data),
+                rename: async () => {},
+                deleteFile: async () => {},
             },
             Directory: { Data: "DATA" },
         });
 
         await vm.runInContext(`(async () => {\n${bundleVm}\n})()`, contexto, { timeout: 30_000 });
+        await new Promise((r) => setTimeout(r, 600)); // deja vencer el debounce del guardado (F1.4)
 
         expect(vm.runInContext("typeof globalThis.__opios", contexto)).toBe("function");
         expect(escritos.some((html) => /<title>Opios/i.test(html))).toBe(true); // portada pintada

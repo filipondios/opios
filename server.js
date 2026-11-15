@@ -1,5 +1,6 @@
 import { abrirDb } from "./src/db.js";
 import { crearApp } from "./src/app.js";
+import { idBanco } from "./src/banco-id.js";
 import { importarDirectorio } from "./src/seed.js";
 import { DatabaseManager } from "./src/gestor-bancos.js";
 import {
@@ -75,7 +76,7 @@ const servidor = Bun.serve({
     port: PORT,
     /* El cuerpo máximo se corta antes de leerlo entero (Fase 2.9). */
     maxRequestBodySize: MAX_CUERPO,
-    fetch: crearApp(repo, { auth: AUTH, zona: APP_TZ }),
+    fetch: crearApp(repo, { auth: AUTH, zona: APP_TZ, banco: idBanco(repo) }),
 });
 if (!AUTH && HOST !== "127.0.0.1" && HOST !== "localhost")
     log("AVISO: la app es accesible desde fuera y no tiene contraseña (define AUTH_USER y AUTH_PASS).");

@@ -8,6 +8,11 @@ export const MAX_OPC = 8;
 
 export const msgError = (e) => (e && e.message ? e.message : String(e));
 
+/** Clave de localStorage dependiente del banco activo (F1.5): `opios.<idBanco>.<nombre>`.
+    El id lo inyecta el servidor/puente en `globalThis.__opiosBancoId`; sin él queda `opios.<nombre>`. */
+export const claveBanco = (nombre) =>
+    globalThis.__opiosBancoId ? `opios.${globalThis.__opiosBancoId}.${nombre}` : `opios.${nombre}`;
+
 /** Error HTTP con el status y el cuerpo que devolvió el servidor. */
 export class ErrorHttp extends Error {
     constructor(status, datos = {}) {

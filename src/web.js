@@ -8,16 +8,21 @@ import { paginaEstadisticas } from "./views/estadisticas.js";
 import { paginaSimulacro } from "./views/simulacro.js";
 import { paginaNoEncontrada } from "./views/error.js";
 
-const pagina = (r, status = 200) =>
-    new Response(aTexto(r), {
-        status,
-        headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
-    });
-
 /** Páginas SSR (GET/HEAD, sin /api/). Devuelve null si la ruta no es una página: el adaptador
-    HTTP prueba entonces con los archivos estáticos. */
-export function crearWeb(repo, servicios) {
+    HTTP prueba entonces con los archivos estáticos. `banco` (F1.5) es el id del banco activo:
+    viaja al cliente para prefijar las claves de localStorage dependientes del banco. */
+export function crearWeb(repo, servicios, { banco = null } = {}) {
     const { fechaHoy, estadisticas, infoExamen } = servicios;
+
+    const pagina = (r, status = 200) => {
+        const html = aTexto(r);
+        return new Response(
+            banco
+                ? html.replace("<head>", `<head><script>globalThis.__opiosBancoId=${JSON.stringify(banco)}</script>`)
+                : html,
+            { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
+        );
+    };
 
     return async function web(ruta) {
         if (ruta === "/")

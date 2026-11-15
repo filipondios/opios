@@ -23,6 +23,20 @@ export function deBase64(texto) {
     return bytes;
 }
 
+/** ¿Son `bytes` un SQLite íntegro? (`PRAGMA integrity_check`, F1.4). */
+export async function integroSqlite(bytes, rutaWasm = "sql-wasm.wasm") {
+    try {
+        const SQL = await sqlJs(rutaWasm);
+        const db = new SQL.Database(bytes);
+        const r = db.exec("PRAGMA integrity_check");
+        const ok = r[0]?.values?.[0]?.[0] === "ok";
+        db.close();
+        return ok;
+    } catch {
+        return false;
+    }
+}
+
 /** Abre (o crea) la base de datos. `bytes` restaura un banco guardado; `onCambios(shim)`
     se avisa tras cada escritura para persistir con `exportar()`. */
 export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {}, rutaWasm = "sql-wasm.wasm" } = {}) {

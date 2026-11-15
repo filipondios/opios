@@ -63,4 +63,28 @@ describe("contratos de la UI", () => {
                 expect(typeof cliente[m[1]], `${archivo} usa cliente.${m[1]}, que no existe`).toBe("function");
         }
     });
+
+    /* F1.5: claves de localStorage por banco; los ajustes visuales (tema, un-toque) son globales. */
+    test("claveBanco prefija con el banco activo y sin él deja la clave histórica", async () => {
+        const { claveBanco } = await import(join(DIR, "comun.js"));
+        delete globalThis.__opiosBancoId;
+        expect(claveBanco("ti.sel")).toBe("opios.ti.sel");
+        globalThis.__opiosBancoId = "banco-1";
+        expect(claveBanco("ti.sel")).toBe("opios.banco-1.ti.sel");
+        delete globalThis.__opiosBancoId;
+    });
+
+    test("las páginas usan claveBanco para lo del banco y literales globales para lo visual", () => {
+        const test = readFileSync(join(DIR, "test.js"), "utf8");
+        expect(test).toContain('claveBanco("ti.sel")');
+        expect(test).not.toMatch(/localStorage\.\w+\("ti\.sel"/); // sin clave de banco suelta
+        expect(test).toContain('"ti.una-pulsacion"'); // ajuste visual: global
+
+        const simulacro = readFileSync(join(DIR, "simulacro.js"), "utf8");
+        expect(simulacro).toContain('claveBanco("simulacro.curso")');
+        expect(simulacro).toContain('claveBanco("simulacro.pendiente")');
+
+        const tema = readFileSync(join(DIR, "tema.js"), "utf8");
+        expect(tema).toContain('"opios.tema"'); // ajuste visual: global
+    });
 });

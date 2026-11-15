@@ -1,5 +1,5 @@
 import * as cliente from "./cliente.js";
-import { h, LETRAS, msgError } from "./comun.js";
+import { claveBanco, h, LETRAS, msgError } from "./comun.js";
 import { calcularResultado } from "./resultado.js";
 import { estadoReloj, mmss, prepararPreguntas, respuestasParaGuardar, temasDebiles } from "./simulacro-logica.js";
 import { etiquetaTema } from "./etiquetas.js";
@@ -33,8 +33,8 @@ import { etiquetaTema } from "./etiquetas.js";
         finalizado = false;
 
     /* ---------- Persistencia (localStorage) ---------- */
-    const CLAVE_CURSO = "opios.simulacro.curso";
-    const CLAVE_PENDIENTE = "opios.simulacro.pendiente";
+    const CLAVE_CURSO = claveBanco("simulacro.curso");
+    const CLAVE_PENDIENTE = claveBanco("simulacro.pendiente");
     const leer = (clave) => {
         try {
             return JSON.parse(localStorage.getItem(clave) || "null");

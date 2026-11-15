@@ -9,10 +9,10 @@ import { ErrorApi } from "./errores.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status });
 
-export function crearAppLocal(repo, { zona = null } = {}) {
+export function crearAppLocal(repo, { zona = null, banco = null } = {}) {
     const servicios = crearServicios(repo, { zona });
     const api = crearApi(repo, servicios);
-    const web = crearWeb(repo, servicios);
+    const web = crearWeb(repo, servicios, { banco });
 
     return async function manejar(req) {
         const url = new URL(req.url);

@@ -88,4 +88,15 @@ describe("app local (task 11)", () => {
             }
         }
     });
+
+    test("el id del banco activo viaja en el HTML para las claves de localStorage (F1.5)", async () => {
+        const repo = abrirRepo(await abrirAdaptadorSqlite({ rutaWasm: "node_modules/sql.js/dist/sql-wasm.wasm" }));
+        try {
+            const app = crearAppLocal(repo, { banco: "banco-1" });
+            const html = await (await app(new Request("http://opios.local/"))).text();
+            expect(html).toContain('globalThis.__opiosBancoId="banco-1"');
+        } finally {
+            repo.close();
+        }
+    });
 });

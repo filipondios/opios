@@ -789,8 +789,8 @@ describe("estadísticas y simulacros", () => {
         expect(html).toContain('id="btn-reanudar"');
         expect(html).toContain('id="btn-descartar"');
         const js = await (await pet("/js/simulacro.js")).text();
-        expect(js).toContain("opios.simulacro.curso");
-        expect(js).toContain("opios.simulacro.pendiente");
+        expect(js).toContain('claveBanco("simulacro.curso")');
+        expect(js).toContain('claveBanco("simulacro.pendiente")');
         expect(js).toContain("crypto?.randomUUID");
         expect(js).toContain("clave_idempotencia");
     });
