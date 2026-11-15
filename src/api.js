@@ -207,7 +207,10 @@ export function crearApi(
                     "La biblioteca no está disponible: la app está en modo directo (OPIOS_DB). Arranca con OPIOS_CATALOGO.",
                 );
             try {
-                return await bancos(req, m, ruta, url);
+                const r = await bancos(req, m, ruta, url);
+                /* Catálogo vivo también en Android (F4.4): sql.js solo escribe al volcar. */
+                if (m !== "GET") await gestor.persistir();
+                return r;
             } catch (e) {
                 if (e instanceof ErrorApi) throw e;
                 throw new ErrorApi(400, msgErrorDe(e));

@@ -4,6 +4,8 @@
    - `instantanea(conexion)` -> Uint8Array con una copia consistente y compacta.
    - `userVersion(conexion)` -> versión del esquema.
    - `integridad(conexion)` -> `PRAGMA integrity_check` ("ok" si está bien).
+   - `soloMemoria` (booleano): true si la conexión no escribe en el almacén (sql.js); el
+     gestor vuelca el catálogo y el banco. Bun escribe en el archivo y es false.
    Implementaciones: `driver-bun.js` (bun:sqlite), `driver-wasm.js` (sql.js). */
 
 export const METODOS_DRIVER = ["abrir", "instantanea", "userVersion", "integridad"];

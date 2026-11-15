@@ -43,9 +43,7 @@ describe("detectarArchivo", () => {
         await expect(
             detectarArchivo(await comprimir(new TextEncoder().encode("esto no es un contenedor"))),
         ).rejects.toThrow(/cabecera/);
-        await expect(detectarArchivo(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4]))).resolves.toMatchObject({
-            tipo: "zip",
-        });
+        await expect(detectarArchivo(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4]))).rejects.toThrow(/zip/);
 
         const dir = mkdtempSync(join(tmpdir(), "opios-detect-"));
         try {

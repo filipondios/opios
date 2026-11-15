@@ -4,13 +4,16 @@
 import { ErrorHttp } from "./comun.js";
 
 async function llamada(ruta, { metodo = "GET", cuerpo, bruto = false } = {}) {
-    const r = await globalThis.__opios(
-        new Request("http://opios.local" + ruta, {
-            method: metodo,
-            headers: cuerpo !== undefined ? { "Content-Type": "application/json" } : undefined,
-            body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
-        }),
-    );
+    const opciones = { method: metodo };
+    if (cuerpo instanceof Uint8Array) {
+        /* Archivo del asistente de importación (F3.4): bytes crudos, no JSON. */
+        opciones.headers = { "Content-Type": "application/octet-stream" };
+        opciones.body = cuerpo;
+    } else if (cuerpo !== undefined) {
+        opciones.headers = { "Content-Type": "application/json" };
+        opciones.body = JSON.stringify(cuerpo);
+    }
+    const r = await globalThis.__opios(new Request("http://opios.local" + ruta, opciones));
     if (bruto) return r;
     if (r.status === 204) return null;
     let datos = {};

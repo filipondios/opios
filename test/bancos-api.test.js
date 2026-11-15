@@ -101,12 +101,6 @@ describe("asistente de importación en el gestor (F3.4–F3.6)", () => {
             const r2 = await gestor.importarBytes(conProgreso, { modo: "actualizar", id: b1.id });
             expect(r2.actualizadas).toBe(2);
             expect((await gestor.abrirActivo()).contarPreguntas()).toBe(2); // el activo sigue abierto
-
-            /* zip: detectado pero aún sin importación (llega con F4). */
-            expect(await gestor.inspeccionar(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4]))).toMatchObject({
-                tipo: "zip",
-                soportado: false,
-            });
         } finally {
             await gestor.close();
             rmSync(dir, { recursive: true, force: true });

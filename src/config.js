@@ -18,6 +18,10 @@ export const MAX_CUERPO = 2_000_000;
    medido en 1.4); 64 MB deja margen sin invitar subidas abusivas. Los endpoints JSON siguen
    limitados por MAX_CUERPO; el de archivos por este. */
 export const MAX_SUBIDA = 64_000_000;
+/* Aviso de banco grande en Android (F4.6): con sql.js la BD entera vive en RAM, así que un
+   archivo grande puede agotar memoria en un móvil modesto. Solo avisa; el límite duro es
+   MAX_SUBIDA. */
+export const AVISO_BANCO_GRANDE = 24_000_000;
 
 /* Límites diarios (Fase 3). El cupo lo calcula el servidor a partir de `respuestas`. */
 export const CUPO_NUEVAS = 15; // preguntas nuevas que se introducen como máximo cada día

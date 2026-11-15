@@ -24,4 +24,6 @@ export const driverBun = {
     },
     userVersion,
     integridad,
+    /* bun:sqlite escribe en el archivo al momento: no hace falta volcar el catálogo. */
+    soloMemoria: false,
 };

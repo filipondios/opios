@@ -54,8 +54,31 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
     /* --- Asistente de importación (F3.4–F3.6): elegir archivo → previsualizar → confirmar.
        El servidor detecta el tipo, valida y avisa de duplicados; aquí se muestra y se
        pregunta. Con duplicado: actualizar (conserva progreso), importar como nuevo o cancelar. */
+
+    /* En Android el archivo se elige con el plugin nativo (F4.3/F4.4): copia el documento a
+       la caché privada y aquí se lee en bytes y se borra el temporal. */
+    const nativo = () => globalThis.Capacitor?.isNativePlatform?.() === true;
+    async function leerConSelectorNativo() {
+        const { SelectorDocumentos, Filesystem } = globalThis.Capacitor.Plugins;
+        const elegido = await SelectorDocumentos.abrir();
+        if (elegido.cancelado) return null; // el usuario cerró el selector sin elegir
+        try {
+            const { data } = await Filesystem.readFile({ path: elegido.ruta, directory: "CACHE" });
+            const binario = atob(data);
+            return { bytes: Uint8Array.from(binario, (c) => c.charCodeAt(0)), nombre: elegido.nombre };
+        } finally {
+            Filesystem.deleteFile({ path: elegido.ruta, directory: "CACHE" }).catch(() => {});
+        }
+    }
+
     let selector = null;
     function importarDesdeArchivo() {
+        if (nativo()) {
+            leerConSelectorNativo()
+                .then((elegido) => elegido && asistente(elegido.bytes, elegido.nombre))
+                .catch((e) => setStatus("warn", msgError(e)));
+            return;
+        }
         if (!selector) {
             selector = h("input", { type: "file", accept: ".opios,.db,.sqlite,.sqlite3,.json,.zip" });
             selector.addEventListener("change", async () => {
@@ -278,7 +301,8 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                 },
                 "Estudiar",
             ),
-            h("button", { class: "btn small", type: "button", onclick: alActualizar }, "Actualizar"),
+            /* Actualizar reimporta desde un directorio JSON del PC: en Android no aplica. */
+            nativo() ? null : h("button", { class: "btn small", type: "button", onclick: alActualizar }, "Actualizar"),
             h("button", { class: "btn small", type: "button", onclick: alExportar }, "Exportar"),
             h("button", { class: "btn small", type: "button", onclick: alRenombrar }, "Renombrar"),
             b.origen === "registrado"
@@ -366,9 +390,13 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             { class: "vacia" },
             h("p", { text: "No hay bancos todavía: importa uno o prueba con el ejemplo." }),
             h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar archivo…"),
-            h("button", { class: "btn", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
-            h("button", { class: "btn", type: "button", onclick: alEjemplo }, "Probar con el ejemplo"),
-            h("p", { class: "meta-banco", text: EXPLICACION }),
+            /* "Usar donde está"/"Probar con el ejemplo" son de PC: en Android no hay rutas
+               ni carpeta de ejemplo en el WebView (F4.4). */
+            nativo() ? null : h("button", { class: "btn", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
+            nativo()
+                ? null
+                : h("button", { class: "btn", type: "button", onclick: alEjemplo }, "Probar con el ejemplo"),
+            nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
         );
     }
 
@@ -385,9 +413,15 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                         { class: "btn small", type: "button", onclick: importarDesdeArchivo },
                         "Importar archivo…",
                     ),
-                    h("button", { class: "btn small", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
+                    nativo()
+                        ? null
+                        : h(
+                              "button",
+                              { class: "btn small", type: "button", onclick: usarDondeEsta },
+                              "Usar donde está…",
+                          ),
                 ),
-                h("p", { class: "meta-banco", text: EXPLICACION }),
+                nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
                 lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
             );
             setStatus("ok", lista.length ? `Bancos: ${lista.length}` : "Biblioteca vacía");

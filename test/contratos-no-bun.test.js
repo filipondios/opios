@@ -85,6 +85,7 @@ describe("bundle del WebView (F1.2)", () => {
         const wasm = await Bun.file(join(RAIZ, "node_modules/sql.js/dist/sql-wasm.wasm")).arrayBuffer();
         const escritos = [];
         const guardados = [];
+        const almacenados = new Map();
         const documento = {
             addEventListener() {},
             open() {},
@@ -113,15 +114,28 @@ describe("bundle del WebView (F1.2)", () => {
             fetch: async () => ({ ok: true, arrayBuffer: async () => wasm }), // sirve sql-wasm.wasm
             App: { addListener: async () => ({ remove() {} }) },
             Filesystem: {
-                readFile: async () => {
-                    throw new Error("no hay banco guardado"); // primer arranque
+                /* Pequeño sistema de archivos en memoria (el puente ya no arranca con un
+                   banco vacío fijo, así que `stat`/`readFile` deben reflejar lo escrito). */
+                stat: async ({ path }) => {
+                    if (!almacenados.has(path)) throw new Error("no existe");
+                    return {};
                 },
-                stat: async () => {
-                    throw new Error("no hay banco guardado");
+                readFile: async ({ path }) => {
+                    if (!almacenados.has(path)) throw new Error("no hay banco guardado"); // primer arranque
+                    return { data: almacenados.get(path) };
                 },
-                writeFile: async ({ data }) => guardados.push(data),
-                rename: async () => {},
-                deleteFile: async () => {},
+                writeFile: async ({ path, data }) => {
+                    almacenados.set(path, data);
+                    guardados.push(data);
+                },
+                rename: async ({ from, to }) => {
+                    almacenados.set(to, almacenados.get(from));
+                    almacenados.delete(from);
+                },
+                deleteFile: async ({ path }) => {
+                    almacenados.delete(path);
+                },
+                readdir: async () => ({ files: [] }),
             },
             Directory: { Data: "DATA" },
         });

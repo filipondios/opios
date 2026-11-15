@@ -6,17 +6,19 @@
    hay una conexión de banco abierta a la vez: se cierra antes de abrir otra (riesgo del
    TODO: evitar cambiar de banco durante una sesión). El modo directo `OPIOS_DB` sigue
    siendo legacy y no pasa por aquí.
-   shortcut: el catálogo solo se persiste al cerrar (instantánea al almacén); si el proceso
-   muere sin close() se pierden los cambios de catálogo desde el arranque. Los bancos van
-   write-through con el driver de Bun; para catálogo vivo, F2.7/2.8. */
+   `importarJson`/`actualizar` leen un directorio con `fuenteDirectorio` (node:fs): son de
+   PC/CLI; en el WebView no se usan y la biblioteca oculta esos botones.
+   El catálogo es write-through en PC; con sql.js (WebView) se vuelca con `persistir()` tras
+   cada mutación (api.js) y en `close()`. */
 import { comprobarAlmacen } from "./almacen.js";
 import { comprobarDriver } from "./driver.js";
+import { AVISO_BANCO_GRANDE, MAX_SUBIDA } from "./config.js";
 import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
 import { exportarBanco } from "./portable.js";
 import { detectarArchivo, fuenteDeJson } from "./banco-archivo.js";
-import { fuenteMemoria } from "./fuente.js";
+import { fuenteDeZip } from "./banco-zip.js";
 import { fuenteDirectorio } from "./fuente-directorio.js";
 import { importarFuente } from "./seed.js";
 import { importarDirectorio } from "./seed-directorio.js";
@@ -258,7 +260,7 @@ export class DatabaseManager {
             r = await importarDirectorio(repo, dirPreguntas, { actualizar: true });
             /* Persiste el resultado (el driver WASM no escribe solo) y actualiza metadatos (F2.7). */
             const bytes = this.#driver.instantanea(repo.db);
-            await this.#almacen.escribir(fila.ruta, bytes);
+            await this.#escribirAtomico(fila.ruta, bytes);
             this.#catalogo
                 .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
                 .run(
@@ -377,7 +379,7 @@ export class DatabaseManager {
                 `«${fila.nombre}» está registrado (su archivo está fuera de Opios): desvincúlalo en vez de eliminarlo.`,
             );
         this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
-        for (const lado of ["", "-wal", "-shm"]) await this.#almacen.borrar(fila.ruta + lado);
+        for (const lado of ["", "-wal", "-shm", ".prev", ".tmp"]) await this.#almacen.borrar(fila.ruta + lado);
         return true;
     }
 
@@ -420,28 +422,20 @@ export class DatabaseManager {
 
     /* --- Asistente de importación (F3.4/F3.5) --- */
 
-    /** Previsualiza un archivo importable (.opios, SQLite o JSON) sin tocar el catálogo ni
-        ningún banco: valida y cuenta. Devuelve `duplicado` si ya está en el catálogo (F3.5). */
+    /** Previsualiza un archivo importable (.opios, SQLite, JSON o zip) sin tocar el catálogo
+        ni ningún banco: valida y cuenta. Devuelve `duplicado` si ya está en el catálogo (F3.5). */
     async inspeccionar(bytes, { nombre = "" } = {}) {
+        this.#comprobarTamano(bytes);
         const arch = await detectarArchivo(bytes);
-        if (arch.tipo === "zip")
-            return {
-                tipo: "zip",
-                soportado: false,
-                mensaje:
-                    "Los .zip se importarán con la versión para Android (F4). Descomprímelo e importa su carpeta (bun run bancos importar) o sus JSON aquí.",
-                duplicado: null,
-                errores: [],
-                avisos: [],
-            };
         let base;
-        if (arch.tipo === "json") {
-            /* Importación de ensayo en memoria: los mismos errores que la real, sin tocar nada. */
+        if (arch.tipo === "json" || arch.tipo === "zip") {
+            /* Ensayo en memoria: los mismos errores que la importación real, sin tocar nada. */
+            const fuente = arch.tipo === "json" ? fuenteDeJson(arch.texto) : await fuenteDeZip(bytes);
             const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
             try {
-                const r = await importarFuente(ensayo, fuenteDeJson(arch.texto));
+                const r = await importarFuente(ensayo, fuente);
                 base = {
-                    tipo: "json",
+                    tipo: arch.tipo,
                     preguntas: r.nuevas,
                     duplicadas: r.duplicadas,
                     errores: r.errores,
@@ -480,7 +474,20 @@ export class DatabaseManager {
             }
         }
         const duplicado = await this.#duplicadoDe(base.uuid ?? null, nombre || base.manifest?.nombre || null);
+        /* Aviso de tamaño (F4.6): en Android la BD entera se carga en RAM. */
+        if (bytes.length > AVISO_BANCO_GRANDE)
+            base.avisos = [
+                ...(base.avisos ?? []),
+                `Banco grande (${Math.round(bytes.length / 1e6)} MB): en Android se carga entero en memoria; puede ir lento o fallar en móviles con poca RAM.`,
+            ];
         return { ...base, duplicado };
+    }
+
+    /* Guardas de tamaño del asistente (F4.6): el límite duro también en el núcleo local
+       (en PC lo corta además el servidor con maxRequestBodySize). */
+    #comprobarTamano(bytes) {
+        if (bytes?.length > MAX_SUBIDA)
+            throw new Error(`El archivo es demasiado grande (máximo ${Math.round(MAX_SUBIDA / 1e6)} MB).`);
     }
 
     /** ¿Ya está este banco en el catálogo? Por uuid_banco primero, luego por nombre (F3.5). */
@@ -502,14 +509,13 @@ export class DatabaseManager {
     /** Importa el archivo detectado (F3.4). modo "nuevo": crea un banco (nombre auto-ajustado
         a «X (2)» si choca). modo "actualizar": fusiona por id_externo en el banco `id`. */
     async importarBytes(bytes, { nombre = "", modo = "nuevo", id = null } = {}) {
+        this.#comprobarTamano(bytes);
         const arch = await detectarArchivo(bytes);
-        if (arch.tipo === "zip")
-            throw new Error(
-                "La importación de .zip llegará con la versión para Android (F4). Descomprímelo e importa su carpeta o sus JSON.",
-            );
-        if (modo === "actualizar") return await this.#fusionar(arch, id);
+        if (modo === "actualizar") return await this.#fusionar(arch, id, bytes);
         if (arch.tipo === "json")
             return await this.#crearDesdeFuente(nombre.trim() || "Importado", fuenteDeJson(arch.texto));
+        if (arch.tipo === "zip")
+            return await this.#crearDesdeFuente(nombre.trim() || "Importado", await fuenteDeZip(bytes));
         const { nombre: nombreLibre, ruta } = await this.#rutaLibre(nombre.trim() || "Importado");
         const temporal = ruta + ".tmp";
         try {
@@ -523,7 +529,7 @@ export class DatabaseManager {
 
     /** Fusiona el archivo en el banco `id` (D2): actualiza por id_externo conservando ids y
         progreso, salta las repetidas por enunciado y no borra nada (archivar es de F5, D3). */
-    async #fusionar(arch, id) {
+    async #fusionar(arch, id, bytes) {
         await this.#listo;
         const fila = this.#catalogo.query("SELECT ruta, nombre FROM bancos WHERE id = ?").get(id);
         if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
@@ -535,8 +541,8 @@ export class DatabaseManager {
         const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
         let r;
         try {
-            if (arch.tipo === "json") {
-                const fuente = fuenteDeJson(arch.texto);
+            if (arch.tipo === "json" || arch.tipo === "zip") {
+                const fuente = arch.tipo === "json" ? fuenteDeJson(arch.texto) : await fuenteDeZip(bytes);
                 /* Ensayo en memoria: si el archivo tiene errores, el banco no se toca. */
                 const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
                 try {
@@ -593,7 +599,7 @@ export class DatabaseManager {
                 }
             }
             const bytes = this.#driver.instantanea(repo.db);
-            await this.#almacen.escribir(fila.ruta, bytes);
+            await this.#escribirAtomico(fila.ruta, bytes);
             this.#catalogo
                 .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
                 .run(
@@ -620,8 +626,12 @@ export class DatabaseManager {
         const fila = this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(id);
         if (!fila) throw new Error(`El banco activo (id ${id}) ya no está en el catálogo.`);
         /* Abrir sin el archivo crearía una base nueva en silencio: un banco ausente es un error. */
-        if (!(await this.#almacen.existe(fila.ruta)))
-            throw new Error(`El banco activo «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
+        if (!(await this.#almacen.existe(fila.ruta))) {
+            /* Corte entre «canónico → .prev» y «temporal → canónico» (F4.4). */
+            if (!(await this.#almacen.existe(fila.ruta + ".prev")))
+                throw new Error(`El banco activo «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
+            await this.#almacen.renombrar(fila.ruta + ".prev", fila.ruta);
+        }
         this.#abierto = {
             id,
             ruta: fila.ruta,
@@ -630,6 +640,36 @@ export class DatabaseManager {
         /* Garantiza uuid_banco en ajustes de cada banco abierto (detección de duplicados, F2.7). */
         idBanco(this.#abierto.repo);
         return this.#abierto.repo;
+    }
+
+    /** Vuelca el catálogo al almacén ya (F4.4): sql.js no escribe solo y en Android no hay
+        `close()` por petición; en Bun es inocuo (el archivo es write-through). */
+    async persistir() {
+        await this.#listo;
+        if (!this.#catalogo || this.#rutaCatalogo === ":memory:" || !this.#driver.soloMemoria) return;
+        /* shortcut: el catálogo se escribe en sitio (no atómico); si un corte lo corrompe, la
+           biblioteca se reconstruye volviendo a registrar los bancos. No guarda datos del usuario. */
+        await this.#almacen.escribir(this.#rutaCatalogo, this.#driver.instantanea(this.#catalogo));
+    }
+
+    /** Persiste el banco abierto sin cerrarlo (F4.4: flush por debounce en Android). */
+    async persistirBanco() {
+        if (!this.#abierto) return;
+        const { ruta, repo } = this.#abierto;
+        await this.#escribirAtomico(ruta, this.#driver.instantanea(repo.db));
+    }
+
+    /* Temporal → copia anterior → definitivo (F4.4): no todos los almacenes sobrescriben al
+       renombrar, y un corte a medias deja siempre una copia válida. */
+    async #escribirAtomico(ruta, bytes) {
+        const temporal = ruta + ".tmp";
+        const anterior = ruta + ".prev";
+        await this.#almacen.escribir(temporal, bytes);
+        if (await this.#almacen.existe(ruta)) {
+            await this.#quitarSiExiste(anterior);
+            await this.#almacen.renombrar(ruta, anterior);
+        }
+        await this.#almacen.renombrar(temporal, ruta);
     }
 
     /** Cierra el banco abierto (si lo hay) persistiéndolo; el banco activo no cambia. */
@@ -648,7 +688,7 @@ export class DatabaseManager {
         } catch {
             /* ya estaba cerrada */
         }
-        if (bytes) await this.#almacen.escribir(ruta, bytes);
+        if (bytes) await this.#escribirAtomico(ruta, bytes);
     }
 
     /** Cierra banco y catálogo, persistiendo el catálogo (imprescindible con sql.js, que no

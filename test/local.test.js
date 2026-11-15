@@ -1,8 +1,12 @@
 /* Task 11: la capa local (src/local.js) sustituye al servidor sin cambiar las páginas. */
 import { describe, expect, test } from "bun:test";
+import { join } from "node:path";
 
 import { abrirAdaptadorSqlite } from "../src/adaptador-sqlite-wasm.js";
+import { crearAlmacenMemoria } from "../src/almacen-memoria.js";
 import { abrirRepo } from "../src/db/index.js";
+import { crearDriverWasm } from "../src/driver-wasm.js";
+import { DatabaseManager } from "../src/gestor-bancos.js";
 import { crearAppLocal } from "../src/local.js";
 import { importarDirectorio } from "../src/seed-directorio.js";
 
@@ -97,6 +101,39 @@ describe("app local (task 11)", () => {
             expect(html).toContain('globalThis.__opiosBancoId="banco-1"');
         } finally {
             repo.close();
+        }
+    });
+
+    test("con gestor, /api/bancos responde 200 sin servidor (F4.4)", async () => {
+        const almacen = crearAlmacenMemoria();
+        const driver = crearDriverWasm({ rutaWasm: "node_modules/sql.js/dist/sql-wasm.wasm" });
+        const gestor = new DatabaseManager({ almacen, driver, rutaCatalogo: "catalogo.db" });
+        try {
+            const b = await gestor.importarJson("Ejem", join(import.meta.dir, "fixtures"));
+            await gestor.activar(b.id);
+            const app = crearAppLocal(await gestor.abrirActivo(), { gestor });
+            const r = await app(new Request("http://opios.local/api/bancos"));
+            expect(r.status).toBe(200);
+            expect((await r.json()).map((x) => x.nombre)).toEqual(["Ejem"]);
+        } finally {
+            await gestor.close();
+        }
+    });
+
+    test("cliente-local envía los bytes como octet-stream (F3.4/F4.4)", async () => {
+        const { bancoInspeccionar } = await import("../public/js/cliente-local.js");
+        let capturada = null;
+        globalThis.__opios = async (req) => {
+            capturada = req;
+            return Response.json({ ok: true });
+        };
+        try {
+            await bancoInspeccionar(new Uint8Array([1, 2, 3]), "mi banco.zip");
+            expect(capturada.headers.get("content-type")).toBe("application/octet-stream");
+            expect(new Uint8Array(await capturada.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+            expect(capturada.url).toContain("nombre=mi%20banco.zip");
+        } finally {
+            delete globalThis.__opios;
         }
     });
 });

@@ -550,4 +550,57 @@ describe("DatabaseManager neutro (F2.3)", () => {
             }
         });
     }
+
+    test("persistir() y persistirBanco() vuelcan sin cerrar el gestor (F4.4)", async () => {
+        const almacen = crearAlmacenMemoria();
+        const driver = () => crearDriverWasm({ rutaWasm: WASM });
+        const gestor = new DatabaseManager({ almacen, driver: driver(), rutaCatalogo: "catalogo.db" });
+        const b = await gestor.importarJson("A", join(import.meta.dir, "fixtures"));
+        await gestor.activar(b.id);
+        const repo = await gestor.abrirActivo();
+        const pid = repo.db.query("SELECT id FROM preguntas LIMIT 1").get().id;
+        repo.guardarProgreso([{ id: pid, caja: 2, vence: "2026-01-01", aciertos: 1, fallos: 0 }]);
+        /* Lo que hace el puente Android: volcar catálogo y banco sin cerrar (debounce). */
+        await gestor.persistir();
+        await gestor.persistirBanco();
+        expect(almacen.archivos.has(`${b.ruta}.prev`)).toBe(true); // rotación de la copia anterior
+
+        const otro = new DatabaseManager({ almacen, driver: driver(), rutaCatalogo: "catalogo.db" });
+        try {
+            expect((await otro.listar()).map((x) => x.nombre)).toEqual(["A"]);
+            /* Corte entre «canónico → .prev» y «temporal → canónico»: se recupera la copia
+               anterior (válida; el último volcado a medias se pierde, como es de esperar). */
+            almacen.archivos.delete(b.ruta);
+            expect((await otro.abrirActivo()).contarPreguntas()).toBe(7);
+        } finally {
+            await otro.close();
+        }
+        await gestor.close();
+    });
+
+    test("persistir() no reescribe el catálogo si el driver ya escribe solo (Bun)", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-gestor-persistir-"));
+        const instantaneas = [];
+        const driver = {
+            ...driverBun,
+            instantanea: (db) => {
+                instantaneas.push(db);
+                return driverBun.instantanea(db);
+            },
+        };
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            await gestor.listar(); // abre el catálogo
+            instantaneas.length = 0;
+            await gestor.persistir(); // write-through: no debe tocar el archivo abierto
+            expect(instantaneas).toHaveLength(0);
+        } finally {
+            await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
 });
