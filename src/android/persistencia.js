@@ -6,7 +6,7 @@ const RETARDO_MS = 400;
 
 /**
  * Gestor de persistencia.
- * - `almacen`: `{ existe, leer→Uint8Array, escribir, mover, borrar }` (rutas relativas al Data).
+ * - `almacen`: `{ existe, leer→Uint8Array, escribir, renombrar, borrar }` (rutas relativas al Data).
  * - `ruta`: archivo canónico del banco.
  * - `exportar()`: bytes actuales del banco (sql.js `export()`).
  * - `integro(bytes)`: promesa que dice si los bytes son un SQLite válido.
@@ -38,9 +38,9 @@ export function crearPersistencia({ almacen, ruta, exportar, integro, retardo = 
             } catch {
                 /* no había copia previa */
             }
-            await almacen.mover(ruta, prev);
+            await almacen.renombrar(ruta, prev);
         }
-        await almacen.mover(tmp, ruta);
+        await almacen.renombrar(tmp, ruta);
     };
 
     const encolarGuardado = () => {
@@ -78,7 +78,7 @@ export function crearPersistencia({ almacen, ruta, exportar, integro, retardo = 
                 } catch {
                     /* el corrupto ya no estaba */
                 }
-                await almacen.mover(prev, ruta);
+                await almacen.renombrar(prev, ruta);
                 return bytes;
             }
             return null;

@@ -2,8 +2,8 @@
    en el almacenamiento privado de la app y expone el núcleo al WebView (window.__opios).
    No hay Bun.serve ni bun:sqlite: solo adaptador-sqlite-wasm + local.js. */
 import { App } from "@capacitor/app";
-import { Directory, Filesystem } from "@capacitor/filesystem";
-import { abrirAdaptadorSqlite, aBase64, deBase64, integroSqlite } from "../adaptador-sqlite-wasm.js";
+import { abrirAdaptadorSqlite, integroSqlite } from "../adaptador-sqlite-wasm.js";
+import { crearAlmacenCapacitor } from "../almacen-capacitor.js";
 import { idBanco } from "../banco-id.js";
 import { abrirRepo } from "../db/index.js";
 import { crearAppLocal } from "../local.js";
@@ -11,22 +11,8 @@ import { crearPersistencia } from "./persistencia.js";
 
 const ARCHIVO = "banco/banco.db";
 
-/* Almacén sobre el sistema de archivos privado de la app (F1.4). */
-const almacen = {
-    existe: async (ruta) => {
-        try {
-            await Filesystem.stat({ path: ruta, directory: Directory.Data });
-            return true;
-        } catch {
-            return false;
-        }
-    },
-    leer: async (ruta) => deBase64((await Filesystem.readFile({ path: ruta, directory: Directory.Data })).data),
-    escribir: (ruta, bytes) =>
-        Filesystem.writeFile({ path: ruta, directory: Directory.Data, data: aBase64(bytes), recursive: true }),
-    mover: (de, a) => Filesystem.rename({ from: de, to: a, directory: Directory.Data }),
-    borrar: (ruta) => Filesystem.deleteFile({ path: ruta, directory: Directory.Data }),
-};
+/* Almacén sobre el sistema de archivos privado de la app (F1.4, F2.1). */
+const almacen = crearAlmacenCapacitor();
 
 export async function arrancar() {
     let shim = null;

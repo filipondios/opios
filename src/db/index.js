@@ -1,4 +1,4 @@
-import { migrar, tieneFts5 } from "./esquema.js";
+import { migrar, sincronizarFts } from "./esquema.js";
 import { crearPreguntas } from "./preguntas.js";
 import { crearProgreso } from "./progreso.js";
 import { crearSimulacros } from "./simulacros.js";
@@ -16,7 +16,8 @@ export function abrirRepo(db) {
     db.run("PRAGMA busy_timeout = 5000");
     db.run("PRAGMA foreign_keys = ON");
     migrar(db);
-    const ftsDisponible = tieneFts5(db);
+    /* F1.8: el índice FTS5 se adapta al build (PC lo trae; sql.js no). */
+    const ftsDisponible = sincronizarFts(db);
 
     const q = {
         temaPorId: db.query("SELECT id FROM temas WHERE id = ?"),

@@ -2,6 +2,30 @@
    corren también sobre el driver SQLite WASM del WebView (task 11). */
 import { claveDe } from "../validar.js";
 
+/* DDL del índice FTS5 (v10) y de sus triggers, compartida por la migración y
+   `sincronizarFts` (F1.8: un banco viaja entre PC, con FTS5, y Android, sin él). */
+const SQL_FTS5_TRIGGERS = `
+CREATE TRIGGER IF NOT EXISTS preguntas_ai AFTER INSERT ON preguntas BEGIN
+  INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
+END;
+CREATE TRIGGER IF NOT EXISTS preguntas_ad AFTER DELETE ON preguntas BEGIN
+  INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
+END;
+CREATE TRIGGER IF NOT EXISTS preguntas_au AFTER UPDATE ON preguntas BEGIN
+  INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
+  INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
+END;
+`;
+
+const SQL_FTS5 = `
+CREATE VIRTUAL TABLE preguntas_fts USING fts5(
+  enunciado,
+  content='preguntas', content_rowid='id',
+  tokenize='unicode61 remove_diacritics 2');
+${SQL_FTS5_TRIGGERS}
+INSERT INTO preguntas_fts(preguntas_fts) VALUES ('rebuild');
+`;
+
 export const MIGRACIONES = [
     /* v1 */ `
   CREATE TABLE temas (
@@ -156,28 +180,7 @@ export const MIGRACIONES = [
 
     /* v10: búsqueda con FTS5 (si el build de SQLite la incluye). Índice sobre el enunciado con
      `remove_diacritics`, de modo que «normalizacion» encuentra «normalización». */
-    (db) => {
-        if (!tieneFts5(db)) return "SELECT 1";
-        return `
-    CREATE VIRTUAL TABLE preguntas_fts USING fts5(
-      enunciado,
-      content='preguntas', content_rowid='id',
-      tokenize='unicode61 remove_diacritics 2');
-
-    CREATE TRIGGER preguntas_ai AFTER INSERT ON preguntas BEGIN
-      INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
-    END;
-    CREATE TRIGGER preguntas_ad AFTER DELETE ON preguntas BEGIN
-      INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
-    END;
-    CREATE TRIGGER preguntas_au AFTER UPDATE ON preguntas BEGIN
-      INSERT INTO preguntas_fts(preguntas_fts, rowid, enunciado) VALUES ('delete', old.id, old.enunciado);
-      INSERT INTO preguntas_fts(rowid, enunciado) VALUES (new.id, new.enunciado);
-    END;
-
-    INSERT INTO preguntas_fts(preguntas_fts) VALUES ('rebuild');
-    `;
-    },
+    (db) => (tieneFts5(db) ? SQL_FTS5 : "SELECT 1"),
 
     /* v11: `id_externo` para actualizar preguntas desde el banco sin cambiar su id interno. */
     /* v11 */ `
@@ -219,6 +222,31 @@ export function tieneFts5(db) {
         }
         return false;
     }
+}
+
+/** Deja el índice FTS5 coherente con lo que permite este build de SQLite (F1.8). Un banco
+    creado en PC trae `preguntas_fts` y sus triggers; en un build sin FTS5 (sql.js) escribir
+    daría «no such module: fts5» desde los triggers. Aquí se quitan los triggers (sin FTS5)
+    o se recrean y reconstruyen (con FTS5, p. ej. al volver al PC). Devuelve si FTS5 está. */
+export function sincronizarFts(db) {
+    const disponibles = tieneFts5(db);
+    const hay = Boolean(db.query("SELECT 1 FROM sqlite_master WHERE name = 'preguntas_fts'").get());
+    if (disponibles) {
+        if (!hay) db.run(SQL_FTS5);
+        else {
+            const sinTriggers = !db
+                .query("SELECT 1 FROM sqlite_master WHERE type = 'trigger' AND name = 'preguntas_ai'")
+                .get();
+            db.run(SQL_FTS5_TRIGGERS);
+            if (sinTriggers) db.run("INSERT INTO preguntas_fts(preguntas_fts) VALUES ('rebuild')");
+        }
+    } else if (hay) {
+        /* La tabla virtual no se puede borrar sin el módulo, pero sin triggers deja de estorbar. */
+        db.run(`DROP TRIGGER IF EXISTS preguntas_ai;
+      DROP TRIGGER IF EXISTS preguntas_ad;
+      DROP TRIGGER IF EXISTS preguntas_au;`);
+    }
+    return disponibles;
 }
 
 /** Aplica las migraciones pendientes y actualiza `user_version`. */

@@ -12,7 +12,7 @@ import { abrirAdaptadorSqlite } from "../src/adaptador-sqlite-wasm.js";
 import { copiaSeguridad } from "../src/backup.js";
 import { abrirDb } from "../src/db.js";
 import { abrirRepo } from "../src/db/index.js";
-import { MIGRACIONES } from "../src/db/esquema.js";
+import { MIGRACIONES, tieneFts5 } from "../src/db/esquema.js";
 import { crearApp } from "../src/app.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
 import { exportarBanco, importarBancoOpios } from "../src/portable.js";
@@ -374,6 +374,71 @@ describe("task 12: backup portable y cambio de banco entre drivers", () => {
             expect((await r.json()).length).toBeGreaterThan(0);
         } finally {
             repo.close();
+        }
+    });
+});
+
+/* --- F1.8: el índice FTS5 no viaja entre builds (PC lo trae, sql.js no) --- */
+const bunTieneFts5 = (() => {
+    const db = new Database(":memory:", { create: true, strict: true });
+    const disponible = tieneFts5(db);
+    db.close();
+    return disponible;
+})();
+
+describe("F1.8: banco portátil PC (con FTS5) ↔ Android (sin FTS5)", () => {
+    test.skipIf(!bunTieneFts5)("se escribe en sql.js y vuelve a Bun con el índice reconstruido", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-fts5-"));
+        try {
+            /* PC: banco con el índice FTS5 y una pregunta indexada. */
+            const repoPc = abrirDb(join(dir, "pc.db"));
+            const bloque = repoPc.crearBloque({ nombre: "Bloque PC" });
+            const tema = repoPc.crearTema({ bloque: bloque.id, numero: 1, nombre: "Tema" });
+            repoPc.crear({
+                tema: tema.id,
+                pregunta: "¿Normalización en PC?",
+                respuestas: ["sí", "no"],
+                correcta: 0,
+                explicacion: "",
+            });
+            expect(repoPc.listar({ texto: "Normalización" }).total).toBe(1);
+            repoPc.close();
+
+            /* Android (sql.js, sin FTS5): la sincronización quita los triggers que estorban... */
+            const dbWasm = await abrirWasm({ bytes: bytesDe(join(dir, "pc.db")) });
+            const repoWasm = abrirRepo(dbWasm);
+            expect(
+                dbWasm.query("SELECT 1 FROM sqlite_master WHERE type = 'trigger' AND name = 'preguntas_ai'").get(),
+            ).toBeNull();
+            /* ...y entonces ESCRIBIR el banco del PC deja de fallar con «no such module: fts5». */
+            repoWasm.crear({
+                tema: tema.id,
+                pregunta: "¿Añadida en Android?",
+                respuestas: ["sí", "no"],
+                correcta: 1,
+                explicacion: "",
+            });
+            expect(repoWasm.listar({ texto: "Añadida" }).total).toBe(1); // filtro en JS
+            const bytesAndroid = dbWasm.exportar();
+            repoWasm.close();
+
+            /* De vuelta al PC: se recrean los triggers y se reconstruye el índice, ya con la nueva. */
+            const rutaVuelta = join(dir, "vuelta.db");
+            writeFileSync(rutaVuelta, bytesAndroid);
+            const repoVuelta = abrirDb(rutaVuelta);
+            try {
+                expect(
+                    repoVuelta.db
+                        .query("SELECT 1 FROM sqlite_master WHERE type = 'trigger' AND name = 'preguntas_ai'")
+                        .get(),
+                ).not.toBeNull();
+                expect(repoVuelta.listar({ texto: "Normalización" }).total).toBe(1);
+                expect(repoVuelta.listar({ texto: "Android" }).total).toBe(1);
+            } finally {
+                repoVuelta.close();
+            }
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
         }
     });
 });

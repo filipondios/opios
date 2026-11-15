@@ -13,7 +13,7 @@ function almacenMemoria(inicial = {}) {
         existe: async (p) => archivos.has(p),
         leer: async (p) => archivos.get(p),
         escribir: async (p, bytes) => archivos.set(p, bytes),
-        mover: async (de, a) => {
+        renombrar: async (de, a) => {
             archivos.set(a, archivos.get(de));
             archivos.delete(de);
         },
