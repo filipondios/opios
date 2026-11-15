@@ -194,11 +194,187 @@ function contrato(nombre, abrir) {
                 repo.close();
             }
         });
+
+        test("actualizar: un error a mitad revierte el lote entero (F5.4)", async () => {
+            const repo = await abrir();
+            try {
+                const tema = repo.crearTema({ bloque: repo.temario()[0].id, numero: 1, nombre: "Tema" }).id;
+                const base = { tema, respuestas: ["a", "b"], correcta: 0, explicacion: "" };
+                repo.crear({ ...base, pregunta: "A" });
+                repo.crear({ ...base, pregunta: "B", id_externo: "ext-b" });
+                const antes = repo.todas();
+
+                /* La primera es nueva; la segunda actualiza `ext-b` con el enunciado de A: 409. */
+                expect(() =>
+                    repo.importar(
+                        [
+                            { ...base, pregunta: "Nueva", id_externo: "ext-nueva" },
+                            { ...base, pregunta: "A", id_externo: "ext-b" },
+                        ],
+                        { actualizar: true },
+                    ),
+                ).toThrow(/mismo enunciado/);
+                expect(repo.todas()).toEqual(antes); // ni siquiera quedó la nueva
+                expect(repo.contarPreguntas()).toBe(2);
+            } finally {
+                repo.close();
+            }
+        });
     });
 }
-
 contrato("contrato del repositorio · Bun SQLite", async () => abrirDb(":memory:"));
 contrato("contrato del repositorio · SQLite WASM", async () => abrirRepo(await abrirWasm()));
+
+/* --- F5.3/F5.4: actualizar desde el origen da el mismo resultado en ambos drivers --- */
+function contratoActualizar(nombre, abrir) {
+    describe(nombre, () => {
+        /* Pregunta en el formato validado que consume `repo.importar`. */
+        const p = (extra = {}) => ({
+            bloque: "Bloque 1",
+            bloque_numero: 1,
+            tema: 1,
+            tema_numero: 1,
+            respuestas: ["a", "b", "c"],
+            correcta: 0,
+            explicacion: "",
+            ...extra,
+        });
+        const temaId = (repo, numero) =>
+            repo
+                .temario()
+                .flatMap((b) => b.temas)
+                .find((t) => t.numero === numero).id;
+        const ids = (repo, tema) =>
+            repo
+                .paraTest([tema])
+                .preguntas.map((x) => x.id)
+                .sort((a, b) => a - b);
+
+        test("enunciado cambiado: conserva el id interno y el progreso (v1 -> v2)", async () => {
+            const repo = await abrir();
+            try {
+                await repo.importar([p({ pregunta: "Versión uno", id_externo: "ext-1" })], { actualizar: true });
+                const id = repo.todas()[0].id;
+                repo.guardarProgreso([{ id, caja: 4, vence: "2999-01-01", aciertos: 5, fallos: 1 }]);
+
+                const r = await repo.importar(
+                    [p({ pregunta: "Versión dos", id_externo: "ext-1", explicacion: "nueva" })],
+                    { actualizar: true },
+                );
+                expect(r).toMatchObject({ nuevas: 0, duplicadas: 0, actualizadas: 1, archivadas: 0 });
+                expect(repo.todas()).toHaveLength(1);
+                expect(repo.obtener(id)).toMatchObject({ pregunta: "Versión dos", explicacion: "nueva" });
+                expect(repo.paraTest([temaId(repo, 1)]).progreso[id]).toEqual([4, "2999-01-01", 5, 1]);
+            } finally {
+                repo.close();
+            }
+        });
+
+        test("movida de tema: mismo id interno y progreso, en el tema nuevo", async () => {
+            const repo = await abrir();
+            try {
+                await repo.importar([p({ pregunta: "Movida", id_externo: "ext-m" })], { actualizar: true });
+                const id = repo.todas()[0].id;
+                repo.guardarProgreso([{ id, caja: 2, vence: "2999-01-01", aciertos: 1, fallos: 0 }]);
+
+                const r = await repo.importar(
+                    [p({ pregunta: "Movida", id_externo: "ext-m", tema: 2, tema_numero: 2 })],
+                    { actualizar: true },
+                );
+                expect(r).toMatchObject({ actualizadas: 1, archivadas: 0 });
+                expect(repo.obtener(id)).toMatchObject({ id, tema_numero: 2 });
+                expect(repo.paraTest([temaId(repo, 2)]).progreso[id]).toEqual([2, "2999-01-01", 1, 0]);
+                expect(ids(repo, temaId(repo, 1))).toEqual([]);
+            } finally {
+                repo.close();
+            }
+        });
+
+        test("ausente: se archiva (nunca se borra) y conserva historial y simulacros", async () => {
+            const repo = await abrir();
+            try {
+                await repo.importar(
+                    [
+                        p({ pregunta: "Se queda", id_externo: "ext-a" }),
+                        p({ pregunta: "Desaparece", id_externo: "ext-b" }),
+                    ],
+                    { actualizar: true },
+                );
+                const tema = temaId(repo, 1);
+                const [dentro, fuera] = [
+                    repo.todas().find((x) => x.id_externo === "ext-a").id,
+                    repo.todas().find((x) => x.id_externo === "ext-b").id,
+                ];
+                repo.guardarProgreso([{ id: fuera, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+                repo.aplicarSesion([{ id: fuera, acierto: 1, ms: 10 }], [], HOY);
+                repo.crearSimulacro(
+                    { temas: [tema], segundos: 60, penalizacion: 0, respuestas: [{ id: fuera, elegida: 0 }] },
+                    HOY,
+                );
+                const progresoAntes = repo.db.query("SELECT * FROM progreso WHERE pregunta_id = ?").get(fuera);
+                const respuestasAntes = repo.db.query("SELECT COUNT(*) AS n FROM respuestas").get().n;
+
+                const r = await repo.importar([p({ pregunta: "Se queda", id_externo: "ext-a" })], { actualizar: true });
+                expect(r).toMatchObject({ actualizadas: 1, archivadas: 1 });
+                expect(repo.contarPreguntas()).toBe(2); // fila física: nada se borra
+                expect(repo.todas()).toHaveLength(2);
+                expect(ids(repo, tema)).toEqual([dentro]); // fuera del estudio
+                expect(repo.db.query("SELECT * FROM progreso WHERE pregunta_id = ?").get(fuera)).toEqual(progresoAntes);
+                expect(repo.db.query("SELECT COUNT(*) AS n FROM respuestas").get().n).toBe(respuestasAntes);
+                expect(repo.contarSimulacros()).toBe(1);
+
+                /* Si vuelve a estar en el origen, se desarchiva. */
+                await repo.importar(
+                    [
+                        p({ pregunta: "Se queda", id_externo: "ext-a" }),
+                        p({ pregunta: "Desaparece", id_externo: "ext-b" }),
+                    ],
+                    { actualizar: true },
+                );
+                expect(ids(repo, tema)).toEqual([dentro, fuera].sort((a, b) => a - b));
+            } finally {
+                repo.close();
+            }
+        });
+
+        test("id_externo ausente: empareja por enunciado y no archiva la existente", async () => {
+            const repo = await abrir();
+            try {
+                await repo.importar([p({ pregunta: "Sin externo" })], { actualizar: true });
+                const id = repo.todas()[0].id;
+                repo.guardarProgreso([{ id, caja: 2, vence: "2999-01-01", aciertos: 1, fallos: 0 }]);
+
+                const r = await repo.importar([p({ pregunta: "Sin externo", explicacion: "otra" })], {
+                    actualizar: true,
+                });
+                expect(r).toMatchObject({ nuevas: 0, duplicadas: 1, actualizadas: 0, archivadas: 0 });
+                expect(repo.todas()).toHaveLength(1); // no duplica
+                expect(repo.paraTest([temaId(repo, 1)]).progreso[id]).toEqual([2, "2999-01-01", 1, 0]);
+            } finally {
+                repo.close();
+            }
+        });
+
+        test("id_externo repetido en el origen: aborta y deja el banco intacto", async () => {
+            const repo = await abrir();
+            try {
+                await repo.importar([p({ pregunta: "A", id_externo: "ext-a" })], { actualizar: true });
+                const antes = repo.todas();
+                expect(() =>
+                    repo.importar(
+                        [p({ pregunta: "B", id_externo: "repe" }), p({ pregunta: "C", id_externo: "repe" })],
+                        { actualizar: true },
+                    ),
+                ).toThrow(/repite el identificador externo/);
+                expect(repo.todas()).toEqual(antes);
+            } finally {
+                repo.close();
+            }
+        });
+    });
+}
+contratoActualizar("actualizar desde el origen · Bun SQLite", async () => abrirDb(":memory:"));
+contratoActualizar("actualizar desde el origen · SQLite WASM", async () => abrirRepo(await abrirWasm()));
 
 /* --- El archivo en sí: lo que escribe un driver lo lee el otro --- */
 describe("task 12: migraciones compartidas", () => {

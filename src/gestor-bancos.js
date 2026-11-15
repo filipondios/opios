@@ -205,6 +205,16 @@ export class DatabaseManager {
         }
     }
 
+    /* Verifica la conexión ya abierta tras fusionar (5.3): si el resultado no es un banco
+       válido no se escribe ni se anota. */
+    #verificarRepo(repo, contexto) {
+        try {
+            return verificarBanco(repo.db);
+        } catch (e) {
+            throw errorDeVerificacion(e, contexto);
+        }
+    }
+
     /* El renombrar solo mueve el .db: los sidecars WAL/SHM del temporal quedarían huérfanos. */
     #limpiarLados(ruta) {
         return Promise.all(["-wal", "-shm"].map((lado) => this.#almacen.borrar(ruta + lado)));
@@ -258,18 +268,14 @@ export class DatabaseManager {
                     `El directorio tiene ${r.errores.length} error(es); banco sin tocar. Primero: ${r.errores[0]}`,
                 );
             r = await importarDirectorio(repo, dirPreguntas, { actualizar: true });
-            /* Persiste el resultado (el driver WASM no escribe solo) y actualiza metadatos (F2.7). */
+            /* Verifica y persiste el resultado (el driver WASM no escribe solo) y actualiza
+               metadatos (F2.7). Un banco dañado no se escribe ni se anota como bueno. */
+            const info = this.#verificarRepo(repo, fila.ruta);
             const bytes = this.#driver.instantanea(repo.db);
             await this.#escribirAtomico(fila.ruta, bytes);
             this.#catalogo
                 .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
-                .run(
-                    bytes.length,
-                    repo.db.query("SELECT COUNT(*) AS n FROM preguntas").get().n,
-                    repo.db.query("PRAGMA user_version").get().user_version,
-                    repo.ajustes().uuid_banco ?? null,
-                    id,
-                );
+                .run(bytes.length, info.preguntas, info.user_version, info.uuid, id);
             r = { ...r, banco: fila.ruta };
         } finally {
             if (!esElAbierto) repo.close();
@@ -509,9 +515,9 @@ export class DatabaseManager {
     /** Importa el archivo detectado (F3.4). modo "nuevo": crea un banco (nombre auto-ajustado
         a «X (2)» si choca). modo "actualizar": fusiona por id_externo en el banco `id`. */
     async importarBytes(bytes, { nombre = "", modo = "nuevo", id = null } = {}) {
+        if (modo === "actualizar") return await this.actualizarDesde(bytes, { id });
         this.#comprobarTamano(bytes);
         const arch = await detectarArchivo(bytes);
-        if (modo === "actualizar") return await this.#fusionar(arch, id, bytes);
         if (arch.tipo === "json")
             return await this.#crearDesdeFuente(nombre.trim() || "Importado", fuenteDeJson(arch.texto));
         if (arch.tipo === "zip")
@@ -527,8 +533,17 @@ export class DatabaseManager {
         }
     }
 
-    /** Fusiona el archivo en el banco `id` (D2): actualiza por id_externo conservando ids y
-        progreso, salta las repetidas por enunciado y no borra nada (archivar es de F5, D3). */
+    /** Actualiza el banco `id` desde un archivo (.opios, SQLite, JSON o zip) (F5.3):
+        valida en memoria, fusiona por `id_externo` (o enunciado) conservando ids y progreso,
+        archiva las preguntas ausentes del origen y verifica el resultado. Un fallo deja el
+        banco intacto. */
+    async actualizarDesde(bytes, { id } = {}) {
+        this.#comprobarTamano(bytes);
+        return await this.#fusionar(await detectarArchivo(bytes), id, bytes);
+    }
+
+    /** Fusiona el archivo en el banco `id` (D2/D3): actualiza por id_externo conservando ids
+        y progreso, salta las repetidas por enunciado y archiva (no borra) las ausentes. */
     async #fusionar(arch, id, bytes) {
         await this.#listo;
         const fila = this.#catalogo.query("SELECT ruta, nombre FROM bancos WHERE id = ?").get(id);
@@ -598,17 +613,12 @@ export class DatabaseManager {
                     await this.#quitarSiExiste(temporal);
                 }
             }
+            const info = this.#verificarRepo(repo, fila.ruta);
             const bytes = this.#driver.instantanea(repo.db);
             await this.#escribirAtomico(fila.ruta, bytes);
             this.#catalogo
                 .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
-                .run(
-                    bytes.length,
-                    repo.db.query("SELECT COUNT(*) AS n FROM preguntas").get().n,
-                    repo.db.query("PRAGMA user_version").get().user_version,
-                    repo.ajustes().uuid_banco ?? null,
-                    id,
-                );
+                .run(bytes.length, info.preguntas, info.user_version, info.uuid, id);
             r = { ...r, banco: fila.ruta, nombre: fila.nombre };
         } finally {
             if (!esElAbierto) repo.close();

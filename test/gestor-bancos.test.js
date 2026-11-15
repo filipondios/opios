@@ -549,6 +549,42 @@ describe("DatabaseManager neutro (F2.3)", () => {
                 ctx.limpiar();
             }
         });
+
+        test(`${nombre}: actualizarDesde con JSON en bytes fusiona y archiva`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const b = await gestor.importarJson("Banco", join(import.meta.dir, "fixtures"));
+                /* Solo queda una de las 7: misma por enunciado, el resto se archiva. */
+                const json = new TextEncoder().encode(
+                    JSON.stringify([
+                        {
+                            tema: 1,
+                            pregunta: "Fixture: ¿Cuál es la capital de Francia?",
+                            respuestas: ["París", "Roma", "Lisboa"],
+                            respuesta_correcta: "a",
+                            explicacion: "París.",
+                        },
+                    ]),
+                );
+                const r = await gestor.actualizarDesde(json, { id: b.id });
+                expect(r).toMatchObject({ nuevas: 0, duplicadas: 1, actualizadas: 0, archivadas: 6 });
+
+                await gestor.activar(b.id);
+                const repo = await gestor.abrirActivo();
+                expect(repo.contarPreguntas()).toBe(7); // las archivadas siguen en la base
+                expect(repo.paraTest(repo.temario().flatMap((x) => x.temas.map((t) => t.id))).preguntas).toHaveLength(
+                    1,
+                );
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
     }
 
     test("persistir() y persistirBanco() vuelcan sin cerrar el gestor (F4.4)", async () => {

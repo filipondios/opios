@@ -70,6 +70,7 @@ async function importarPorBloques(repo, fuente, opciones) {
             nuevas: 0,
             duplicadas: 0,
             actualizadas: 0,
+            archivadas: 0,
             errores: ["No se pudo leer la raíz del banco"],
             avisos: [],
         };
@@ -176,8 +177,8 @@ async function importarPorBloques(repo, fuente, opciones) {
 
     const sinId = avisoSinIdExterno(validas);
     if (sinId) avisos.push(sinId);
-    const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
-    return { archivos, nuevas, duplicadas, actualizadas, errores, avisos };
+    const { nuevas, duplicadas, actualizadas, archivadas } = repo.importar(validas, opciones);
+    return { archivos, nuevas, duplicadas, actualizadas, archivadas, errores, avisos };
 }
 
 /** Importa una `fuente` (F2.6): detecta `bloque_N/` o cae al formato antiguo de JSON sueltos. */
@@ -189,6 +190,7 @@ export async function importarFuente(repo, fuente, opciones = {}) {
             nuevas: 0,
             duplicadas: 0,
             actualizadas: 0,
+            archivadas: 0,
             errores: ["No se pudo leer la raíz del banco"],
             avisos: [],
         };
@@ -217,7 +219,7 @@ export async function importarFuente(repo, fuente, opciones = {}) {
             }
         });
     }
-    const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
+    const { nuevas, duplicadas, actualizadas, archivadas } = repo.importar(validas, opciones);
     const avisos = [...banco.avisos];
     const sinId = avisoSinIdExterno(validas);
     if (sinId) avisos.push(sinId);
@@ -226,6 +228,7 @@ export async function importarFuente(repo, fuente, opciones = {}) {
         nuevas,
         duplicadas,
         actualizadas,
+        archivadas,
         errores,
         avisos,
     };

@@ -223,7 +223,7 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                 const r = await cliente.bancoImportarArchivo(bytes, { nombre: nombreSugerido, ...opciones });
                 setStatus(
                     "ok",
-                    `Importado «${r.nombre ?? nombreSugerido}»: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas`,
+                    `Importado «${r.nombre ?? nombreSugerido}»: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas${r.archivadas ? `, ${r.archivadas} archivadas` : ""}`,
                 );
                 await refrescar();
             } catch (e) {
@@ -247,7 +247,7 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             const r = await cliente.bancoActualizar(b.id);
             setStatus(
                 "ok",
-                `Actualizado: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas`,
+                `Actualizado: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas${r.archivadas ? `, ${r.archivadas} archivadas` : ""}`,
             );
             await refrescar();
         };

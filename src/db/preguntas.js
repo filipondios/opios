@@ -207,30 +207,53 @@ export function crearPreguntas({ db, q, ftsDisponible, asegurarTemaEnBloque, tem
         },
 
         /** Importa preguntas ya validadas; las que ya existen (mismo enunciado normalizado) se omiten.
-        Con `actualizar`, las que traen `id_externo` y ya existen se actualizan conservando su id. */
+        Con `actualizar`, las que traen `id_externo` y ya existen se actualizan conservando su id
+        y las preguntas del banco que ya no están en el origen se archivan (D3, nunca se borran). */
         importar: db.transaction((lista, { actualizar = false } = {}) => {
             let nuevas = 0,
                 duplicadas = 0,
                 actualizadas = 0;
+            const presentes = new Set();
+            const idsExternos = new Set();
             for (const original of lista) {
                 /* Formato antiguo sin bloque: `tema` es el número dentro del bloque por defecto. */
                 const v = original.bloque ? original : { ...original, tema: temaLegacy(original.tema) };
                 if (actualizar && v.id_externo != null) {
+                    if (idsExternos.has(v.id_externo))
+                        throw new ErrorApi(409, `El origen repite el identificador externo «${v.id_externo}».`);
+                    idsExternos.add(v.id_externo);
                     const existente = q.porIdExterno.get(v.id_externo);
                     if (existente) {
                         guardar(existente.id, v);
+                        presentes.add(existente.id);
                         actualizadas++;
                         continue;
                     }
                 }
-                if (q.porClaveNorm.get(claveDe(v.pregunta))) {
+                /* Sin id_externo (o con uno nuevo) el emparejado es por enunciado, menos fiable (F5.2). */
+                const porEnunciado = q.porClaveNorm.get(claveDe(v.pregunta));
+                if (porEnunciado) {
                     duplicadas++;
+                    presentes.add(porEnunciado.id);
                     continue;
                 }
-                guardar(null, v);
+                presentes.add(guardar(null, v));
                 nuevas++;
             }
-            return { nuevas, duplicadas, actualizadas };
+            let archivadas = 0;
+            if (actualizar) {
+                const archivar = db.query("UPDATE preguntas SET archivada = 1 WHERE id = ? AND archivada = 0");
+                const desarchivar = db.query("UPDATE preguntas SET archivada = 0 WHERE id = ? AND archivada = 1");
+                for (const f of db.query("SELECT id, archivada FROM preguntas").all()) {
+                    if (presentes.has(f.id)) {
+                        if (f.archivada) desarchivar.run(f.id);
+                    } else if (!f.archivada) {
+                        archivar.run(f.id);
+                        archivadas++;
+                    }
+                }
+            }
+            return { nuevas, duplicadas, actualizadas, archivadas };
         }),
     };
 }
