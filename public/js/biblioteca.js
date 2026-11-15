@@ -21,6 +21,12 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         const d = new Date(s);
         return Number.isNaN(d.getTime()) ? s : d.toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" });
     };
+    /* Fecha local YYYY-MM-DD para el nombre de la copia (no la de UTC de toISOString). */
+    const fechaCorta = () => {
+        const d = new Date();
+        const p = (n) => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    };
 
     /* Cambiar de banco guarda (flush) y cierra el actual en el servidor; con un simulacro a
        mitad se pide confirmación antes (F2.8). La página nueva lleva el banco nuevo inyectado. */
@@ -71,30 +77,29 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         }
     }
 
-    let selector = null;
-    function importarDesdeArchivo() {
-        if (nativo()) {
-            leerConSelectorNativo()
-                .then((elegido) => elegido && asistente(elegido.bytes, elegido.nombre))
-                .catch((e) => setStatus("warn", msgError(e)));
-            return;
-        }
-        if (!selector) {
-            selector = h("input", { type: "file", accept: ".opios,.db,.sqlite,.sqlite3,.json,.zip" });
-            selector.addEventListener("change", async () => {
-                const f = selector.files[0];
-                if (!f) return;
-                try {
-                    await asistente(new Uint8Array(await f.arrayBuffer()), f.name);
-                } catch (e) {
-                    setStatus("warn", msgError(e));
-                }
-                selector.value = "";
+    /* Pide un archivo y lo entrega en bytes: plugin nativo en Android, <input type=file> en
+       PC. `accept` solo filtra el selector del navegador; el tipo real se valida al leer. */
+    async function elegirArchivo(accept, manejar) {
+        try {
+            if (nativo()) {
+                const elegido = await leerConSelectorNativo();
+                if (elegido) await manejar(elegido.bytes, elegido.nombre);
+                return;
+            }
+            const input = h("input", { type: "file", accept });
+            input.addEventListener("change", async () => {
+                const f = input.files[0];
+                if (f) await manejar(new Uint8Array(await f.arrayBuffer()), f.name);
+                input.remove();
             });
-            document.body.append(selector);
+            document.body.append(input);
+            input.click();
+        } catch (e) {
+            setStatus("warn", msgError(e));
         }
-        selector.click();
     }
+
+    const importarDesdeArchivo = () => elegirArchivo(".opios,.db,.sqlite,.sqlite3,.json,.zip", asistente);
 
     /* --- "Usar donde está" (F4.1): registrar una SQLite que ya está en el disco del PC.
         El navegador no da la ruta de un archivo elegido con <input type=file>, así que la
@@ -234,6 +239,149 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                     h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
                 );
             }
+        }
+    }
+
+    /* --- Copia completa y restauración (F5.6) --- */
+
+    /* Descarga un `.opios-backup` (zip con todos los bancos y su progreso). */
+    async function descargarCopia() {
+        try {
+            const r = await cliente.bancoCopia();
+            const n = Number(r.headers.get("X-Opios-Bancos") ?? 0);
+            const avisos = Number(r.headers.get("X-Opios-Avisos") ?? 0);
+            const url = URL.createObjectURL(await r.blob());
+            const a = h("a", { href: url, download: `copia-opios-${fechaCorta()}.opios-backup` });
+            document.body.append(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            setStatus(
+                avisos ? "warn" : "ok",
+                `Copia descargada: ${n} banco(s)${avisos ? ` · ${avisos} aviso(s): alguno no estaba accesible` : ""}`,
+            );
+        } catch (e) {
+            setStatus("warn", msgError(e));
+        }
+    }
+
+    const restaurarDesdeArchivo = () => elegirArchivo(".opios-backup,.zip", previsualizarCopia);
+
+    /* Previsualiza la copia (qué bancos trae y cuáles ya están) y deja marcar qué restaurar. */
+    async function previsualizarCopia(bytes, nombreArchivo) {
+        let pre;
+        try {
+            pre = await cliente.copiaInspeccionar(bytes);
+        } catch (e) {
+            setStatus("warn", msgError(e));
+            panel(
+                h("h3", { text: "No se puede restaurar" }),
+                h("p", { class: "error-biblioteca", text: msgError(e) }),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
+            );
+            return;
+        }
+        if (!pre.bancos.length) {
+            setStatus("warn", "La copia no trae ningún banco.");
+            return;
+        }
+        const filas = pre.bancos.map((b) => {
+            const input = h("input", { type: "checkbox", checked: true });
+            return {
+                banco: b,
+                input,
+                nodo: h(
+                    "label",
+                    { class: "fila-restaurar" },
+                    input,
+                    h(
+                        "span",
+                        null,
+                        `${b.nombre} — ${b.preguntas} pregunta(s)`,
+                        b.duplicado
+                            ? h("span", {
+                                  class: "aviso-dup",
+                                  text: ` · ya en tu biblioteca como «${b.duplicado.nombre}»: se reemplazará`,
+                              })
+                            : null,
+                    ),
+                ),
+            };
+        });
+        const duplicados = pre.bancos.filter((b) => b.duplicado).length;
+        setStatus("ok", "Revisa y confirma la restauración");
+        panel(
+            h("h3", { text: "Restaurar copia" }),
+            h("p", {
+                class: "meta-banco",
+                text: `${nombreArchivo} — ${pre.bancos.length} banco(s)${duplicados ? ` · ${duplicados} ya en tu biblioteca` : ""} · creada ${fmtCuando(pre.creado)}`,
+            }),
+            duplicados
+                ? h("p", {
+                      class: "error-biblioteca",
+                      text: "Antes de reemplazar un banco se guarda una copia del actual como «.antes-de-restaurar». Desmarca los que no quieras tocar.",
+                  })
+                : null,
+            h("div", { class: "lista-restaurar" }, ...filas.map((f) => f.nodo)),
+            h(
+                "div",
+                { class: "acciones-importar" },
+                h(
+                    "button",
+                    { class: "btn", type: "button", onclick: () => confirmarCopia(bytes, filas) },
+                    "Restaurar seleccionados",
+                ),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Cancelar"),
+            ),
+        );
+    }
+
+    async function confirmarCopia(bytes, filas) {
+        const elegidos = filas.filter((f) => f.input.checked);
+        if (!elegidos.length) {
+            setStatus("warn", "No has marcado ningún banco.");
+            return;
+        }
+        const archivos = elegidos.map((f) => f.banco.archivo);
+        const reemplaza = elegidos.filter((f) => f.banco.duplicado).length;
+        if (
+            reemplaza &&
+            !confirm(
+                `Se reemplazarán ${reemplaza} banco(s) que ya tienes (antes se guarda el actual como «.antes-de-restaurar»). ¿Continuar?`,
+            )
+        ) {
+            setStatus("warn", "Restauración cancelada.");
+            return;
+        }
+        try {
+            const { resultados } = await cliente.copiaRestaurar(bytes, { archivos, sobrescribir: reemplaza > 0 });
+            const n = (a) => resultados.filter((x) => x.accion === a).length;
+            setStatus(
+                n("error") ? "warn" : "ok",
+                `Restauración: ${n("creado")} creado(s), ${n("reemplazado")} reemplazado(s), ${n("omitido")} omitido(s)${n("error") ? `, ${n("error")} error(es)` : ""}`,
+            );
+            const descripcion = (r) =>
+                r.accion === "omitido"
+                    ? `omitido (${r.motivo})`
+                    : r.accion === "error"
+                      ? `error (${r.mensaje})`
+                      : r.accion;
+            panel(
+                h("h3", { text: "Resultado de la restauración" }),
+                h(
+                    "ul",
+                    { class: "lista-errores" },
+                    ...resultados.map((r) =>
+                        h("li", {
+                            class: r.accion === "error" ? "error-biblioteca" : null,
+                            text: `${r.nombre}: ${descripcion(r)}`,
+                        }),
+                    ),
+                ),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver a la biblioteca"),
+            );
+        } catch (e) {
+            setStatus("warn", msgError(e));
         }
     }
 
@@ -432,6 +580,16 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                               { class: "btn small", type: "button", onclick: usarDondeEsta },
                               "Usar donde está…",
                           ),
+                    h(
+                        "button",
+                        { class: "btn small", type: "button", onclick: descargarCopia },
+                        "Descargar copia completa",
+                    ),
+                    h(
+                        "button",
+                        { class: "btn small", type: "button", onclick: restaurarDesdeArchivo },
+                        "Restaurar copia...",
+                    ),
                 ),
                 nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
                 lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),

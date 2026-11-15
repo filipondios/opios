@@ -74,6 +74,16 @@ export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, {
    (F5.5) empaqueta el banco sin progreso. */
 export const bancoExportar = (id, { conProgreso = true } = {}) =>
     llamada(`/api/bancos/${id}/exportar${conProgreso ? "" : "?progreso=0"}`, { metodo: "POST", bruto: true });
+/* Copia completa (F5.6): descarga un `.opios-backup` con todos los bancos (Response cruda). */
+export const bancoCopia = () => llamada("/api/bancos/copia", { metodo: "POST", bruto: true });
+export const copiaInspeccionar = (bytes) =>
+    llamada("/api/bancos/copia/inspeccionar", { metodo: "POST", cuerpo: bytes });
+export const copiaRestaurar = (bytes, { archivos = [], sobrescribir = false } = {}) => {
+    const p = new URLSearchParams();
+    if (archivos.length) p.set("archivos", archivos.join(","));
+    if (sobrescribir) p.set("sobrescribir", "1");
+    return llamada(`/api/bancos/copia/restaurar${p.toString() ? `?${p}` : ""}`, { metodo: "POST", cuerpo: bytes });
+};
 export const bancoRenombrar = (id, nombre) => llamada(`/api/bancos/${id}`, { metodo: "PUT", cuerpo: { nombre } });
 export const bancoBorrar = (id) => llamada(`/api/bancos/${id}`, { metodo: "DELETE" });
 /* "Usar donde está" (F4.1): registra un archivo .db que ya existe en el disco del PC. */

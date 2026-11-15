@@ -12,6 +12,7 @@ import { DatabaseManager } from "../src/gestor-bancos.js";
 import { almacenBun } from "../src/almacen-bun.js";
 import { driverBun } from "../src/driver-bun.js";
 import { descontenedor, descomprimir } from "../src/portable.js";
+import { leerCopia, FORMATO_COPIA } from "../src/copia.js";
 import { DIR_EJEMPLO } from "../src/config-servidor.js";
 
 const DIR_FIXTURE = join(import.meta.dir, "fixtures"); // 7 preguntas
@@ -121,6 +122,7 @@ describe("biblioteca: modo directo (sin gestor)", () => {
         for (const [ruta, metodo, cuerpo] of [
             ["/api/bancos/importar", "POST", { nombre: "x" }],
             ["/api/bancos/1/activar", "POST", {}],
+            ["/api/bancos/copia", "POST", {}],
             ["/api/bancos/1", "DELETE", undefined],
         ]) {
             const r = await app(
@@ -335,6 +337,49 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         expect((await r.json()).nombre).toBe("Extra");
         r = await petBytes("/api/bancos/importar-archivo?nombre=Extra", bytesJson);
         expect((await r.json()).nombre).toBe("Extra (2)");
+    });
+
+    test("copia completa y restauración por HTTP (F5.6)", async () => {
+        const petBytes = (ruta, bytes) =>
+            app(
+                new Request("http://localhost" + ruta, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/octet-stream" },
+                    body: bytes,
+                }),
+            );
+
+        /* POST /copia: descarga un .opios-backup con los bancos y sus cabeceras de resumen. */
+        let r = await pet("/api/bancos/copia", "POST");
+        expect(r.status).toBe(200);
+        expect(r.headers.get("Content-Disposition")).toContain(".opios-backup");
+        expect(Number(r.headers.get("X-Opios-Bancos"))).toBeGreaterThan(0);
+        const bytes = new Uint8Array(await r.arrayBuffer());
+        expect((await leerCopia(bytes)).manifest.formato).toBe(FORMATO_COPIA);
+
+        /* inspeccionar: trae los bancos; los que ya están salen marcados como duplicados. */
+        r = await petBytes("/api/bancos/copia/inspeccionar", bytes);
+        expect(r.status).toBe(200);
+        const pre = await r.json();
+        expect(pre.bancos.length).toBeGreaterThan(0);
+        expect(pre.bancos.every((b) => b.duplicado)).toBe(true);
+
+        /* restaurar sin sobrescribir: se omiten todos (no se toca la biblioteca). */
+        const archivos = pre.bancos.map((b) => b.archivo).join(",");
+        r = await petBytes(`/api/bancos/copia/restaurar?archivos=${encodeURIComponent(archivos)}`, bytes);
+        expect(r.status).toBe(200);
+        let { resultados } = await r.json();
+        expect(resultados.every((x) => x.accion === "omitido")).toBe(true);
+
+        /* restaurar con sobrescribir=1: se reemplazan y queda la copia del anterior. */
+        r = await petBytes("/api/bancos/copia/restaurar?sobrescribir=1", bytes);
+        expect(r.status).toBe(200);
+        ({ resultados } = await r.json());
+        expect(resultados.length).toBe(pre.bancos.length);
+        expect(resultados.every((x) => x.accion === "reemplazado")).toBe(true);
+        const lista = await (await pet("/api/bancos")).json();
+        const repuesto = lista.find((b) => b.id === resultados[0].id);
+        expect(existsSync(`${repuesto.ruta}.antes-de-restaurar`)).toBe(true);
     });
 
     test("Eliminar vs Desvincular vs Localizar en el gestor (F3.7/F3.8)", async () => {

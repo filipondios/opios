@@ -16,7 +16,8 @@ import { AVISO_BANCO_GRANDE, MAX_SUBIDA } from "./config.js";
 import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
-import { exportarBanco, vaciarProgreso } from "./portable.js";
+import { exportarBanco, importarBancoOpios, vaciarProgreso } from "./portable.js";
+import { empaquetarCopia, leerCopia } from "./copia.js";
 import { detectarArchivo, fuenteDeJson } from "./banco-archivo.js";
 import { fuenteDeZip } from "./banco-zip.js";
 import { fuenteDirectorio } from "./fuente-directorio.js";
@@ -41,6 +42,21 @@ const juntoA = (ruta, nombre) => {
     const i = ruta.lastIndexOf("/");
     return i < 0 ? nombre : ruta.slice(0, i + 1) + nombre;
 };
+
+/** Nombre de archivo seguro para una entrada de la copia completa (F5.6). */
+const sanearNombre = (nombre) =>
+    String(nombre ?? "")
+        .trim()
+        .replace(/[^a-zA-Z0-9._-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "banco";
+
+/** Nombre de entrada único dentro del zip (evita pisar homónimos). */
+function archivoLibre(base, usados) {
+    let nombre = `${base}.opios`;
+    for (let n = 2; usados.has(nombre); n++) nombre = `${base}-${n}.opios`;
+    usados.add(nombre);
+    return nombre;
+}
 
 export class DatabaseManager {
     #almacen;
@@ -380,6 +396,109 @@ export class DatabaseManager {
             return await fn(db);
         } finally {
             db.close();
+        }
+    }
+
+    /** Copia completa (F5.6): un `.opios-backup` (zip con manifest) con TODOS los bancos
+        accesibles, cada uno con su progreso. Los que no están accesibles se omiten con aviso. */
+    async copiaCompleta() {
+        await this.#listo;
+        const bancos = [];
+        const avisos = [];
+        const usados = new Set();
+        for (const b of await this.listar()) {
+            if (!b.disponible) {
+                avisos.push(`«${b.nombre}» no está accesible: no se incluye en la copia.`);
+                continue;
+            }
+            try {
+                const paquete = await this.exportar(b.id);
+                bancos.push({ archivo: archivoLibre(sanearNombre(b.nombre), usados), manifest: paquete.manifest, bytes: paquete.bytes });
+            } catch (e) {
+                avisos.push(`«${b.nombre}»: ${e.message}`);
+            }
+        }
+        return { ...empaquetarCopia(bancos), avisos };
+    }
+
+    /** Previsualiza un `.opios-backup` sin tocar nada (F5.6): qué bancos trae y cuáles ya
+        están en la biblioteca (duplicado por uuid o nombre). */
+    async inspeccionarCopia(bytes) {
+        this.#comprobarTamano(bytes);
+        const copia = await leerCopia(bytes);
+        const bancos = [];
+        for (const b of copia.bancos) {
+            const pre = await this.inspeccionar(b.bytes, { nombre: b.nombre });
+            bancos.push({
+                archivo: b.archivo,
+                nombre: b.nombre,
+                preguntas: pre.preguntas,
+                version_banco: pre.version_banco,
+                uuid: pre.uuid ?? null,
+                duplicado: pre.duplicado,
+            });
+        }
+        return { formato: copia.manifest.formato, creado: copia.manifest.creado, bancos };
+    }
+
+    /** Restaura bancos de un `.opios-backup` (F5.6). `archivos` selecciona cuáles (todos si
+        se omite). Un banco que ya está en la biblioteca NO se sobrescribe si `sobrescribir`
+        es false; con true se reemplaza, guardando antes el archivo actual como
+        `*.antes-de-restaurar`. Un fallo en un banco no cancela los demás. */
+    async restaurarCopia(bytes, { archivos = [], sobrescribir = false } = {}) {
+        this.#comprobarTamano(bytes);
+        await this.#listo;
+        const copia = await leerCopia(bytes);
+        const elegidos = archivos?.length ? copia.bancos.filter((b) => archivos.includes(b.archivo)) : copia.bancos;
+        const resultados = [];
+        for (const b of elegidos) {
+            try {
+                const dup = (await this.inspeccionar(b.bytes, { nombre: b.nombre })).duplicado;
+                if (dup && !sobrescribir) {
+                    resultados.push({
+                        archivo: b.archivo,
+                        nombre: b.nombre,
+                        accion: "omitido",
+                        id: dup.id,
+                        motivo: `ya está en la biblioteca como «${dup.nombre}»`,
+                    });
+                } else if (dup) {
+                    resultados.push(await this.#reemplazarDesdeCopia(b, dup));
+                } else {
+                    const r = await this.importarBytes(b.bytes, { nombre: b.nombre });
+                    resultados.push({
+                        archivo: b.archivo,
+                        nombre: r.nombre,
+                        accion: "creado",
+                        id: r.id,
+                        preguntas: r.preguntas,
+                    });
+                }
+            } catch (e) {
+                resultados.push({ archivo: b.archivo, nombre: b.nombre, accion: "error", mensaje: e.message });
+            }
+        }
+        return { resultados };
+    }
+
+    /* Restaura un banco sobre otro ya existente: cierra el activo si es el destino, guarda
+       su estado actual como `.antes-de-restaurar` y lo reemplaza verificado. */
+    async #reemplazarDesdeCopia(b, dup) {
+        const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(dup.id);
+        const eraActivo = this.#abierto && this.#abierto.id === dup.id;
+        if (eraActivo) await this.cerrar(); // vuelca y libera la conexión única antes de pisar el archivo
+        try {
+            if (await this.#almacen.existe(fila.ruta))
+                await this.#almacen.escribir(`${fila.ruta}.antes-de-restaurar`, await this.#almacen.leer(fila.ruta));
+            await importarBancoOpios(this.#driver, this.#almacen, fila.ruta, b.bytes);
+            const info = await this.#verificar(fila.ruta);
+            const tam = (await this.#almacen.leer(fila.ruta)).length;
+            this.#catalogo
+                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
+                .run(tam, info.preguntas, info.user_version, info.uuid, dup.id);
+            return { archivo: b.archivo, nombre: fila.nombre, accion: "reemplazado", id: dup.id, preguntas: info.preguntas };
+        } finally {
+            if (eraActivo) await this.abrirActivo(); // deja la app sirviendo el banco restaurado
         }
     }
 

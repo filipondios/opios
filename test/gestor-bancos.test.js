@@ -590,6 +590,61 @@ describe("DatabaseManager neutro (F2.3)", () => {
             }
         });
 
+        test(`${nombre}: copia completa, inspeccionar y restaurar (omite, reemplaza y crea)`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const b1 = await gestor.importarJson("Uno", join(import.meta.dir, "fixtures"));
+                const b2 = await gestor.importarJson("Dos", join(import.meta.dir, "fixtures"));
+                await gestor.activar(b1.id);
+                const repo = await gestor.abrirActivo();
+                const pid = repo.todas()[0].id;
+                repo.guardarProgreso([{ id: pid, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+                const fila1 = (await gestor.listar()).find((x) => x.nombre === "Uno");
+
+                /* La copia completa trae los dos bancos con su progreso, sin avisos. */
+                const copia = await gestor.copiaCompleta();
+                expect(copia.avisos).toEqual([]);
+                expect(copia.manifest.bancos.map((b) => b.nombre)).toEqual(["Dos", "Uno"]);
+                expect(copia.manifest.bancos.every((b) => b.archivo.endsWith(".opios"))).toBe(true);
+
+                /* Inspección: los dos ya están (duplicados por uuid). */
+                const pre = await gestor.inspeccionarCopia(copia.bytes);
+                expect(pre.bancos).toHaveLength(2);
+                expect(pre.bancos.every((b) => b.duplicado && b.preguntas === 7)).toBe(true);
+
+                /* Sin sobrescribir: se omiten, sin tocar nada. */
+                const r1 = await gestor.restaurarCopia(copia.bytes);
+                expect(r1.resultados.map((r) => r.accion)).toEqual(["omitido", "omitido"]);
+
+                /* Con sobrescribir: se reemplazan y guardan el anterior como .antes-de-restaurar. */
+                const r2 = await gestor.restaurarCopia(copia.bytes, { sobrescribir: true });
+                expect(r2.resultados.map((r) => r.accion)).toEqual(["reemplazado", "reemplazado"]);
+                expect(await ctx.almacen.existe(fila1.ruta + ".antes-de-restaurar")).toBe(true);
+                /* El activo se reabre con el progreso que llevaba la copia. */
+                const activo = await gestor.abrirActivo();
+                const tema = activo.temario()[0].temas[0].id;
+                expect(activo.paraTest([tema]).progreso[pid][0]).toBe(3);
+
+                /* Borrado: al no estar en la biblioteca, se restaura como banco nuevo. */
+                await gestor.borrar(b2.id);
+                expect((await gestor.listar()).map((x) => x.nombre)).toEqual(["Uno"]);
+                const archivo2 = copia.manifest.bancos.find((b) => b.nombre === "Dos").archivo;
+                const pre2 = await gestor.inspeccionarCopia(copia.bytes);
+                expect(pre2.bancos.find((b) => b.archivo === archivo2).duplicado).toBeFalsy();
+                const r3 = await gestor.restaurarCopia(copia.bytes, { archivos: [archivo2] });
+                expect(r3.resultados).toEqual([expect.objectContaining({ accion: "creado", preguntas: 7 })]);
+                expect((await gestor.listar()).map((x) => x.nombre)).toEqual(["Dos", "Uno"]);
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
+
         test(`${nombre}: actualizarDesde con JSON en bytes fusiona y archiva`, async () => {
             const ctx = preparar();
             const gestor = new DatabaseManager({

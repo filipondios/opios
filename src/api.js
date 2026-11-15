@@ -140,6 +140,36 @@ export function crearApi(
             );
         }
 
+        /* Copia completa (F5.6): descarga un `.opios-backup` con todos los bancos. */
+        if (ruta === "/api/bancos/copia" && m === "POST") {
+            const { bytes, manifest, avisos } = await gestor.copiaCompleta();
+            return new Response(bytes, {
+                headers: {
+                    "Content-Type": "application/octet-stream",
+                    "Content-Disposition": `attachment; filename="copia-opios-${fechaHoy()}.opios-backup"`,
+                    "Cache-Control": "no-store",
+                    "X-Opios-Bancos": String(manifest.bancos.length),
+                    "X-Opios-Avisos": String(avisos.length),
+                },
+            });
+        }
+        if (ruta === "/api/bancos/copia/inspeccionar" && m === "POST") {
+            return json(await gestor.inspeccionarCopia(await cuerpoBytes(req)));
+        }
+        if (ruta === "/api/bancos/copia/restaurar" && m === "POST") {
+            const bytes = await cuerpoBytes(req);
+            const archivos = (url.searchParams.get("archivos") ?? "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+            return json(
+                await gestor.restaurarCopia(bytes, {
+                    archivos,
+                    sobrescribir: url.searchParams.get("sobrescribir") === "1",
+                }),
+            );
+        }
+
         const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar|desvincular|localizar))?$/);
         if (mb) {
             const id = Number(mb[1]);
