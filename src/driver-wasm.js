@@ -9,7 +9,9 @@ export function crearDriverWasm({ rutaWasm = "sql-wasm.wasm" } = {}) {
         async abrir(almacen, ruta, { readonly = false } = {}) {
             const hay = await almacen.existe(ruta);
             if (!hay && readonly) throw new Error(`No existe el banco «${ruta}».`);
-            return abrirAdaptadorSqlite({ bytes: hay ? await almacen.leer(ruta) : null, rutaWasm });
+            const bytes = hay ? await almacen.leer(ruta) : null;
+            /* Un archivo de 0 bytes (catálogo recién creado por el gestor) equivale a banco nuevo. */
+            return abrirAdaptadorSqlite({ bytes: bytes?.length ? bytes : null, rutaWasm });
         },
         instantanea: (db) => db.exportar(),
         userVersion,

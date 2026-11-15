@@ -20,6 +20,8 @@ const files = [
     "src/almacen-capacitor.js",
     "src/driver.js",
     "src/driver-wasm.js",
+    "src/db/validar-sqlite.js",
+    "src/portable.js",
     "public/js/cliente-local.js",
     "src/android/puente.js",
     "src/android/persistencia.js",

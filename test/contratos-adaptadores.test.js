@@ -14,6 +14,8 @@ import { abrirDb } from "../src/db.js";
 import { abrirRepo } from "../src/db/index.js";
 import { MIGRACIONES, tieneFts5 } from "../src/db/esquema.js";
 import { crearApp } from "../src/app.js";
+import { almacenBun } from "../src/almacen-bun.js";
+import { driverBun } from "../src/driver-bun.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
 import { exportarBanco, importarBancoOpios } from "../src/portable.js";
 import { importarDirectorio } from "../src/seed.js";
@@ -296,11 +298,20 @@ describe("task 12: backup portable y cambio de banco entre drivers", () => {
                 repoCopia.close();
             }
 
-            const paquete = join(dir, "wasm.opios");
-            expect(exportarBanco(banco, paquete, { nombre: "Desde Android" })).toMatchObject({ preguntas: 7 });
+            /* El PC lo empaqueta (instantánea consistente del driver) y lo restaura. */
+            const repoExportar = abrirDb(banco);
+            let paquete;
+            try {
+                paquete = await exportarBanco(driverBun, repoExportar.db, { nombre: "Desde Android" });
+            } finally {
+                repoExportar.close();
+            }
+            expect(paquete.manifest).toMatchObject({ preguntas: 7 });
 
             const restaurado = join(dir, "restaurado.db");
-            expect(importarBancoOpios(paquete, restaurado)).toMatchObject({ preguntas: 7 });
+            expect(await importarBancoOpios(driverBun, almacenBun, restaurado, paquete.bytes)).toMatchObject({
+                preguntas: 7,
+            });
 
             /* Restaurado: lo abre Bun y lo abre el adaptador, con el mismo contenido. */
             const repoBun = abrirDb(restaurado);
@@ -323,7 +334,11 @@ describe("task 12: backup portable y cambio de banco entre drivers", () => {
 
     test("el catálogo alterna entre un banco de Bun y uno del adaptador conservando cada progreso", async () => {
         const dir = mkdtempSync(join(tmpdir(), "opios-catalogo-drivers-"));
-        const gestor = new DatabaseManager(join(dir, "catalogo.db"));
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver: driverBun,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
         try {
             /* Banco A: creado por el PC. Banco B: creado en el WebView. */
             const rutaA = join(dir, "a.db");
@@ -339,25 +354,25 @@ describe("task 12: backup portable y cambio de banco entre drivers", () => {
             const rutaB = join(dir, "b.db");
             writeFileSync(rutaB, bytesB);
 
-            /* registrar() valida con la conexión de Bun: el banco del WebView pasa el filtro. */
-            const bancoA = gestor.registrar("Banco A", rutaA);
-            const bancoB = gestor.registrar("Banco B", rutaB);
+            /* registrar() valida con el filtro único (F2.4): el banco del WebView pasa. */
+            const bancoA = await gestor.registrar("Banco A", rutaA);
+            const bancoB = await gestor.registrar("Banco B", rutaB);
 
-            gestor.activar(bancoA.id);
-            expect(gestor.abrirActivo().paraTest([a.tema]).progreso[a.id]).toEqual([4, "2026-07-01", 2, 1]);
-            gestor.cerrar();
+            await gestor.activar(bancoA.id);
+            expect((await gestor.abrirActivo()).paraTest([a.tema]).progreso[a.id]).toEqual([4, "2026-07-01", 2, 1]);
+            await gestor.cerrar();
 
-            gestor.activar(bancoB.id);
-            const repoActivoB = gestor.abrirActivo();
+            await gestor.activar(bancoB.id);
+            const repoActivoB = await gestor.abrirActivo();
             expect(repoActivoB.contarPreguntas()).toBe(1); // solo la suya, no la del otro banco
             expect(repoActivoB.paraTest([b.tema]).progreso[b.id]).toEqual([2, "2026-07-01", 2, 1]);
-            gestor.cerrar();
+            await gestor.cerrar();
 
             /* Volver al primero no mezcla ni pierde progreso. */
-            gestor.activar(bancoA.id);
-            expect(gestor.abrirActivo().paraTest([a.tema]).progreso[a.id][0]).toBe(4);
+            await gestor.activar(bancoA.id);
+            expect((await gestor.abrirActivo()).paraTest([a.tema]).progreso[a.id][0]).toBe(4);
         } finally {
-            gestor.close();
+            await gestor.close();
             rmSync(dir, { recursive: true, force: true });
         }
     });

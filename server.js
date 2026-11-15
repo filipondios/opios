@@ -3,6 +3,8 @@ import { crearApp } from "./src/app.js";
 import { idBanco } from "./src/banco-id.js";
 import { importarDirectorio } from "./src/seed.js";
 import { DatabaseManager } from "./src/gestor-bancos.js";
+import { almacenBun } from "./src/almacen-bun.js";
+import { driverBun } from "./src/driver-bun.js";
 import {
     APP_TZ,
     AUTH,
@@ -26,17 +28,17 @@ let repo,
     gestor = null;
 try {
     if (RUTA_CATALOGO) {
-        gestor = new DatabaseManager(RUTA_CATALOGO);
-        if (!gestor.idActivo()) {
+        gestor = new DatabaseManager({ almacen: almacenBun, driver: driverBun, rutaCatalogo: RUTA_CATALOGO });
+        if (!(await gestor.idActivo())) {
             logErr(
                 `El catálogo ${RUTA_CATALOGO} no tiene banco activo. ` +
                     "Elige uno con: bun run bancos listar && bun run bancos activar <id>",
             );
-            gestor.close();
+            await gestor.close();
             process.exit(1);
         }
-        repo = gestor.abrirActivo();
-        log(`Modo biblioteca: banco activo ${gestor.rutaActiva()} (catálogo: ${RUTA_CATALOGO})`);
+        repo = await gestor.abrirActivo();
+        log(`Modo biblioteca: banco activo ${await gestor.rutaActiva()} (catálogo: ${RUTA_CATALOGO})`);
     } else {
         repo = abrirDb(DB_PATH);
     }
@@ -80,7 +82,7 @@ const servidor = Bun.serve({
 });
 if (!AUTH && HOST !== "127.0.0.1" && HOST !== "localhost")
     log("AVISO: la app es accesible desde fuera y no tiene contraseña (define AUTH_USER y AUTH_PASS).");
-log(`Test infinito en ${servidor.url}  (base de datos: ${gestor ? gestor.rutaActiva() : DB_PATH})`);
+log(`Test infinito en ${servidor.url}  (base de datos: ${gestor ? await gestor.rutaActiva() : DB_PATH})`);
 log(`Hosts aceptados: ${ALLOWED_HOSTS.join(", ")}`);
 
 /* Cierre ordenado: deja de aceptar conexiones y después cierra la base de datos. */
@@ -101,7 +103,7 @@ async function cerrar(senal) {
     }
     if (gestor) {
         try {
-            gestor.close(); // cierra banco (de nuevo, si acaso) y catálogo
+            await gestor.close(); // cierra banco (de nuevo, si acaso) y catálogo
         } catch (e) {
             logErr("Error al cerrar el catálogo:", e);
         }

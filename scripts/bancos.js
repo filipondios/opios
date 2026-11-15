@@ -7,6 +7,8 @@
    Gestiona el catálogo del modo biblioteca. Requiere OPIOS_CATALOGO. */
 import { RUTA_CATALOGO } from "../src/config-servidor.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
+import { almacenBun } from "../src/almacen-bun.js";
+import { driverBun } from "../src/driver-bun.js";
 import { ejecutarCli } from "../src/cli.js";
 
 await ejecutarCli(async () => {
@@ -15,11 +17,11 @@ await ejecutarCli(async () => {
         process.exit(1);
     }
     const [comando, ...args] = process.argv.slice(2);
-    const gestor = new DatabaseManager(RUTA_CATALOGO);
+    const gestor = new DatabaseManager({ almacen: almacenBun, driver: driverBun, rutaCatalogo: RUTA_CATALOGO });
     try {
         if (comando === "listar" && args.length === 0) {
-            const activo = gestor.idActivo();
-            const filas = gestor.listar();
+            const activo = await gestor.idActivo();
+            const filas = await gestor.listar();
             if (!filas.length) return console.log("Catálogo vacío: registra un banco con «bun run bancos registrar».");
             for (const b of filas)
                 console.log(
@@ -28,19 +30,19 @@ await ejecutarCli(async () => {
             return;
         }
         if (comando === "registrar" && args.length === 2) {
-            const b = gestor.registrar(args[0], args[1]);
+            const b = await gestor.registrar(args[0], args[1]);
             return console.log(`Registrado: ${b.id} ${b.nombre} -> ${b.ruta}`);
         }
         if (comando === "activar" && args.length === 1) {
-            gestor.activar(Number(args[0]));
-            return console.log(`Banco activo: ${args[0]} (${gestor.rutaActiva()})`);
+            await gestor.activar(Number(args[0]));
+            return console.log(`Banco activo: ${args[0]} (${await gestor.rutaActiva()})`);
         }
         if (comando === "importar" && args.length === 2) {
             const b = await gestor.importarJson(args[0], args[1]);
             return console.log(`Creado: ${b.id} ${b.nombre} -> ${b.ruta}`);
         }
         if (comando === "copiar" && args.length === 2) {
-            const b = gestor.copiar(args[0], args[1]);
+            const b = await gestor.copiar(args[0], args[1]);
             return console.log(`Copiado: ${b.id} ${b.nombre} -> ${b.ruta}`);
         }
         if (comando === "actualizar" && args.length === 1) {
@@ -57,6 +59,6 @@ await ejecutarCli(async () => {
         );
         process.exit(1);
     } finally {
-        gestor.close();
+        await gestor.close();
     }
 });
