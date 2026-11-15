@@ -6,6 +6,14 @@ import { RE_TEMA, recorrerBanco } from "./estructura-banco.js";
 
 const numeroDeTema = (nombre) => Number(RE_TEMA.exec(nombre)?.[1]);
 
+/** Sin `id_externo`, actualizar desde el origen solo puede emparejar por enunciado (menos fiable). */
+function avisoSinIdExterno(validas) {
+    const n = validas.filter((v) => v.id_externo == null).length;
+    return n
+        ? `${n} pregunta(s) sin id_externo: al actualizar desde el origen se emparejarán por enunciado (menos fiable).`
+        : null;
+}
+
 /** Lee un archivo que debe contener una lista de preguntas (o { preguntas: [...] }). */
 async function leerLista(fuente, ruta) {
     let datos;
@@ -166,6 +174,8 @@ async function importarPorBloques(repo, fuente, opciones) {
             "Hay JSON sueltos en la raíz del banco: usa bloque_X/tema_N.json (el formato antiguo sigue funcionando por ahora).",
         );
 
+    const sinId = avisoSinIdExterno(validas);
+    if (sinId) avisos.push(sinId);
     const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
     return { archivos, nuevas, duplicadas, actualizadas, errores, avisos };
 }
@@ -208,12 +218,15 @@ export async function importarFuente(repo, fuente, opciones = {}) {
         });
     }
     const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
+    const avisos = [...banco.avisos];
+    const sinId = avisoSinIdExterno(validas);
+    if (sinId) avisos.push(sinId);
     return {
         archivos,
         nuevas,
         duplicadas,
         actualizadas,
         errores,
-        avisos: banco.avisos,
+        avisos,
     };
 }

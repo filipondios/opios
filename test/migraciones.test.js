@@ -139,13 +139,13 @@ describe("migraciones", () => {
         const dir = mkdtempSync(join(tmpdir(), "opios-clave-"));
         const ruta = join(dir, "opios.db");
         try {
-            /* Crea una base hasta la versión anterior a v12 y le devuelve el nombre antiguo a la columna. */
+            /* Crea una base hasta v11 (la versión anterior a v12) y le devuelve el nombre antiguo a la columna. */
             const vieja = new Database(ruta, { create: true, strict: true });
-            for (let v = 0; v < MIGRACIONES.length - 1; v++) {
+            for (let v = 0; v < 11; v++) {
                 const m = MIGRACIONES[v];
                 vieja.run(typeof m === "function" ? m(vieja) : m);
             }
-            vieja.run(`PRAGMA user_version = ${MIGRACIONES.length - 1}`);
+            vieja.run("PRAGMA user_version = 11");
             vieja.run("DROP INDEX IF EXISTS ux_preguntas_clave_norm");
             vieja.run("ALTER TABLE preguntas RENAME COLUMN clave_norm TO clave");
             vieja.run("INSERT INTO temas (id, bloque_id, numero, nombre) VALUES (1, 1, 1, 'Tema antiguo')");
@@ -171,6 +171,44 @@ describe("migraciones", () => {
                 expect(repo.db.query("SELECT clave_norm FROM preguntas WHERE id = 1").get().clave_norm).toBe(
                     claveDe("¿Pregunta antigua?"),
                 );
+            } finally {
+                repo.close();
+            }
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("una base v12 recibe la columna `archivada` con valor 0 y conserva los datos (v13)", () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-archivada-"));
+        const ruta = join(dir, "opios.db");
+        try {
+            /* Base tal y como queda justo antes de v13. */
+            const vieja = new Database(ruta, { create: true, strict: true });
+            for (let v = 0; v < MIGRACIONES.length - 1; v++) {
+                const m = MIGRACIONES[v];
+                vieja.run(typeof m === "function" ? m(vieja) : m);
+            }
+            vieja.run(`PRAGMA user_version = ${MIGRACIONES.length - 1}`);
+            vieja.run("INSERT INTO temas (id, bloque_id, numero, nombre) VALUES (1, 1, 1, 'Tema')");
+            vieja.run(`INSERT INTO preguntas (id, tema_id, enunciado, clave_norm, explicacion)
+                 VALUES (1, 1, '¿Sigue aquí?', 'sigue aqui', '')`);
+            vieja.close();
+
+            const repo = abrirDb(ruta);
+            try {
+                const columnas = repo.db
+                    .query("PRAGMA table_info(preguntas)")
+                    .all()
+                    .map((c) => c.name);
+                expect(columnas).toContain("archivada");
+                /* Las filas existentes y las nuevas quedan sin archivar por defecto. */
+                expect(repo.db.query("SELECT archivada FROM preguntas WHERE id = 1").get().archivada).toBe(0);
+                repo.db.run(
+                    "INSERT INTO preguntas (id, tema_id, enunciado, clave_norm) VALUES (2, 1, 'Nueva', 'nueva')",
+                );
+                expect(repo.db.query("SELECT archivada FROM preguntas WHERE id = 2").get().archivada).toBe(0);
+                expect(repo.paraTest([1]).preguntas.map((p) => p.id)).toEqual([1, 2]);
             } finally {
                 repo.close();
             }

@@ -206,6 +206,10 @@ export const MIGRACIONES = [
         db.run("CREATE UNIQUE INDEX IF NOT EXISTS ux_preguntas_clave_norm ON preguntas(clave_norm)");
         return "SELECT 1";
     },
+
+    /* v13: borrado lógico (`archivada=1`) al actualizar desde el origen. La pregunta desaparece
+     del estudio y las estadísticas, pero su progreso y sus respuestas se conservan (historial). */
+    `ALTER TABLE preguntas ADD COLUMN archivada INTEGER NOT NULL DEFAULT 0;`,
 ];
 
 /** Comprueba si el SQLite de este build incluye FTS5. */

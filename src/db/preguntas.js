@@ -120,19 +120,21 @@ export function crearPreguntas({ db, q, ftsDisponible, asegurarTemaEnBloque, tem
             const preguntas = ensamblar(
                 db
                     .query(`SELECT ${CAMPOS_PREGUNTA} ${JOINS_PREGUNTA}
-                  WHERE p.tema_id IN (${marcas(temas.length)}) ORDER BY p.id`)
+                  WHERE p.tema_id IN (${marcas(temas.length)}) AND p.archivada = 0 ORDER BY p.id`)
                     .all(...temas),
                 db
                     .query(`SELECT o.pregunta_id, o.posicion, o.texto, o.es_correcta FROM opciones o
                   JOIN preguntas p ON p.id = o.pregunta_id
-                  WHERE p.tema_id IN (${marcas(temas.length)}) ORDER BY o.pregunta_id, o.posicion`)
+                  WHERE p.tema_id IN (${marcas(temas.length)}) AND p.archivada = 0
+                  ORDER BY o.pregunta_id, o.posicion`)
                     .all(...temas),
             );
             const progreso = {};
             const filas = db
                 .query(
                     `SELECT pr.pregunta_id AS id, pr.caja, pr.vence, pr.aciertos, pr.fallos FROM progreso pr
-         JOIN preguntas p ON p.id = pr.pregunta_id WHERE p.tema_id IN (${marcas(temas.length)})`,
+         JOIN preguntas p ON p.id = pr.pregunta_id
+         WHERE p.tema_id IN (${marcas(temas.length)}) AND p.archivada = 0`,
                 )
                 .all(...temas);
             for (const f of filas) progreso[f.id] = [f.caja, f.vence, f.aciertos, f.fallos];

@@ -21,6 +21,7 @@ export function crearProgreso({ db, q }) {
         JOIN temas t ON t.id = p.tema_id
         LEFT JOIN bloques b ON b.id = t.bloque_id
         LEFT JOIN progreso pr ON pr.pregunta_id = p.id
+        WHERE p.archivada = 0
         GROUP BY p.tema_id
         ORDER BY COALESCE(b.orden, 2147483647), COALESCE(t.numero, t.id), p.tema_id`)
                 .all(hoy, cajaDominada, cajaDominada);
@@ -66,7 +67,8 @@ export function crearProgreso({ db, q }) {
                COALESCE(SUM(pr.vence <= ?), 0)                           AS repaso,
                COALESCE(SUM(pr.aciertos), 0)                             AS aciertos,
                COALESCE(SUM(pr.fallos), 0)                               AS fallos
-        FROM preguntas p LEFT JOIN progreso pr ON pr.pregunta_id = p.id`)
+        FROM preguntas p LEFT JOIN progreso pr ON pr.pregunta_id = p.id
+        WHERE p.archivada = 0`)
                 .get(cajaDominada, cajaDominada, hoy);
         },
 
@@ -75,8 +77,9 @@ export function crearProgreso({ db, q }) {
             const hasta = sumarDias(hoy, Math.max(1, dias) - 1);
             return db
                 .query(`
-        SELECT vence, COUNT(*) AS n FROM progreso
-        WHERE vence <= ? GROUP BY vence ORDER BY vence`)
+        SELECT pr.vence, COUNT(*) AS n FROM progreso pr
+        JOIN preguntas p ON p.id = pr.pregunta_id AND p.archivada = 0
+        WHERE pr.vence <= ? GROUP BY pr.vence ORDER BY pr.vence`)
                 .all(hasta);
         },
 
@@ -93,7 +96,7 @@ export function crearProgreso({ db, q }) {
         JOIN temas t ON t.id = p.tema_id
         LEFT JOIN bloques b ON b.id = t.bloque_id
         LEFT JOIN progreso pr ON pr.pregunta_id = p.id
-        WHERE COALESCE(pr.fallos, 0) > 0
+        WHERE COALESCE(pr.fallos, 0) > 0 AND p.archivada = 0
         ORDER BY fallos DESC, aciertos ASC, p.id
         LIMIT ?`)
                 .all(limite);
@@ -124,8 +127,14 @@ export function crearProgreso({ db, q }) {
         WHERE r.origen = 'test' AND r.fecha = ?
           AND NOT EXISTS (SELECT 1 FROM respuestas r2 WHERE r2.pregunta_id = r.pregunta_id AND r2.id < r.id)`)
                 .get(hoy).n;
-            const repasosPendientes = db.query("SELECT COUNT(*) AS n FROM progreso WHERE vence <= ?").get(hoy).n;
-            const repasosAtrasados = db.query("SELECT COUNT(*) AS n FROM progreso WHERE vence < ?").get(hoy).n;
+            const repasosPendientes = db
+                .query(`SELECT COUNT(*) AS n FROM progreso pr JOIN preguntas p ON p.id = pr.pregunta_id
+                        AND p.archivada = 0 WHERE pr.vence <= ?`)
+                .get(hoy).n;
+            const repasosAtrasados = db
+                .query(`SELECT COUNT(*) AS n FROM progreso pr JOIN preguntas p ON p.id = pr.pregunta_id
+                        AND p.archivada = 0 WHERE pr.vence < ?`)
+                .get(hoy).n;
             return {
                 nuevasHoy,
                 cupoNuevas: CUPO_NUEVAS,

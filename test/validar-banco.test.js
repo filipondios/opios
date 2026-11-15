@@ -61,6 +61,32 @@ describe("validación de un banco (Fase 8.9)", () => {
         }
     });
 
+    test("avisa de las preguntas sin id_externo (emparejado por enunciado al actualizar)", async () => {
+        /* El banco de ejemplo trae id_externo en todas: sin aviso. */
+        expect((await validarBanco(repo, DIR_EJEMPLO)).avisos.some((a) => a.includes("sin id_externo"))).toBe(false);
+
+        const dir = temporal();
+        try {
+            await Bun.write(
+                join(dir, "bloque_1/tema_1.json"),
+                JSON.stringify([
+                    { pregunta: "¿Sin identificador?", respuestas: ["A", "B"], respuesta_correcta: "a" },
+                    {
+                        pregunta: "¿Con identificador?",
+                        respuestas: ["A", "B"],
+                        respuesta_correcta: "a",
+                        id_externo: "x-1",
+                    },
+                ]),
+            );
+            const aviso = (await validarBanco(repo, dir)).avisos.find((a) => a.includes("sin id_externo"));
+            expect(aviso).toContain("1 pregunta(s)");
+            expect(aviso).toContain("enunciado");
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
     test("un directorio inexistente es un error", async () => {
         const r = await validarBanco(repo, join(tmpdir(), `opios-no-existe-${Date.now()}`));
         expect(r.errores.length).toBe(1);

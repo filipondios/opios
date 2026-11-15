@@ -1125,6 +1125,37 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
         expect(repo.db.query("SELECT COUNT(*) n FROM respuestas").get().n).toBe(0);
     });
 
+    test("una pregunta archivada sale del estudio y las estadísticas, pero conserva su historial", async () => {
+        const [a] = await ids();
+        repo.guardarProgreso([{ id: a, caja: 1, vence: hoyIso(), aciertos: 0, fallos: 2 }]);
+        repo.registrarRespuestas([{ id: a, acierto: 0, ms: null }], hoyIso());
+
+        repo.db.run("UPDATE preguntas SET archivada = 1 WHERE id = ?", a);
+
+        const t = await (await pet("/api/test?temas=1")).json();
+        expect(t.preguntas.map((p) => p.id)).not.toContain(a);
+        expect(t.preguntas).toHaveLength(TOTAL_TEMA_1 - 1);
+        expect(t.progreso[a]).toBeUndefined();
+        expect(repo.estadisticasGlobales(hoyIso(), 4).total).toBe(TOTAL_FIXTURE - 1);
+        expect(repo.estadisticasTemas(hoyIso(), 4).find((x) => x.tema === 1).total).toBe(TOTAL_TEMA_1 - 1);
+        expect(repo.preguntasMasFalladas(20).map((p) => p.id)).not.toContain(a);
+        expect(
+            repo
+                .temario()
+                .flatMap((b) => b.temas)
+                .find((x) => x.id === 1).preguntas,
+        ).toBe(TOTAL_TEMA_1 - 1);
+        expect(repo.previsionRepasos(hoyIso())).toEqual([]);
+        expect((await carga()).repasosPendientes).toBe(0);
+
+        /* El historial, el progreso y la propia pregunta no se borran (se puede desarchivar/exportar). */
+        expect(repo.db.query("SELECT COUNT(*) AS n FROM respuestas WHERE pregunta_id = ?").get(a).n).toBe(1);
+        expect(repo.db.query("SELECT fallos FROM progreso WHERE pregunta_id = ?").get(a).fallos).toBe(2);
+        expect(repo.actividadReciente(sumarDias(hoyIso(), -13)).at(-1)).toMatchObject({ n: 1, fallos: 1 });
+        expect(repo.obtener(a)).not.toBeNull();
+        expect(repo.listar({ tema: 1 }).items.map((p) => p.id)).toContain(a);
+    });
+
     test("el cupo de nuevas cuenta primeras respuestas de test y no las de simulacro", async () => {
         const bank = await ids();
         await pet("/api/respuestas", "POST", {

@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 
 import { abrirAdaptadorSqlite, deBase64 } from "../src/adaptador-sqlite-wasm.js";
 import { abrirRepo } from "../src/db/index.js";
+import { MIGRACIONES } from "../src/db/esquema.js";
 import { importarDirectorio } from "../src/seed-directorio.js";
 
 const WASM = "node_modules/sql.js/dist/sql-wasm.wasm";
@@ -12,7 +13,7 @@ describe("adaptador sqlite wasm", () => {
     test("migra el esquema completo y acepta el banco de ejemplo", async () => {
         const db = await abrir();
         const repo = abrirRepo(db);
-        expect(db.query("PRAGMA user_version").get().user_version).toBe(12);
+        expect(db.query("PRAGMA user_version").get().user_version).toBe(MIGRACIONES.length);
         const r = await importarDirectorio(repo, "./test/fixtures");
         expect(r.nuevas).toBe(7);
         expect(repo.contarPreguntas()).toBe(7);
