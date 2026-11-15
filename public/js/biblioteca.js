@@ -214,10 +214,29 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             await cliente.bancoRenombrar(b.id, nombre);
             await refrescar();
         };
+        /* Eliminar (F3.7): solo copias gestionadas — borra el archivo de Opios y su progreso.
+           Se confirma escribiendo el nombre y se sugiere exportar antes. */
         const alBorrar = async () => {
-            if (!confirm(`¿Eliminar «${b.nombre}» y su archivo? El progreso de ese banco se pierde.`)) return;
+            if (
+                !confirm(
+                    `¿Eliminar «${b.nombre}» y su archivo? El progreso de ese banco se pierde.\n` +
+                        "Sugerencia: si quieres conservarlo, cancela y usa Exportar antes.",
+                )
+            )
+                return;
+            if (prompt(`Para confirmar, escribe el nombre del banco: «${b.nombre}»`)?.trim() !== b.nombre) {
+                setStatus("warn", "Confirmación incorrecta: no se eliminó nada.");
+                return;
+            }
             await cliente.bancoBorrar(b.id);
             setStatus("ok", "Banco eliminado");
+            await refrescar();
+        };
+        /* Desvincular (F3.7): bancos registrados en PC — el archivo externo jamás se borra. */
+        const alDesvincular = async () => {
+            if (!confirm(`¿Desvincular «${b.nombre}»? Se quita de la biblioteca; su archivo NO se borra.`)) return;
+            await cliente.bancoDesvincular(b.id);
+            setStatus("ok", "Banco desvinculado (el archivo sigue donde estaba)");
             await refrescar();
         };
         return [
@@ -238,12 +257,52 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             h("button", { class: "btn small", type: "button", onclick: alActualizar }, "Actualizar"),
             h("button", { class: "btn small", type: "button", onclick: alExportar }, "Exportar"),
             h("button", { class: "btn small", type: "button", onclick: alRenombrar }, "Renombrar"),
-            h("button", { class: "btn small", type: "button", onclick: alBorrar, disabled: activo }, "Eliminar"),
+            b.origen === "registrado"
+                ? h(
+                      "button",
+                      { class: "btn small", type: "button", onclick: alDesvincular, disabled: activo },
+                      "Desvincular",
+                  )
+                : h("button", { class: "btn small", type: "button", onclick: alBorrar, disabled: activo }, "Eliminar"),
+        ];
+    }
+
+    /* Banco con el archivo ausente (F3.8): Localizar reenlaza la ruta (también en el activo:
+       es la única salida si el único banco quedó desconectado); Desvincular lo suelta. */
+    function botonesAusente(b, activo) {
+        const alLocalizar = async () => {
+            const ruta = prompt(
+                `El archivo de «${b.nombre}» no está en su sitio (${b.ruta}).\n¿Dónde está ahora? Nueva ruta:`,
+                b.ruta,
+            )?.trim();
+            if (!ruta || ruta === b.ruta) return;
+            try {
+                await cliente.bancoLocalizar(b.id, ruta);
+                setStatus("ok", "Banco localizado");
+                await refrescar();
+            } catch (e) {
+                setStatus("warn", msgError(e));
+            }
+        };
+        const alDesvincular = async () => {
+            if (!confirm(`¿Desvincular «${b.nombre}»? Se quita de la biblioteca; su archivo NO se borra.`)) return;
+            await cliente.bancoDesvincular(b.id);
+            setStatus("ok", "Banco desvinculado (el archivo sigue donde estaba)");
+            await refrescar();
+        };
+        return [
+            h("button", { class: "btn small", type: "button", onclick: alLocalizar }, "Localizar"),
+            h(
+                "button",
+                { class: "btn small", type: "button", onclick: alDesvincular, disabled: activo },
+                "Desvincular",
+            ),
         ];
     }
 
     function tarjeta(b) {
         const activo = !!b.activo;
+        const disponible = b.disponible !== false;
         const meta = [
             `${b.preguntas ?? "?"} preguntas`,
             fmtTam(b.tam_bytes),
@@ -252,12 +311,13 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         ];
         return h(
             "article",
-            { class: "tarjeta-banco" + (activo ? " activa" : "") },
+            { class: "tarjeta-banco" + (activo ? " activa" : "") + (disponible ? "" : " ausente") },
             h(
                 "header",
                 null,
                 h("h3", { text: b.nombre }),
                 activo ? h("span", { class: "etiqueta-activa", text: "Activo" }) : null,
+                disponible ? null : h("span", { class: "etiqueta-ausente", text: "No disponible" }),
             ),
             b.progreso
                 ? h("p", {
@@ -266,7 +326,8 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                   })
                 : null,
             h("p", { class: "meta", text: meta.join(" · ") }),
-            h("footer", null, botones(b, activo)),
+            disponible ? null : h("p", { class: "error-biblioteca", text: `No se encuentra su archivo (${b.ruta}).` }),
+            h("footer", null, disponible ? botones(b, activo) : botonesAusente(b, activo)),
         );
     }
 

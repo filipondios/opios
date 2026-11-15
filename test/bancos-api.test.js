@@ -2,7 +2,7 @@
    (driver Bun, almacén fs) y las páginas /biblioteca. En modo directo (sin gestor) las
    rutas de bancos fallan con 409 y la página sigue existiendo. */
 import { describe, expect, test } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -243,12 +243,17 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         r = await pet("/api/bancos/999", "PUT", { nombre: "Nadie" });
         expect(r.status).toBe(400);
 
-        /* DELETE: el activo no se borra; otro sí, con su archivo. */
+        /* DELETE (F3.7): el activo no se toca; un registrado exige desvincular; una copia
+           gestionada se elimina con su archivo. */
         r = await pet(`/api/bancos/${creado.id}`, "DELETE");
         expect(r.status).toBe(400);
         r = await pet(`/api/bancos/${ids.Vacio}`, "DELETE");
+        expect(r.status).toBe(400); // registrado: no se puede borrar su archivo externo
+        expect((await r.json()).error).toMatch(/desvinc/);
+        /* Desvincular quita el banco del catálogo pero el archivo queda intacto (test de 3.7). */
+        r = await pet(`/api/bancos/${ids.Vacio}/desvincular`, "POST", {});
         expect(r.status).toBe(204);
-        expect(existsSync(join(dir, "vacio.db"))).toBe(false);
+        expect(existsSync(join(dir, "vacio.db"))).toBe(true);
         lista = await (await pet("/api/bancos")).json();
         expect(lista.some((b) => b.id === ids.Vacio)).toBe(false);
         r = await pet("/api/bancos/999/activar", "POST", {});
@@ -296,5 +301,62 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         expect((await r.json()).nombre).toBe("Extra");
         r = await petBytes("/api/bancos/importar-archivo?nombre=Extra", bytesJson);
         expect((await r.json()).nombre).toBe("Extra (2)");
+    });
+
+    test("Eliminar vs Desvincular vs Localizar en el gestor (F3.7/F3.8)", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-borrar-"));
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver: driverBun,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            /* Copia gestionada + banco registrado (archivo externo). */
+            const gestionada = await gestor.importarJson("Copia", DIR_FIXTURE);
+            const externo = join(dir, "externo.db");
+            abrirDb(externo).close();
+            const registrado = await gestor.registrar("Externo", externo);
+
+            /* Eliminar: solo copias gestionadas; borra archivo. */
+            await expect(gestor.borrar(registrado.id)).rejects.toThrow(/desvinc/);
+            await gestor.borrar(gestionada.id);
+            expect(existsSync(gestionada.ruta)).toBe(false);
+
+            /* Desvincular (test de 3.7): quita del catálogo y el archivo externo queda intacto. */
+            await gestor.desvincular(registrado.id);
+            expect(existsSync(externo)).toBe(true);
+            expect((await gestor.listar()).some((b) => b.id === registrado.id)).toBe(false);
+
+            /* Localizar (3.8): banco con archivo movido → disponible:false → reenlazar. */
+            const copia = await gestor.importarJson("Mudable", DIR_FIXTURE);
+            const rutaVieja = copia.ruta;
+            const rutaNueva = join(dir, "movido.db");
+            renameSync(rutaVieja, rutaNueva);
+            const lista = await gestor.listar();
+            expect(lista.find((b) => b.id === copia.id)).toMatchObject({ disponible: false });
+            await gestor.activar(copia.id);
+            await expect(gestor.abrirActivo()).rejects.toThrow(/no está accesible/);
+            const r = await gestor.localizar(copia.id, rutaNueva);
+            expect(r).toMatchObject({ id: copia.id, ruta: rutaNueva, activo: true, nombre: "Mudable" });
+            expect((await gestor.abrirActivo()).contarPreguntas()).toBe(copia.preguntas); // reabierto en la ruta nueva
+            expect(existsSync(rutaVieja)).toBe(false); // no se ha duplicado nada
+
+            /* Localizar con un archivo que no es un banco Opios → error, catálogo sin tocar. */
+            const basura = join(dir, "basura.db");
+            writeFileSync(basura, "no es sqlite");
+            await expect(gestor.localizar(copia.id, basura)).rejects.toThrow();
+            expect(await gestor.rutaActiva()).toBe(rutaNueva);
+
+            /* Localizar de un banco que no es el activo tampoco rompe nada. */
+            const otra = await gestor.importarJson("Otra", DIR_FIXTURE);
+            const otraNueva = join(dir, "otra.db");
+            renameSync(otra.ruta, otraNueva);
+            const r2 = await gestor.localizar(otra.id, otraNueva);
+            expect(r2).toMatchObject({ activo: false });
+            expect((await gestor.abrirActivo()).contarPreguntas()).toBe(copia.preguntas); // el activo sigue abierto
+        } finally {
+            await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+        }
     });
 });

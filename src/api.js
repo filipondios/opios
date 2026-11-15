@@ -92,7 +92,9 @@ export function crearApi(
                Se lee de la conexión que tiene el gestor (no de `repo`, que puede quedar
                cerrado tras un cambio de banco en caliente). */
             const activa = lista.find((b) => b.activo);
-            if (activa) activa.progreso = (await gestor.abrirActivo()).estadisticasGlobales(fechaHoy(), CAJA_DOMINADA);
+            /* Si el archivo del activo no está (F3.8) no hay conexión que consulte. */
+            if (activa && activa.disponible)
+                activa.progreso = (await gestor.abrirActivo()).estadisticasGlobales(fechaHoy(), CAJA_DOMINADA);
             return json(lista);
         }
 
@@ -127,7 +129,7 @@ export function crearApi(
             );
         }
 
-        const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar))?$/);
+        const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar|desvincular|localizar))?$/);
         if (mb) {
             const id = Number(mb[1]);
             if (mb[2] === "activar" && m === "POST") {
@@ -154,6 +156,20 @@ export function crearApi(
                 if (!dirPreguntas)
                     throw new ErrorApi(400, "No hay directorio de preguntas configurado (OPIOS_PREGUNTAS).");
                 return json(await gestor.actualizar(id, dirPreguntas));
+            }
+            if (mb[2] === "desvincular" && m === "POST") {
+                await gestor.desvincular(id);
+                return new Response(null, { status: 204 });
+            }
+            if (mb[2] === "localizar" && m === "POST") {
+                const cuerpo = await cuerpoJson(req);
+                const r = await gestor.localizar(id, String(cuerpo?.ruta ?? ""));
+                /* Si relocalizamos el activo, el repo del servidor (caliente) apunta al archivo nuevo. */
+                if (r.activo) {
+                    const nuevo = await gestor.abrirActivo();
+                    if (alActivar) await alActivar(nuevo);
+                }
+                return json(r);
             }
             if (!mb[2]) {
                 if (m === "PUT") {

@@ -71,6 +71,11 @@ export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, {
 export const bancoExportar = (id) => llamada(`/api/bancos/${id}/exportar`, { metodo: "POST", bruto: true });
 export const bancoRenombrar = (id, nombre) => llamada(`/api/bancos/${id}`, { metodo: "PUT", cuerpo: { nombre } });
 export const bancoBorrar = (id) => llamada(`/api/bancos/${id}`, { metodo: "DELETE" });
+/* Desvincular (F3.7): quita el banco del catálogo sin tocar su archivo (bancos registrados en PC). */
+export const bancoDesvincular = (id) => llamada(`/api/bancos/${id}/desvincular`, { metodo: "POST", cuerpo: {} });
+/* Localizar (F3.8): reenlaza un banco cuyo archivo se movió o desconectó. */
+export const bancoLocalizar = (id, ruta) =>
+    llamada(`/api/bancos/${id}/localizar`, { metodo: "POST", cuerpo: { ruta } });
 /* Asistente de importación (F3.4): el archivo viaja como bytes. `nombre` (nombre del
    archivo elegido) ayuda a sugerir nombre y detectar duplicados por nombre. */
 export const bancoInspeccionar = (bytes, nombre = "") =>

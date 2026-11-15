@@ -287,13 +287,17 @@ export class DatabaseManager {
     async listar() {
         await this.#listo;
         const activo = await this.idActivo();
-        return this.#catalogo
+        const filas = this.#catalogo
             .query(
                 "SELECT id, nombre, ruta, origen, tam_bytes, preguntas, version_banco, ultima_vez " +
                     "FROM bancos ORDER BY nombre COLLATE NOCASE, id",
             )
-            .all()
-            .map((b) => ({ ...b, activo: b.id === activo }));
+            .all();
+        /* `disponible` (F3.8): ¿está el archivo donde se anotó? Un disco externo desconectado
+           no impide listar; la tarjeta avisa y ofrece Localizar/Desvincular. */
+        return Promise.all(
+            filas.map(async (b) => ({ ...b, activo: b.id === activo, disponible: await this.#almacen.existe(b.ruta) })),
+        );
     }
 
     async idActivo() {
@@ -359,17 +363,59 @@ export class DatabaseManager {
         return { id, nombre: limpio };
     }
 
-    /** Elimina un banco del catálogo y borra su archivo y sidecars. Nunca el activo:
-        quien quiera borrarlo debe activar otro primero (nunca se queda sin banco). */
+    /** Elimina una copia gestionada (importada/copiada: el archivo es de Opios) del catálogo
+        y borra su archivo y sidecars. Nunca el activo: quien quiera borrarlo debe activar
+        otro primero (nunca se queda sin banco). Los registrados van con `desvincular`. */
     async borrar(id) {
         await this.#listo;
         if (id === (await this.idActivo()))
             throw new Error("No se puede borrar el banco activo: activa otro banco primero.");
-        const fila = this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(id);
+        const fila = this.#catalogo.query("SELECT nombre, ruta, origen FROM bancos WHERE id = ?").get(id);
         if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (fila.origen === "registrado")
+            throw new Error(
+                `«${fila.nombre}» está registrado (su archivo está fuera de Opios): desvincúlalo en vez de eliminarlo.`,
+            );
         this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
         for (const lado of ["", "-wal", "-shm"]) await this.#almacen.borrar(fila.ruta + lado);
         return true;
+    }
+
+    /** Quita un banco del catálogo SIN borrar su archivo (F3.7): para bancos registrados en
+        PC, cuyo archivo vive fuera de Opios y jamás se toca. Nunca el activo. */
+    async desvincular(id) {
+        await this.#listo;
+        if (id === (await this.idActivo()))
+            throw new Error("No se puede desvincular el banco activo: activa otro banco primero.");
+        if (!this.#catalogo.query("SELECT 1 FROM bancos WHERE id = ?").get(id))
+            throw new Error(`El banco ${id} no está en el catálogo.`);
+        this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
+        return true;
+    }
+
+    /** Reenlaza un banco cuyo archivo se movió o desconectó (F3.8): valida el archivo nuevo
+        (F2.4) y actualiza ruta y metadatos. Si es el abierto, lo cierra (flush del archivo
+        viejo) y lo reabre en su nueva ruta. */
+    async localizar(id, nuevaRuta) {
+        await this.#listo;
+        const limpio = String(nuevaRuta ?? "").trim();
+        if (!limpio) throw new Error("Indica la ruta del archivo del banco.");
+        const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (limpio === fila.ruta) throw new Error(`Esa ya es la ruta actual de «${fila.nombre}».`);
+        if (!(await this.#almacen.existe(limpio)))
+            throw new Error(`No existe «${limpio}»: localiza el archivo donde esté ahora.`);
+        /* El archivo nuevo debe ser un banco Opios válido antes de tocar el catálogo. */
+        const info = await this.#verificar(limpio);
+        const esElAbierto = this.#abierto && this.#abierto.id === id;
+        if (esElAbierto) await this.cerrar(); // suelta el archivo antiguo (flush)
+        this.#catalogo
+            .query(
+                "UPDATE bancos SET ruta = ?, tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?",
+            )
+            .run(limpio, (await this.#almacen.leer(limpio)).length, info.preguntas, info.user_version, info.uuid, id);
+        if (esElAbierto) await this.abrirActivo(); // reabre el activo en su nueva ruta
+        return { id, nombre: fila.nombre, ruta: limpio, activo: (await this.idActivo()) === id };
     }
 
     /* --- Asistente de importación (F3.4/F3.5) --- */

@@ -3,6 +3,7 @@ import { crearApp } from "./src/app.js";
 import { idBanco } from "./src/banco-id.js";
 import { importarDirectorio } from "./src/seed-directorio.js";
 import { DatabaseManager } from "./src/gestor-bancos.js";
+import { ErrorApi } from "./src/errores.js";
 import { almacenBun } from "./src/almacen-bun.js";
 import { driverBun } from "./src/driver-bun.js";
 import {
@@ -43,12 +44,24 @@ try {
             await gestor.close();
             process.exit(1);
         }
-        repoActual = await gestor.abrirActivo();
+        /* F3.8: si el archivo del banco activo no está (disco externo, archivo movido), el
+           servidor arranca igual; la biblioteca sirve para Localizar o activar otro banco. */
+        try {
+            repoActual = await gestor.abrirActivo();
+        } catch (e) {
+            logErr(`El banco activo no está disponible: ${e.message}`);
+            logErr("El servidor arranca igual: usa /biblioteca para localizar el archivo o activar otro banco.");
+        }
         nombreBancoActual = await gestor.nombreActivo();
         repo = new Proxy(
             {},
             {
                 get: (_, k) => {
+                    if (!repoActual)
+                        throw new ErrorApi(
+                            503,
+                            "El banco activo no está disponible: localiza su archivo o activa otro banco en /biblioteca.",
+                        );
                     const v = repoActual[k];
                     return typeof v === "function" ? v.bind(repoActual) : v;
                 },
@@ -63,9 +76,15 @@ try {
     process.exit(1);
 }
 
-/* Importación del banco al arrancar (Fase 8.2). El modo lo decide `OPIOS_SEED`. */
+/* Importación del banco al arrancar (Fase 8.2). El modo lo decide `OPIOS_SEED`. Con el banco
+   activo ausente (F3.8) no hay conexión: se omite la siembra y el servidor sigue arriba. */
 const hayVariable = Boolean((process.env.OPIOS_PREGUNTAS ?? "").trim());
-const bdVacia = repo.contarPreguntas() === 0;
+let bdVacia = true;
+try {
+    bdVacia = repo.contarPreguntas() === 0;
+} catch (e) {
+    if (!(e instanceof ErrorApi)) throw e;
+}
 log(`Banco de preguntas: ${DIR_PREGUNTAS}`);
 try {
     if (debeImportar(OPIOS_SEED, bdVacia, hayVariable)) {
@@ -84,9 +103,14 @@ try {
         );
     }
 } catch (e) {
-    logErr(`Error al importar el banco: ${e.message}`);
-    repo.close();
-    process.exit(1);
+    /* Solo el «banco no disponible» se tolera; los datos rotos siguen siendo fatales. */
+    if (gestor && e instanceof ErrorApi) {
+        logErr(`Importación omitida: ${e.message}`);
+    } else {
+        logErr(`Error al importar el banco: ${e.message}`);
+        repo.close();
+        process.exit(1);
+    }
 }
 
 const servidor = Bun.serve({
@@ -100,7 +124,7 @@ const servidor = Bun.serve({
         zona: APP_TZ,
         /* El id/nombre del banco activo van al cliente en cada página (F1.5/F3.3); en modo
            biblioteca se leen por petición porque el activo puede cambiar en caliente. */
-        banco: gestor ? () => idBanco(repoActual) : idBanco(repo),
+        banco: gestor ? () => (repoActual ? idBanco(repoActual) : null) : idBanco(repo),
         bancoNombre: gestor ? () => nombreBancoActual : null,
         gestor,
         dirPreguntas: DIR_PREGUNTAS,
