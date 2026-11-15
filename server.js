@@ -9,6 +9,7 @@ import {
     APP_TZ,
     AUTH,
     DB_PATH,
+    DIR_EJEMPLO,
     DIR_PREGUNTAS,
     HOST,
     PORT,
@@ -26,6 +27,11 @@ const logErr = (...a) => console.error(new Date().toISOString(), ...a);
    Por defecto sigue el modo directo `OPIOS_DB` (legacy), igual que los scripts CLI. */
 let repo,
     gestor = null;
+/* En modo biblioteca la app se construye una vez, pero el banco activo puede cambiar en
+   caliente (POST /api/bancos/:id/activar). `repoActual` es el banco abierto y `repo` un
+   proxy que resuelve cada llamada contra él: la app no necesita reconstruirse. */
+let repoActual = null,
+    nombreBancoActual = null;
 try {
     if (RUTA_CATALOGO) {
         gestor = new DatabaseManager({ almacen: almacenBun, driver: driverBun, rutaCatalogo: RUTA_CATALOGO });
@@ -37,7 +43,17 @@ try {
             await gestor.close();
             process.exit(1);
         }
-        repo = await gestor.abrirActivo();
+        repoActual = await gestor.abrirActivo();
+        nombreBancoActual = await gestor.nombreActivo();
+        repo = new Proxy(
+            {},
+            {
+                get: (_, k) => {
+                    const v = repoActual[k];
+                    return typeof v === "function" ? v.bind(repoActual) : v;
+                },
+            },
+        );
         log(`Modo biblioteca: banco activo ${await gestor.rutaActiva()} (catálogo: ${RUTA_CATALOGO})`);
     } else {
         repo = abrirDb(DB_PATH);
@@ -78,7 +94,23 @@ const servidor = Bun.serve({
     port: PORT,
     /* El cuerpo máximo se corta antes de leerlo entero (Fase 2.9). */
     maxRequestBodySize: MAX_CUERPO,
-    fetch: crearApp(repo, { auth: AUTH, zona: APP_TZ, banco: idBanco(repo) }),
+    fetch: crearApp(repo, {
+        auth: AUTH,
+        zona: APP_TZ,
+        /* El id/nombre del banco activo van al cliente en cada página (F1.5/F3.3); en modo
+           biblioteca se leen por petición porque el activo puede cambiar en caliente. */
+        banco: gestor ? () => idBanco(repoActual) : idBanco(repo),
+        bancoNombre: gestor ? () => nombreBancoActual : null,
+        gestor,
+        dirPreguntas: DIR_PREGUNTAS,
+        dirEjemplo: DIR_EJEMPLO,
+        alActivar: gestor
+            ? async (nuevo) => {
+                  repoActual = nuevo;
+                  nombreBancoActual = await gestor.nombreActivo();
+              }
+            : null,
+    }),
 });
 if (!AUTH && HOST !== "127.0.0.1" && HOST !== "localhost")
     log("AVISO: la app es accesible desde fuera y no tiene contraseña (define AUTH_USER y AUTH_PASS).");

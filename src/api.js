@@ -1,4 +1,4 @@
-import { MAX_CUERPO } from "./config.js";
+import { MAX_CUERPO, CAJA_DOMINADA } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import {
     validarPregunta,
@@ -12,6 +12,9 @@ import {
 import { serializarJson } from "./serializar.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
+
+/** Los errores del gestor llevan mensaje de usuario; lo que no, mensaje genérico. */
+const msgErrorDe = (e) => (e instanceof Error && e.message ? e.message : "Error inesperado.");
 
 /** Cuerpo JSON de una petición de escritura. Exigir application/json impide los envíos cruzados desde formularios de otras webs. */
 async function cuerpoJson(req) {
@@ -58,12 +61,101 @@ function idsDe(cuerpo) {
     return cuerpo.ids;
 }
 
-/** Rutas /api/*: recibe la petición ya autenticada y responde JSON (sin render ni archivos). */
-export function crearApi(repo, servicios) {
+/** Rutas /api/*: recibe la petición ya autenticada y responde JSON (sin render ni archivos).
+    Con `gestor` (modo biblioteca, OPIOS_CATALOGO) añade las rutas /api/bancos (F3.1):
+    en modo directo fallan con 409 y mensaje claro. `dirPreguntas`/`dirEjemplo` son los
+    directorios JSON que el servidor puede importar/actualizar; `alActivar` lo llama el
+    servidor tras cambiar de banco activo para reabrir su repo. */
+export function crearApi(
+    repo,
+    servicios,
+    { gestor = null, dirPreguntas = null, dirEjemplo = null, alActivar = null } = {},
+) {
     const { fechaHoy, estadisticas, temarioConProgreso, infoExamen } = servicios;
+
+    /* Biblioteca: los errores del gestor son de datos del usuario (nombre repetido, ruta
+       ausente, banco activo…), siempre con mensaje claro → 400; lo del enrutado es ErrorApi. */
+    async function bancos(req, m, ruta) {
+        if (ruta === "/api/bancos" && m === "GET") {
+            const lista = await gestor.listar();
+            /* Resumen de progreso: solo el banco activo está abierto; el resto llega con F5.
+               Se lee de la conexión que tiene el gestor (no de `repo`, que puede quedar
+               cerrado tras un cambio de banco en caliente). */
+            const activa = lista.find((b) => b.activo);
+            if (activa) activa.progreso = (await gestor.abrirActivo()).estadisticasGlobales(fechaHoy(), CAJA_DOMINADA);
+            return json(lista);
+        }
+
+        if (ruta === "/api/bancos/importar" && m === "POST") {
+            const cuerpo = await cuerpoJson(req);
+            const nombre = String(cuerpo?.nombre ?? "").trim();
+            if (!nombre) throw new ErrorApi(400, "Indica el nombre del banco.");
+            if (cuerpo.ruta != null && typeof cuerpo.ruta !== "string")
+                throw new ErrorApi(400, "«ruta» debe ser un texto.");
+            const dir = cuerpo.ejemplo ? dirEjemplo : cuerpo.ruta?.trim() || dirPreguntas;
+            if (!dir) throw new ErrorApi(400, "Indica la ruta del directorio de preguntas.");
+            return json(await gestor.importarJson(nombre, dir), 201);
+        }
+
+        const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar))?$/);
+        if (mb) {
+            const id = Number(mb[1]);
+            if (mb[2] === "activar" && m === "POST") {
+                await gestor.activar(id);
+                const nuevo = await gestor.abrirActivo();
+                if (alActivar) await alActivar(nuevo);
+                return json({ ok: true, activo: id });
+            }
+            if (mb[2] === "exportar" && m === "POST") {
+                const { bytes, manifest } = await gestor.exportar(id);
+                const archivo =
+                    String(manifest.nombre)
+                        .replace(/[^a-zA-Z0-9._-]+/g, "-")
+                        .replace(/^-+|-+$/g, "") || "banco";
+                return new Response(bytes, {
+                    headers: {
+                        "Content-Type": "application/octet-stream",
+                        "Content-Disposition": `attachment; filename="${archivo}.opios"`,
+                        "Cache-Control": "no-store",
+                    },
+                });
+            }
+            if (mb[2] === "actualizar" && m === "POST") {
+                if (!dirPreguntas)
+                    throw new ErrorApi(400, "No hay directorio de preguntas configurado (OPIOS_PREGUNTAS).");
+                return json(await gestor.actualizar(id, dirPreguntas));
+            }
+            if (!mb[2]) {
+                if (m === "PUT") {
+                    const cuerpo = await cuerpoJson(req);
+                    return json(await gestor.renombrar(id, String(cuerpo?.nombre ?? "")));
+                }
+                if (m === "DELETE") {
+                    await gestor.borrar(id);
+                    return new Response(null, { status: 204 });
+                }
+            }
+        }
+
+        throw new ErrorApi(404, "Ruta no encontrada.");
+    }
 
     return async function api(req, url, ruta) {
         const m = req.method;
+
+        if (ruta.startsWith("/api/bancos")) {
+            if (!gestor)
+                throw new ErrorApi(
+                    409,
+                    "La biblioteca no está disponible: la app está en modo directo (OPIOS_DB). Arranca con OPIOS_CATALOGO.",
+                );
+            try {
+                return await bancos(req, m, ruta);
+            } catch (e) {
+                if (e instanceof ErrorApi) throw e;
+                throw new ErrorApi(400, msgErrorDe(e));
+            }
+        }
 
         if (ruta === "/api/temas" && m === "GET") {
             return json(estadisticas().map(({ tema, total }) => ({ tema, total })));

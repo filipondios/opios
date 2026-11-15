@@ -13,11 +13,24 @@ import { crearManejadorHttp } from "./http.js";
  * `zona` (por defecto, la del sistema) decide en qué zona horaria se calcula ese «hoy»;
  * la inyecta el servidor (`APP_TZ`).
  */
-export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = null, banco = null } = {}) {
+export function crearApp(
+    repo,
+    {
+        auth = null,
+        ahora = () => new Date(),
+        zona = null,
+        banco = null,
+        bancoNombre = null,
+        gestor = null,
+        dirPreguntas = null,
+        dirEjemplo = null,
+        alActivar = null,
+    } = {},
+) {
     const servicios = crearServicios(repo, { ahora, zona });
     return crearManejadorHttp({
-        api: crearApi(repo, servicios),
-        web: crearWeb(repo, servicios, { banco }),
+        api: crearApi(repo, servicios, { gestor, dirPreguntas, dirEjemplo, alActivar }),
+        web: crearWeb(repo, servicios, { banco, bancoNombre }),
         auth,
     });
 }

@@ -1,0 +1,85 @@
+/* Biblioteca (F3.2): rejilla de tarjetas de bancos. Reutiliza .btn y los tokens de base.css. */
+.biblioteca {
+  padding: var(--sp-4) 0;
+}
+
+.rejilla-bancos {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.tarjeta-banco {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-1);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.tarjeta-banco.activa {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-1);
+}
+
+.tarjeta-banco header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.tarjeta-banco h3 {
+  margin: 0;
+  font: 600 16px var(--f-ui);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.etiqueta-activa {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+  font: 600 11px var(--f-ui);
+  flex: none;
+}
+
+.tarjeta-banco .progreso,
+.tarjeta-banco .meta {
+  margin: 0;
+  font: 400 13px/1.4 var(--f-ui);
+  color: var(--text-2);
+}
+
+.tarjeta-banco footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.vacia {
+  text-align: center;
+  padding: var(--sp-6) var(--sp-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.vacia p {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.error-biblioteca {
+  color: var(--bad);
+  margin-top: var(--sp-3);
+}

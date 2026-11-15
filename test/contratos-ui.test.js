@@ -39,6 +39,13 @@ describe("contratos de la UI", () => {
             "bloqueBorrar",
             "temaGuardar",
             "temaBorrar",
+            "bancosListar",
+            "bancoImportar",
+            "bancoActivar",
+            "bancoActualizar",
+            "bancoExportar",
+            "bancoRenombrar",
+            "bancoBorrar",
         ])
             expect(codigo, `cliente.js debe exportar ${operacion}`).toContain(`export const ${operacion}`);
         /* Sin DOM: solo el transporte de comun.js. */

@@ -88,6 +88,8 @@ a{color:inherit}
 .top-right{display:flex;align-items:center;gap:var(--sp-3);margin-left:auto;min-width:0}
 .brand{font:600 15px var(--f-ui);letter-spacing:.02em;color:var(--text);text-decoration:none;white-space:nowrap}
 .brand:hover{color:var(--text-2)}
+.banco-actual{font:600 13px var(--f-ui);color:var(--text-2);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:16ch;border:1px solid var(--line);border-radius:var(--r-pill);padding:2px 10px}
+.banco-actual:hover{color:var(--text);border-color:var(--control)}
 .top-nav{display:flex;align-items:center;gap:2px;flex-wrap:nowrap}
 .top-nav a{
   position:relative;font:500 13px var(--f-ui);color:var(--text-2);text-decoration:none;

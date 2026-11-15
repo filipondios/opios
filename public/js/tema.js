@@ -3,6 +3,14 @@
 (() => {
     "use strict";
 
+    /* F3.3: nombre del banco activo (lo inyecta el servidor en modo biblioteca) junto a la
+       marca, enlazando a la Biblioteca. Sin inyección (modo directo) el enlace queda oculto. */
+    const bancoActual = document.getElementById("banco-actual");
+    if (bancoActual && globalThis.__opiosBancoNombre) {
+        bancoActual.textContent = globalThis.__opiosBancoNombre;
+        bancoActual.hidden = false;
+    }
+
     const CLAVE = "opios.tema";
     const raiz = document.documentElement;
     const boton = document.getElementById("btn-tema");

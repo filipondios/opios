@@ -14,6 +14,7 @@ import { comprobarDriver } from "./driver.js";
 import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
+import { exportarBanco } from "./portable.js";
 import { importarDirectorio } from "./seed-directorio.js";
 
 const ESQUEMA = `
@@ -193,26 +194,59 @@ export class DatabaseManager {
         return ruta;
     }
 
-    /** Actualiza el banco activo desde un directorio JSON (task 9): en sitio, conservando
+    /** Actualiza el banco `id` desde un directorio JSON (task 9, F3.1): en sitio, conservando
         ids internos y progreso mediante `id_externo` (y la deduplicación por enunciado).
         Nunca reemplaza el archivo: primero valida el directorio con una importación de
-        ensayo en memoria y, si hay errores, aborta sin tocar el banco. */
-    async actualizarActivo(dirPreguntas) {
-        const repo = await this.abrirActivo();
-        /* Ensayo en RAM: `:memory:` es banco nuevo para bun:sqlite y para sql.js. */
-        const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
-        let r;
+        ensayo en memoria y, si hay errores, aborta sin tocar el banco. Si el banco a
+        actualizar no es el abierto, se cierra el abierto (flush) y se reabre al terminar. */
+    async actualizar(id, dirPreguntas) {
+        await this.#listo;
+        const fila = this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (!(await this.#almacen.existe(fila.ruta)))
+            throw new Error(`El banco «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
+        const abierto = this.#abierto;
+        const esElAbierto = abierto && abierto.id === id;
+        if (abierto && !esElAbierto) await this.cerrar(); // libera la única conexión de banco
+        const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
         try {
-            r = await importarDirectorio(ensayo, dirPreguntas, { actualizar: true });
+            /* Ensayo en RAM: `:memory:` es banco nuevo para bun:sqlite y para sql.js. */
+            const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
+            let r;
+            try {
+                r = await importarDirectorio(ensayo, dirPreguntas, { actualizar: true });
+            } finally {
+                ensayo.close();
+            }
+            if (r.errores.length)
+                throw new Error(
+                    `El directorio tiene ${r.errores.length} error(es); banco sin tocar. Primero: ${r.errores[0]}`,
+                );
+            r = await importarDirectorio(repo, dirPreguntas, { actualizar: true });
+            /* Persiste el resultado (el driver WASM no escribe solo) y actualiza metadatos (F2.7). */
+            const bytes = this.#driver.instantanea(repo.db);
+            await this.#almacen.escribir(fila.ruta, bytes);
+            this.#catalogo
+                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ? WHERE id = ?")
+                .run(
+                    bytes.length,
+                    repo.db.query("SELECT COUNT(*) AS n FROM preguntas").get().n,
+                    repo.db.query("PRAGMA user_version").get().user_version,
+                    id,
+                );
+            return { ...r, banco: fila.ruta };
         } finally {
-            ensayo.close();
+            if (!esElAbierto) repo.close();
         }
-        if (r.errores.length)
-            throw new Error(
-                `El directorio tiene ${r.errores.length} error(es); banco sin tocar. Primero: ${r.errores[0]}`,
-            );
-        const final = await importarDirectorio(repo, dirPreguntas, { actualizar: true });
-        return { ...final, banco: await this.rutaActiva() };
+        /* Reabre el banco activo que se cerró para actualizar otro. */
+        if (abierto && !esElAbierto) await this.abrirActivo();
+    }
+
+    /** Actualiza el banco activo (compatibilidad con el CLI). */
+    async actualizarActivo(dirPreguntas) {
+        const id = await this.idActivo();
+        if (!id) throw new Error("No hay banco activo: elige uno del catálogo primero.");
+        return this.actualizar(id, dirPreguntas);
     }
 
     async listar() {
@@ -251,6 +285,56 @@ export class DatabaseManager {
     async rutaActiva() {
         const id = await this.idActivo();
         return id ? (this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(id)?.ruta ?? null) : null;
+    }
+
+    /** Nombre del banco activo (para la cabecera, F3.3), sin abrirlo. */
+    async nombreActivo() {
+        const id = await this.idActivo();
+        return id ? (this.#catalogo.query("SELECT nombre FROM bancos WHERE id = ?").get(id)?.nombre ?? null) : null;
+    }
+
+    /** Empaqueta el banco `id` en bytes .opios (F2.5). El activo usa su conexión abierta;
+        los demás se leen con una conexión solo lectura puntual (no toca la conexión única). */
+    async exportar(id) {
+        await this.#listo;
+        const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (this.#abierto && this.#abierto.id === id)
+            return exportarBanco(this.#driver, this.#abierto.repo.db, { nombre: fila.nombre });
+        if (!(await this.#almacen.existe(fila.ruta)))
+            throw new Error(`El banco «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
+        const db = await this.#driver.abrir(this.#almacen, fila.ruta, { readonly: true });
+        try {
+            return await exportarBanco(this.#driver, db, { nombre: fila.nombre });
+        } finally {
+            db.close();
+        }
+    }
+
+    /** Cambia el nombre en el catálogo (F3.1). El archivo no se mueve: la ruta es interna. */
+    async renombrar(id, nombre) {
+        await this.#listo;
+        const limpio = String(nombre ?? "").trim();
+        if (!limpio) throw new Error("El nombre no puede estar vacío.");
+        if (!this.#catalogo.query("SELECT 1 FROM bancos WHERE id = ?").get(id))
+            throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (this.#catalogo.query("SELECT 1 FROM bancos WHERE nombre = ? COLLATE NOCASE AND id != ?").get(limpio, id))
+            throw new Error(`Ya existe un banco llamado «${limpio}».`);
+        this.#catalogo.query("UPDATE bancos SET nombre = ? WHERE id = ?").run(limpio, id);
+        return { id, nombre: limpio };
+    }
+
+    /** Elimina un banco del catálogo y borra su archivo y sidecars. Nunca el activo:
+        quien quiera borrarlo debe activar otro primero (nunca se queda sin banco). */
+    async borrar(id) {
+        await this.#listo;
+        if (id === (await this.idActivo()))
+            throw new Error("No se puede borrar el banco activo: activa otro banco primero.");
+        const fila = this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
+        for (const lado of ["", "-wal", "-shm"]) await this.#almacen.borrar(fila.ruta + lado);
+        return true;
     }
 
     /** Abre (una sola vez) el banco activo y devuelve el repo. Falla claro si falta el archivo. */

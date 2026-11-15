@@ -7,6 +7,7 @@ const PAGINAS = [
     { id: "estadisticas", href: "/estadisticas", texto: "Estadísticas" },
     { id: "maker", href: "/maker", texto: "Maker" },
     { id: "temario", href: "/temario", texto: "Temario" },
+    { id: "biblioteca", href: "/biblioteca", texto: "Bancos" },
 ];
 
 /**
@@ -14,17 +15,7 @@ const PAGINAS = [
  * `actual` es el id de la página en el menú (test, simulacro, estadisticas, maker, temario).
  * Los scripts indicados en `js` se cargan como módulos ESM.
  */
-export function layout({
-    titulo,
-    marca = "Opios",
-    actual = null,
-    estado,
-    estadoTipo = "ok",
-    ancho = false,
-    css = [],
-    js = [],
-    cuerpo,
-}) {
+export function layout({ titulo, actual = null, estado, estadoTipo = "ok", ancho = false, css = [], js = [], cuerpo }) {
     return html`<!doctype html>
 <html lang="es">
 <head>
@@ -40,7 +31,8 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
 <body>
 <div class="wrap${ancho ? " wide" : ""}">
   <header class="top">
-    <a class="brand" href="/">${marca}</a>
+    <a class="brand" href="/">Opios</a>
+    <a class="banco-actual" href="/biblioteca" id="banco-actual" hidden></a>
     <nav class="top-nav" aria-label="Principal">
       ${PAGINAS.map((p) => html`<a href="${p.href}"${p.id === actual ? html` aria-current="page"` : ""}>${p.texto}</a>`)}
     </nav>

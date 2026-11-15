@@ -61,3 +61,13 @@ export const temaGuardar = ({ bloque, numero, nombre }, id = null) => {
         : llamada("/api/temas/" + id, { metodo: "PUT", cuerpo });
 };
 export const temaBorrar = (id) => llamada("/api/temas/" + id, { metodo: "DELETE" });
+
+/* --- Biblioteca (bancos, F3.1) --- */
+export const bancosListar = () => llamada("/api/bancos");
+export const bancoImportar = (cuerpo) => llamada("/api/bancos/importar", { metodo: "POST", cuerpo });
+export const bancoActivar = (id) => llamada(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
+export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
+/* Devuelve la Response cruda: el exportar es una descarga, no JSON. */
+export const bancoExportar = (id) => llamada(`/api/bancos/${id}/exportar`, { metodo: "POST", bruto: true });
+export const bancoRenombrar = (id, nombre) => llamada(`/api/bancos/${id}`, { metodo: "PUT", cuerpo: { nombre } });
+export const bancoBorrar = (id) => llamada(`/api/bancos/${id}`, { metodo: "DELETE" });
