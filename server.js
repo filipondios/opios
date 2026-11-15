@@ -1,7 +1,7 @@
 import { abrirDb } from "./src/db.js";
 import { crearApp } from "./src/app.js";
 import { idBanco } from "./src/banco-id.js";
-import { importarDirectorio } from "./src/seed.js";
+import { importarDirectorio } from "./src/seed-directorio.js";
 import { DatabaseManager } from "./src/gestor-bancos.js";
 import { almacenBun } from "./src/almacen-bun.js";
 import { driverBun } from "./src/driver-bun.js";

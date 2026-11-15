@@ -1,11 +1,12 @@
-/* Estructura física del banco de preguntas (Fase 2.5): un solo sitio donde vive la regla.
-   La app es una lista de permitidos: solo se leen las carpetas `bloque_N/` y, dentro,
-   `info.json` y `tema_N.json`. Cualquier otro archivo o carpeta (`generated/`, `examenes/`,
-   notas, PDF…) se ignora sin configurar nada. `seed`, `validar`, `calidad` e `ids` recorren
-   el banco con este módulo, así que todos aplican la misma regla. */
+/* Estructura física del banco de preguntas (Fase 2.5, neutra desde F2.6): un solo sitio
+   donde vive la regla. La app es una lista de permitidos: solo se leen las carpetas
+   `bloque_N/` y, dentro, `info.json` y `tema_N.json`. Cualquier otro archivo o carpeta
+   (`generated/`, `examenes/`, notas, PDF…) se ignora sin configurar nada. `seed`, `validar`,
+   `calidad` e `ids` recorren el banco con este módulo, así que todos aplican la misma regla.
+   Las rutas que devuelve son RELATIVAS a la raíz de la `fuente` (fuente.js), nunca del
+   sistema de archivos; la versión PC (archivosDeBanco) está en estructura-banco-directorio.js. */
 
-import { readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { comprobarFuente } from "./fuente.js";
 
 /** Carpeta de bloque: minúsculas, guion bajo y número sin ceros a la izquierda (`bloque_1`). */
 export const RE_BLOQUE = /^bloque_([1-9]\d*)$/;
@@ -21,7 +22,8 @@ const RE_BLOQUE_PARECIDO = /^(?:[^\W_]\w*[\s_-]*)?bloque[\s_-]*0*\d/i;
 const RE_TEMA_PARECIDO = /^tema[\s_-]*0*\d+\./i;
 
 const numeroDe = (re, nombre) => Number(re.exec(nombre)[1]);
-const clave = (n) =>
+/** Normaliza un nombre para compararlo sin mayúsculas, espacios ni guiones. */
+export const clave = (n) =>
     String(n)
         .toLowerCase()
         .replace(/[\s_-]+/g, "");
@@ -36,18 +38,18 @@ export function parecidoATema(nombre) {
 }
 
 /**
- * Recorre un directorio de banco y clasifica todo lo que hay. Es puro respecto al orden:
- * los nombres entran ya listados, así que se puede probar sin tocar el disco.
+ * Clasifica el contenido de la raíz del banco. Es puro respecto al orden: los nombres entran
+ * ya listados, así que se puede probar sin sistema de archivos.
  * @returns {{bloques: Array<{nombre:string, numero:number, ruta:string}>, sueltos: string[], ignorados: Array<{nombre:string, motivo:string}>, avisos: string[]}}
  */
-export function clasificarBanco(dir, nombres) {
+export function clasificarBanco(nombres) {
     const bloques = [],
         sueltos = [],
         ignorados = [],
         avisos = [];
     for (const nombre of [...nombres].sort()) {
         if (RE_BLOQUE.test(nombre)) {
-            bloques.push({ nombre, numero: numeroDe(RE_BLOQUE, nombre), ruta: join(dir, nombre) });
+            bloques.push({ nombre, numero: numeroDe(RE_BLOQUE, nombre), ruta: nombre });
             continue;
         }
         if (parecidoABloque(nombre)) {
@@ -71,22 +73,18 @@ export function clasificarBanco(dir, nombres) {
 const RE_JSON_RAIZ = /\.json$/i;
 
 /** Clasifica el contenido de una carpeta de bloque. */
-export function clasificarBloque(dir, bloque, nombres) {
+export function clasificarBloque(bloque, nombres) {
     const temas = [],
         otros = [],
         avisos = [];
     let info = null;
     for (const nombre of [...nombres].sort()) {
         if (esInfo(nombre)) {
-            info = { nombre, ruta: join(dir, bloque, nombre) };
+            info = { nombre, ruta: `${bloque}/${nombre}` };
             continue;
         }
         if (RE_TEMA.test(nombre)) {
-            temas.push({
-                nombre,
-                numero: numeroDe(RE_TEMA, nombre),
-                ruta: join(dir, bloque, nombre),
-            });
+            temas.push({ nombre, numero: numeroDe(RE_TEMA, nombre), ruta: `${bloque}/${nombre}` });
             continue;
         }
         if (parecidoATema(nombre)) {
@@ -103,22 +101,24 @@ export function clasificarBloque(dir, bloque, nombres) {
 }
 
 /**
- * Recorrido único del banco: lee el directorio y cada `bloque_N/` y devuelve lo importable
- * junto con lo ignorado y los avisos de nombres parecidos. Con `soloBloques` no se consideran
- * los JSON sueltos de la raíz (el exportador nunca los escribe: usa `bloque_N.json`).
- * `leer` se puede inyectar para probarlo sin sistema de archivos.
+ * Recorrido único del banco a través de una `fuente` (F2.6): devuelve lo importable junto
+ * con lo ignorado y los avisos de nombres parecidos. Las rutas del resultado son relativas
+ * a la raíz de la fuente. Con `soloBloques` no se consideran los JSON sueltos de la raíz
+ * (el exportador nunca los escribe: usa `bloque_N.json`). Devuelve null si la raíz no se
+ * puede listar (no existe o es ilegible).
  */
-export async function recorrerBanco(dir, { leer = readdir, soloBloques = false } = {}) {
-    const resultado = { dir, bloques: [], sueltos: [], ignorados: [], avisos: [] };
+export async function recorrerBanco(fuente, { soloBloques = false } = {}) {
+    comprobarFuente(fuente);
+    const resultado = { bloques: [], sueltos: [], ignorados: [], avisos: [] };
     let raiz;
     try {
-        raiz = await leer(dir);
+        raiz = await fuente.listar();
     } catch {
-        return null; // el directorio no existe: quien llame decidirá qué hacer
+        return null; // la raíz no está accesible: quien llame decidirá qué hacer
     }
 
-    const r = clasificarBanco(dir, raiz);
-    resultado.sueltos = soloBloques ? [] : r.sueltos.map((n) => join(dir, n));
+    const r = clasificarBanco(raiz);
+    resultado.sueltos = soloBloques ? [] : [...r.sueltos];
     if (soloBloques) for (const n of r.sueltos) resultado.ignorados.push({ ruta: n, motivo: "JSON suelto en la raíz" });
     resultado.avisos.push(...r.avisos);
     for (const i of r.ignorados) resultado.ignorados.push({ ruta: i.nombre, motivo: i.motivo });
@@ -126,53 +126,15 @@ export async function recorrerBanco(dir, { leer = readdir, soloBloques = false }
     for (const bloque of r.bloques) {
         let dentro;
         try {
-            dentro = await leer(bloque.ruta);
+            dentro = await fuente.listar(bloque.ruta);
         } catch (e) {
             resultado.avisos.push(`${bloque.nombre}: no se puede leer su contenido (${e.message}).`);
             continue;
         }
-        const c = clasificarBloque(dir, bloque.nombre, dentro);
+        const c = clasificarBloque(bloque.nombre, dentro);
         resultado.avisos.push(...c.avisos);
         for (const o of c.otros) resultado.ignorados.push({ ruta: `${bloque.nombre}/${o.nombre}`, motivo: o.motivo });
         resultado.bloques.push({ ...bloque, info: c.info, temas: c.temas });
     }
     return resultado;
-}
-
-/** Lista plana de archivos de tema del banco, con su bloque. `incluye` añade otras carpetas (p. ej. `--incluir generated`). */
-export async function archivosDeBanco(dir, { incluye = [], leer = readdir, soloBloques = false } = {}) {
-    const banco = await recorrerBanco(dir, { leer, soloBloques });
-    if (!banco) return { banco: null, archivos: [] };
-    const extra = new Set(incluye.map((n) => clave(n)));
-    const archivos = [];
-    for (const b of banco.bloques) {
-        for (const t of b.temas) archivos.push({ ruta: t.ruta, bloque: b.nombre, tema: t.numero, generado: false });
-        let dentro;
-        try {
-            dentro = await leer(b.ruta);
-        } catch {
-            continue;
-        }
-        for (const nombre of dentro.sort()) {
-            if (!extra.has(clave(nombre))) continue;
-            let hijos;
-            try {
-                hijos = await leer(join(b.ruta, nombre));
-            } catch {
-                continue;
-            }
-            for (const h of hijos.filter((x) => /\.json$/i.test(x)).sort())
-                archivos.push({
-                    ruta: join(b.ruta, nombre, h),
-                    bloque: b.nombre,
-                    tema: RE_TEMA.test(h) ? numeroDe(RE_TEMA, h) : null,
-                    generado: true,
-                });
-        }
-    }
-    /* Formato antiguo: JSON sueltos en la raíz (sin contar los que escribe `export --por-bloques`). */
-    for (const ruta of banco.sueltos)
-        if (!RE_EXPORTE.test(ruta.slice(dir.length + 1)))
-            archivos.push({ ruta, bloque: null, tema: null, generado: false });
-    return { banco, archivos };
 }

@@ -6,6 +6,7 @@ import { join } from "node:path";
 
 import { abrirDb } from "../src/db.js";
 import { abrirRepo } from "../src/db/index.js";
+import { MIGRACIONES } from "../src/db/esquema.js";
 import { almacenBun } from "../src/almacen-bun.js";
 import { driverBun } from "../src/driver-bun.js";
 import { crearAlmacenMemoria } from "../src/almacen-memoria.js";
@@ -379,6 +380,94 @@ describe("task 6: modo biblioteca PC (CLI y arranque del servidor)", () => {
             } finally {
                 hijo.kill();
                 await hijo.exited;
+            }
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+});
+
+/* --- F2.7: metadatos del catálogo y uuid_banco en cada banco --- */
+describe("F2.7: metadatos del catálogo", () => {
+    test("cada camino de entrada anota origen, tamaño, preguntas y versión; activar pone ultima_vez", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-meta-"));
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver: driverBun,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            const b = await gestor.importarJson("Importado", join(import.meta.dir, "fixtures"));
+            expect(b).toMatchObject({
+                origen: "importado",
+                preguntas: 7,
+                version_banco: MIGRACIONES.length,
+            });
+            expect(b.tam_bytes).toBeGreaterThan(0);
+
+            const c = await gestor.copiar("Copiado", b.ruta);
+            expect(c).toMatchObject({ origen: "copiado", preguntas: 7 });
+
+            const extra = join(dir, "directo.db");
+            abrirDb(extra).close();
+            const r = await gestor.registrar("Registrado", extra);
+            expect(r).toMatchObject({ origen: "registrado", preguntas: 0 });
+
+            const filas = await gestor.listar();
+            const porNombre = Object.fromEntries(filas.map((f) => [f.nombre, f]));
+            for (const nombre of ["Importado", "Copiado", "Registrado"]) {
+                expect(porNombre[nombre].tam_bytes).toBeGreaterThan(0);
+                expect(porNombre[nombre].version_banco).toBe(MIGRACIONES.length);
+                expect(porNombre[nombre].ultima_vez).toBeNull(); // aún sin activar
+            }
+
+            /* Activar anota cuándo se usó por última vez y deja uuid_banco en el banco. */
+            await gestor.activar(b.id);
+            const activado = (await gestor.listar()).find((f) => f.id === b.id);
+            expect(activado.ultima_vez).toBeTruthy();
+            expect(Number.isNaN(Date.parse(activado.ultima_vez))).toBe(false);
+            const repo = await gestor.abrirActivo();
+            expect(repo.ajustes().uuid_banco).toBeTruthy();
+            await gestor.cerrar();
+        } finally {
+            await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("un catálogo antiguo (sin columnas de metadatos) se completa al abrir", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-meta-viejo-"));
+        try {
+            /* Catálogo con el esquema de antes de F2.7, con un banco ya dentro. */
+            const rutaVieja = join(dir, "catalogo.db");
+            const banco = join(dir, "banco.db");
+            abrirDb(banco).close();
+            const viejo = new Database(rutaVieja, { create: true, strict: true });
+            viejo.run(`CREATE TABLE bancos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL UNIQUE COLLATE NOCASE CHECK (length(trim(nombre)) > 0),
+                ruta TEXT NOT NULL UNIQUE,
+                creado TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE estado (clave TEXT PRIMARY KEY, valor TEXT);`);
+            viejo.query("INSERT INTO bancos (nombre, ruta) VALUES (?, ?)").run("Antiguo", banco);
+            viejo.close();
+
+            const gestor = new DatabaseManager({ almacen: almacenBun, driver: driverBun, rutaCatalogo: rutaVieja });
+            try {
+                const filas = await gestor.listar();
+                expect(filas).toHaveLength(1);
+                expect(filas[0]).toMatchObject({ nombre: "Antiguo", origen: null, ultima_vez: null });
+
+                /* El gestor antiguo sigue funcionando y anota metadatos de lo nuevo. */
+                const otro = join(dir, "otro.db");
+                abrirDb(otro).close();
+                const nuevo = await gestor.registrar("Nuevo", otro);
+                expect(nuevo).toMatchObject({ origen: "registrado" });
+                await gestor.activar(nuevo.id);
+                expect((await gestor.listar()).find((f) => f.id === nuevo.id).ultima_vez).toBeTruthy();
+            } finally {
+                await gestor.close();
             }
         } finally {
             rmSync(dir, { recursive: true, force: true });

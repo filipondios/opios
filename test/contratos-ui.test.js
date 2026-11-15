@@ -84,6 +84,10 @@ describe("contratos de la UI", () => {
         expect(simulacro).toContain('claveBanco("simulacro.curso")');
         expect(simulacro).toContain('claveBanco("simulacro.pendiente")');
 
+        /* F2.8: la biblioteca consultará esto antes de cambiar de banco (bloquear/confirmar). */
+        const comun = readFileSync(join(DIR, "comun.js"), "utf8");
+        expect(comun).toContain('claveBanco("simulacro.curso")');
+
         const tema = readFileSync(join(DIR, "tema.js"), "utf8");
         expect(tema).toContain('"opios.tema"'); // ajuste visual: global
     });

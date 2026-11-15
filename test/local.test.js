@@ -4,7 +4,7 @@ import { describe, expect, test } from "bun:test";
 import { abrirAdaptadorSqlite } from "../src/adaptador-sqlite-wasm.js";
 import { abrirRepo } from "../src/db/index.js";
 import { crearAppLocal } from "../src/local.js";
-import { importarDirectorio } from "../src/seed.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
 
 /* Monta una app local sobre un banco de ejemplo. Devuelve `[app, cerrar]`. */
 async function appDeEjemplo() {

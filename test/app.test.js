@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
 import { exportarPorBloques } from "../src/exportar.js";
-import { importarDirectorio } from "../src/seed.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
 import { DIR_EJEMPLO } from "../src/config-servidor.js";
 import { CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
 import { MIGRACIONES } from "../src/db/esquema.js";

@@ -18,7 +18,7 @@ import { almacenBun } from "../src/almacen-bun.js";
 import { driverBun } from "../src/driver-bun.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
 import { exportarBanco, importarBancoOpios } from "../src/portable.js";
-import { importarDirectorio } from "../src/seed.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
 
 const WASM = "node_modules/sql.js/dist/sql-wasm.wasm";
 const HOY = "2026-06-01";

@@ -20,7 +20,7 @@ import {
     importarBancoOpios,
     FORMATO,
 } from "../src/portable.js";
-import { importarDirectorio } from "../src/seed.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
 
 const WASM = "node_modules/sql.js/dist/sql-wasm.wasm";
 const driverWasm = crearDriverWasm({ rutaWasm: WASM });

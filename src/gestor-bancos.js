@@ -11,9 +11,10 @@
    write-through con el driver de Bun; para catálogo vivo, F2.7/2.8. */
 import { comprobarAlmacen } from "./almacen.js";
 import { comprobarDriver } from "./driver.js";
+import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
-import { importarDirectorio } from "./seed.js";
+import { importarDirectorio } from "./seed-directorio.js";
 
 const ESQUEMA = `
 CREATE TABLE IF NOT EXISTS bancos (
@@ -57,6 +58,19 @@ export class DatabaseManager {
         this.#catalogo = await this.#driver.abrir(this.#almacen, this.#rutaCatalogo);
         this.#catalogo.run("PRAGMA foreign_keys = ON");
         this.#catalogo.run(ESQUEMA);
+        /* Catálogos creados antes de F2.7: añade las columnas de metadatos si faltan. */
+        for (const [col, tipo] of [
+            ["origen", "TEXT"],
+            ["tam_bytes", "INTEGER"],
+            ["preguntas", "INTEGER"],
+            ["version_banco", "INTEGER"],
+            ["ultima_vez", "TEXT"],
+        ])
+            try {
+                this.#catalogo.run(`ALTER TABLE bancos ADD COLUMN ${col} ${tipo}`);
+            } catch {
+                /* la columna ya existía */
+            }
     }
 
     /** Registra un banco SQLite existente. Ruta y nombre deben ser únicos y el banco válido. */
@@ -65,9 +79,16 @@ export class DatabaseManager {
         if (!(await this.#almacen.existe(ruta)))
             throw new Error(`El banco «${ruta}» no existe. Registra una SQLite existente o copia primero el archivo.`);
         /* Validar ANTES de anotarlo en el catálogo: un banco inválido no entra nunca (F2.4). */
-        await this.#verificar(ruta);
-        const fila = await this.#insertar(nombre.trim(), ruta);
-        return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta };
+        const info = await this.#verificar(ruta);
+        const tam_bytes = (await this.#almacen.leer(ruta)).length;
+        const meta = {
+            origen: "registrado",
+            tam_bytes,
+            preguntas: info.preguntas,
+            version_banco: info.user_version,
+        };
+        const fila = await this.#insertar(nombre.trim(), ruta, meta);
+        return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
     }
 
     /** Crea un banco nuevo importando un directorio JSON (misma estructura que el seed).
@@ -84,6 +105,8 @@ export class DatabaseManager {
                 throw new Error(
                     `Importación con errores (${r.errores.length}); banco no creado. Primera: ${r.errores[0]}`,
                 );
+            /* Marca el banco nuevo con su uuid en `ajustes` (detección de duplicados, F2.7). */
+            idBanco(repo);
             bytes = this.#driver.instantanea(repo.db);
         } catch (e) {
             await this.#quitarSiExiste(temporal);
@@ -92,7 +115,7 @@ export class DatabaseManager {
             repo.close();
         }
         await this.#almacen.escribir(temporal, bytes); // el driver WASM no escribe solo
-        return await this.#anotar(nombre, temporal, ruta);
+        return await this.#anotar(nombre, temporal, ruta, "importado", bytes.length);
     }
 
     /** Copia un banco SQLite existente al catálogo (el original queda intacto y registrado
@@ -103,33 +126,42 @@ export class DatabaseManager {
         const temporal = ruta + ".tmp";
         await this.#quitarSiExiste(temporal);
         try {
-            await this.#almacen.escribir(temporal, await this.#almacen.leer(rutaOrigen));
+            const bytes = await this.#almacen.leer(rutaOrigen);
+            await this.#almacen.escribir(temporal, bytes);
+            return await this.#anotar(nombre, temporal, ruta, "copiado", bytes.length);
         } catch (e) {
             await this.#quitarSiExiste(temporal);
             throw e;
         }
-        return await this.#anotar(nombre, temporal, ruta);
     }
 
-    /* Verifica el temporal (F2.4), lo renombra a su lugar definitivo y lo anota en el catálogo. */
-    async #anotar(nombre, temporal, ruta) {
+    /* Verifica el temporal (F2.4), lo renombra a su lugar definitivo y lo anota en el catálogo
+       con sus metadatos (F2.7). Si algo falla, no queda ni temporal ni banco a medias. */
+    async #anotar(nombre, temporal, ruta, origen, tamBytes) {
         try {
-            await this.#verificar(temporal);
+            const info = await this.#verificar(temporal);
             await this.#limpiarLados(temporal);
             await this.#almacen.renombrar(temporal, ruta); // atómico dentro del mismo directorio
+            const meta = {
+                origen,
+                tam_bytes: tamBytes,
+                preguntas: info.preguntas,
+                version_banco: info.user_version,
+            };
+            const fila = await this.#insertar(nombre.trim(), ruta, meta);
+            return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
         } catch (e) {
             await this.#quitarSiExiste(temporal);
+            await this.#quitarSiExiste(ruta); // si falló el INSERT tras renombrar, no queda huérfano
             throw e;
         }
-        const fila = await this.#insertar(nombre.trim(), ruta);
-        return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta };
     }
 
     /* Abre la ruta solo lectura y pasa el filtro único de banco Opios (F2.4). */
     async #verificar(ruta) {
         const db = await this.#driver.abrir(this.#almacen, ruta, { readonly: true });
         try {
-            verificarBanco(db);
+            return verificarBanco(db);
         } catch (e) {
             throw errorDeVerificacion(e, ruta);
         } finally {
@@ -187,7 +219,10 @@ export class DatabaseManager {
         await this.#listo;
         const activo = await this.idActivo();
         return this.#catalogo
-            .query("SELECT id, nombre, ruta FROM bancos ORDER BY nombre COLLATE NOCASE, id")
+            .query(
+                "SELECT id, nombre, ruta, origen, tam_bytes, preguntas, version_banco, ultima_vez " +
+                    "FROM bancos ORDER BY nombre COLLATE NOCASE, id",
+            )
             .all()
             .map((b) => ({ ...b, activo: b.id === activo }));
     }
@@ -197,7 +232,8 @@ export class DatabaseManager {
         return Number(this.#catalogo.query("SELECT valor FROM estado WHERE clave = 'activo'").get()?.valor) || null;
     }
 
-    /** Elige el banco activo; cierra el que estuviera abierto (nunca dos conexiones a la vez). */
+    /** Elige el banco activo (F2.8): flush y cierre del abierto antes de tocar el catálogo;
+        el abrir del nuevo y la recarga de `__opios`/UI los hace quien llama tras activar. */
     async activar(id) {
         await this.#listo;
         if (!this.#catalogo.query("SELECT 1 FROM bancos WHERE id = ?").get(id))
@@ -208,6 +244,7 @@ export class DatabaseManager {
                 "INSERT INTO estado (clave, valor) VALUES ('activo', ?) ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor",
             )
             .run(String(id));
+        this.#catalogo.query("UPDATE bancos SET ultima_vez = ? WHERE id = ?").run(new Date().toISOString(), id);
     }
 
     /** Ruta del banco activo (sin abrirlo). */
@@ -226,7 +263,13 @@ export class DatabaseManager {
         /* Abrir sin el archivo crearía una base nueva en silencio: un banco ausente es un error. */
         if (!(await this.#almacen.existe(fila.ruta)))
             throw new Error(`El banco activo «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
-        this.#abierto = { id, ruta: fila.ruta, repo: abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta)) };
+        this.#abierto = {
+            id,
+            ruta: fila.ruta,
+            repo: abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta)),
+        };
+        /* Garantiza uuid_banco en ajustes de cada banco abierto (detección de duplicados, F2.7). */
+        idBanco(this.#abierto.repo);
         return this.#abierto.repo;
     }
 
@@ -266,8 +309,12 @@ export class DatabaseManager {
         if (bytes) await this.#almacen.escribir(this.#rutaCatalogo, bytes);
     }
 
-    async #insertar(nombre, ruta) {
+    async #insertar(nombre, ruta, meta) {
         await this.#listo;
-        return this.#catalogo.query("INSERT INTO bancos (nombre, ruta) VALUES (?, ?)").run(nombre, ruta); // el UNIQUE de la tabla lanza con un error claro
+        return this.#catalogo
+            .query(
+                "INSERT INTO bancos (nombre, ruta, origen, tam_bytes, preguntas, version_banco) VALUES (?, ?, ?, ?, ?, ?)",
+            )
+            .run(nombre, ruta, meta.origen, meta.tam_bytes, meta.preguntas, meta.version_banco); // el UNIQUE de la tabla lanza con un error claro
     }
 }

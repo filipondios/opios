@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 
 import { abrirAdaptadorSqlite, deBase64 } from "../src/adaptador-sqlite-wasm.js";
 import { abrirRepo } from "../src/db/index.js";
-import { importarDirectorio } from "../src/seed.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
 
 const WASM = "node_modules/sql.js/dist/sql-wasm.wasm";
 const abrir = (opciones = {}) => abrirAdaptadorSqlite({ rutaWasm: WASM, ...opciones });

@@ -13,6 +13,16 @@ export const msgError = (e) => (e && e.message ? e.message : String(e));
 export const claveBanco = (nombre) =>
     globalThis.__opiosBancoId ? `opios.${globalThis.__opiosBancoId}.${nombre}` : `opios.${nombre}`;
 
+/** ¿Hay un simulacro a mitad? (F2.8) La biblioteca lo consultará antes de cambiar de banco:
+    si lo hay, pedirá confirmación antes del flush -> cerrar -> abrir. */
+export const simulacroEnCurso = () => {
+    try {
+        return localStorage.getItem(claveBanco("simulacro.curso")) != null;
+    } catch {
+        return false;
+    }
+};
+
 /** Error HTTP con el status y el cuerpo que devolvió el servidor. */
 export class ErrorHttp extends Error {
     constructor(status, datos = {}) {

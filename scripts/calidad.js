@@ -5,7 +5,7 @@
 import { join } from "node:path";
 import { DIR_PREGUNTAS } from "../src/config-servidor.js";
 import { analizarPreguntas, MINIMO_SESGO } from "../src/calidad.js";
-import { archivosDeBanco } from "../src/estructura-banco.js";
+import { archivosDeBanco } from "../src/estructura-banco-directorio.js";
 
 const pct = (parte, total) => (total ? (parte / total) * 100 : 0);
 const fmtPct = (parte, total) => (total ? pct(parte, total).toFixed(1) + " %" : "—");
