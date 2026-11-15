@@ -8,7 +8,5 @@
 export function prepararPagina(html, sufijo) {
     const conModulos = html.replace(/(<script\b[^>]*\bsrc=")([^"]*)(")/g, (_, a, src, c) => a + src + sufijo + c);
     const shell = `<script type="module" src="/opios.js${sufijo}"></script>`;
-    return conModulos.includes("</body>")
-        ? conModulos.replace("</body>", shell + "</body>")
-        : conModulos + shell;
+    return conModulos.includes("</body>") ? conModulos.replace("</body>", shell + "</body>") : conModulos + shell;
 }

@@ -110,6 +110,32 @@ La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIO
 
 El contenedor se ejecuta con el usuario `bun` y, por defecto, solo acepta cabeceras `Host` de loopback. Si accedes a él por la LAN, añade tu dirección con `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
 
+## Android
+
+La misma aplicación funciona en Android: el núcleo (servicios, API y páginas) se empaqueta
+para el WebView y el banco se guarda con SQLite WASM en el almacenamiento privado de la app
+(`files/banco/banco.db`). Requisitos en la máquina de desarrollo:
+
+- **JDK 21** con `JAVA_HOME` apuntando a él.
+- **Android SDK** con la **API 36** (compile/target SDK, minSdk 24) y sus *build-tools*; el
+  SDK se localiza por `ANDROID_HOME`/`ANDROID_SDK_ROOT` o por `android/local.properties`.
+- **Bun** y las dependencias ya instaladas (`bun install`).
+
+Con un emulador o un dispositivo conectado por USB (depuración USB activada):
+
+```bash
+bun run android        # empaqueta dist-web/ y sincroniza el proyecto Android
+bun run android:abrir  # abre android/ en Android Studio
+```
+
+En Android Studio, pulsa **Run** (o `cd android && ./gradlew installDebug`) para instalar y
+arrancar la app. Para depurar la interfaz, abre `chrome://inspect` en Chrome con la app en
+marcha. Para extraer el banco guardado en un build de depuración:
+
+```bash
+adb exec-out run-as es.opios.app cat files/banco/banco.db > banco.db
+```
+
 ## Cómo se estudia
 
 Los repasos usan un **sistema Leitner simplificado de dos capas**: cada pregunta tiene una caja (0-6) y una fecha de vencimiento.

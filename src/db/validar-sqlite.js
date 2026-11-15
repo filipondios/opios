@@ -18,7 +18,10 @@ export function validarBancoSqlite(ruta) {
                 `Esquema futuro no compatible: v${user_version} y esta versión solo conoce hasta v${MIGRACIONES.length}.`,
             );
         const tablas = new Set(
-            db.query("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((t) => t.name),
+            db
+                .query("SELECT name FROM sqlite_master WHERE type = 'table'")
+                .all()
+                .map((t) => t.name),
         );
         for (const tabla of ["preguntas", "opciones", "progreso", "temas"])
             if (!tablas.has(tabla)) throw new Error(`No es un banco Opios: falta la tabla «${tabla}».`);

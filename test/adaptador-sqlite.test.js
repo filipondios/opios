@@ -36,7 +36,13 @@ describe("adaptador sqlite wasm", () => {
         const db = await abrir({ onCambios: (s) => onCambios.push(s) });
         const repo = abrirRepo(db);
         await importarDirectorio(repo, "./test/fixtures");
-        const id = repo.crear({ tema: 1, pregunta: "¿De prueba?", respuestas: ["Sí", "No"], correcta: 0, explicacion: "" });
+        const id = repo.crear({
+            tema: 1,
+            pregunta: "¿De prueba?",
+            respuestas: ["Sí", "No"],
+            correcta: 0,
+            explicacion: "",
+        });
         repo.guardarProgreso([{ id, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
         expect(onCambios.length).toBeGreaterThan(0); // avisó tras cada escritura
 
@@ -47,6 +53,23 @@ describe("adaptador sqlite wasm", () => {
         expect(repo2.contarPreguntas()).toBe(8);
         expect(repo2.paraTest([1]).progreso[id]).toEqual([3, "2999-01-01", 2, 1]);
         db2.close();
+    });
+
+    test("guardar con una transacción abierta no falla: el aviso llega tras el COMMIT", async () => {
+        /* Antes, onCambios exportaba dentro del BEGIN de migrar()/importar() y sql.js lo
+           rechazaba («SQLite is busy or locked»): el WebView no llegaba a guardar nunca. */
+        const guardados = [];
+        const db = await abrir({ onCambios: (s) => guardados.push(s.exportar()) });
+        const repo = abrirRepo(db);
+        await importarDirectorio(repo, "./test/fixtures");
+        const antes = guardados.length;
+        repo.crear({ tema: 1, pregunta: "¿De prueba?", respuestas: ["Sí", "No"], correcta: 0, explicacion: "" });
+        expect(guardados.length).toBeGreaterThan(antes);
+
+        const db2 = await abrir({ bytes: guardados.at(-1) });
+        expect(abrirRepo(db2).contarPreguntas()).toBe(8); // incluye la recién creada
+        db2.close();
+        db.close();
     });
 
     test("acepta bytes en base64 (lo que devuelve Filesystem.readFile) y deBase64 invierte aBase64", async () => {

@@ -9,8 +9,7 @@ import { join } from "node:path";
 const DIR = join(import.meta.dir, "../public/js");
 const PAGINAS = readdirSync(DIR).filter((f) => f.endsWith(".js") && f !== "comun.js" && f !== "cliente.js");
 
-const sinComentarios = (codigo) =>
-    codigo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const sinComentarios = (codigo) => codigo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
 
 describe("contratos de la UI", () => {
     test("las páginas no llaman a api() ni fetch() directamente: pasan por cliente.js", () => {

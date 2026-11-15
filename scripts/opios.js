@@ -19,6 +19,8 @@ await ejecutarCli(async () => {
             `Restaurado ${destino}: ${m.preguntas} pregunta(s), esquema v${m.user_version} (regístralo con «bun run bancos registrar»).`,
         );
     }
-    console.error("Uso: bun run opios exportar <banco.db> <destino.opios> [nombre] | importar <origen.opios> [destino.db]");
+    console.error(
+        "Uso: bun run opios exportar <banco.db> <destino.opios> [nombre] | importar <origen.opios> [destino.db]",
+    );
     process.exit(1);
 });

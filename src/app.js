@@ -10,9 +10,10 @@ import { crearManejadorHttp } from "./http.js";
  * Crea el manejador de peticiones (independiente del puerto, así se puede probar sin red).
  * Con `auth = { usuario, clave }` se exige autenticación HTTP Basic en todo salvo /healthz.
  * `ahora` devuelve la fecha actual; los tests la fijan para calcular repasos «de hoy».
- * `zona` (por defecto `APP_TZ`) decide en qué zona horaria se calcula ese «hoy».
+ * `zona` (por defecto, la del sistema) decide en qué zona horaria se calcula ese «hoy»;
+ * la inyecta el servidor (`APP_TZ`).
  */
-export function crearApp(repo, { auth = null, ahora = () => new Date(), zona } = {}) {
+export function crearApp(repo, { auth = null, ahora = () => new Date(), zona = null } = {}) {
     const servicios = crearServicios(repo, { ahora, zona });
     return crearManejadorHttp({
         api: crearApi(repo, servicios),

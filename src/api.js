@@ -9,7 +9,7 @@ import {
     validarSimulacro,
     validarAjustes,
 } from "./validar.js";
-import { serializarJson } from "./exportar.js";
+import { serializarJson } from "./serializar.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
 

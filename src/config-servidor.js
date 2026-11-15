@@ -31,6 +31,10 @@ export function resolverDirPreguntas(env = {}, existe = () => false) {
 
 export const DIR_PREGUNTAS = resolverDirPreguntas(process.env, (p) => existsSync(p));
 
+/* Zona horaria para calcular «hoy» (p. ej. Europe/Madrid). Sin `APP_TZ`, la del sistema.
+   Vive aquí porque lee entorno: el núcleo compartido recibe la zona por parámetro. */
+export const APP_TZ = process.env.APP_TZ ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 export const PORT = Number(process.env.PORT ?? 8000);
 // Solo accesible desde esta máquina.
 export const HOST = process.env.HOST ?? "127.0.0.1";

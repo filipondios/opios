@@ -52,7 +52,9 @@ await ejecutarCli(async () => {
             for (const a of r.avisos) console.log("  aviso:", a);
             return;
         }
-        console.error("Uso: bun run bancos listar | registrar <nombre> <ruta> | activar <id> | importar <nombre> <dir> | copiar <nombre> <ruta> | actualizar <dir>");
+        console.error(
+            "Uso: bun run bancos listar | registrar <nombre> <ruta> | activar <id> | importar <nombre> <dir> | copiar <nombre> <ruta> | actualizar <dir>",
+        );
         process.exit(1);
     } finally {
         gestor.close();

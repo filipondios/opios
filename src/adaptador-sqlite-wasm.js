@@ -29,8 +29,11 @@ export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {},
     const SQL = await sqlJs(rutaWasm);
     const db = new SQL.Database(bytes ? deBase64TextSiHaceFalta(bytes) : undefined);
     let cerrada = false;
+    /* sql.js no deja exportar con una transacción abierta: dentro de `transaction` se
+       pospone el aviso a la confirmación (si no, el WebView no podría guardar). */
+    let enTransaccion = 0;
     const avisar = () => {
-        if (!cerrada) onCambios(shim);
+        if (!cerrada && enTransaccion === 0) onCambios(shim);
     };
 
     /* Sentencia con el mismo contrato que Bun: run devuelve { changes, lastInsertRowid }. */
@@ -82,15 +85,18 @@ export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {},
             avisar();
             return r;
         },
-        transaction: (fn) =>
-            (...args) => {
+        transaction: (fn) => {
+            return (...args) => {
                 db.run("BEGIN");
+                enTransaccion++;
                 try {
                     const r = fn(...args);
                     db.run("COMMIT");
+                    enTransaccion--;
                     avisar();
                     return r;
                 } catch (e) {
+                    enTransaccion--;
                     try {
                         db.run("ROLLBACK");
                     } catch {
@@ -98,7 +104,8 @@ export async function abrirAdaptadorSqlite({ bytes = null, onCambios = () => {},
                     }
                     throw e;
                 }
-            },
+            };
+        },
         exportar: () => db.export(),
         close: () => {
             cerrada = true;

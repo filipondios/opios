@@ -9,8 +9,8 @@ import { ErrorApi } from "./errores.js";
 
 const json = (datos, status = 200) => Response.json(datos, { status });
 
-export function crearAppLocal(repo) {
-    const servicios = crearServicios(repo);
+export function crearAppLocal(repo, { zona = null } = {}) {
+    const servicios = crearServicios(repo, { zona });
     const api = crearApi(repo, servicios);
     const web = crearWeb(repo, servicios);
 

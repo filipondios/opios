@@ -187,7 +187,9 @@ describe("task 9: actualización del banco activo con id_externo", () => {
             const b = await gestor.importarJson("Banco", bancoJson(dir + "/v1", [P1]));
             gestor.activar(b.id);
             const idOriginal = gestor.abrirActivo().todas()[0].id;
-            gestor.abrirActivo().guardarProgreso([{ id: idOriginal, caja: 4, vence: "2999-01-01", aciertos: 5, fallos: 1 }]);
+            gestor
+                .abrirActivo()
+                .guardarProgreso([{ id: idOriginal, caja: 4, vence: "2999-01-01", aciertos: 5, fallos: 1 }]);
             gestor.cerrar();
 
             /* Misma id_externo, contenido distinto. */

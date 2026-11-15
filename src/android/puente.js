@@ -26,11 +26,17 @@ export async function arrancar() {
         onCambios: (shim) => {
             const bytesActuales = aBase64(shim.exportar());
             cadena = cadena.then(() =>
-                Filesystem.writeFile({ path: ARCHIVO, directory: Directory.Data, data: bytesActuales, recursive: true }),
+                Filesystem.writeFile({
+                    path: ARCHIVO,
+                    directory: Directory.Data,
+                    data: bytesActuales,
+                    recursive: true,
+                }),
             );
         },
     });
     const repo = abrirRepo(db);
-    globalThis.__opios = crearAppLocal(repo);
+    /* El WebView no tiene `process.env`: la zona es la del dispositivo. */
+    globalThis.__opios = crearAppLocal(repo, { zona: Intl.DateTimeFormat().resolvedOptions().timeZone });
     return repo;
 }

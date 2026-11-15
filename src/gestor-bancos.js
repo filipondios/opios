@@ -44,9 +44,7 @@ export class DatabaseManager {
             throw new Error(`El banco «${ruta}» no existe. Registra una SQLite existente o copia primero el archivo.`);
         /* Validar ANTES de anotarlo en el catálogo: un banco inválido no entra nunca. */
         validarBancoSqlite(ruta);
-        const fila = this.#catalogo
-            .query("INSERT INTO bancos (nombre, ruta) VALUES (?, ?)")
-            .run(nombre.trim(), ruta); // el UNIQUE de la tabla lanza con un error claro
+        const fila = this.#catalogo.query("INSERT INTO bancos (nombre, ruta) VALUES (?, ?)").run(nombre.trim(), ruta); // el UNIQUE de la tabla lanza con un error claro
         return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta };
     }
 
@@ -62,7 +60,9 @@ export class DatabaseManager {
             if (r.errores.length) {
                 repo.close();
                 this.#quitarSiExiste(temporal);
-                throw new Error(`Importación con errores (${r.errores.length}); banco no creado. Primera: ${r.errores[0]}`);
+                throw new Error(
+                    `Importación con errores (${r.errores.length}); banco no creado. Primera: ${r.errores[0]}`,
+                );
             }
         } finally {
             repo.close();
@@ -71,7 +71,10 @@ export class DatabaseManager {
     }
 
     /** Copia un banco SQLite existente al catálogo (el original queda intacto y registrado
-        donde estaba). Copia a temporal + valida + renombra: nunca queda un banco a medias. */    copiar(nombre, rutaOrigen) {
+        donde estaba). Copia a temporal + valida + renombra: nunca queda un banco a medias. */ copiar(
+        nombre,
+        rutaOrigen,
+    ) {
         if (!existsSync(rutaOrigen)) throw new Error(`No existe el banco «${rutaOrigen}».`);
         const ruta = this.rutaDestino(nombre);
         const temporal = ruta + ".tmp";
@@ -105,7 +108,10 @@ export class DatabaseManager {
 
     /** Ruta definitiva de un banco nuevo (junto al catálogo). Falla si ya existe. */
     rutaDestino(nombre) {
-        const limpio = String(nombre).trim().replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+        const limpio = String(nombre)
+            .trim()
+            .replace(/[^a-zA-Z0-9._-]+/g, "-")
+            .replace(/^-+|-+$/g, "");
         if (!limpio) throw new Error("Nombre de banco no válido.");
         const ruta = join(dirname(this.#rutaCatalogo), `${limpio}.db`);
         if (existsSync(ruta)) throw new Error(`Ya existe ${ruta}; elige otro nombre.`);
@@ -152,7 +158,9 @@ export class DatabaseManager {
             throw new Error(`El banco ${id} no está en el catálogo.`);
         this.cerrar();
         this.#catalogo
-            .query("INSERT INTO estado (clave, valor) VALUES ('activo', ?) ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor")
+            .query(
+                "INSERT INTO estado (clave, valor) VALUES ('activo', ?) ON CONFLICT (clave) DO UPDATE SET valor = excluded.valor",
+            )
             .run(String(id));
     }
 

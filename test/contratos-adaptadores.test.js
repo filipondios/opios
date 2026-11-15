@@ -47,7 +47,16 @@ function contrato(nombre, abrir) {
                         .all()
                         .map((t) => t.name),
                 );
-                for (const tabla of ["bloques", "temas", "preguntas", "opciones", "progreso", "respuestas", "simulacros", "ajustes"])
+                for (const tabla of [
+                    "bloques",
+                    "temas",
+                    "preguntas",
+                    "opciones",
+                    "progreso",
+                    "respuestas",
+                    "simulacros",
+                    "ajustes",
+                ])
                     expect(tablas.has(tabla), `falta la tabla ${tabla}`).toBe(true);
                 expect(repo.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
             } finally {
@@ -102,8 +111,20 @@ function contrato(nombre, abrir) {
             try {
                 const bloque = repo.crearBloque({ nombre: "Bloque sesión" });
                 const tema = repo.crearTema({ bloque: bloque.id, numero: 1, nombre: "Tema sesión" });
-                const a = repo.crear({ tema: tema.id, pregunta: "A", respuestas: ["sí", "no"], correcta: 0, explicacion: "" });
-                const b = repo.crear({ tema: tema.id, pregunta: "B", respuestas: ["sí", "no"], correcta: 1, explicacion: "" });
+                const a = repo.crear({
+                    tema: tema.id,
+                    pregunta: "A",
+                    respuestas: ["sí", "no"],
+                    correcta: 0,
+                    explicacion: "",
+                });
+                const b = repo.crear({
+                    tema: tema.id,
+                    pregunta: "B",
+                    respuestas: ["sí", "no"],
+                    correcta: 1,
+                    explicacion: "",
+                });
 
                 repo.guardarProgreso([{ id: a, caja: 4, vence: "2026-06-10", aciertos: 3, fallos: 1 }]);
                 expect(repo.paraTest([tema.id]).progreso[a]).toEqual([4, "2026-06-10", 3, 1]);
@@ -130,7 +151,14 @@ function contrato(nombre, abrir) {
                     },
                     HOY,
                 );
-                expect(sim).toMatchObject({ total: 2, aciertos: 1, fallos: 1, en_blanco: 0, puntos: 0.67, temas: [tema.id] });
+                expect(sim).toMatchObject({
+                    total: 2,
+                    aciertos: 1,
+                    fallos: 1,
+                    en_blanco: 0,
+                    puntos: 0.67,
+                    temas: [tema.id],
+                });
                 expect(sim.detalle).toHaveLength(2);
                 expect(repo.paraTest([tema.id]).progreso[b].slice(0, 2)).toEqual([1, HOY]); // un fallo baja a caja 1
                 expect(repo.contarSimulacros()).toBe(1);
@@ -153,7 +181,9 @@ function contrato(nombre, abrir) {
 
                 /* Falla a mitad de una transacción explícita: tampoco queda el INSERT previo. */
                 const tx = repo.db.transaction(() => {
-                    repo.db.query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)").run(90, "Rollback", 90);
+                    repo.db
+                        .query("INSERT INTO bloques (numero, nombre, orden) VALUES (?, ?, ?)")
+                        .run(90, "Rollback", 90);
                     throw new Error("boom");
                 });
                 expect(tx).toThrow("boom");
@@ -181,8 +211,12 @@ describe("task 12: migraciones compartidas", () => {
             vieja.run(
                 "INSERT INTO preguntas (id, tema_id, enunciado, clave_norm, explicacion) VALUES (10, 1, '¿Antigua?', 'antigua', '')",
             );
-            vieja.run("INSERT INTO opciones (id, pregunta_id, posicion, texto, es_correcta) VALUES (100, 10, 0, 'A', 1)");
-            vieja.run("INSERT INTO progreso (pregunta_id, caja, vence, aciertos, fallos) VALUES (10, 4, '2026-04-15', 3, 1)");
+            vieja.run(
+                "INSERT INTO opciones (id, pregunta_id, posicion, texto, es_correcta) VALUES (100, 10, 0, 'A', 1)",
+            );
+            vieja.run(
+                "INSERT INTO progreso (pregunta_id, caja, vence, aciertos, fallos) VALUES (10, 4, '2026-04-15', 3, 1)",
+            );
             vieja.run(`PRAGMA user_version = 1`);
             vieja.close();
 
@@ -190,7 +224,12 @@ describe("task 12: migraciones compartidas", () => {
             const repo = abrirRepo(db);
             try {
                 expect(repo.db.query("PRAGMA user_version").get().user_version).toBe(MIGRACIONES.length);
-                expect(repo.obtener(10)).toMatchObject({ id: 10, pregunta: "¿Antigua?", respuestas: ["A"], correcta: 0 });
+                expect(repo.obtener(10)).toMatchObject({
+                    id: 10,
+                    pregunta: "¿Antigua?",
+                    respuestas: ["A"],
+                    correcta: 0,
+                });
                 expect(repo.paraTest([1]).progreso[10]).toEqual([4, "2026-04-15", 3, 1]);
                 expect(repo.db.query("PRAGMA foreign_key_check").all()).toEqual([]);
             } finally {

@@ -114,8 +114,7 @@ export function crearManejadorHttp({ api, web, auth = null }) {
         return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
     }
 
-    const jsonError = (datos, status) =>
-        Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
+    const jsonError = (datos, status) => Response.json(datos, { status, headers: { "Cache-Control": "no-store" } });
 
     return async function manejar(req) {
         const url = new URL(req.url);

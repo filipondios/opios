@@ -3,11 +3,13 @@
    nivel (`query`/`run`/`transaction`) y las APIs de Bun (`bun:sqlite`, `Bun.*`) — son
    del adaptador de almacenamiento (`src/db/`) y del adaptador HTTP (`src/http.js`).
    `test/contratos.test.js` lo comprueba. Cumplirlo permite portar el núcleo a Android. */
-import { CAJA_DOMINADA, APP_TZ, FACTOR_EXAMEN } from "./config.js";
+import { CAJA_DOMINADA, FACTOR_EXAMEN } from "./config.js";
 import { hoyIso, diasEntre } from "./fechas.js";
 
-/** Capa de servicios: cálculos que la API y las páginas comparten. */
-export function crearServicios(repo, { ahora = () => new Date(), zona = APP_TZ } = {}) {
+/** Capa de servicios: cálculos que la API y las páginas comparten.
+    `zona` (por defecto, la del sistema) la inyecta el punto de entrada: `server.js` en PC
+    y `puente.js` en el WebView. Así este módulo no depende del entorno (`process.env`). */
+export function crearServicios(repo, { ahora = () => new Date(), zona = null } = {}) {
     const fechaHoy = () => hoyIso(ahora(), zona);
     const estadisticas = () => repo.estadisticasTemas(fechaHoy(), CAJA_DOMINADA);
     /** Temario con las cifras de repaso de cada tema (para barras y bloques plegables). */

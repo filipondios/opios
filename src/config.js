@@ -20,9 +20,6 @@ export const CUPO_NUEVAS = 15; // preguntas nuevas que se introducen como máxim
 export const FRENO_ATRASO = 2; // si hay más de FRENO_ATRASO × CUPO_NUEVAS repasos atrasados, no entran nuevas
 export const FACTOR_EXAMEN = 0.15; // tope de intervalo = FACTOR_EXAMEN × días hasta el examen (Fase 3.6)
 
-/* Zona horaria para calcular «hoy» en el servidor (p. ej. Europe/Madrid). Vacío = zona del sistema. */
-export const APP_TZ = process.env.APP_TZ ?? null;
-
 /**
  * Decide si hay que importar el banco al arrancar. Función pura.
  * Con `auto` y sin `OPIOS_PREGUNTAS`, solo importa si la BD está vacía: evita meter el banco de

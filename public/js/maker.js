@@ -255,11 +255,8 @@ import { etiquetaTema } from "./etiquetas.js";
         const edicion = id !== null;
         setStatus("busy", "Guardando…");
         try {
-            await (edicion
-                ? cliente.preguntaGuardar(cuerpoDe(q), id)
-                : cliente.preguntaGuardar(cuerpoDe(q)));
-            if (reemplazo && editando !== null && editando !== id)
-                await cliente.preguntaBorrar(editando);
+            await (edicion ? cliente.preguntaGuardar(cuerpoDe(q), id) : cliente.preguntaGuardar(cuerpoDe(q)));
+            if (reemplazo && editando !== null && editando !== id) await cliente.preguntaBorrar(editando);
         } catch (e) {
             setStatus("warn", "No se pudo guardar");
             throw e;

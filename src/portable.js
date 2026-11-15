@@ -40,9 +40,7 @@ function descontenedor(buf) {
         throw new Error("Manifest del banco .opios no válido (JSON roto).");
     }
     if (!manifest || manifest.formato !== FORMATO)
-        throw new Error(
-            `Formato ${manifest?.formato} no soportado: esta versión de Opios lee el formato ${FORMATO}.`,
-        );
+        throw new Error(`Formato ${manifest?.formato} no soportado: esta versión de Opios lee el formato ${FORMATO}.`);
     return { manifest, sqlite: buf.subarray(fin) };
 }
 

@@ -25,14 +25,18 @@ export const simulacroGuardar = (cuerpo) => api("/api/simulacros", { metodo: "PO
 /* --- Maker (preguntas) --- */
 export const preguntaObtener = (id) => api("/api/preguntas/" + id);
 export const preguntaGuardar = (cuerpo, id = null) =>
-    id === null ? api("/api/preguntas", { metodo: "POST", cuerpo }) : api("/api/preguntas/" + id, { metodo: "PUT", cuerpo });
+    id === null
+        ? api("/api/preguntas", { metodo: "POST", cuerpo })
+        : api("/api/preguntas/" + id, { metodo: "PUT", cuerpo });
 export const preguntaBorrar = (id) => api("/api/preguntas/" + id, { metodo: "DELETE" });
 export const preguntasListar = (consulta) => api("/api/preguntas?" + consulta);
 
 /* --- Temario (bloques y temas) --- */
 export const bloquesReordenar = (ids) => api("/api/bloques/reordenar", { metodo: "POST", cuerpo: { ids } });
 export const bloqueGuardar = (nombre, id = null) =>
-    id === null ? api("/api/bloques", { metodo: "POST", cuerpo: { nombre } }) : api("/api/bloques/" + id, { metodo: "PUT", cuerpo: { nombre } });
+    id === null
+        ? api("/api/bloques", { metodo: "POST", cuerpo: { nombre } })
+        : api("/api/bloques/" + id, { metodo: "PUT", cuerpo: { nombre } });
 export const bloqueBorrar = (id) => api("/api/bloques/" + id, { metodo: "DELETE" });
 export const temaGuardar = ({ bloque, numero, nombre }, id = null) => {
     const cuerpo = { bloque, numero, nombre };
