@@ -1,4 +1,4 @@
-import { MAX_CUERPO, CAJA_DOMINADA } from "./config.js";
+import { MAX_CUERPO, MAX_SUBIDA, CAJA_DOMINADA } from "./config.js";
 import { ErrorApi } from "./errores.js";
 import {
     validarPregunta,
@@ -15,6 +15,16 @@ const json = (datos, status = 200) => Response.json(datos, { status, headers: { 
 
 /** Los errores del gestor llevan mensaje de usuario; lo que no, mensaje genérico. */
 const msgErrorDe = (e) => (e instanceof Error && e.message ? e.message : "Error inesperado.");
+
+/** Cuerpo binario del asistente de importación (.opios, SQLite o JSON), en octet-stream. */
+async function cuerpoBytes(req) {
+    if (!(req.headers.get("content-type") ?? "").toLowerCase().startsWith("application/octet-stream"))
+        throw new ErrorApi(415, "Envía el archivo como application/octet-stream.");
+    const buf = await req.arrayBuffer();
+    if (buf.byteLength > MAX_SUBIDA)
+        throw new ErrorApi(413, `Archivo demasiado grande (máximo ${Math.round(MAX_SUBIDA / 1e6)} MB).`);
+    return new Uint8Array(buf);
+}
 
 /** Cuerpo JSON de una petición de escritura. Exigir application/json impide los envíos cruzados desde formularios de otras webs. */
 async function cuerpoJson(req) {
@@ -75,7 +85,7 @@ export function crearApi(
 
     /* Biblioteca: los errores del gestor son de datos del usuario (nombre repetido, ruta
        ausente, banco activo…), siempre con mensaje claro → 400; lo del enrutado es ErrorApi. */
-    async function bancos(req, m, ruta) {
+    async function bancos(req, m, ruta, url) {
         if (ruta === "/api/bancos" && m === "GET") {
             const lista = await gestor.listar();
             /* Resumen de progreso: solo el banco activo está abierto; el resto llega con F5.
@@ -95,6 +105,26 @@ export function crearApi(
             const dir = cuerpo.ejemplo ? dirEjemplo : cuerpo.ruta?.trim() || dirPreguntas;
             if (!dir) throw new ErrorApi(400, "Indica la ruta del directorio de preguntas.");
             return json(await gestor.importarJson(nombre, dir), 201);
+        }
+
+        /* Asistente de importación (F3.4/F3.5): el archivo viaja en el cuerpo. */
+        if (ruta === "/api/bancos/inspeccionar" && m === "POST") {
+            const bytes = await cuerpoBytes(req);
+            return json(await gestor.inspeccionar(bytes, { nombre: url.searchParams.get("nombre") ?? "" }));
+        }
+        if (ruta === "/api/bancos/importar-archivo" && m === "POST") {
+            const bytes = await cuerpoBytes(req);
+            const modo = url.searchParams.get("modo") === "actualizar" ? "actualizar" : "nuevo";
+            const id = modo === "actualizar" ? entero(url.searchParams.get("id"), { min: 1 }) : null;
+            if (Number.isNaN(id)) throw new ErrorApi(400, "Falta el id del banco a actualizar (?id=).");
+            return json(
+                await gestor.importarBytes(bytes, {
+                    nombre: url.searchParams.get("nombre") ?? "",
+                    modo,
+                    id,
+                }),
+                201,
+            );
         }
 
         const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar))?$/);
@@ -150,7 +180,7 @@ export function crearApi(
                     "La biblioteca no está disponible: la app está en modo directo (OPIOS_DB). Arranca con OPIOS_CATALOGO.",
                 );
             try {
-                return await bancos(req, m, ruta);
+                return await bancos(req, m, ruta, url);
             } catch (e) {
                 if (e instanceof ErrorApi) throw e;
                 throw new ErrorApi(400, msgErrorDe(e));

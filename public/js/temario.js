@@ -4,8 +4,6 @@ import { etiquetaTema } from "./etiquetas.js";
 
 /* Página del temario (cliente): gestiona bloques y temas contra /api/temario, /api/bloques y /api/temas. */
 (() => {
-    "use strict";
-
     const $ = (s) => document.querySelector(s);
     function setStatus(kind, text) {
         const s = $("#status");

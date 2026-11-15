@@ -5,8 +5,6 @@ import * as cliente from "./cliente.js";
 import { h, msgError, simulacroEnCurso } from "./comun.js";
 
 (() => {
-    "use strict";
-
     const $ = (s) => document.querySelector(s);
     const setStatus = (kind, text) => {
         const s = $("#status");
@@ -51,6 +49,145 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         if (!nombre) return null;
         const b = await cliente.bancoImportar({ nombre, ...cuerpo });
         return b;
+    }
+
+    /* --- Asistente de importación (F3.4–F3.6): elegir archivo → previsualizar → confirmar.
+       El servidor detecta el tipo, valida y avisa de duplicados; aquí se muestra y se
+       pregunta. Con duplicado: actualizar (conserva progreso), importar como nuevo o cancelar. */
+    let selector = null;
+    function importarDesdeArchivo() {
+        if (!selector) {
+            selector = h("input", { type: "file", accept: ".opios,.db,.sqlite,.sqlite3,.json,.zip" });
+            selector.addEventListener("change", async () => {
+                const f = selector.files[0];
+                if (!f) return;
+                try {
+                    await asistente(new Uint8Array(await f.arrayBuffer()), f.name);
+                } catch (e) {
+                    setStatus("warn", msgError(e));
+                }
+                selector.value = "";
+            });
+            document.body.append(selector);
+        }
+        selector.click();
+    }
+
+    function listaErrores(items) {
+        if (!items?.length) return null;
+        return h(
+            "details",
+            { class: "lista-errores" },
+            h("summary", { text: `${items.length} problema(s)` }),
+            h("ul", null, ...items.map((e) => h("li", { text: e }))),
+        );
+    }
+
+    function panel(...kids) {
+        const caja = $("#biblioteca-caja");
+        caja.replaceChildren(h("div", { class: "dialogo-importar" }, ...kids));
+    }
+
+    async function asistente(bytes, nombreArchivo) {
+        let pre;
+        try {
+            pre = await cliente.bancoInspeccionar(bytes, nombreArchivo);
+        } catch (e) {
+            setStatus("warn", msgError(e));
+            panel(
+                h("h3", { text: "No se puede importar" }),
+                h("p", { class: "error-biblioteca", text: msgError(e) }),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
+            );
+            return;
+        }
+        if (pre.soportado === false) {
+            setStatus("warn", pre.mensaje);
+            panel(
+                h("h3", { text: "No se puede importar" }),
+                h("p", { class: "error-biblioteca", text: pre.mensaje }),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
+            );
+            return;
+        }
+        if (pre.errores?.length) {
+            setStatus("warn", `El archivo tiene ${pre.errores.length} error(es)`);
+            panel(
+                h("h3", { text: "El archivo tiene errores: no se importa" }),
+                h("p", { class: "meta-banco", text: `Tipo: ${pre.tipo}. Errores (archivo y nº de pregunta):` }),
+                listaErrores(pre.errores),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
+            );
+            return;
+        }
+
+        const dup = pre.duplicado;
+        const nombreSugerido = pre.manifest?.nombre || nombreArchivo.replace(/\.[^.]+$/, "").trim() || "Importado";
+        const resumen = [
+            `Tipo: ${pre.tipo}`,
+            `${pre.preguntas} pregunta(s)`,
+            pre.version_banco ? `versión del banco: v${pre.version_banco}` : null,
+            dup
+                ? `ya está en tu biblioteca como «${dup.nombre}» (detectado por ${dup.por === "uuid" ? "su identificador" : "el nombre"})`
+                : null,
+        ]
+            .filter(Boolean)
+            .join(" · ");
+        setStatus("ok", dup ? "Banco ya importado: elige qué hacer" : "Revisa y confirma la importación");
+        panel(
+            h("h3", { text: "Importar banco" }),
+            h("p", { class: "meta-banco", text: `${nombreArchivo} — ${resumen}` }),
+            listaErrores(pre.avisos),
+            dup
+                ? h("p", {
+                      class: "error-biblioteca",
+                      text: "Si actualizas, se conservan los ids y el progreso del banco que ya tienes; si lo importas como nuevo, quedará con otro nombre (por ejemplo «X (2)»).",
+                  })
+                : null,
+            h(
+                "div",
+                { class: "acciones-importar" },
+                dup
+                    ? h(
+                          "button",
+                          {
+                              class: "btn",
+                              type: "button",
+                              onclick: () => confirmar({ modo: "actualizar", id: dup.id }),
+                          },
+                          `Actualizar «${dup.nombre}» (conserva progreso)`,
+                      )
+                    : null,
+                h(
+                    "button",
+                    {
+                        class: "btn",
+                        type: "button",
+                        onclick: () => confirmar({ modo: "nuevo" }),
+                    },
+                    dup ? "Importar como nuevo" : "Importar",
+                ),
+                h("button", { class: "btn", type: "button", onclick: refrescar }, "Cancelar"),
+            ),
+        );
+
+        async function confirmar(opciones) {
+            try {
+                const r = await cliente.bancoImportarArchivo(bytes, { nombre: nombreSugerido, ...opciones });
+                setStatus(
+                    "ok",
+                    `Importado «${r.nombre ?? nombreSugerido}»: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas`,
+                );
+                await refrescar();
+            } catch (e) {
+                setStatus("warn", msgError(e));
+                panel(
+                    h("h3", { text: "La importación falló" }),
+                    h("p", { class: "error-biblioteca", text: msgError(e) }),
+                    h("button", { class: "btn", type: "button", onclick: refrescar }, "Volver"),
+                );
+            }
+        }
     }
 
     function botones(b, activo) {
@@ -133,21 +270,17 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         );
     }
 
-    /* Estado vacío (D6): importar o probar con el banco de ejemplo que trae la app. */
+    /* Estado vacío (D6): importar (asistente) o probar con el banco de ejemplo que trae la app. */
     function vacia() {
         const alEjemplo = async () => {
             const b = await importar({ nombre: "Ejemplo", ejemplo: true });
             if (b && (await cambiar(b.id))) location.href = "/";
         };
-        const alImportar = async () => {
-            const b = await importar();
-            if (b) await refrescar();
-        };
         return h(
             "div",
             { class: "vacia" },
             h("p", { text: "No hay bancos todavía: importa uno o prueba con el ejemplo." }),
-            h("button", { class: "btn", type: "button", onclick: alImportar }, "Importar"),
+            h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar"),
             h("button", { class: "btn", type: "button", onclick: alEjemplo }, "Probar con el ejemplo"),
         );
     }
@@ -156,7 +289,18 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         const caja = $("#biblioteca-caja");
         try {
             const lista = await cliente.bancosListar();
-            caja.replaceChildren(lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia());
+            caja.replaceChildren(
+                h(
+                    "div",
+                    { class: "toolbar-biblioteca" },
+                    h(
+                        "button",
+                        { class: "btn small", type: "button", onclick: importarDesdeArchivo },
+                        "Importar archivo…",
+                    ),
+                ),
+                lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
+            );
             setStatus("ok", lista.length ? `Bancos: ${lista.length}` : "Biblioteca vacía");
         } catch (e) {
             caja.replaceChildren(h("p", { class: "error-biblioteca", text: msgError(e) }));

@@ -15,6 +15,10 @@ import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
 import { exportarBanco } from "./portable.js";
+import { detectarArchivo, fuenteDeJson } from "./banco-archivo.js";
+import { fuenteMemoria } from "./fuente.js";
+import { fuenteDirectorio } from "./fuente-directorio.js";
+import { importarFuente } from "./seed.js";
 import { importarDirectorio } from "./seed-directorio.js";
 
 const ESQUEMA = `
@@ -66,6 +70,7 @@ export class DatabaseManager {
             ["preguntas", "INTEGER"],
             ["version_banco", "INTEGER"],
             ["ultima_vez", "TEXT"],
+            ["uuid_banco", "TEXT"], // F3.5: detección de duplicados en el asistente de importación
         ])
             try {
                 this.#catalogo.run(`ALTER TABLE bancos ADD COLUMN ${col} ${tipo}`);
@@ -87,6 +92,7 @@ export class DatabaseManager {
             tam_bytes,
             preguntas: info.preguntas,
             version_banco: info.user_version,
+            uuid_banco: info.uuid,
         };
         const fila = await this.#insertar(nombre.trim(), ruta, meta);
         return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
@@ -95,13 +101,22 @@ export class DatabaseManager {
     /** Crea un banco nuevo importando un directorio JSON (misma estructura que el seed).
         Se construye en un temporal y se renombra: el banco aparece completo o no aparece. */
     async importarJson(nombre, dirPreguntas) {
-        const ruta = await this.rutaDestino(nombre);
+        return this.#crearDesdeFuente(nombre, fuenteDirectorio(dirPreguntas), { estricto: true });
+    }
+
+    /* Crea un banco nuevo desde una `fuente` (directorio en PC, JSON en memoria para el
+       asistente de importación). Con `estricto` falla si el nombre o la ruta ya existen
+       (semántica del CLI); sin él, busca un nombre libre añadiendo « (2)», « (3)»… */
+    async #crearDesdeFuente(nombre, fuente, { estricto = false } = {}) {
+        const { nombre: nombreLibre, ruta } = estricto
+            ? { nombre: String(nombre).trim(), ruta: await this.rutaDestino(nombre) }
+            : await this.#rutaLibre(nombre);
         const temporal = ruta + ".tmp";
         await this.#quitarSiExiste(temporal);
         const repo = abrirRepo(await this.#driver.abrir(this.#almacen, temporal));
         let bytes;
         try {
-            const r = await importarDirectorio(repo, dirPreguntas);
+            const r = await importarFuente(repo, fuente);
             if (r.errores.length)
                 throw new Error(
                     `Importación con errores (${r.errores.length}); banco no creado. Primera: ${r.errores[0]}`,
@@ -116,7 +131,24 @@ export class DatabaseManager {
             repo.close();
         }
         await this.#almacen.escribir(temporal, bytes); // el driver WASM no escribe solo
-        return await this.#anotar(nombre, temporal, ruta, "importado", bytes.length);
+        return await this.#anotar(nombreLibre, temporal, ruta, "importado", bytes.length);
+    }
+
+    /* Primer nombre libre con su ruta: «X», «X (2)», «X (3)»… hasta que el nombre no esté
+       en el catálogo y su archivo no exista (F3.5, «importar como nuevo» de un duplicado). */
+    async #rutaLibre(nombre) {
+        const base = String(nombre ?? "").trim() || "Banco importado";
+        for (let n = 1; ; n++) {
+            const candidato = n === 1 ? base : `${base} (${n})`;
+            let ruta = null;
+            try {
+                ruta = await this.rutaDestino(candidato);
+            } catch {
+                /* el archivo ya existe: probamos el siguiente sufijo */
+            }
+            if (ruta && !this.#catalogo.query("SELECT 1 FROM bancos WHERE nombre = ? COLLATE NOCASE").get(candidato))
+                return { nombre: candidato, ruta };
+        }
     }
 
     /** Copia un banco SQLite existente al catálogo (el original queda intacto y registrado
@@ -148,6 +180,7 @@ export class DatabaseManager {
                 tam_bytes: tamBytes,
                 preguntas: info.preguntas,
                 version_banco: info.user_version,
+                uuid_banco: info.uuid,
             };
             const fila = await this.#insertar(nombre.trim(), ruta, meta);
             return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
@@ -209,10 +242,10 @@ export class DatabaseManager {
         const esElAbierto = abierto && abierto.id === id;
         if (abierto && !esElAbierto) await this.cerrar(); // libera la única conexión de banco
         const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
+        let r;
         try {
             /* Ensayo en RAM: `:memory:` es banco nuevo para bun:sqlite y para sql.js. */
             const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
-            let r;
             try {
                 r = await importarDirectorio(ensayo, dirPreguntas, { actualizar: true });
             } finally {
@@ -227,19 +260,21 @@ export class DatabaseManager {
             const bytes = this.#driver.instantanea(repo.db);
             await this.#almacen.escribir(fila.ruta, bytes);
             this.#catalogo
-                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ? WHERE id = ?")
+                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
                 .run(
                     bytes.length,
                     repo.db.query("SELECT COUNT(*) AS n FROM preguntas").get().n,
                     repo.db.query("PRAGMA user_version").get().user_version,
+                    repo.ajustes().uuid_banco ?? null,
                     id,
                 );
-            return { ...r, banco: fila.ruta };
+            r = { ...r, banco: fila.ruta };
         } finally {
             if (!esElAbierto) repo.close();
         }
         /* Reabre el banco activo que se cerró para actualizar otro. */
         if (abierto && !esElAbierto) await this.abrirActivo();
+        return r;
     }
 
     /** Actualiza el banco activo (compatibilidad con el CLI). */
@@ -337,6 +372,200 @@ export class DatabaseManager {
         return true;
     }
 
+    /* --- Asistente de importación (F3.4/F3.5) --- */
+
+    /** Previsualiza un archivo importable (.opios, SQLite o JSON) sin tocar el catálogo ni
+        ningún banco: valida y cuenta. Devuelve `duplicado` si ya está en el catálogo (F3.5). */
+    async inspeccionar(bytes, { nombre = "" } = {}) {
+        const arch = await detectarArchivo(bytes);
+        if (arch.tipo === "zip")
+            return {
+                tipo: "zip",
+                soportado: false,
+                mensaje:
+                    "Los .zip se importarán con la versión para Android (F4). Descomprímelo e importa su carpeta (bun run bancos importar) o sus JSON aquí.",
+                duplicado: null,
+                errores: [],
+                avisos: [],
+            };
+        let base;
+        if (arch.tipo === "json") {
+            /* Importación de ensayo en memoria: los mismos errores que la real, sin tocar nada. */
+            const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
+            try {
+                const r = await importarFuente(ensayo, fuenteDeJson(arch.texto));
+                base = {
+                    tipo: "json",
+                    preguntas: r.nuevas,
+                    duplicadas: r.duplicadas,
+                    errores: r.errores,
+                    avisos: r.avisos,
+                };
+            } finally {
+                ensayo.close();
+            }
+        } else {
+            const temporal = juntoA(
+                this.#rutaCatalogo,
+                `inspeccion-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`,
+            );
+            try {
+                await this.#almacen.escribir(temporal, arch.sqlite);
+                const db = await this.#driver.abrir(this.#almacen, temporal, { readonly: true });
+                let info;
+                try {
+                    info = verificarBanco(db);
+                } catch (e) {
+                    throw errorDeVerificacion(e, "el archivo importado");
+                } finally {
+                    db.close();
+                }
+                base = {
+                    tipo: arch.tipo,
+                    manifest: arch.manifest ?? null,
+                    preguntas: info.preguntas,
+                    version_banco: info.user_version,
+                    uuid: info.uuid,
+                    errores: [],
+                    avisos: [],
+                };
+            } finally {
+                await this.#quitarSiExiste(temporal);
+            }
+        }
+        const duplicado = await this.#duplicadoDe(base.uuid ?? null, nombre || base.manifest?.nombre || null);
+        return { ...base, duplicado };
+    }
+
+    /** ¿Ya está este banco en el catálogo? Por uuid_banco primero, luego por nombre (F3.5). */
+    async #duplicadoDe(uuid, nombre) {
+        if (uuid) {
+            const fila = this.#catalogo.query("SELECT id, nombre FROM bancos WHERE uuid_banco = ?").get(uuid);
+            if (fila) return { ...fila, por: "uuid" };
+        }
+        const limpio = String(nombre ?? "").trim();
+        if (limpio) {
+            const fila = this.#catalogo
+                .query("SELECT id, nombre FROM bancos WHERE nombre = ? COLLATE NOCASE")
+                .get(limpio);
+            if (fila) return { ...fila, por: "nombre" };
+        }
+        return null;
+    }
+
+    /** Importa el archivo detectado (F3.4). modo "nuevo": crea un banco (nombre auto-ajustado
+        a «X (2)» si choca). modo "actualizar": fusiona por id_externo en el banco `id`. */
+    async importarBytes(bytes, { nombre = "", modo = "nuevo", id = null } = {}) {
+        const arch = await detectarArchivo(bytes);
+        if (arch.tipo === "zip")
+            throw new Error(
+                "La importación de .zip llegará con la versión para Android (F4). Descomprímelo e importa su carpeta o sus JSON.",
+            );
+        if (modo === "actualizar") return await this.#fusionar(arch, id);
+        if (arch.tipo === "json")
+            return await this.#crearDesdeFuente(nombre.trim() || "Importado", fuenteDeJson(arch.texto));
+        const { nombre: nombreLibre, ruta } = await this.#rutaLibre(nombre.trim() || "Importado");
+        const temporal = ruta + ".tmp";
+        try {
+            await this.#almacen.escribir(temporal, arch.sqlite);
+            return await this.#anotar(nombreLibre, temporal, ruta, "importado", arch.sqlite.length);
+        } catch (e) {
+            await this.#quitarSiExiste(temporal);
+            throw e;
+        }
+    }
+
+    /** Fusiona el archivo en el banco `id` (D2): actualiza por id_externo conservando ids y
+        progreso, salta las repetidas por enunciado y no borra nada (archivar es de F5, D3). */
+    async #fusionar(arch, id) {
+        await this.#listo;
+        const fila = this.#catalogo.query("SELECT ruta, nombre FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (!(await this.#almacen.existe(fila.ruta)))
+            throw new Error(`El banco «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
+        const abierto = this.#abierto;
+        const esElAbierto = abierto && abierto.id === id;
+        if (abierto && !esElAbierto) await this.cerrar(); // libera la única conexión de banco
+        const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
+        let r;
+        try {
+            if (arch.tipo === "json") {
+                const fuente = fuenteDeJson(arch.texto);
+                /* Ensayo en memoria: si el archivo tiene errores, el banco no se toca. */
+                const ensayo = abrirRepo(await this.#driver.abrir(this.#almacen, ":memory:"));
+                try {
+                    const e = await importarFuente(ensayo, fuente, { actualizar: true });
+                    if (e.errores.length)
+                        throw new Error(
+                            `El archivo tiene ${e.errores.length} error(es); banco sin tocar. Primera: ${e.errores[0]}`,
+                        );
+                } finally {
+                    ensayo.close();
+                }
+                r = await importarFuente(repo, fuente, { actualizar: true });
+            } else {
+                const temporal = juntoA(
+                    this.#rutaCatalogo,
+                    `fusion-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`,
+                );
+                try {
+                    await this.#almacen.escribir(temporal, arch.sqlite);
+                    /* Copia temporal en lectura-escritura: así abrirRepo puede migrarla (versión
+                       antigua) sin tocar el original; una versión futura lanza el error claro. */
+                    const fuenteDb = await this.#driver.abrir(this.#almacen, temporal);
+                    let lista;
+                    try {
+                        let fuenteRepo;
+                        try {
+                            fuenteRepo = abrirRepo(fuenteDb);
+                        } catch (e) {
+                            throw errorDeVerificacion(e, "el archivo importado");
+                        }
+                        try {
+                            lista = fuenteRepo.todas().map((p) => ({
+                                /* Del banco fuente sale el id interno de su tema/bloque: para
+                                   fusionar manda la numeración (tema_N dentro de bloque_N). */
+                                pregunta: p.pregunta,
+                                respuestas: p.respuestas,
+                                correcta: p.correcta,
+                                explicacion: p.explicacion,
+                                id_externo: p.id_externo,
+                                bloque: p.bloque_nombre,
+                                bloque_numero: p.bloque_numero,
+                                tema: p.tema_numero,
+                                tema_numero: p.tema_numero,
+                            }));
+                        } finally {
+                            fuenteRepo.close();
+                        }
+                    } finally {
+                        fuenteDb.close();
+                    }
+                    r = await repo.importar(lista, { actualizar: true });
+                } finally {
+                    await this.#quitarSiExiste(temporal);
+                }
+            }
+            const bytes = this.#driver.instantanea(repo.db);
+            await this.#almacen.escribir(fila.ruta, bytes);
+            this.#catalogo
+                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
+                .run(
+                    bytes.length,
+                    repo.db.query("SELECT COUNT(*) AS n FROM preguntas").get().n,
+                    repo.db.query("PRAGMA user_version").get().user_version,
+                    repo.ajustes().uuid_banco ?? null,
+                    id,
+                );
+            r = { ...r, banco: fila.ruta, nombre: fila.nombre };
+        } finally {
+            if (!esElAbierto) repo.close();
+        }
+        /* Reabre el banco activo que se cerró para fusionar en otro. */
+        if (abierto && !esElAbierto) await this.abrirActivo();
+        return r;
+    }
+
     /** Abre (una sola vez) el banco activo y devuelve el repo. Falla claro si falta el archivo. */
     async abrirActivo() {
         if (this.#abierto) return this.#abierto.repo;
@@ -397,8 +626,16 @@ export class DatabaseManager {
         await this.#listo;
         return this.#catalogo
             .query(
-                "INSERT INTO bancos (nombre, ruta, origen, tam_bytes, preguntas, version_banco) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO bancos (nombre, ruta, origen, tam_bytes, preguntas, version_banco, uuid_banco) VALUES (?, ?, ?, ?, ?, ?, ?)",
             )
-            .run(nombre, ruta, meta.origen, meta.tam_bytes, meta.preguntas, meta.version_banco); // el UNIQUE de la tabla lanza con un error claro
+            .run(
+                nombre,
+                ruta,
+                meta.origen,
+                meta.tam_bytes,
+                meta.preguntas,
+                meta.version_banco,
+                meta.uuid_banco ?? null,
+            ); // el UNIQUE de la tabla lanza con un error claro
     }
 }

@@ -78,7 +78,11 @@ async function leerError(r) {
  */
 export async function api(url, { metodo = "GET", cuerpo, bruto = false, headers, ...init } = {}) {
     const opciones = { method: metodo, ...init };
-    if (cuerpo !== undefined) {
+    if (cuerpo instanceof Uint8Array) {
+        /* Archivo del asistente de importación (F3.4): bytes crudos, no JSON. */
+        opciones.headers = { ...(headers || {}), "Content-Type": "application/octet-stream" };
+        opciones.body = cuerpo;
+    } else if (cuerpo !== undefined) {
         opciones.headers = { ...(headers || {}), "Content-Type": "application/json" };
         opciones.body = JSON.stringify(cuerpo);
     } else if (headers) {

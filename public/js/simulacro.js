@@ -7,8 +7,6 @@ import { etiquetaTema } from "./etiquetas.js";
 /* Simulacro (cliente): configuración, examen cronometrado y revisión final.
    Las preguntas se piden a /api/test y el resultado se guarda en /api/simulacros. */
 (() => {
-    "use strict";
-
     const $ = (s) => document.querySelector(s);
     const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
     const setStatus = (kind, text) => {

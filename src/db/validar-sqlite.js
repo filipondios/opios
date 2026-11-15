@@ -15,7 +15,7 @@ export function verificarBanco(db) {
     const user_version = db.query("PRAGMA user_version").get().user_version;
     if (user_version > MIGRACIONES.length)
         throw new Error(
-            `Esquema futuro no compatible: v${user_version} y esta versión solo conoce hasta v${MIGRACIONES.length}.`,
+            `Esquema futuro no compatible: v${user_version} y esta versión solo conoce hasta v${MIGRACIONES.length}. Actualiza Opios.`,
         );
     const tablas = new Set(
         db
@@ -27,7 +27,15 @@ export function verificarBanco(db) {
         if (!tablas.has(tabla)) throw new Error(`No es un banco Opios: falta la tabla «${tabla}».`);
     const rotas = db.query("PRAGMA foreign_key_check").all();
     if (rotas.length) throw new Error(`La SQLite tiene ${rotas.length} referencia(s) rota(s) (foreign_key_check).`);
-    return { user_version, preguntas: db.query("SELECT COUNT(*) AS n FROM preguntas").get().n };
+    /* El uuid del banco (F3.5, detección de duplicados) es opcional: bancos muy viejos o
+       ajenos pueden no traer la tabla de ajustes; se ignora en ese caso. */
+    let uuid = null;
+    try {
+        uuid = db.query("SELECT valor FROM ajustes WHERE clave = 'uuid_banco'").get()?.valor ?? null;
+    } catch {
+        /* sin tabla ajustes */
+    }
+    return { user_version, preguntas: db.query("SELECT COUNT(*) AS n FROM preguntas").get().n, uuid };
 }
 
 /** Reenvía mis errores claros y contextualiza los que vienen de SQLite. */

@@ -6,8 +6,6 @@ import { etiquetaTema } from "./etiquetas.js";
 /* Test infinito (cliente): UI del test. El planificador vive en ./repaso.js.
    Los datos viven en el servidor (SQLite): preguntas por /api/test y progreso por /api/progreso. */
 (() => {
-    "use strict";
-
     /* ---------- Parámetros de la UI ---------- */
     const PAUSA_ACIERTO_MS = 450; // pausa tras un acierto antes de pasar a la siguiente
     const ETIQUETA = "Guardado en la base de datos";
@@ -23,7 +21,7 @@ import { etiquetaTema } from "./etiquetas.js";
     let sesion = null;
     let cur = null; // pregunta en pantalla
     let timerAcierto = null;
-    let sucios = new Set();
+    const sucios = new Set();
     let timerSesion = null;
     let carga = null; // cupo diario que devuelve el servidor
     let fechaCarga = null; // día al que corresponde `carga` (Fase 2.10)

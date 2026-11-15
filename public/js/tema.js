@@ -1,8 +1,6 @@
 /* Conmutador de tema claro/oscuro. La elección se guarda en localStorage
    y el script del <head> la aplica antes de pintar para evitar parpadeos. */
 (() => {
-    "use strict";
-
     /* F3.3: nombre del banco activo (lo inyecta el servidor en modo biblioteca) junto a la
        marca, enlazando a la Biblioteca. Sin inyección (modo directo) el enlace queda oculto. */
     const bancoActual = document.getElementById("banco-actual");

@@ -14,6 +14,10 @@ export const MAX_ETIQUETA = 60;
 /* Tamaño máximo del cuerpo de una petición, en bytes (Fase 2.9). Se aplica en `Bun.serve`
    y también en `cuerpoJson`, que mide bytes y no caracteres. */
 export const MAX_CUERPO = 2_000_000;
+/* Subida de archivos (F3.4): .opios/SQLite/JSON. Un banco grande ronda 5 MB (10k preguntas,
+   medido en 1.4); 64 MB deja margen sin invitar subidas abusivas. Los endpoints JSON siguen
+   limitados por MAX_CUERPO; el de archivos por este. */
+export const MAX_SUBIDA = 64_000_000;
 
 /* Límites diarios (Fase 3). El cupo lo calcula el servidor a partir de `respuestas`. */
 export const CUPO_NUEVAS = 15; // preguntas nuevas que se introducen como máximo cada día

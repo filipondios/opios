@@ -17,7 +17,7 @@ import {
     OPIOS_SEED,
     RUTA_CATALOGO,
 } from "./src/config-servidor.js";
-import { MAX_CUERPO, debeImportar } from "./src/config.js";
+import { MAX_SUBIDA, debeImportar } from "./src/config.js";
 
 /* Registro con fecha en cada línea. */
 const log = (...a) => console.log(new Date().toISOString(), ...a);
@@ -92,8 +92,9 @@ try {
 const servidor = Bun.serve({
     hostname: HOST,
     port: PORT,
-    /* El cuerpo máximo se corta antes de leerlo entero (Fase 2.9). */
-    maxRequestBodySize: MAX_CUERPO,
+    /* El cuerpo máximo se corta antes de leerlo entero (Fase 2.9). El límite fino por
+       tipo de cuerpo lo hace la API: MAX_CUERPO para JSON, MAX_SUBIDA para archivos (F3.4). */
+    maxRequestBodySize: MAX_SUBIDA,
     fetch: crearApp(repo, {
         auth: AUTH,
         zona: APP_TZ,

@@ -2,7 +2,7 @@
    (driver Bun, almacén fs) y las páginas /biblioteca. En modo directo (sin gestor) las
    rutas de bancos fallan con 409 y la página sigue existiendo. */
 import { describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -16,6 +16,103 @@ import { DIR_EJEMPLO } from "../src/config-servidor.js";
 
 const DIR_FIXTURE = join(import.meta.dir, "fixtures"); // 7 preguntas
 const JSON_H = { "Content-Type": "application/json" };
+
+describe("asistente de importación en el gestor (F3.4–F3.6)", () => {
+    test("inspeccionar e importarBytes: json, .opios, duplicados por uuid/nombre y fusión con progreso", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-asistente-"));
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver: driverBun,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            /* Fuente con id_externo: así la fusión puede demostrar que conserva ids y progreso. */
+            const dirFusion = join(dir, "fuente");
+            mkdirSync(dirFusion);
+            writeFileSync(
+                join(dirFusion, "tema_1.json"),
+                JSON.stringify([
+                    {
+                        tema: 1,
+                        pregunta: "¿Uno?",
+                        respuestas: ["A", "B"],
+                        respuesta_correcta: "a",
+                        id_externo: "ext-1",
+                        explicacion: "",
+                    },
+                    {
+                        tema: 1,
+                        pregunta: "¿Dos?",
+                        respuestas: ["A", "B"],
+                        respuesta_correcta: "b",
+                        id_externo: "ext-2",
+                        explicacion: "",
+                    },
+                ]),
+            );
+            const b1 = await gestor.importarJson("Original", dirFusion);
+            expect(b1).toMatchObject({ preguntas: 2 });
+            expect(b1.uuid_banco).toBeTruthy();
+
+            /* JSON: la previsualización valida de verdad (ensayo en memoria) y detecta el
+               duplicado por nombre; los errores salen en español con archivo y nº. */
+            const preJson = await gestor.inspeccionar(
+                new TextEncoder().encode(
+                    JSON.stringify([{ tema: 1, pregunta: "¿X?", respuestas: ["A", "B"], respuesta_correcta: "a" }]),
+                ),
+                { nombre: "Original" },
+            );
+            expect(preJson).toMatchObject({ tipo: "json", preguntas: 1, duplicado: { id: b1.id, por: "nombre" } });
+            const roto = JSON.stringify([{ pregunta: "", respuestas: ["A", "B"], respuesta_correcta: "a" }]);
+            const preMalo = await gestor.inspeccionar(new TextEncoder().encode(roto));
+            expect(preMalo.errores).toHaveLength(1);
+            expect(preMalo.errores[0]).toMatch(/importado\.json #1:/);
+
+            /* .opios: duplicado por uuid del manifest + banco interno. */
+            const { bytes } = await gestor.exportar(b1.id);
+            expect(await gestor.inspeccionar(bytes)).toMatchObject({
+                tipo: "opios",
+                preguntas: 2,
+                duplicado: { id: b1.id, por: "uuid" },
+            });
+
+            /* «Importar como nuevo» de un duplicado: nombre auto-ajustado, sin choques. */
+            const copia = await gestor.importarBytes(bytes, { nombre: "Original" });
+            expect(copia.nombre).toBe("Original (2)");
+            expect((await gestor.listar()).length).toBe(2);
+
+            /* Fusión en el activo: actualiza por id_externo y conserva el progreso. */
+            await gestor.activar(b1.id);
+            const repo = await gestor.abrirActivo();
+            const pid = repo.db.query("SELECT id FROM preguntas WHERE id_externo = 'ext-1'").get().id;
+            repo.guardarProgreso([{ id: pid, caja: 3, vence: "2026-01-01", aciertos: 5, fallos: 1 }]);
+            const conProgreso = (await gestor.exportar(b1.id)).bytes;
+            const r = await gestor.importarBytes(conProgreso, { modo: "actualizar", id: b1.id });
+            expect(r).toMatchObject({ nuevas: 0, duplicadas: 0, actualizadas: 2, banco: b1.ruta, nombre: "Original" });
+            expect(repo.db.query("SELECT pregunta_id, caja, aciertos FROM progreso").get()).toMatchObject({
+                pregunta_id: pid,
+                caja: 3,
+                aciertos: 5,
+            });
+
+            /* Fusión en un banco NO abierto: libera la conexión, fusiona y reabre el activo. */
+            await gestor.activar(copia.id);
+            await gestor.abrirActivo();
+            const r2 = await gestor.importarBytes(conProgreso, { modo: "actualizar", id: b1.id });
+            expect(r2.actualizadas).toBe(2);
+            expect((await gestor.abrirActivo()).contarPreguntas()).toBe(2); // el activo sigue abierto
+
+            /* zip: detectado pero aún sin importación (llega con F4). */
+            expect(await gestor.inspeccionar(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3, 4]))).toMatchObject({
+                tipo: "zip",
+                soportado: false,
+            });
+        } finally {
+            await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+});
 
 describe("biblioteca: modo directo (sin gestor)", () => {
     const app = crearApp(abrirDb(":memory:"));
@@ -163,5 +260,41 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         expect(html).toContain("__opiosBancoId=");
         expect(html).toContain("__opiosBancoNombre=");
         expect(html).toContain('id="banco-actual"');
+    });
+
+    test("asistente por HTTP (F3.4): inspeccionar e importar-archivo, con 415/400 y auto-sufijo", async () => {
+        const bytesJson = new TextEncoder().encode(
+            JSON.stringify([
+                { tema: 1, pregunta: "¿Extra?", respuestas: ["A", "B"], respuesta_correcta: "a", explicacion: "" },
+            ]),
+        );
+        const petBytes = (ruta, bytes) =>
+            app(
+                new Request("http://localhost" + ruta, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/octet-stream" },
+                    body: bytes,
+                }),
+            );
+
+        let r = await petBytes("/api/bancos/inspeccionar?nombre=Ejemplo%20Renombrado", bytesJson);
+        expect(r.status).toBe(200);
+        const pre = await r.json();
+        expect(pre).toMatchObject({ tipo: "json", preguntas: 1, duplicado: { por: "nombre" } });
+
+        /* Content-type incorrecto → 415; actualizar sin id → 400. */
+        r = await app(
+            new Request("http://localhost/api/bancos/inspeccionar", { method: "POST", headers: JSON_H, body: "{}" }),
+        );
+        expect(r.status).toBe(415);
+        r = await petBytes("/api/bancos/importar-archivo?modo=actualizar", bytesJson);
+        expect(r.status).toBe(400);
+
+        /* Importar dos veces lo mismo como nuevo: el segundo queda «Extra (2)». */
+        r = await petBytes("/api/bancos/importar-archivo?nombre=Extra", bytesJson);
+        expect(r.status).toBe(201);
+        expect((await r.json()).nombre).toBe("Extra");
+        r = await petBytes("/api/bancos/importar-archivo?nombre=Extra", bytesJson);
+        expect((await r.json()).nombre).toBe("Extra (2)");
     });
 });

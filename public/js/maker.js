@@ -4,8 +4,6 @@ import { etiquetaTema } from "./etiquetas.js";
 
 /* Creador de preguntas (cliente): edita directamente la base de datos a través de /api/preguntas. */
 (() => {
-    "use strict";
-
     const OPC_INICIALES = 4,
         PAGINA = 50,
         MAX_ETIQUETA = 60;
