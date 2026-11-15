@@ -53,10 +53,19 @@ async function gzip(bytes, Clase) {
 export const comprimir = (bytes) => gzip(bytes, CompressionStream);
 export const descomprimir = (bytes) => gzip(bytes, DecompressionStream);
 
+/* Vacía el progreso personal de una COPIA de banco (F5.5): repaso, respuestas, simulacros
+   y ajustes, conservando la identidad (`uuid_banco`, que sirve para detectar duplicados).
+   No lo llames sobre el banco real: escribe. */
+export function vaciarProgreso(db) {
+    for (const tabla of ["progreso", "respuestas", "simulacros"]) db.run(`DELETE FROM ${tabla}`);
+    db.run("DELETE FROM ajustes WHERE clave <> 'uuid_banco'");
+}
+
 /** Empaqueta el banco abierto con `driver` (Bun o sql.js) en bytes .opios. Verifica la
     conexión antes (F2.4) y usa la instantánea del driver (copia consistente y compacta).
+    Con `incluyeProgreso: false` quien llama debe pasar una copia sin progreso (F5.5).
     Devuelve { bytes, manifest }. */
-export async function exportarBanco(driver, db, { nombre = "banco" } = {}) {
+export async function exportarBanco(driver, db, { nombre = "banco", incluyeProgreso = true } = {}) {
     let info;
     try {
         info = verificarBanco(db);
@@ -70,6 +79,7 @@ export async function exportarBanco(driver, db, { nombre = "banco" } = {}) {
         creado: new Date().toISOString(),
         user_version: info.user_version,
         preguntas: info.preguntas,
+        incluye_progreso: incluyeProgreso,
     };
     return { bytes: await comprimir(contenedor(manifest, driver.instantanea(db))), manifest };
 }

@@ -18,8 +18,10 @@ import {
     descontenedor,
     exportarBanco,
     importarBancoOpios,
+    vaciarProgreso,
     FORMATO,
 } from "../src/portable.js";
+import { copiaSeguridad } from "../src/backup.js";
 import { importarDirectorio } from "../src/seed-directorio.js";
 
 const WASM = "node_modules/sql.js/dist/sql-wasm.wasm";
@@ -56,6 +58,7 @@ describe("banco portable .opios (task 8 / F2.5)", () => {
                 app: "opios",
                 nombre: "Mi banco",
                 preguntas: 7,
+                incluye_progreso: true,
             });
             expect(paquete.bytes).toBeInstanceOf(Uint8Array);
 
@@ -74,6 +77,53 @@ describe("banco portable .opios (task 8 / F2.5)", () => {
                 repo1.close();
                 repo2.close();
             }
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("sin progreso: vaciarProgreso deja las preguntas y el uuid, y el manifest lo declara (F5.5)", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-portable-limpio-"));
+        try {
+            const repo = abrirDb(join(dir, "banco.db"));
+            await importarDirectorio(repo, DIR_FIXTURE);
+            const p = repo.todas()[0];
+            repo.guardarProgreso([{ id: p.id, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+            repo.aplicarSesion([{ id: p.id, acierto: 1, ms: 10 }], [], "2026-06-01");
+            repo.crearSimulacro(
+                { temas: [p.tema], segundos: 60, penalizacion: 0, respuestas: [{ id: p.id, elegida: 0 }] },
+                "2026-06-01",
+            );
+            repo.guardarAjuste("fecha_examen", "2026-07-01");
+            repo.guardarAjuste("uuid_banco", "uuid-fijo");
+            const progresoAntes = repo.paraTest([p.tema]).progreso[p.id];
+
+            /* El gestor vacía una COPIA (F5.5); aquí se reproduce con copiaSeguridad. */
+            const copia = join(dir, "copia.db");
+            copiaSeguridad(repo.db, copia);
+            const repoCopia = abrirDb(copia);
+            vaciarProgreso(repoCopia.db);
+            const paquete = await exportarBanco(driverBun, repoCopia.db, { nombre: "Limpio", incluyeProgreso: false });
+            repoCopia.close();
+            expect(paquete.manifest).toMatchObject({ incluye_progreso: false, preguntas: 7 });
+
+            const rutaLimpia = join(dir, "limpio.db");
+            await importarBancoOpios(driverBun, almacenBun, rutaLimpia, paquete.bytes);
+            const limpio = abrirDb(rutaLimpia);
+            try {
+                expect(limpio.contarPreguntas()).toBe(7);
+                expect(limpio.db.query("SELECT COUNT(*) AS n FROM progreso").get().n).toBe(0);
+                expect(limpio.db.query("SELECT COUNT(*) AS n FROM respuestas").get().n).toBe(0);
+                expect(limpio.contarSimulacros()).toBe(0);
+                expect(limpio.ajustes()).toEqual({ uuid_banco: "uuid-fijo" });
+            } finally {
+                limpio.close();
+            }
+
+            /* El original conserva progreso y ajustes. */
+            expect(repo.paraTest([p.tema]).progreso[p.id]).toEqual(progresoAntes);
+            expect(repo.ajustes().fecha_examen).toBe("2026-07-01");
+            repo.close();
         } finally {
             rmSync(dir, { recursive: true, force: true });
         }

@@ -34,10 +34,10 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         return true;
     }
 
-    async function exportar(b) {
-        const r = await cliente.bancoExportar(b.id);
+    async function exportar(b, conProgreso) {
+        const r = await cliente.bancoExportar(b.id, { conProgreso });
         const url = URL.createObjectURL(await r.blob());
-        const a = h("a", { href: url, download: `${b.nombre}.opios` });
+        const a = h("a", { href: url, download: `${b.nombre}${conProgreso ? "" : "-sin-progreso"}.opios` });
         document.body.append(a);
         a.click();
         a.remove();
@@ -251,9 +251,12 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             );
             await refrescar();
         };
-        const alExportar = async () => {
-            await exportar(b);
-            setStatus("ok", "Banco exportado (.opios)");
+        const alExportar = async (conProgreso) => {
+            await exportar(b, conProgreso);
+            setStatus(
+                "ok",
+                conProgreso ? "Banco exportado con progreso (.opios)" : "Banco exportado sin progreso (.opios)",
+            );
         };
         const alRenombrar = async () => {
             const nombre = prompt("Nuevo nombre:", b.nombre)?.trim();
@@ -303,7 +306,16 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             ),
             /* Actualizar reimporta desde un directorio JSON del PC: en Android no aplica. */
             nativo() ? null : h("button", { class: "btn small", type: "button", onclick: alActualizar }, "Actualizar"),
-            h("button", { class: "btn small", type: "button", onclick: alExportar }, "Exportar"),
+            h(
+                "button",
+                { class: "btn small", type: "button", onclick: () => alExportar(true) },
+                "Exportar con progreso",
+            ),
+            h(
+                "button",
+                { class: "btn small", type: "button", onclick: () => alExportar(false) },
+                "Exportar sin progreso",
+            ),
             h("button", { class: "btn small", type: "button", onclick: alRenombrar }, "Renombrar"),
             b.origen === "registrado"
                 ? h(

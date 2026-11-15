@@ -16,7 +16,7 @@ import { AVISO_BANCO_GRANDE, MAX_SUBIDA } from "./config.js";
 import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
-import { exportarBanco } from "./portable.js";
+import { exportarBanco, vaciarProgreso } from "./portable.js";
 import { detectarArchivo, fuenteDeJson } from "./banco-archivo.js";
 import { fuenteDeZip } from "./banco-zip.js";
 import { fuenteDirectorio } from "./fuente-directorio.js";
@@ -340,19 +340,44 @@ export class DatabaseManager {
         return id ? (this.#catalogo.query("SELECT nombre FROM bancos WHERE id = ?").get(id)?.nombre ?? null) : null;
     }
 
-    /** Empaqueta el banco `id` en bytes .opios (F2.5). El activo usa su conexión abierta;
-        los demás se leen con una conexión solo lectura puntual (no toca la conexión única). */
-    async exportar(id) {
+    /** Empaqueta el banco `id` en bytes .opios (F2.5/F5.5). El activo usa su conexión abierta;
+        los demás se leen con una conexión solo lectura puntual (no toca la conexión única).
+        Con `incluyeProgreso: false` se vacía una COPIA temporal: el banco real nunca se toca. */
+    async exportar(id, { incluyeProgreso = true } = {}) {
         await this.#listo;
         const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(id);
         if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
-        if (this.#abierto && this.#abierto.id === id)
-            return exportarBanco(this.#driver, this.#abierto.repo.db, { nombre: fila.nombre });
+        const opciones = { nombre: fila.nombre, incluyeProgreso };
+        return await this.#conBanco(id, fila, async (db) => {
+            if (incluyeProgreso) return await exportarBanco(this.#driver, db, opciones);
+            const temporal = juntoA(
+                this.#rutaCatalogo,
+                `exportar-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`,
+            );
+            try {
+                await this.#almacen.escribir(temporal, this.#driver.instantanea(db));
+                const copia = await this.#driver.abrir(this.#almacen, temporal);
+                try {
+                    vaciarProgreso(copia);
+                    return await exportarBanco(this.#driver, copia, opciones);
+                } finally {
+                    copia.close();
+                }
+            } finally {
+                for (const lado of ["", "-wal", "-shm"]) await this.#quitarSiExiste(temporal + lado);
+            }
+        });
+    }
+
+    /* Abre el banco `id` para operar en él: reutiliza la conexión del activo o abre una
+       lectura puntual. Falla claro si el archivo no está accesible. */
+    async #conBanco(id, fila, fn) {
+        if (this.#abierto && this.#abierto.id === id) return await fn(this.#abierto.repo.db);
         if (!(await this.#almacen.existe(fila.ruta)))
             throw new Error(`El banco «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
         const db = await this.#driver.abrir(this.#almacen, fila.ruta, { readonly: true });
         try {
-            return await exportarBanco(this.#driver, db, { nombre: fila.nombre });
+            return await fn(db);
         } finally {
             db.close();
         }

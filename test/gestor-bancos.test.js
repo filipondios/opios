@@ -12,6 +12,7 @@ import { driverBun } from "../src/driver-bun.js";
 import { crearAlmacenMemoria } from "../src/almacen-memoria.js";
 import { crearDriverWasm } from "../src/driver-wasm.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
+import { importarBancoOpios } from "../src/portable.js";
 
 describe("DatabaseManager (task 5)", () => {
     test("catálogo, duplicados, banco activo y abrir/cerrar", async () => {
@@ -544,6 +545,45 @@ describe("DatabaseManager neutro (F2.3)", () => {
                 } finally {
                     await reabrir.close();
                 }
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
+
+        test(`${nombre}: exportar sin progreso deja la copia limpia y no toca el banco`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const b = await gestor.importarJson("Banco", join(import.meta.dir, "fixtures"));
+                await gestor.activar(b.id);
+                const repo = await gestor.abrirActivo();
+                const pid = repo.todas()[0].id;
+                repo.guardarProgreso([{ id: pid, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+                repo.guardarAjuste("fecha_examen", "2026-07-01");
+
+                const paquete = await gestor.exportar(b.id, { incluyeProgreso: false });
+                expect(paquete.manifest).toMatchObject({ incluye_progreso: false, preguntas: 7 });
+
+                const destino = `${ctx.base}/limpio.db`;
+                await importarBancoOpios(ctx.driver, ctx.almacen, destino, paquete.bytes);
+                const db = await ctx.driver.abrir(ctx.almacen, destino, { readonly: true });
+                try {
+                    expect(db.query("SELECT COUNT(*) AS n FROM preguntas").get().n).toBe(7);
+                    expect(db.query("SELECT COUNT(*) AS n FROM progreso").get().n).toBe(0);
+                    expect(db.query("SELECT COUNT(*) AS n FROM ajustes WHERE clave = 'fecha_examen'").get().n).toBe(0);
+                } finally {
+                    db.close();
+                }
+
+                /* El banco real (activo) conserva su progreso y su ajuste. */
+                const activo = await gestor.abrirActivo();
+                expect(activo.paraTest([repo.temario()[0].temas[0].id]).progreso[pid]).toEqual([3, "2999-01-01", 2, 1]);
+                expect(activo.ajustes().fecha_examen).toBe("2026-07-01");
             } finally {
                 await gestor.close();
                 ctx.limpiar();

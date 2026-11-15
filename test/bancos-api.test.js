@@ -209,6 +209,11 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         lista = await (await pet("/api/bancos")).json();
         expect(lista.find((b) => b.activo).progreso.total).toBe(creado.preguntas);
 
+        /* Progreso y ajuste en el banco activo: la copia sin progreso no debe llevarlos (F5.5). */
+        const preguntaActiva = repoActual.todas()[0];
+        repoActual.guardarProgreso([{ id: preguntaActiva.id, caja: 3, vence: "2999-01-01", aciertos: 2, fallos: 1 }]);
+        repoActual.guardarAjuste("fecha_examen", "2026-07-01");
+
         /* POST exportar: bytes .opios válidos (descomprimir + cabecera + manifest). */
         r = await pet(`/api/bancos/${creado.id}/exportar`, "POST");
         expect(r.status).toBe(200);
@@ -216,6 +221,24 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         const interno = descontenedor(await descomprimir(new Uint8Array(await r.arrayBuffer())));
         expect(interno.manifest).toMatchObject({ formato: 1, nombre: "Del Ejemplo" });
         expect(interno.sqlite.length).toBeGreaterThan(0);
+
+        /* POST exportar sin progreso: la copia no lleva progreso ni ajustes; el original sí. */
+        r = await pet(`/api/bancos/${creado.id}/exportar?progreso=0`, "POST");
+        expect(r.status).toBe(200);
+        expect(r.headers.get("Content-Disposition")).toContain("sin-progreso");
+        const limpio = descontenedor(await descomprimir(new Uint8Array(await r.arrayBuffer())));
+        expect(limpio.manifest).toMatchObject({ incluye_progreso: false, preguntas: creado.preguntas });
+        writeFileSync(join(dir, "limpio.db"), limpio.sqlite);
+        const repoLimpio = abrirDb(join(dir, "limpio.db"));
+        try {
+            expect(repoLimpio.contarPreguntas()).toBe(creado.preguntas);
+            expect(repoLimpio.db.query("SELECT COUNT(*) AS n FROM progreso").get().n).toBe(0);
+            expect(repoLimpio.ajustes().fecha_examen).toBeUndefined();
+        } finally {
+            repoLimpio.close();
+        }
+        expect(repoActual.paraTest([preguntaActiva.tema]).progreso[preguntaActiva.id]).toEqual([3, "2999-01-01", 2, 1]);
+
         /* Exportar un banco que no es el activo tampoco rompe la conexión única. */
         expect((await pet(`/api/bancos/${ids.Vacio}/exportar`, "POST")).status).toBe(200);
 

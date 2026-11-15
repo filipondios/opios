@@ -70,8 +70,10 @@ export const bancosListar = () => llamada("/api/bancos");
 export const bancoImportar = (cuerpo) => llamada("/api/bancos/importar", { metodo: "POST", cuerpo });
 export const bancoActivar = (id) => llamada(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
 export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
-/* Devuelve la Response cruda: el exportar es una descarga, no JSON. */
-export const bancoExportar = (id) => llamada(`/api/bancos/${id}/exportar`, { metodo: "POST", bruto: true });
+/* Devuelve la Response cruda: el exportar es una descarga, no JSON. `conProgreso:false`
+   (F5.5) empaqueta el banco sin progreso. */
+export const bancoExportar = (id, { conProgreso = true } = {}) =>
+    llamada(`/api/bancos/${id}/exportar${conProgreso ? "" : "?progreso=0"}`, { metodo: "POST", bruto: true });
 export const bancoRenombrar = (id, nombre) => llamada(`/api/bancos/${id}`, { metodo: "PUT", cuerpo: { nombre } });
 export const bancoBorrar = (id) => llamada(`/api/bancos/${id}`, { metodo: "DELETE" });
 /* "Usar donde está" (F4.1): registra un archivo .db que ya existe en el disco del PC. */

@@ -150,7 +150,8 @@ export function crearApi(
                 return json({ ok: true, activo: id });
             }
             if (mb[2] === "exportar" && m === "POST") {
-                const { bytes, manifest } = await gestor.exportar(id);
+                const incluyeProgreso = url.searchParams.get("progreso") !== "0";
+                const { bytes, manifest } = await gestor.exportar(id, { incluyeProgreso });
                 const archivo =
                     String(manifest.nombre)
                         .replace(/[^a-zA-Z0-9._-]+/g, "-")
@@ -158,7 +159,7 @@ export function crearApi(
                 return new Response(bytes, {
                     headers: {
                         "Content-Type": "application/octet-stream",
-                        "Content-Disposition": `attachment; filename="${archivo}.opios"`,
+                        "Content-Disposition": `attachment; filename="${archivo}${incluyeProgreso ? "" : "-sin-progreso"}.opios"`,
                         "Cache-Control": "no-store",
                     },
                 });
