@@ -54,9 +54,18 @@ export const AUTH =
         ? { usuario: process.env.AUTH_USER, clave: process.env.AUTH_PASS }
         : null;
 export const DB_PATH = process.env.OPIOS_DB ?? join(ROOT, "data", "opios.db");
-/* Modo biblioteca (task 6): con `OPIOS_CATALOGO` la app abre el banco activo del catálogo
-   (DatabaseManager) en lugar del modo directo `OPIOS_DB`. Vacío = modo directo (legacy). */
-export const RUTA_CATALOGO = (process.env.OPIOS_CATALOGO ?? "").trim();
+/* Modo biblioteca (task 6 / F4.2): dónde vive el catálogo. `OPIOS_CATALOGO` (legacy, ruta
+   exacta) manda; si no, `OPIOS_DATOS` nombra la carpeta de datos y el catálogo + las copias
+   de bancos viven ahí (juntoA(rutaCatalogo, …) ya coloca los bancos nuevos al lado). Vacío
+   = modo directo `OPIOS_DB` (legacy). Función pura para poder probarla. */
+export function resolverRutaCatalogo(env = {}) {
+    const catalogo = String(env.OPIOS_CATALOGO ?? "").trim();
+    if (catalogo) return catalogo;
+    const datos = String(env.OPIOS_DATOS ?? "").trim();
+    return datos ? join(datos, "catalogo.db") : "";
+}
+
+export const RUTA_CATALOGO = resolverRutaCatalogo(process.env);
 
 /* Modo de importación al arrancar (Fase 8.2): `vacia` (solo si la BD no tiene preguntas),
    `auto` (en cada arranque, con --actualizar) o `no` (nunca). La decisión pura (debeImportar)

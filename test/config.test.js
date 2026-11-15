@@ -1,6 +1,31 @@
 import { describe, expect, test } from "bun:test";
-import { DIR_EJEMPLO, DIR_PREGUNTAS_POR_DEFECTO, resolverDirPreguntas } from "../src/config-servidor.js";
+import { join } from "node:path";
+import {
+    DIR_EJEMPLO,
+    DIR_PREGUNTAS_POR_DEFECTO,
+    resolverDirPreguntas,
+    resolverRutaCatalogo,
+} from "../src/config-servidor.js";
 import { debeImportar } from "../src/config.js";
+
+describe("ubicación de datos (F4.2)", () => {
+    test("OPIOS_CATALOGO (legacy) manda sobre OPIOS_DATOS", () => {
+        expect(resolverRutaCatalogo({ OPIOS_CATALOGO: "/datos/mio.db", OPIOS_DATOS: "/otro" })).toBe("/datos/mio.db");
+    });
+
+    test("OPIOS_DATOS nombra la carpeta: el catálogo vive dentro", () => {
+        expect(resolverRutaCatalogo({ OPIOS_DATOS: "/datos" })).toBe(join("/datos", "catalogo.db"));
+    });
+
+    test("sin variables: modo directo (legacy OPIOS_DB)", () => {
+        expect(resolverRutaCatalogo({})).toBe("");
+        expect(resolverRutaCatalogo({ OPIOS_DB: "/x/opios.db" })).toBe("");
+    });
+
+    test("variables en blanco se ignoran", () => {
+        expect(resolverRutaCatalogo({ OPIOS_CATALOGO: "  ", OPIOS_DATOS: "  " })).toBe("");
+    });
+});
 
 describe("directorio del banco (Fase 8.1)", () => {
     test("OPIOS_PREGUNTAS manda cuando la carpeta existe", () => {

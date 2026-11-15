@@ -100,7 +100,12 @@
 .toolbar-biblioteca {
   display: flex;
   justify-content: flex-end;
+  gap: var(--sp-2);
   margin-bottom: var(--sp-3);
+}
+
+.toolbar-biblioteca + .meta-banco {
+  margin: 0 0 var(--sp-4);
 }
 
 .dialogo-importar {

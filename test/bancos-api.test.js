@@ -260,6 +260,23 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         expect(r.status).toBe(400);
     });
 
+    test("usar donde está (F4.1): registrar una SQLite existente por ruta", async () => {
+        const externo = join(dir, "donde-esta.db");
+        abrirDb(externo).close();
+        let r = await pet("/api/bancos/registrar", "POST", { nombre: "DondeEsta", ruta: externo });
+        expect(r.status).toBe(201);
+        expect(await r.json()).toMatchObject({ nombre: "DondeEsta", ruta: externo, origen: "registrado" });
+        expect(existsSync(externo)).toBe(true); // el archivo no se copia ni se mueve
+
+        /* Falta la ruta, la ruta no existe o el nombre está repetido → 400 con mensaje. */
+        r = await pet("/api/bancos/registrar", "POST", { nombre: "SinRuta" });
+        expect(r.status).toBe(400);
+        r = await pet("/api/bancos/registrar", "POST", { nombre: "Fantasma", ruta: join(dir, "no.db") });
+        expect(r.status).toBe(400);
+        r = await pet("/api/bancos/registrar", "POST", { nombre: "DondeEsta", ruta: externo });
+        expect(r.status).toBe(400);
+    });
+
     test("la página /biblioteca lleva el banco activo inyectado (id y nombre)", async () => {
         const html = await (await pet("/biblioteca")).text();
         expect(html).toContain("__opiosBancoId=");
@@ -357,6 +374,34 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         } finally {
             await gestor.close();
             rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("bancos en rutas/discos distintos (F4.2): registrar donde está y copiar a la carpeta de datos", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-datos-"));
+        const otroDisco = mkdtempSync(join(tmpdir(), "opios-disco2-"));
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver: driverBun,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            const externo = join(otroDisco, "externo.db");
+            abrirDb(externo).close();
+            const donde = await gestor.registrar("Externo", externo);
+            expect(donde.ruta).toBe(externo); // se usa donde está
+            await gestor.activar(donde.id);
+            expect((await gestor.abrirActivo()).contarPreguntas()).toBe(0);
+
+            /* Copiar: la copia vive junto al catálogo y el original queda intacto. */
+            const copia = await gestor.copiar("Copia", externo);
+            expect(copia.ruta.startsWith(dir)).toBe(true);
+            expect(existsSync(externo)).toBe(true);
+            expect((await gestor.listar()).map((b) => b.nombre)).toEqual(["Copia", "Externo"]);
+        } finally {
+            await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+            rmSync(otroDisco, { recursive: true, force: true });
         }
     });
 });

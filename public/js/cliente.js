@@ -55,6 +55,9 @@ export const bancoActualizar = (id) => api(`/api/bancos/${id}/actualizar`, { met
 export const bancoExportar = (id) => api(`/api/bancos/${id}/exportar`, { metodo: "POST", bruto: true });
 export const bancoRenombrar = (id, nombre) => api(`/api/bancos/${id}`, { metodo: "PUT", cuerpo: { nombre } });
 export const bancoBorrar = (id) => api(`/api/bancos/${id}`, { metodo: "DELETE" });
+/* "Usar donde está" (F4.1): registra un archivo .db que ya existe en el disco del PC. */
+export const bancoRegistrar = (nombre, ruta) =>
+    api("/api/bancos/registrar", { metodo: "POST", cuerpo: { nombre, ruta } });
 /* Desvincular (F3.7): quita el banco del catálogo sin tocar su archivo (bancos registrados en PC). */
 export const bancoDesvincular = (id) => api(`/api/bancos/${id}/desvincular`, { metodo: "POST", cuerpo: {} });
 /* Localizar (F3.8): reenlaza un banco cuyo archivo se movió o desconectó. */

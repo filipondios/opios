@@ -73,6 +73,30 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         selector.click();
     }
 
+    /* --- "Usar donde está" (F4.1): registrar una SQLite que ya está en el disco del PC.
+        El navegador no da la ruta de un archivo elegido con <input type=file>, así que la
+        ruta se pide con prompt; el asistente de archivo (copiar a Opios) es el de F3.4. */
+    async function usarDondeEsta() {
+        const nombre = prompt("Nombre del banco:", "Mi banco")?.trim();
+        if (!nombre) return;
+        const ruta = prompt(
+            "Ruta del archivo .db del banco (p. ej. /home/tu/banco.db):\n" +
+                "El archivo sigue donde está: el progreso se guarda dentro y nunca se borra.",
+        )?.trim();
+        if (!ruta) return;
+        try {
+            await cliente.bancoRegistrar(nombre, ruta);
+            setStatus("ok", `Banco «${nombre}» registrado donde estaba`);
+            await refrescar();
+        } catch (e) {
+            setStatus("warn", msgError(e));
+        }
+    }
+
+    const EXPLICACION =
+        "«Usar donde está» registra un archivo .db que ya tienes en el disco " +
+        "(el progreso se guarda en él); «Importar archivo» copia el banco a la carpeta de Opios.";
+
     function listaErrores(items) {
         if (!items?.length) return null;
         return h(
@@ -341,8 +365,10 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             "div",
             { class: "vacia" },
             h("p", { text: "No hay bancos todavía: importa uno o prueba con el ejemplo." }),
-            h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar"),
+            h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar archivo…"),
+            h("button", { class: "btn", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
             h("button", { class: "btn", type: "button", onclick: alEjemplo }, "Probar con el ejemplo"),
+            h("p", { class: "meta-banco", text: EXPLICACION }),
         );
     }
 
@@ -359,7 +385,9 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                         { class: "btn small", type: "button", onclick: importarDesdeArchivo },
                         "Importar archivo…",
                     ),
+                    h("button", { class: "btn small", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
                 ),
+                h("p", { class: "meta-banco", text: EXPLICACION }),
                 lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
             );
             setStatus("ok", lista.length ? `Bancos: ${lista.length}` : "Biblioteca vacía");

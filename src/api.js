@@ -109,6 +109,17 @@ export function crearApi(
             return json(await gestor.importarJson(nombre, dir), 201);
         }
 
+        /* "Usar donde está" (F4.1): registra una SQLite que ya existe en el disco del PC;
+            el archivo sigue en su sitio (el progreso se guarda dentro). */
+        if (ruta === "/api/bancos/registrar" && m === "POST") {
+            const cuerpo = await cuerpoJson(req);
+            const nombre = String(cuerpo?.nombre ?? "").trim();
+            const archivo = String(cuerpo?.ruta ?? "").trim();
+            if (!nombre) throw new ErrorApi(400, "Indica el nombre del banco.");
+            if (!archivo) throw new ErrorApi(400, "Indica la ruta del archivo del banco.");
+            return json(await gestor.registrar(nombre, archivo), 201);
+        }
+
         /* Asistente de importación (F3.4/F3.5): el archivo viaja en el cuerpo. */
         if (ruta === "/api/bancos/inspeccionar" && m === "POST") {
             const bytes = await cuerpoBytes(req);
