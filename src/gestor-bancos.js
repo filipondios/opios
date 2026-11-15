@@ -102,18 +102,20 @@ export class DatabaseManager {
         if (!ruta.trim()) throw new Error("Indica la ruta del banco.");
         if (!(await this.#almacen.existe(ruta)))
             throw new Error(`El banco «${ruta}» no existe. Registra una SQLite existente o copia primero el archivo.`);
-        /* Validar ANTES de anotarlo en el catálogo: un banco inválido no entra nunca (F2.4). */
+        /* Validar ANTES de anotarlo en el catálogo: un banco inválido no entra nunca (F2.4/F5.7). */
         const info = await this.#verificar(ruta);
         const tam_bytes = (await this.#almacen.leer(ruta)).length;
-        const meta = {
+        const fila = await this.#insertar(nombre.trim(), ruta, "registrado", tam_bytes, info);
+        return {
+            id: fila.lastInsertRowid,
+            nombre: nombre.trim(),
+            ruta,
             origen: "registrado",
             tam_bytes,
             preguntas: info.preguntas,
             version_banco: info.user_version,
             uuid_banco: info.uuid,
         };
-        const fila = await this.#insertar(nombre.trim(), ruta, meta);
-        return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
     }
 
     /** Crea un banco nuevo importando un directorio JSON (misma estructura que el seed).
@@ -187,21 +189,24 @@ export class DatabaseManager {
     }
 
     /* Verifica el temporal (F2.4), lo renombra a su lugar definitivo y lo anota en el catálogo
-       con sus metadatos (F2.7). Si algo falla, no queda ni temporal ni banco a medias. */
+       con sus metadatos (F2.7). Si algo falla, no queda ni temporal ni banco a medias.
+       F5.7: `info` sale de `verificarBanco` y es el único origen de los metadatos. */
     async #anotar(nombre, temporal, ruta, origen, tamBytes) {
         try {
             const info = await this.#verificar(temporal);
             await this.#limpiarLados(temporal);
             await this.#almacen.renombrar(temporal, ruta); // atómico dentro del mismo directorio
-            const meta = {
+            const fila = await this.#insertar(nombre.trim(), ruta, origen, tamBytes, info);
+            return {
+                id: fila.lastInsertRowid,
+                nombre: nombre.trim(),
+                ruta,
                 origen,
                 tam_bytes: tamBytes,
                 preguntas: info.preguntas,
                 version_banco: info.user_version,
                 uuid_banco: info.uuid,
             };
-            const fila = await this.#insertar(nombre.trim(), ruta, meta);
-            return { id: fila.lastInsertRowid, nombre: nombre.trim(), ruta, ...meta };
         } catch (e) {
             await this.#quitarSiExiste(temporal);
             await this.#quitarSiExiste(ruta); // si falló el INSERT tras renombrar, no queda huérfano
@@ -862,20 +867,14 @@ export class DatabaseManager {
         if (bytes) await this.#almacen.escribir(this.#rutaCatalogo, bytes);
     }
 
-    async #insertar(nombre, ruta, meta) {
+    /* Único punto de alta en el catálogo (F5.7): `info` es el objeto que devuelve
+       `verificarBanco`, de modo que un banco sin verificar no puede quedar registrado. */
+    async #insertar(nombre, ruta, origen, tamBytes, info) {
         await this.#listo;
         return this.#catalogo
             .query(
                 "INSERT INTO bancos (nombre, ruta, origen, tam_bytes, preguntas, version_banco, uuid_banco) VALUES (?, ?, ?, ?, ?, ?, ?)",
             )
-            .run(
-                nombre,
-                ruta,
-                meta.origen,
-                meta.tam_bytes,
-                meta.preguntas,
-                meta.version_banco,
-                meta.uuid_banco ?? null,
-            ); // el UNIQUE de la tabla lanza con un error claro
+            .run(nombre, ruta, origen, tamBytes, info.preguntas, info.user_version, info.uuid ?? null); // el UNIQUE de la tabla lanza con un error claro
     }
 }

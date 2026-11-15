@@ -12,7 +12,8 @@ import { driverBun } from "../src/driver-bun.js";
 import { crearAlmacenMemoria } from "../src/almacen-memoria.js";
 import { crearDriverWasm } from "../src/driver-wasm.js";
 import { DatabaseManager } from "../src/gestor-bancos.js";
-import { importarBancoOpios } from "../src/portable.js";
+import { comprimir, contenedor, importarBancoOpios } from "../src/portable.js";
+import { empaquetarCopia } from "../src/copia.js";
 
 describe("DatabaseManager (task 5)", () => {
     test("catálogo, duplicados, banco activo y abrir/cerrar", async () => {
@@ -639,6 +640,48 @@ describe("DatabaseManager neutro (F2.3)", () => {
                 const r3 = await gestor.restaurarCopia(copia.bytes, { archivos: [archivo2] });
                 expect(r3.resultados).toEqual([expect.objectContaining({ accion: "creado", preguntas: 7 })]);
                 expect((await gestor.listar()).map((x) => x.nombre)).toEqual(["Dos", "Uno"]);
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
+
+        test(`${nombre}: verificarBanco obligatorio: un archivo ajeno no entra por import ni por restore`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                /* SQLite válida pero sin el esquema de Opios, y su .opios equivalente. */
+                const ajeno = await ctx.driver.abrir(ctx.almacen, `${ctx.base}/ajena.db`);
+                const bytesAjeno = ctx.driver.instantanea(ajeno);
+                ajeno.close();
+                const paquete = await comprimir(
+                    contenedor({ formato: 1, app: "opios", nombre: "Ajena", user_version: 0 }, bytesAjeno),
+                );
+
+                await expect(gestor.importarBytes(bytesAjeno, { nombre: "Ajena" })).rejects.toThrow(/banco Opios/);
+                await expect(gestor.importarBytes(paquete, { nombre: "Ajena" })).rejects.toThrow(/banco Opios/);
+
+                /* Restaurar una copia con ese banco ajeno: error por banco, catálogo intacto. */
+                const copia = empaquetarCopia([
+                    {
+                        archivo: "Ajena.opios",
+                        manifest: { nombre: "Ajena", preguntas: 0, user_version: 0 },
+                        bytes: paquete,
+                    },
+                ]);
+                const resta = await gestor.restaurarCopia(copia.bytes);
+                expect(resta.resultados).toEqual([expect.objectContaining({ accion: "error" })]);
+
+                expect(await gestor.listar()).toEqual([]);
+
+                /* Control: el mismo camino con un .opios válido sí registra y cuenta bien. */
+                const buena = await gestor.importarJson("Buena", join(import.meta.dir, "fixtures"));
+                expect(buena).toMatchObject({ preguntas: 7, origen: "importado" });
+                expect(await gestor.listar()).toHaveLength(1);
             } finally {
                 await gestor.close();
                 ctx.limpiar();

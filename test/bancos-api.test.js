@@ -2,6 +2,7 @@
    (driver Bun, almacén fs) y las páginas /biblioteca. En modo directo (sin gestor) las
    rutas de bancos fallan con 409 y la página sigue existiendo. */
 import { describe, expect, test } from "bun:test";
+import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -337,6 +338,16 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         expect((await r.json()).nombre).toBe("Extra");
         r = await petBytes("/api/bancos/importar-archivo?nombre=Extra", bytesJson);
         expect((await r.json()).nombre).toBe("Extra (2)");
+
+        /* F5.7: una SQLite válida que no es un banco Opios se rechaza y no entra al catálogo. */
+        const ajena = join(dir, "ajena-incorrecta.db");
+        const dbAjena = new Database(ajena);
+        dbAjena.run("CREATE TABLE otra (x INTEGER)");
+        dbAjena.close();
+        r = await petBytes("/api/bancos/importar-archivo?nombre=Ajena", new Uint8Array(await Bun.file(ajena).arrayBuffer()));
+        expect(r.status).toBe(400);
+        expect((await r.json()).error).toMatch(/No es un banco Opios/);
+        expect((await (await pet("/api/bancos")).json()).some((b) => b.nombre === "Ajena")).toBe(false);
     });
 
     test("copia completa y restauración por HTTP (F5.6)", async () => {
