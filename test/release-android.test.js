@@ -63,4 +63,17 @@ describe("release de Android (7.1–7.3)", () => {
             "registerPlugin(InstaladorApk::class.java)",
         );
     });
+
+    test("la migración y el modo biblioteca de Docker están cableados", () => {
+        const migrar = leer("scripts/migrar-bancos.js");
+        expect(migrar).toContain("instantanea(");
+        expect(migrar).toContain("MIGRACIONES.length");
+        expect(migrar).toContain("Actualiza Opios");
+        expect(JSON.parse(leer("package.json")).scripts.migrar).toContain("migrar-bancos.js");
+        expect(leer("Dockerfile")).toContain("OPIOS_DATOS=/data");
+        expect(leer("docker-compose.yml")).toContain("OPIOS_DATOS: /data");
+        expect(leer("src/config-servidor.js")).toContain("OPIOS_AVISO_VERSION");
+        expect(leer("src/web.js")).toContain("__opiosVersion");
+        expect(leer("public/js/actualizaciones.js")).toContain("globalThis.__opiosVersion");
+    });
 });

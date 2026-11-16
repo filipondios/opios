@@ -16,6 +16,7 @@ Primera versión estable de `opios`.
 - Docker: imagen sin banco y `docker-compose.yml` con el banco montado en solo lectura.
 - Sin dependencias externas: solo Bun y SQLite (la app Android añade Capacitor y SQLite WASM).
 - Aplicación Android con biblioteca de bancos, importación/exportación `.opios`, copias completas y «deshacer»; APK de release firmado con clave propia y `sha256`.
+- Aviso de versión nueva (Android y PC con `OPIOS_AVISO_VERSION`) con notas de la release e instalador verificado; migración guiada de catálogo y bancos con instantánea previa (`bun run migrar`); Docker en modo biblioteca con datos persistentes.
 
 ### Requisitos
 

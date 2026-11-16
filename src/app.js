@@ -21,6 +21,7 @@ export function crearApp(
         zona = null,
         banco = null,
         bancoNombre = null,
+        version = null,
         gestor = null,
         dirPreguntas = null,
         dirEjemplo = null,
@@ -30,7 +31,7 @@ export function crearApp(
     const servicios = crearServicios(repo, { ahora, zona });
     return crearManejadorHttp({
         api: crearApi(repo, servicios, { gestor, dirPreguntas, dirEjemplo, alActivar }),
-        web: crearWeb(repo, servicios, { banco, bancoNombre }),
+        web: crearWeb(repo, servicios, { banco, bancoNombre, version }),
         auth,
     });
 }

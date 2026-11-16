@@ -19,7 +19,8 @@
         "empaquetar": "bun scripts/empaquetar.js",
         "android": "bun run empaquetar && cap sync android",
         "android:abrir": "cap open android",
-        "release:android": "bun scripts/release-android.js"
+        "release:android": "bun scripts/release-android.js",
+        "migrar": "bun scripts/migrar-bancos.js"
     },
     "dependencies": {
         "@capacitor/android": "^8.6.2",

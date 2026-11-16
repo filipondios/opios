@@ -95,6 +95,8 @@ Se importan únicamente `bloque_N/info.json` y `bloque_N/tema_N.json`, de manera
 | `APP_TZ` | zona horaria del sistema | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`) |
 | `AUTH_USER` + `AUTH_PASS` | - | Autenticación básica HTTP cuando se definen ambas |
 | `ALLOWED_HOSTS` | solo loopback | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
+| `OPIOS_DATOS` | - | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`) |
+| `OPIOS_AVISO_VERSION` | `1` | Aviso de versión nueva en la cabecera; `0` lo desactiva |
 
 Los límites diarios (15 preguntas nuevas al día, el freno de repasos atrasados) y el factor que acorta los intervalos según se acerca el examen son constantes de `src/config.js` (`CUPO_NUEVAS`, `FRENO_ATRASO`, `FACTOR_EXAMEN`).
 
@@ -106,7 +108,15 @@ docker run -d -p 10000:10000 -v opios-data:/data \
   -e AUTH_USER=usuario -e AUTH_PASS=clave opios
 ```
 
-La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback.
+La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback. La imagen arranca en **modo biblioteca** (`OPIOS_DATOS=/data`): el catálogo y los bancos viven en el volumen `opios-data`, así que sobreviven a `docker compose down` y puedes gestionarlos desde la pestaña «Bancos».
+
+Para actualizar la app sobre datos existentes, para el contenedor y ejecuta el script de migración con el mismo volumen montado (guarda antes una instantánea de cada banco):
+
+```bash
+OPIOS_DATOS=/ruta/al/volumen bun run migrar
+```
+
+Si un banco tiene un esquema más nuevo que esta versión, el script lo deja intacto y avisa de que hay que actualizar Opios; no pierdas esa copia.
 
 El contenedor se ejecuta con el usuario `bun` y, por defecto, solo acepta cabeceras `Host` de loopback. Si accedes a él por la LAN, añade tu dirección con `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
 

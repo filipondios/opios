@@ -67,6 +67,11 @@ export function resolverRutaCatalogo(env = {}) {
 
 export const RUTA_CATALOGO = resolverRutaCatalogo(process.env);
 
+/* Aviso de versión en PC (7.5/7.8): `OPIOS_AVISO_VERSION=0` lo desactiva. En Android el aviso
+   siempre está activo (usa la versión nativa); aquí es opcional porque GitHub puede no estar
+   accesible y la app debe funcionar igual sin red. */
+export const AVISO_VERSION = String(process.env.OPIOS_AVISO_VERSION ?? "1") !== "0";
+
 /* Modo de importación al arrancar (Fase 8.2): `vacia` (solo si la BD no tiene preguntas),
    `auto` (en cada arranque, con --actualizar) o `no` (nunca). La decisión pura (debeImportar)
    vive en `src/config.js`, que también usa el núcleo local. */

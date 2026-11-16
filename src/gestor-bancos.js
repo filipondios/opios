@@ -838,6 +838,29 @@ export class DatabaseManager {
         await this.#escribirAtomico(ruta, this.#driver.instantanea(repo.db));
     }
 
+    /** Instantánea rotativa (5.9/7.7): la usa también `scripts/migrar-bancos.js` antes de migrar. */
+    async instantanea(ruta, db = null) {
+        return await this.#instantanea(ruta, db);
+    }
+
+    /** Abre un banco del catálogo por id o ruta, lo migra y lo cierra (7.7). */
+    async abrir(idORuta) {
+        const fila =
+            typeof idORuta === "number"
+                ? this.#catalogo.query("SELECT ruta FROM bancos WHERE id = ?").get(idORuta)
+                : this.#catalogo.query("SELECT ruta FROM bancos WHERE ruta = ?").get(idORuta);
+        if (!fila) throw new Error(`El banco «${idORuta}» no está en el catálogo.`);
+        await this.cerrar();
+        const db = await this.#driver.abrir(this.#almacen, fila.ruta);
+        this.#abierto = { id: typeof idORuta === "number" ? idORuta : null, ruta: fila.ruta, repo: abrirRepo(db) };
+        return this.#abierto.repo;
+    }
+
+    /** Cierra el banco abierto por `abrir()`, persistiendo la migración (7.7). */
+    async cerrarBanco() {
+        await this.cerrar();
+    }
+
     /* Instantánea rotativa (5.9): antes de actualizar, restaurar o migrar se guarda el estado
        previo. `.snap.1` es siempre la más reciente y es la que usa «Deshacer». Con `db` se
        vuelca la conexión abierta (sql.js puede tener cambios aún no escritos en el archivo). */

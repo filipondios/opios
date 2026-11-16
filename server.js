@@ -17,6 +17,7 @@ import {
     ALLOWED_HOSTS,
     OPIOS_SEED,
     RUTA_CATALOGO,
+    AVISO_VERSION,
 } from "./src/config-servidor.js";
 import { MAX_SUBIDA, debeImportar } from "./src/config.js";
 
@@ -126,6 +127,7 @@ const servidor = Bun.serve({
            biblioteca se leen por petición porque el activo puede cambiar en caliente. */
         banco: gestor ? () => (repoActual ? idBanco(repoActual) : null) : idBanco(repo),
         bancoNombre: gestor ? () => nombreBancoActual : null,
+        version: AVISO_VERSION ? "1.0.0" : null,
         gestor,
         dirPreguntas: DIR_PREGUNTAS,
         dirEjemplo: DIR_EJEMPLO,

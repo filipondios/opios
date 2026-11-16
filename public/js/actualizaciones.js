@@ -1,5 +1,6 @@
-/* Aviso de versión (7.5): consulta la última release de GitHub una vez al día, compara con
-   la versión nativa y muestra las notas. Sin red, sin plugin o sin versión nueva: no hace nada. */
+/* Aviso de versión (7.5/7.8): consulta la última release de GitHub una vez al día, compara con
+   la versión de la app (nativa en Android, inyectada en PC) y muestra las notas. Sin red, sin
+   versión o sin release nueva: no hace nada. */
 import { h, leerJsonExterna, msgError } from "./comun.js";
 
 const URL_RELEASES = "https://api.github.com/repos/filipondios/opios/releases/latest";
@@ -21,16 +22,17 @@ export const esMayor = (tag, actual) => {
 
 (async () => {
     const plugins = globalThis.Capacitor?.Plugins;
-    if (!plugins?.App?.getInfo) return; // solo Android tiene versión nativa
+    /* Android: versión nativa. PC: la inyecta el servidor si OPIOS_AVISO_VERSION != 0. */
+    const version = plugins?.App?.getInfo ? (await plugins.App.getInfo()).version : globalThis.__opiosVersion;
+    if (!version) return;
     try {
         const hoy = new Date().toISOString().slice(0, 10);
         if (localStorage.getItem(CLAVE_DIA) === hoy) return;
         localStorage.setItem(CLAVE_DIA, hoy); // un intento por día, también si falla
 
-        const info = await plugins.App.getInfo();
         const release = await leerJsonExterna(URL_RELEASES);
         const apk = release.assets?.find((a) => a.name?.endsWith(".apk"));
-        if (!release.tag_name || !apk || !esMayor(release.tag_name, info.version)) return;
+        if (!release.tag_name || !apk || !esMayor(release.tag_name, version)) return;
 
         const caja = h("aside", { class: "aviso-version", role: "status", "aria-label": "Actualización disponible" });
         const instalar = h("button", { class: "btn", type: "button" }, "Descargar e instalar");
