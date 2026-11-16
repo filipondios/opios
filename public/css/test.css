@@ -111,6 +111,10 @@ details.bloque > summary:hover{background:var(--hover)}
 }
 .keys-help .keys span{display:inline-flex;gap:6px;align-items:center}
 
+/* Tablet: cuatro métricas en una fila aprovechando el ancho. */
+@media (min-width:600px) and (max-width:1024px){
+  .hoy-metricas{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
 @media (max-width:520px){
   .hoy-metricas{grid-template-columns:1fr}
   .opt{padding:11px 12px;gap:12px}

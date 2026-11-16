@@ -153,16 +153,26 @@ async function cerrar(senal) {
     } catch (e) {
         logErr("Error al parar el servidor:", e);
     }
-    try {
-        repo.close();
-    } catch (e) {
-        logErr("Error al cerrar la base de datos:", e);
-    }
     if (gestor) {
+        /* 5.10: el gestor hace flush + wal_checkpoint(TRUNCATE) + cierre del banco abierto
+           y del catálogo. Llamar además a repo.close() aquí cerraría la conexión antes del
+           volcado y perdería el checkpoint. */
         try {
-            await gestor.close(); // cierra banco (de nuevo, si acaso) y catálogo
+            await gestor.close();
         } catch (e) {
-            logErr("Error al cerrar el catálogo:", e);
+            logErr("Error al cerrar la base de datos:", e);
+        }
+    } else {
+        /* Modo directo (legacy): no hay gestor que lo haga. */
+        try {
+            driverBun.puntoControl(repo.db);
+        } catch (e) {
+            logErr("Error al hacer checkpoint de la base de datos:", e);
+        }
+        try {
+            repo.close();
+        } catch (e) {
+            logErr("Error al cerrar la base de datos:", e);
         }
     }
     log("Cerrado correctamente.");

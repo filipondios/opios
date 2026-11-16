@@ -20,7 +20,7 @@ export function layout({ titulo, actual = null, estado, estadoTipo = "ok", ancho
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Opios: ${titulo}</title>
 <link rel="icon" href="/logo.png" type="image/png">
@@ -47,6 +47,7 @@ ${cuerpo}
 </div>
 ${js.map((s) => html`<script type="module" src="/js/${s}"></script>`)}
 <script src="/js/tema.js" defer></script>
+<script type="module" src="/js/actualizaciones.js"></script>
 </body>
 </html>
 `;

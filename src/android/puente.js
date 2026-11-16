@@ -107,6 +107,14 @@ export async function arrancar() {
     });
     App.addListener("pause", () => flush());
 
+    /* Botón Atrás (6.2): vuelve dentro de la app; solo desde la portada pide confirmación
+       para salir. `arrancar()` corre una sola vez, así que el listener no se acumula. */
+    App.addListener("backButton", () => {
+        if (globalThis.__opiosOcupado) return; // 6.4
+        if (location.pathname !== "/" && history.state?.opios) history.back();
+        else if (confirm("¿Salir de Opios?")) App.exitApp();
+    });
+
     /* El WebView no tiene `process.env`: la zona es la del dispositivo. El id del banco (F1.5)
        se inyecta en las páginas para prefijar las claves de localStorage por banco. */
     globalThis.__opios = crearAppLocal(repo, {

@@ -2,16 +2,58 @@
    Los datos vienen de cliente.js (nada de fetch aquí). El resumen de progreso lo trae
    /api/bancos solo para el banco activo (es el único abierto; el resto llega en F5). */
 import * as cliente from "./cliente.js";
-import { h, msgError, simulacroEnCurso } from "./comun.js";
+import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from "./comun.js";
 
 (() => {
     const $ = (s) => document.querySelector(s);
-    const setStatus = (kind, text) => {
+    /* Textos sin jerga para el origen del banco (6.6). */
+    const ORIGENES = {
+        registrado: "un archivo que ya tenías",
+        copiado: "una copia guardada en Opios",
+        importado: "un archivo importado",
+    };
+    const setStatus = (kind, text, cancelar = null) => {
         const s = $("#status");
         s.dataset.state = kind;
         s.title = text;
         const visible = s.querySelector(".status-text");
         if (visible) visible.textContent = text;
+        s.querySelector(".status-cancelar")?.remove();
+        if (cancelar)
+            s.append(
+                h("button", { class: "status-cancelar btn small", type: "button", onclick: cancelar }, "Cancelar"),
+            );
+    };
+
+    /* Operación de escritura (6.4): indicador de ocupado, botón Cancelar y navegación
+       bloqueada mientras dura. Una cancelación aborta la petición en curso. */
+    async function conOperacion(etiqueta, fn) {
+        if (senalOperacion()) return null; // una sola operación a la vez: ignora dobles clics
+        const op = iniciarOperacion();
+        setStatus("busy", etiqueta, () => {
+            setStatus("warn", "Cancelando…");
+            op.cancelar();
+        });
+        try {
+            return await fn();
+        } catch (e) {
+            if (e?.name === "AbortError") {
+                setStatus("warn", "Operación cancelada.");
+                return null;
+            }
+            throw e;
+        } finally {
+            op.fin();
+            $("#status")?.querySelector(".status-cancelar")?.remove();
+        }
+    }
+
+    /* Base64 por trozos para pasar los bytes del .opios al plugin nativo (F5.8): un solo
+       String.fromCharCode con el archivo entero agotaría la pila. */
+    const bytesABase64 = (bytes) => {
+        let s = "";
+        for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+        return btoa(s);
     };
 
     const fmtTam = (n) =>
@@ -40,21 +82,37 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         return true;
     }
 
+    /* En Android el WebView no descarga archivos: el usuario elige destino con el selector
+       nativo (F4.3) y el plugin escribe los bytes ahí (F5.8). En PC, descarga normal. */
     async function exportar(b, conProgreso) {
-        const r = await cliente.bancoExportar(b.id, { conProgreso });
+        const nombre = `${b.nombre}${conProgreso ? "" : "-sin-progreso"}.opios`;
+        const { SelectorDocumentos } = nativo() ? globalThis.Capacitor.Plugins : {};
+        let uri = null;
+        if (SelectorDocumentos) {
+            const destino = await SelectorDocumentos.crear({ nombre, mime: "application/x-opios" });
+            if (destino.cancelado) return false;
+            uri = destino.uri;
+        }
+        const r = await conOperacion(`Exportando «${b.nombre}»…`, () => cliente.bancoExportar(b.id, { conProgreso }));
+        if (r === null) return false;
+        if (uri) {
+            const bytes = new Uint8Array(await r.arrayBuffer());
+            await SelectorDocumentos.guardar({ uri, datos: bytesABase64(bytes) });
+            return true;
+        }
         const url = URL.createObjectURL(await r.blob());
-        const a = h("a", { href: url, download: `${b.nombre}${conProgreso ? "" : "-sin-progreso"}.opios` });
+        const a = h("a", { href: url, download: nombre });
         document.body.append(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+        return true;
     }
 
     async function importar(cuerpo) {
         const nombre = cuerpo?.nombre ?? prompt("Nombre del banco nuevo:", "Mi banco")?.trim();
         if (!nombre) return null;
-        const b = await cliente.bancoImportar({ nombre, ...cuerpo });
-        return b;
+        return await conOperacion("Importando banco…", () => cliente.bancoImportar({ nombre, ...cuerpo }));
     }
 
     /* --- Asistente de importación (F3.4–F3.6): elegir archivo → previsualizar → confirmar.
@@ -178,7 +236,7 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         const resumen = [
             `Tipo: ${pre.tipo}`,
             `${pre.preguntas} pregunta(s)`,
-            pre.version_banco ? `versión del banco: v${pre.version_banco}` : null,
+            pre.version_banco ? `formato: v${pre.version_banco}` : null,
             dup
                 ? `ya está en tu biblioteca como «${dup.nombre}» (detectado por ${dup.por === "uuid" ? "su identificador" : "el nombre"})`
                 : null,
@@ -225,7 +283,10 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
 
         async function confirmar(opciones) {
             try {
-                const r = await cliente.bancoImportarArchivo(bytes, { nombre: nombreSugerido, ...opciones });
+                const r = await conOperacion("Importando banco…", () =>
+                    cliente.bancoImportarArchivo(bytes, { nombre: nombreSugerido, ...opciones }),
+                );
+                if (r === null) return;
                 setStatus(
                     "ok",
                     `Importado «${r.nombre ?? nombreSugerido}»: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas${r.archivadas ? `, ${r.archivadas} archivadas` : ""}`,
@@ -247,7 +308,8 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
     /* Descarga un `.opios-backup` (zip con todos los bancos y su progreso). */
     async function descargarCopia() {
         try {
-            const r = await cliente.bancoCopia();
+            const r = await conOperacion("Preparando la copia completa…", () => cliente.bancoCopia());
+            if (r === null) return;
             const n = Number(r.headers.get("X-Opios-Bancos") ?? 0);
             const avisos = Number(r.headers.get("X-Opios-Avisos") ?? 0);
             const url = URL.createObjectURL(await r.blob());
@@ -354,7 +416,11 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             return;
         }
         try {
-            const { resultados } = await cliente.copiaRestaurar(bytes, { archivos, sobrescribir: reemplaza > 0 });
+            const copia = await conOperacion("Restaurando copia…", () =>
+                cliente.copiaRestaurar(bytes, { archivos, sobrescribir: reemplaza > 0 }),
+            );
+            if (copia === null) return;
+            const { resultados } = copia;
             const n = (a) => resultados.filter((x) => x.accion === a).length;
             setStatus(
                 n("error") ? "warn" : "ok",
@@ -391,8 +457,9 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             if (await cambiar(b.id)) location.href = "/";
         };
         const alActualizar = async () => {
-            if (!confirm(`Actualizar «${b.nombre}» desde el directorio de preguntas configurado?`)) return;
-            const r = await cliente.bancoActualizar(b.id);
+            if (!confirm(`¿Actualizar «${b.nombre}» con las preguntas de la carpeta de Opios?`)) return;
+            const r = await conOperacion(`Actualizando «${b.nombre}»…`, () => cliente.bancoActualizar(b.id));
+            if (r === null) return;
             setStatus(
                 "ok",
                 `Actualizado: ${r.nuevas} nuevas, ${r.duplicadas} duplicadas, ${r.actualizadas} actualizadas${r.archivadas ? `, ${r.archivadas} archivadas` : ""}`,
@@ -400,11 +467,37 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             await refrescar();
         };
         const alExportar = async (conProgreso) => {
-            await exportar(b, conProgreso);
-            setStatus(
-                "ok",
-                conProgreso ? "Banco exportado con progreso (.opios)" : "Banco exportado sin progreso (.opios)",
-            );
+            try {
+                if (!(await exportar(b, conProgreso))) return; // canceló el selector nativo
+                setStatus(
+                    "ok",
+                    nativo()
+                        ? "Banco guardado en el destino elegido (.opios)"
+                        : conProgreso
+                          ? "Banco exportado con progreso (.opios)"
+                          : "Banco exportado sin progreso (.opios)",
+                );
+            } catch (e) {
+                setStatus("warn", msgError(e));
+            }
+        };
+        /* 5.9: repone la última instantánea anterior a actualizar/restaurar/migrar. Solo se
+           ofrece si el banco tiene alguna (el gestor lo indica en `deshacible`). */
+        const alDeshacer = async () => {
+            if (
+                !confirm(
+                    `¿Deshacer la última actualización de «${b.nombre}»? Se recupera el estado anterior ` +
+                        "(se conservan las 3 últimas copias).",
+                )
+            )
+                return;
+            try {
+                const r = await cliente.bancoDeshacer(b.id);
+                setStatus("ok", `Deshecha la última actualización de «${r.nombre}» (${r.preguntas} preguntas)`);
+                await refrescar();
+            } catch (e) {
+                setStatus("warn", msgError(e));
+            }
         };
         const alRenombrar = async () => {
             const nombre = prompt("Nuevo nombre:", b.nombre)?.trim();
@@ -437,12 +530,19 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
             setStatus("ok", "Banco desvinculado (el archivo sigue donde estaba)");
             await refrescar();
         };
+        const accion = (texto, onclick, extra = {}) =>
+            h(
+                "button",
+                { class: "btn small", type: "button", onclick, "aria-label": `${texto} de «${b.nombre}»`, ...extra },
+                texto,
+            );
         return [
             h(
                 "a",
                 {
                     class: "btn small",
                     href: "/",
+                    "aria-label": `Estudiar «${b.nombre}»`,
                     onclick: activo
                         ? null
                         : (e) => {
@@ -453,25 +553,14 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
                 "Estudiar",
             ),
             /* Actualizar reimporta desde un directorio JSON del PC: en Android no aplica. */
-            nativo() ? null : h("button", { class: "btn small", type: "button", onclick: alActualizar }, "Actualizar"),
-            h(
-                "button",
-                { class: "btn small", type: "button", onclick: () => alExportar(true) },
-                "Exportar con progreso",
-            ),
-            h(
-                "button",
-                { class: "btn small", type: "button", onclick: () => alExportar(false) },
-                "Exportar sin progreso",
-            ),
-            h("button", { class: "btn small", type: "button", onclick: alRenombrar }, "Renombrar"),
+            nativo() ? null : accion("Actualizar", alActualizar),
+            b.deshacible ? accion("Deshacer última actualización", alDeshacer) : null,
+            accion("Exportar con progreso", () => alExportar(true)),
+            accion("Exportar sin progreso", () => alExportar(false)),
+            accion("Cambiar nombre", alRenombrar),
             b.origen === "registrado"
-                ? h(
-                      "button",
-                      { class: "btn small", type: "button", onclick: alDesvincular, disabled: activo },
-                      "Desvincular",
-                  )
-                : h("button", { class: "btn small", type: "button", onclick: alBorrar, disabled: activo }, "Eliminar"),
+                ? accion("Quitar de la biblioteca", alDesvincular, { disabled: activo })
+                : accion("Eliminar", alBorrar, { disabled: activo }),
         ];
     }
 
@@ -514,7 +603,7 @@ import { h, msgError, simulacroEnCurso } from "./comun.js";
         const meta = [
             `${b.preguntas ?? "?"} preguntas`,
             fmtTam(b.tam_bytes),
-            `origen: ${b.origen ?? "—"}`,
+            `cómo se añadió: ${ORIGENES[b.origen] ?? "—"}`,
             `último uso: ${fmtCuando(b.ultima_vez)}`,
         ];
         return h(

@@ -24,6 +24,10 @@ export const driverBun = {
     },
     userVersion,
     integridad,
+    /* 5.10: con WAL, los datos pueden estar todavía en el -wal al cerrar; vuelca y trunca. */
+    puntoControl(db) {
+        db.run("PRAGMA wal_checkpoint(TRUNCATE)");
+    },
     /* bun:sqlite escribe en el archivo al momento: no hace falta volcar el catálogo. */
     soloMemoria: false,
 };

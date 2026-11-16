@@ -18,13 +18,15 @@
         "test": "bun test",
         "empaquetar": "bun scripts/empaquetar.js",
         "android": "bun run empaquetar && cap sync android",
-        "android:abrir": "cap open android"
+        "android:abrir": "cap open android",
+        "release:android": "bun scripts/release-android.js"
     },
     "dependencies": {
         "@capacitor/android": "^8.6.2",
         "@capacitor/app": "^8",
         "@capacitor/core": "^8.6.2",
         "@capacitor/filesystem": "^8.1.5",
+        "@capacitor/status-bar": "^8",
         "sql.js": "^1.16.0"
     },
     "devDependencies": {

@@ -51,6 +51,8 @@ export const bancosListar = () => api("/api/bancos");
 export const bancoImportar = (cuerpo) => api("/api/bancos/importar", { metodo: "POST", cuerpo });
 export const bancoActivar = (id) => api(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
 export const bancoActualizar = (id) => api(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
+/* Deshacer última actualización/restauración/migración (5.9). */
+export const bancoDeshacer = (id) => api(`/api/bancos/${id}/deshacer`, { metodo: "POST", cuerpo: {} });
 /* Devuelve la Response cruda: el exportar es una descarga, no JSON. `conProgreso:false`
    (F5.5) empaqueta el banco sin progreso. */
 export const bancoExportar = (id, { conProgreso = true } = {}) =>

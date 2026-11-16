@@ -170,7 +170,9 @@ export function crearApi(
             );
         }
 
-        const mb = ruta.match(/^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar|desvincular|localizar))?$/);
+        const mb = ruta.match(
+            /^\/api\/bancos\/(\d+)(?:\/(activar|exportar|actualizar|desvincular|localizar|deshacer))?$/,
+        );
         if (mb) {
             const id = Number(mb[1]);
             if (mb[2] === "activar" && m === "POST") {
@@ -198,6 +200,12 @@ export function crearApi(
                 if (!dirPreguntas)
                     throw new ErrorApi(400, "No hay directorio de preguntas configurado (OPIOS_PREGUNTAS).");
                 return json(await gestor.actualizar(id, dirPreguntas));
+            }
+            if (mb[2] === "deshacer" && m === "POST") {
+                const r = await gestor.deshacer(id);
+                /* El repo activo se reabre dentro del gestor: actualiza el proxy del servidor. */
+                if (alActivar && (await gestor.idActivo()) === id) await alActivar(await gestor.abrirActivo());
+                return json(r);
             }
             if (mb[2] === "desvincular" && m === "POST") {
                 await gestor.desvincular(id);

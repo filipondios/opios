@@ -85,6 +85,7 @@ describe("bundle del WebView (F1.2)", () => {
         const wasm = await Bun.file(join(RAIZ, "node_modules/sql.js/dist/sql-wasm.wasm")).arrayBuffer();
         const escritos = [];
         const guardados = [];
+        const escuchas = [];
         const almacenados = new Map();
         const documento = {
             addEventListener() {},
@@ -112,7 +113,12 @@ describe("bundle del WebView (F1.2)", () => {
             setTimeout,
             clearTimeout,
             fetch: async () => ({ ok: true, arrayBuffer: async () => wasm }), // sirve sql-wasm.wasm
-            App: { addListener: async () => ({ remove() {} }) },
+            App: {
+                addListener: async (nombre) => {
+                    escuchas.push(nombre);
+                    return { remove() {} };
+                },
+            },
             Filesystem: {
                 /* Pequeño sistema de archivos en memoria (el puente ya no arranca con un
                    banco vacío fijo, así que `stat`/`readFile` deben reflejar lo escrito). */
@@ -145,6 +151,8 @@ describe("bundle del WebView (F1.2)", () => {
 
         expect(vm.runInContext("typeof globalThis.__opios", contexto)).toBe("function");
         expect(escritos.some((html) => /<title>Opios/i.test(html))).toBe(true); // portada pintada
+        /* 6.2: el botón Atrás se registra una sola vez aunque el shell se reejecute. */
+        expect(escuchas.filter((n) => n === "backButton")).toHaveLength(1);
         /* El puente persistió: el último guardado es un SQLite válido (base64). */
         expect(guardados.length).toBeGreaterThan(0);
         expect(Buffer.from(guardados.at(-1), "base64").subarray(0, 15).toString()).toBe("SQLite format 3");

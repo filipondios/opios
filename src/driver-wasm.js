@@ -16,6 +16,8 @@ export function crearDriverWasm({ rutaWasm = "sql-wasm.wasm", onCambios = () => 
         instantanea: (db) => db.exportar(),
         userVersion,
         integridad,
+        /* sql.js no tiene archivos WAL: la BD entera vive en memoria. */
+        puntoControl: () => {},
         /* sql.js no escribe en el almacén: el gestor debe volcar catálogo y banco (F4.4). */
         soloMemoria: true,
     };

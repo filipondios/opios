@@ -12,7 +12,9 @@ async function mostrarRuta(ruta, { empujar = true } = {}) {
     const r = await globalThis.__opios(new Request("http://opios.local" + ruta));
     if (!r.ok) throw new Error("Ruta no disponible: " + ruta);
     globalThis.__opiosRuta = ruta; // antes de document.open: si el documento se reemplaza, no se reintenta
-    if (empujar) history.pushState({}, "", ruta);
+    /* Marca las entradas que empujó la app: así el botón Atrás distingue «volver» de
+       «salir» aunque la app se abra directamente en una ruta profunda (sin historial). */
+    if (empujar) history.pushState({ opios: true }, "", ruta);
     const html = prepararPagina(await r.text(), "?r=" + Date.now());
     document.open();
     document.write(html);
@@ -24,6 +26,7 @@ document.addEventListener("click", (e) => {
     if (!a || a.target || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.altKey) return;
     const ruta = a.getAttribute("href");
     e.preventDefault();
+    if (globalThis.__opiosOcupado) return; // 6.4: no se navega mientras se está escribiendo
     mostrarRuta(ruta).catch(() => (location.href = ruta)); // sin puente: navegación clásica
 });
 

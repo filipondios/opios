@@ -254,6 +254,13 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         lista = await (await pet("/api/bancos")).json();
         expect(lista.find((b) => b.id === creado.id).preguntas).toBe(creado.preguntas);
 
+        /* POST deshacer (5.9): el activo ofrece la instantánea previa a la actualización. */
+        expect(lista.find((b) => b.id === creado.id).deshacible).toBe(true);
+        r = await pet(`/api/bancos/${creado.id}/deshacer`, "POST", {});
+        expect(r.status).toBe(200);
+        expect(await r.json()).toMatchObject({ id: creado.id, nombre: "Del Ejemplo" });
+        expect(repoActual.contarPreguntas()).toBe(creado.preguntas);
+
         /* PUT renombrar: cambia el nombre; los repetidos y los ids raros fallan con 400. */
         r = await pet(`/api/bancos/${creado.id}`, "PUT", { nombre: "Ejemplo Renombrado" });
         expect(r.status).toBe(200);
@@ -344,7 +351,10 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         const dbAjena = new Database(ajena);
         dbAjena.run("CREATE TABLE otra (x INTEGER)");
         dbAjena.close();
-        r = await petBytes("/api/bancos/importar-archivo?nombre=Ajena", new Uint8Array(await Bun.file(ajena).arrayBuffer()));
+        r = await petBytes(
+            "/api/bancos/importar-archivo?nombre=Ajena",
+            new Uint8Array(await Bun.file(ajena).arrayBuffer()),
+        );
         expect(r.status).toBe(400);
         expect((await r.json()).error).toMatch(/No es un banco Opios/);
         expect((await (await pet("/api/bancos")).json()).some((b) => b.nombre === "Ajena")).toBe(false);

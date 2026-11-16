@@ -43,6 +43,7 @@ describe("contratos de la UI", () => {
             "bancoImportar",
             "bancoActivar",
             "bancoActualizar",
+            "bancoDeshacer",
             "bancoExportar",
             "bancoRenombrar",
             "bancoBorrar",
@@ -84,6 +85,42 @@ describe("contratos de la UI", () => {
         globalThis.__opiosBancoId = "banco-1";
         expect(claveBanco("ti.sel")).toBe("opios.banco-1.ti.sel");
         delete globalThis.__opiosBancoId;
+    });
+
+    /* 7.5: el aviso solo aparece si la release es realmente más nueva que la app instalada. */
+    test("esMayor compara la release con la versión nativa", async () => {
+        const { esMayor } = await import(join(DIR, "actualizaciones.js"));
+        expect(esMayor("v1.0.1", "1.0.0")).toBe(true);
+        expect(esMayor("v1.1.0", "1.0.9")).toBe(true);
+        expect(esMayor("v1.0.0", "1.0.0")).toBe(false);
+        expect(esMayor("v0.9.9", "1.0.0")).toBe(false);
+        expect(esMayor("1.0.0-beta.1", "1.0.0")).toBe(false);
+    });
+
+    /* 6.4: una operación larga expone su señal y bloquea la navegación hasta que termina. */
+    test("iniciarOperacion publica la señal, cancela y libera el bloqueo", async () => {
+        const { iniciarOperacion, senalOperacion } = await import(join(DIR, "comun.js"));
+        expect(senalOperacion()).toBeNull();
+        const op = iniciarOperacion();
+        try {
+            expect(senalOperacion()).not.toBeNull();
+            expect(globalThis.__opiosOcupado).toBe(true);
+            op.cancelar();
+            expect(senalOperacion().aborted).toBe(true);
+        } finally {
+            op.fin();
+        }
+        expect(senalOperacion()).toBeNull();
+        expect(globalThis.__opiosOcupado).toBe(false);
+    });
+
+    /* 6.3: el teclado encoge el visualViewport pero no el layout; el CSS necesita el solape. */
+    test("altoTeclado mide solo el solape y nunca es negativo", async () => {
+        const { altoTeclado } = await import(join(DIR, "comun.js"));
+        expect(altoTeclado(null, 800)).toBe(0);
+        expect(altoTeclado({ height: 500, offsetTop: 0 }, 800)).toBe(300);
+        expect(altoTeclado({ height: 800, offsetTop: 0 }, 800)).toBe(0);
+        expect(altoTeclado({ height: 900, offsetTop: -100 }, 800)).toBe(0);
     });
 
     test("las páginas usan claveBanco para lo del banco y literales globales para lo visual", () => {

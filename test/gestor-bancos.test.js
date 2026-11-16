@@ -723,6 +723,57 @@ describe("DatabaseManager neutro (F2.3)", () => {
                 ctx.limpiar();
             }
         });
+
+        test(`${nombre}: instantáneas rotativas y deshacer la última actualización (5.9)`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const b = await gestor.importarJson("Banco", join(import.meta.dir, "fixtures")); // 7 preguntas
+                await gestor.activar(b.id);
+                const activas = async () => {
+                    const repo = await gestor.abrirActivo();
+                    const temas = repo.temario().flatMap((x) => x.temas.map((t) => t.id));
+                    return repo.paraTest(temas).preguntas.map((p) => p.pregunta);
+                };
+                expect(await activas()).toHaveLength(7);
+
+                const jsonCon = (texto) =>
+                    new TextEncoder().encode(
+                        JSON.stringify([
+                            {
+                                tema: 1,
+                                pregunta: texto,
+                                respuestas: ["A", "B"],
+                                respuesta_correcta: "a",
+                                explicacion: "",
+                            },
+                        ]),
+                    );
+                await gestor.actualizarDesde(jsonCon("Solo A"), { id: b.id });
+                expect(await activas()).toEqual(["Solo A"]);
+                expect((await gestor.listar())[0].deshacible).toBe(true);
+                expect(await ctx.almacen.existe(`${b.ruta}.snap.1`)).toBe(true);
+
+                await gestor.actualizarDesde(jsonCon("Solo B"), { id: b.id });
+                expect(await activas()).toEqual(["Solo B"]);
+                expect(await ctx.almacen.existe(`${b.ruta}.snap.2`)).toBe(true);
+
+                /* Un deshacer repone el estado anterior a la última actualización; el segundo,
+                   el anterior a la primera (las 7 preguntas originales). */
+                await gestor.deshacer(b.id);
+                expect(await activas()).toEqual(["Solo A"]);
+                await gestor.deshacer(b.id);
+                expect(await activas()).toHaveLength(7);
+                await expect(gestor.deshacer(b.id)).rejects.toThrow(/No hay ninguna actualización/);
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
     }
 
     test("persistir() y persistirBanco() vuelcan sin cerrar el gestor (F4.4)", async () => {
@@ -774,6 +825,33 @@ describe("DatabaseManager neutro (F2.3)", () => {
             expect(instantaneas).toHaveLength(0);
         } finally {
             await gestor.close();
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("close() hace wal_checkpoint(TRUNCATE) del banco y del catálogo (5.10)", async () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-gestor-checkpoint-"));
+        let checkpoints = 0;
+        const driver = {
+            ...driverBun,
+            puntoControl: (db) => {
+                checkpoints++;
+                driverBun.puntoControl(db);
+            },
+        };
+        const gestor = new DatabaseManager({
+            almacen: almacenBun,
+            driver,
+            rutaCatalogo: join(dir, "catalogo.db"),
+        });
+        try {
+            const b = await gestor.importarJson("Banco", join(import.meta.dir, "fixtures"));
+            await gestor.activar(b.id);
+            await gestor.abrirActivo();
+            expect(checkpoints).toBe(0);
+            await gestor.close(); // cierra el banco abierto y el catálogo
+            expect(checkpoints).toBe(2);
+        } finally {
             rmSync(dir, { recursive: true, force: true });
         }
     });

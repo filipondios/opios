@@ -62,6 +62,32 @@ class SelectorDocumentos : Plugin() {
         startActivityForResult(call, intent, "alCrear")
     }
 
+    /*
+     * Escribe en el destino elegido con crear() el archivo .opios exportado (F5.8).
+     * JS pasa los bytes en base64: el WebView no tiene acceso directo al content:// del SAF,
+     * pero la app sí, a través del permiso que da el propio selector al elegir destino.
+     */
+    @PluginMethod
+    fun guardar(call: PluginCall) {
+        val uri = call.getString("uri")?.let { Uri.parse(it) }
+        val datos = call.getString("datos")
+        if (uri == null || datos == null) {
+            call.reject("Faltan los datos para guardar el archivo.")
+            return
+        }
+        try {
+            val bytes = android.util.Base64.decode(datos, android.util.Base64.DEFAULT)
+            context.contentResolver.openOutputStream(uri)?.use { salida -> salida.write(bytes) }
+                ?: run {
+                    call.reject("No se pudo escribir en el destino elegido.")
+                    return
+                }
+            call.resolve()
+        } catch (e: Exception) {
+            call.reject("No se pudo guardar el archivo: ${e.message}")
+        }
+    }
+
     /** Espacio libre del almacenamiento interno, en bytes (F4.4: avisar antes de importar). */
     @PluginMethod
     fun espacioLibre(call: PluginCall) {

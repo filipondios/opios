@@ -15,6 +15,7 @@ import { comprobarDriver } from "./driver.js";
 import { AVISO_BANCO_GRANDE, MAX_SUBIDA } from "./config.js";
 import { idBanco } from "./banco-id.js";
 import { abrirRepo } from "./db/index.js";
+import { MIGRACIONES } from "./db/esquema.js";
 import { errorDeVerificacion, verificarBanco } from "./db/validar-sqlite.js";
 import { exportarBanco, importarBancoOpios, vaciarProgreso } from "./portable.js";
 import { empaquetarCopia, leerCopia } from "./copia.js";
@@ -275,6 +276,7 @@ export class DatabaseManager {
         const esElAbierto = abierto && abierto.id === id;
         if (abierto && !esElAbierto) await this.cerrar(); // libera la única conexión de banco
         const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
+        await this.#instantanea(fila.ruta, repo.db); // 5.9: estado previo a la actualización
         let r;
         try {
             /* Ensayo en RAM: `:memory:` es banco nuevo para bun:sqlite y para sql.js. */
@@ -325,7 +327,12 @@ export class DatabaseManager {
         /* `disponible` (F3.8): ¿está el archivo donde se anotó? Un disco externo desconectado
            no impide listar; la tarjeta avisa y ofrece Localizar/Desvincular. */
         return Promise.all(
-            filas.map(async (b) => ({ ...b, activo: b.id === activo, disponible: await this.#almacen.existe(b.ruta) })),
+            filas.map(async (b) => ({
+                ...b,
+                activo: b.id === activo,
+                disponible: await this.#almacen.existe(b.ruta),
+                deshacible: await this.#almacen.existe(`${b.ruta}.snap.1`),
+            })),
         );
     }
 
@@ -418,7 +425,11 @@ export class DatabaseManager {
             }
             try {
                 const paquete = await this.exportar(b.id);
-                bancos.push({ archivo: archivoLibre(sanearNombre(b.nombre), usados), manifest: paquete.manifest, bytes: paquete.bytes });
+                bancos.push({
+                    archivo: archivoLibre(sanearNombre(b.nombre), usados),
+                    manifest: paquete.manifest,
+                    bytes: paquete.bytes,
+                });
             } catch (e) {
                 avisos.push(`«${b.nombre}»: ${e.message}`);
             }
@@ -491,6 +502,7 @@ export class DatabaseManager {
     async #reemplazarDesdeCopia(b, dup) {
         const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(dup.id);
         const eraActivo = this.#abierto && this.#abierto.id === dup.id;
+        await this.#instantanea(fila.ruta, eraActivo ? this.#abierto.repo.db : null); // 5.9: antes de reemplazar
         if (eraActivo) await this.cerrar(); // vuelca y libera la conexión única antes de pisar el archivo
         try {
             if (await this.#almacen.existe(fila.ruta))
@@ -501,7 +513,13 @@ export class DatabaseManager {
             this.#catalogo
                 .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
                 .run(tam, info.preguntas, info.user_version, info.uuid, dup.id);
-            return { archivo: b.archivo, nombre: fila.nombre, accion: "reemplazado", id: dup.id, preguntas: info.preguntas };
+            return {
+                archivo: b.archivo,
+                nombre: fila.nombre,
+                accion: "reemplazado",
+                id: dup.id,
+                preguntas: info.preguntas,
+            };
         } finally {
             if (eraActivo) await this.abrirActivo(); // deja la app sirviendo el banco restaurado
         }
@@ -534,7 +552,8 @@ export class DatabaseManager {
                 `«${fila.nombre}» está registrado (su archivo está fuera de Opios): desvincúlalo en vez de eliminarlo.`,
             );
         this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
-        for (const lado of ["", "-wal", "-shm", ".prev", ".tmp"]) await this.#almacen.borrar(fila.ruta + lado);
+        for (const lado of ["", "-wal", "-shm", ".prev", ".tmp", ".snap.1", ".snap.2", ".snap.3"])
+            await this.#almacen.borrar(fila.ruta + lado);
         return true;
     }
 
@@ -703,6 +722,7 @@ export class DatabaseManager {
         const esElAbierto = abierto && abierto.id === id;
         if (abierto && !esElAbierto) await this.cerrar(); // libera la única conexión de banco
         const repo = esElAbierto ? abierto.repo : abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta));
+        await this.#instantanea(fila.ruta, repo.db); // 5.9: estado previo a la fusión
         let r;
         try {
             if (arch.tipo === "json" || arch.tipo === "zip") {
@@ -791,11 +811,11 @@ export class DatabaseManager {
                 throw new Error(`El banco activo «${fila.ruta}» no está accesible (ruta ausente o desconectada).`);
             await this.#almacen.renombrar(fila.ruta + ".prev", fila.ruta);
         }
-        this.#abierto = {
-            id,
-            ruta: fila.ruta,
-            repo: abrirRepo(await this.#driver.abrir(this.#almacen, fila.ruta)),
-        };
+        const db = await this.#driver.abrir(this.#almacen, fila.ruta);
+        /* 5.9: `abrirRepo` migra en caliente; guarda antes el estado previo si hay migración. */
+        const version = this.#driver.userVersion(db);
+        if (version > 0 && version < MIGRACIONES.length) await this.#instantanea(fila.ruta, db);
+        this.#abierto = { id, ruta: fila.ruta, repo: abrirRepo(db) };
         /* Garantiza uuid_banco en ajustes de cada banco abierto (detección de duplicados, F2.7). */
         idBanco(this.#abierto.repo);
         return this.#abierto.repo;
@@ -818,6 +838,49 @@ export class DatabaseManager {
         await this.#escribirAtomico(ruta, this.#driver.instantanea(repo.db));
     }
 
+    /* Instantánea rotativa (5.9): antes de actualizar, restaurar o migrar se guarda el estado
+       previo. `.snap.1` es siempre la más reciente y es la que usa «Deshacer». Con `db` se
+       vuelca la conexión abierta (sql.js puede tener cambios aún no escritos en el archivo). */
+    async #instantanea(ruta, db = null) {
+        if (ruta === ":memory:" || !(await this.#almacen.existe(ruta))) return;
+        const s1 = `${ruta}.snap.1`;
+        const s2 = `${ruta}.snap.2`;
+        const s3 = `${ruta}.snap.3`;
+        await this.#quitarSiExiste(s3);
+        if (await this.#almacen.existe(s2)) await this.#almacen.renombrar(s2, s3);
+        if (await this.#almacen.existe(s1)) await this.#almacen.renombrar(s1, s2);
+        await this.#almacen.escribir(s1, db ? this.#driver.instantanea(db) : await this.#almacen.leer(ruta));
+    }
+
+    /* Deshace la última operación que cambió el banco (5.9): repone `.snap.1`, verifica el
+       resultado antes de anotarlo y rota para que un segundo «deshacer» retroceda uno más. */
+    async deshacer(id) {
+        await this.#listo;
+        const fila = this.#catalogo.query("SELECT nombre, ruta FROM bancos WHERE id = ?").get(id);
+        if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
+        const snap = `${fila.ruta}.snap.1`;
+        if (!(await this.#almacen.existe(snap)))
+            throw new Error("No hay ninguna actualización que deshacer en este banco.");
+        const info = await this.#verificar(snap); // una instantánea rota nunca reemplaza al banco bueno
+        const bytes = await this.#almacen.leer(snap);
+        const eraActivo = this.#abierto && this.#abierto.id === id;
+        if (eraActivo) await this.cerrar(); // vuelca el estado actual antes de pisar el archivo
+        try {
+            await this.#escribirAtomico(fila.ruta, bytes);
+            this.#catalogo
+                .query("UPDATE bancos SET tam_bytes = ?, preguntas = ?, version_banco = ?, uuid_banco = ? WHERE id = ?")
+                .run(bytes.length, info.preguntas, info.user_version, info.uuid, id);
+            await this.#almacen.borrar(snap);
+            if (await this.#almacen.existe(`${fila.ruta}.snap.2`))
+                await this.#almacen.renombrar(`${fila.ruta}.snap.2`, snap);
+            if (await this.#almacen.existe(`${fila.ruta}.snap.3`))
+                await this.#almacen.renombrar(`${fila.ruta}.snap.3`, `${fila.ruta}.snap.2`);
+        } finally {
+            if (eraActivo) await this.abrirActivo();
+        }
+        return { id, nombre: fila.nombre, preguntas: info.preguntas };
+    }
+
     /* Temporal → copia anterior → definitivo (F4.4): no todos los almacenes sobrescriben al
        renombrar, y un corte a medias deja siempre una copia válida. */
     async #escribirAtomico(ruta, bytes) {
@@ -838,6 +901,7 @@ export class DatabaseManager {
         this.#abierto = null;
         let bytes = null;
         try {
+            this.#driver.puntoControl(repo.db); // 5.10: WAL → archivo principal antes de volcar/cerrar
             bytes = this.#driver.instantanea(repo.db);
         } catch {
             /* la conexión ya estaba cerrada (p. ej. repo.close() del servidor): nada que persistir */
@@ -862,7 +926,13 @@ export class DatabaseManager {
         const catalogo = this.#catalogo;
         this.#catalogo = null;
         if (!catalogo) return;
-        const bytes = this.#rutaCatalogo === ":memory:" ? null : this.#driver.instantanea(catalogo);
+        let bytes = null;
+        try {
+            this.#driver.puntoControl(catalogo);
+            bytes = this.#rutaCatalogo === ":memory:" ? null : this.#driver.instantanea(catalogo);
+        } catch {
+            /* catálogo ya cerrado: nada que volcar */
+        }
         catalogo.close();
         if (bytes) await this.#almacen.escribir(this.#rutaCatalogo, bytes);
     }

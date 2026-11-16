@@ -136,6 +136,19 @@ marcha. Para extraer el banco guardado en un build de depuración:
 adb exec-out run-as es.opios.app cat files/banco/banco.db > banco.db
 ```
 
+### APK de release
+
+Para publicar actualizaciones, la app debe firmarse **siempre con la misma clave**:
+
+```bash
+keytool -genkeypair -v -keystore android/opios-release.jks -alias opios \
+  -keyalg RSA -keysize 2048 -validity 10000
+cp android/keystore.properties.example android/keystore.properties  # rellena las claves
+bun run release:android   # empaqueta, sincroniza, compila y deja dist/opios-<ver>.apk + .sha256
+```
+
+Guarda `android/opios-release.jks` y `android/keystore.properties` **fuera del repo** (están en `.gitignore`): perderlos impide firmar la siguiente actualización con la misma identidad. `versionName` sale de `package.json` y `versionCode` se calcula a partir de esa versión.
+
 ## Cómo se estudia
 
 Los repasos usan un **sistema Leitner simplificado de dos capas**: cada pregunta tiene una caja (0-6) y una fecha de vencimiento.

@@ -25,8 +25,18 @@
     const prefiereOscuro = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     const temaActual = () => raiz.dataset.theme || (prefiereOscuro() ? "dark" : "light");
 
+    /* Android: la barra de estado sigue al tema (6.5). Los plugins oficiales ya están en
+       `Capacitor.Plugins`, así que el script no necesita importar nada. */
+    const pintarBarra = (oscuro) => {
+        const barra = globalThis.Capacitor?.Plugins?.StatusBar;
+        if (!barra) return;
+        barra.setStyle({ style: oscuro ? "LIGHT" : "DARK" }).catch(() => {});
+        barra.setBackgroundColor({ color: oscuro ? "#0B0B0C" : "#FAFAFA" }).catch(() => {});
+    };
+
     function pintar() {
         const oscuro = temaActual() === "dark";
+        pintarBarra(oscuro);
         const icono = document.getElementById("tema-icono");
         const texto = document.getElementById("tema-texto");
         const destino = oscuro ? "claro" : "oscuro";

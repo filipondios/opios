@@ -14,12 +14,16 @@ data/*.db-wal
 .env.*
 !.env.example
 
-# Banco de preguntas local (clon de opios-bank) y formato antiguo
-opios-bank/
-preguntas/
-
-# Web empaquetada para Capacitor (task 11)
+# Web empaquetada para Capacitor
 dist-web/
 
-# Notas locales de trabajo
+# Firma de release
+android/keystore.properties
+android/*.jks
+dist/
+
+# Otros
 TODO.md
+graphify-out/
+.opencode/
+AGENTS.md

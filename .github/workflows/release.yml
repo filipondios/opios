@@ -1,0 +1,62 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Dependencias
+        # bun.lock no se versiona: se resuelve desde package.json.
+        run: bun install
+
+      - name: Tests y chequeos
+        run: |
+          bunx @biomejs/biome@2.6.6 lint src test scripts server.js public/js
+          bunx @biomejs/biome@2.6.6 format src test scripts server.js public/js package.json biome.json ejemplo
+          bun test
+
+      - name: Preparar firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for secreto in "$KEYSTORE_BASE64" "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD"; do
+            test -n "$secreto" || { echo "Faltan secretos de firma en el repo"; exit 1; }
+          done
+          echo "$KEYSTORE_BASE64" | base64 -d > android/opios-release.jks
+          cat > android/keystore.properties <<EOF
+          storeFile=opios-release.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Compilar APK firmado
+        run: bun run release:android
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/opios-$VERSION.apk" "dist/opios-$VERSION.apk.sha256" \
+            --title "Opios $VERSION" --generate-notes

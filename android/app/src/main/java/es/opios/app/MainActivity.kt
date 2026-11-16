@@ -13,6 +13,7 @@ import com.getcapacitor.BridgeActivity
 class MainActivity : BridgeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         registerPlugin(SelectorDocumentos::class.java)
+        registerPlugin(InstaladorApk::class.java)
         super.onCreate(savedInstanceState)
     }
 }

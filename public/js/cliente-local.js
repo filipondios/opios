@@ -1,10 +1,12 @@
 /* Interfaz de datos (task 10): operaciones con nombre sin red ni DOM. El shell lo envía
    al núcleo vía window.__opios. */
 
-import { ErrorHttp } from "./comun.js";
+import { ErrorHttp, senalOperacion } from "./comun.js";
 
 async function llamada(ruta, { metodo = "GET", cuerpo, bruto = false } = {}) {
     const opciones = { method: metodo };
+    const senal = senalOperacion();
+    if (senal) opciones.signal = senal;
     if (cuerpo instanceof Uint8Array) {
         /* Archivo del asistente de importación (F3.4): bytes crudos, no JSON. */
         opciones.headers = { "Content-Type": "application/octet-stream" };
@@ -70,6 +72,8 @@ export const bancosListar = () => llamada("/api/bancos");
 export const bancoImportar = (cuerpo) => llamada("/api/bancos/importar", { metodo: "POST", cuerpo });
 export const bancoActivar = (id) => llamada(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
 export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
+/* Deshacer última actualización/restauración/migración (5.9). */
+export const bancoDeshacer = (id) => llamada(`/api/bancos/${id}/deshacer`, { metodo: "POST", cuerpo: {} });
 /* Devuelve la Response cruda: el exportar es una descarga, no JSON. `conProgreso:false`
    (F5.5) empaqueta el banco sin progreso. */
 export const bancoExportar = (id, { conProgreso = true } = {}) =>

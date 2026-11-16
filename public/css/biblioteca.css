@@ -118,6 +118,9 @@
   flex-direction: column;
   gap: var(--sp-3);
   max-width: 560px;
+  /* El asistente de importación también debe caber con el teclado abierto (6.3). */
+  max-height: calc(100dvh - var(--teclado, 0px) - var(--sp-5));
+  overflow: auto;
 }
 
 .dialogo-importar h3 {
