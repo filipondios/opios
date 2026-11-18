@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { validarBanco } from "../src/validar-banco.js";
-import { DIR_EJEMPLO } from "../src/config.js";
+import { DIR_EJEMPLO } from "../src/config-servidor.js";
 
 const RAIZ = join(import.meta.dir, "..");
 const temporal = () => mkdtempSync(join(tmpdir(), "opios-validar-"));
@@ -56,6 +56,32 @@ describe("validación de un banco (Fase 8.9)", () => {
             const r = await validarBanco(repo, dir);
             expect(r.errores.length).toBeGreaterThan(0);
             expect(r.nuevas).toBe(0);
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
+    test("avisa de las preguntas sin id_externo (emparejado por enunciado al actualizar)", async () => {
+        /* El banco de ejemplo trae id_externo en todas: sin aviso. */
+        expect((await validarBanco(repo, DIR_EJEMPLO)).avisos.some((a) => a.includes("sin id_externo"))).toBe(false);
+
+        const dir = temporal();
+        try {
+            await Bun.write(
+                join(dir, "bloque_1/tema_1.json"),
+                JSON.stringify([
+                    { pregunta: "¿Sin identificador?", respuestas: ["A", "B"], respuesta_correcta: "a" },
+                    {
+                        pregunta: "¿Con identificador?",
+                        respuestas: ["A", "B"],
+                        respuesta_correcta: "a",
+                        id_externo: "x-1",
+                    },
+                ]),
+            );
+            const aviso = (await validarBanco(repo, dir)).avisos.find((a) => a.includes("sin id_externo"));
+            expect(aviso).toContain("1 pregunta(s)");
+            expect(aviso).toContain("enunciado");
         } finally {
             rmSync(dir, { recursive: true, force: true });
         }

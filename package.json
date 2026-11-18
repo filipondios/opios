@@ -1,6 +1,6 @@
 {
     "name": "opios",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "private": true,
     "type": "module",
     "description": "Opios: sistema de preguntas tipo test por temas con repaso espaciado.",
@@ -10,9 +10,27 @@
         "seed": "bun scripts/seed.js",
         "export": "bun scripts/export.js",
         "backup": "bun scripts/backup.js",
+        "bancos": "bun scripts/bancos.js",
+        "opios": "bun scripts/opios.js",
         "calidad": "bun scripts/calidad.js",
         "validar": "bun scripts/validar.js",
         "ids": "bun scripts/ids.js",
-        "test": "bun test"
+        "test": "bun test",
+        "empaquetar": "bun scripts/empaquetar.js",
+        "android": "bun run empaquetar && cap sync android",
+        "android:abrir": "cap open android",
+        "release:android": "bun scripts/release-android.js",
+        "migrar": "bun scripts/migrar-bancos.js"
+    },
+    "dependencies": {
+        "@capacitor/android": "^8.6.2",
+        "@capacitor/app": "^8",
+        "@capacitor/core": "^8.6.2",
+        "@capacitor/filesystem": "^8.1.5",
+        "@capacitor/status-bar": "^8",
+        "sql.js": "^1.16.0"
+    },
+    "devDependencies": {
+        "@capacitor/cli": "^8.6.2"
     }
 }

@@ -1,14 +1,16 @@
 /* Validación de un banco de preguntas sin tocar la base de datos real (Fase 8.9).
-   Importa en `repo` (normalmente una BD `:memory:`) y añade comprobaciones del directorio. */
-import { importarDirectorio } from "./seed.js";
+   Importa en `repo` (normalmente una BD `:memory:`) y añade comprobaciones del directorio.
+   Solo PC: lee el directorio con `fuenteDirectorio` (F2.6). */
+import { importarDirectorio } from "./seed-directorio.js";
 import { analizarPreguntas, MINIMO_SESGO } from "./calidad.js";
 import { validarInfoBloque } from "./validar.js";
 import { RE_TEMA, recorrerBanco } from "./estructura-banco.js";
+import { fuenteDirectorio } from "./fuente-directorio.js";
 
 /** Preguntas de un archivo del banco: array u objeto `{ preguntas }`; [] si no se puede leer. */
-async function leerLista(archivo) {
+async function leerLista(fuente, ruta) {
     try {
-        const datos = await Bun.file(archivo).json();
+        const datos = JSON.parse(await fuente.leerTexto(ruta));
         return Array.isArray(datos) ? datos : Array.isArray(datos?.preguntas) ? datos.preguntas : [];
     } catch {
         return [];
@@ -24,6 +26,7 @@ async function leerLista(archivo) {
  * avisos que solo advierten.
  */
 export async function validarBanco(repo, dir, { umbralSesgo = 30, minimoMuestra = MINIMO_SESGO } = {}) {
+    const fuente = fuenteDirectorio(dir);
     const r = await importarDirectorio(repo, dir);
     const errores = [...r.errores];
     const avisos = [...(r.avisos ?? [])];
@@ -32,7 +35,7 @@ export async function validarBanco(repo, dir, { umbralSesgo = 30, minimoMuestra 
             `${r.duplicadas} pregunta(s) duplicadas (mismo enunciado normalizado); solo se importa la primera.`,
         );
 
-    const banco = await recorrerBanco(dir);
+    const banco = await recorrerBanco(fuente);
     if (!banco)
         return {
             archivos: 0,
@@ -48,7 +51,7 @@ export async function validarBanco(repo, dir, { umbralSesgo = 30, minimoMuestra 
         let info = null;
         if (archivoInfo) {
             try {
-                info = validarInfoBloque(await Bun.file(archivoInfo.ruta).json());
+                info = validarInfoBloque(JSON.parse(await fuente.leerTexto(archivoInfo.ruta)));
             } catch {
                 info = null;
             }
@@ -64,7 +67,7 @@ export async function validarBanco(repo, dir, { umbralSesgo = 30, minimoMuestra 
         }
 
         for (const tema of temas) {
-            const a = analizarPreguntas(await leerLista(tema.ruta));
+            const a = analizarPreguntas(await leerLista(fuente, tema.ruta));
             /* Con pocas muestras el porcentaje es ruido: 2 aciertos entre 6 preguntas ya superan el 30 %. */
             if (a.n >= minimoMuestra && (a.unicaLarga / a.n) * 100 > umbralSesgo)
                 avisos.push(

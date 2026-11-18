@@ -1,12 +1,11 @@
 import { Sesion, hoyIso } from "./repaso.js";
-import { api, barajar, h, LETRAS, msgError } from "./comun.js";
+import { barajar, claveBanco, h, LETRAS, msgError } from "./comun.js";
+import * as cliente from "./cliente.js";
 import { etiquetaTema } from "./etiquetas.js";
 
 /* Test infinito (cliente): UI del test. El planificador vive en ./repaso.js.
    Los datos viven en el servidor (SQLite): preguntas por /api/test y progreso por /api/progreso. */
 (() => {
-    "use strict";
-
     /* ---------- Parámetros de la UI ---------- */
     const PAUSA_ACIERTO_MS = 450; // pausa tras un acierto antes de pasar a la siguiente
     const ETIQUETA = "Guardado en la base de datos";
@@ -22,7 +21,7 @@ import { etiquetaTema } from "./etiquetas.js";
     let sesion = null;
     let cur = null; // pregunta en pantalla
     let timerAcierto = null;
-    let sucios = new Set();
+    const sucios = new Set();
     let timerSesion = null;
     let carga = null; // cupo diario que devuelve el servidor
     let fechaCarga = null; // día al que corresponde `carga` (Fase 2.10)
@@ -32,6 +31,8 @@ import { etiquetaTema } from "./etiquetas.js";
     let unaPulsacion = false; // responder al primer toque (móvil)
     let selAntesPuntero = null; // opción marcada antes del puntero, para distinguir el primer toque
     const CLAVE_UN_TOQUE = "ti.una-pulsacion";
+    /* La selección de temas es del banco; el ajuste de un-toque es visual y global (F1.5). */
+    const CLAVE_SEL = claveBanco("ti.sel");
 
     function setStatus(kind, text) {
         const s = $("#status");
@@ -83,19 +84,15 @@ import { etiquetaTema } from "./etiquetas.js";
         respuestasCola = [];
         setStatus("busy", "Guardando…");
         try {
-            await api("/api/sesion", {
-                metodo: "POST",
-                keepalive: true,
-                cuerpo: {
-                    respuestas: lote,
-                    progreso: ids
-                        .filter((id) => progress[id])
-                        .map((id) => {
-                            const p = progress[id];
-                            const b = baseProgreso[id] ?? [0, 0, 0, 0];
-                            return { id, caja: p[0], vence: p[1], aciertos: p[2] - b[2], fallos: p[3] - b[3] };
-                        }),
-                },
+            await cliente.sesionGuardar({
+                respuestas: lote,
+                progreso: ids
+                    .filter((id) => progress[id])
+                    .map((id) => {
+                        const p = progress[id];
+                        const b = baseProgreso[id] ?? [0, 0, 0, 0];
+                        return { id, caja: p[0], vence: p[1], aciertos: p[2] - b[2], fallos: p[3] - b[3] };
+                    }),
             });
             for (const id of ids) if (progress[id]) baseProgreso[id] = [...progress[id]];
             setStatus("ok", ETIQUETA);
@@ -159,7 +156,7 @@ import { etiquetaTema } from "./etiquetas.js";
         if (hoy === fechaCarga) return;
         fechaCarga = hoy;
         try {
-            carga = await api("/api/carga");
+            carga = await cliente.carga();
             pintarCarga();
             if (sesion) sesion.actualizarCupo(nuevasPermitidas());
         } catch (e) {
@@ -171,12 +168,12 @@ import { etiquetaTema } from "./etiquetas.js";
     const chips = () => [...document.querySelectorAll("#grid .chip")];
     function guardarSeleccion() {
         try {
-            localStorage.setItem("ti.sel", JSON.stringify([...seleccion]));
+            localStorage.setItem(CLAVE_SEL, JSON.stringify([...seleccion]));
         } catch (e) {}
     }
     function leerSeleccion() {
         try {
-            const v = JSON.parse(localStorage.getItem("ti.sel"));
+            const v = JSON.parse(localStorage.getItem(CLAVE_SEL));
             return Array.isArray(v) ? v : null;
         } catch (e) {
             return null;
@@ -279,7 +276,7 @@ import { etiquetaTema } from "./etiquetas.js";
     /* Pide al servidor la rejilla actualizada (estadísticas tras una sesión o un reinicio). */
     async function refrescarTemas() {
         try {
-            $("#grid").innerHTML = await (await api("/fragmentos/temas", { bruto: true })).text();
+            $("#grid").innerHTML = await cliente.fragmentosTemas();
             leerCarga();
             fechaCarga = hoyIso();
             sincronizarSeleccion();
@@ -352,7 +349,7 @@ import { etiquetaTema } from "./etiquetas.js";
             sucios.clear();
             respuestasCola = [];
             baseProgreso = {};
-            await api("/api/progreso", { metodo: "DELETE" });
+            await cliente.progresoReiniciar();
             progress = {};
             await refrescarTemas();
         },
@@ -381,7 +378,7 @@ import { etiquetaTema } from "./etiquetas.js";
         if (!input) return;
         setStatus("busy", "Guardando...");
         try {
-            const d = await api("/api/ajustes", { metodo: "PUT", cuerpo: { fecha_examen: input.value || null } });
+            const d = await cliente.ajustesGuardar(input.value);
             examenInfo = d.examen;
             pintarExamen();
             setStatus("ok", ETIQUETA);
@@ -404,7 +401,7 @@ import { etiquetaTema } from "./etiquetas.js";
         setStatus("busy", "Cargando preguntas…");
         try {
             await guardarSesion();
-            const d = await api("/api/test?temas=" + [...seleccion].sort((a, b) => a - b).join(","));
+            const d = await cliente.test([...seleccion]);
             bank = d.preguntas.map((q) => ({
                 i: q.id,
                 t: q.tema,

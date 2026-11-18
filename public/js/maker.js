@@ -1,10 +1,9 @@
-import { api, h, LETRAS, MAX_OPC, MIN_OPC, msgError as msg } from "./comun.js";
+import * as cliente from "./cliente.js";
+import { h, LETRAS, MAX_OPC, MIN_OPC, msgError as msg } from "./comun.js";
 import { etiquetaTema } from "./etiquetas.js";
 
 /* Creador de preguntas (cliente): edita directamente la base de datos a través de /api/preguntas. */
 (() => {
-    "use strict";
-
     const OPC_INICIALES = 4,
         PAGINA = 50,
         MAX_ETIQUETA = 60;
@@ -254,11 +253,8 @@ import { etiquetaTema } from "./etiquetas.js";
         const edicion = id !== null;
         setStatus("busy", "Guardando…");
         try {
-            await (edicion
-                ? api("/api/preguntas/" + id, { metodo: "PUT", cuerpo: cuerpoDe(q) })
-                : api("/api/preguntas", { metodo: "POST", cuerpo: cuerpoDe(q) }));
-            if (reemplazo && editando !== null && editando !== id)
-                await api("/api/preguntas/" + editando, { metodo: "DELETE" });
+            await (edicion ? cliente.preguntaGuardar(cuerpoDe(q), id) : cliente.preguntaGuardar(cuerpoDe(q)));
+            if (reemplazo && editando !== null && editando !== id) await cliente.preguntaBorrar(editando);
         } catch (e) {
             setStatus("warn", "No se pudo guardar");
             throw e;
@@ -306,7 +302,7 @@ import { etiquetaTema } from "./etiquetas.js";
             filtroActual = filtro.value;
         const selTema = $("#f-tema"),
             temaActual = draft.tema || selTema.value;
-        temario = await api("/api/temario");
+        temario = await cliente.temario();
         etiquetas = new Map();
         for (const b of temario) for (const t of b.temas) etiquetas.set(t.id, { ...t, bloque_nombre: b.nombre });
 
@@ -350,7 +346,7 @@ import { etiquetaTema } from "./etiquetas.js";
         const mio = ++envio;
         try {
             await cargarTemas();
-            const d = await api("/api/preguntas?" + parametros(0));
+            const d = await cliente.preguntasListar(parametros(0));
             if (mio !== envio) return;
             items = d.items;
             total = d.total;
@@ -362,7 +358,7 @@ import { etiquetaTema } from "./etiquetas.js";
     async function masPreguntas() {
         const mio = ++envio;
         try {
-            const d = await api("/api/preguntas?" + parametros(items.length));
+            const d = await cliente.preguntasListar(parametros(items.length));
             if (mio !== envio) return;
             items = items.concat(d.items);
             total = d.total;
@@ -463,7 +459,7 @@ import { etiquetaTema } from "./etiquetas.js";
     }
     async function borrar(id) {
         try {
-            await api("/api/preguntas/" + id, { metodo: "DELETE" });
+            await cliente.preguntaBorrar(id);
         } catch (e) {
             flash("No se pudo borrar: " + msg(e), "warn");
             return;
@@ -515,7 +511,7 @@ import { etiquetaTema } from "./etiquetas.js";
         const id = Number(new URLSearchParams(location.search).get("editar"));
         if (!Number.isInteger(id) || id <= 0) return;
         try {
-            editar(await api("/api/preguntas/" + id));
+            editar(await cliente.preguntaObtener(id));
         } catch (e) {
             flash("No se pudo abrir la pregunta: " + msg(e), "warn");
         }

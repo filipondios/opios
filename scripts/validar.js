@@ -2,7 +2,7 @@
    Comprueba un banco de preguntas sin tocar tu base de datos: importa en una BD en memoria y
    lista los errores y los avisos. Sale con código 1 si hay errores (útil en el CI del banco). */
 import { abrirDb } from "../src/db.js";
-import { DIR_PREGUNTAS } from "../src/config.js";
+import { DIR_PREGUNTAS } from "../src/config-servidor.js";
 import { validarBanco } from "../src/validar-banco.js";
 import { ejecutarCli } from "../src/cli.js";
 

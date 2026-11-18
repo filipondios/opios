@@ -1,0 +1,186 @@
+/* Biblioteca (F3.2): rejilla de tarjetas de bancos. Reutiliza .btn y los tokens de base.css. */
+.biblioteca {
+  padding: var(--sp-4) 0;
+}
+
+.rejilla-bancos {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.tarjeta-banco {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-1);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.tarjeta-banco.activa {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-1);
+}
+
+.tarjeta-banco header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.tarjeta-banco h3 {
+  margin: 0;
+  font: 600 16px var(--f-ui);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.etiqueta-activa {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+  font: 600 11px var(--f-ui);
+  flex: none;
+}
+
+.etiqueta-ausente {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+  font: 600 11px var(--f-ui);
+  flex: none;
+}
+
+.tarjeta-banco.ausente header h3 {
+  color: var(--text-2);
+}
+
+.tarjeta-banco .progreso,
+.tarjeta-banco .meta {
+  margin: 0;
+  font: 400 13px/1.4 var(--f-ui);
+  color: var(--text-2);
+}
+
+.tarjeta-banco footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.vacia {
+  text-align: center;
+  padding: var(--sp-6) var(--sp-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.vacia p {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.error-biblioteca {
+  color: var(--bad);
+  margin-top: var(--sp-3);
+}
+
+.toolbar-biblioteca {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.toolbar-biblioteca + .meta-banco {
+  margin: 0 0 var(--sp-4);
+}
+
+.dialogo-importar {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-1);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 560px;
+  /* El asistente de importación también debe caber con el teclado abierto (6.3). */
+  max-height: calc(100dvh - var(--teclado, 0px) - var(--sp-5));
+  overflow: auto;
+}
+
+.dialogo-importar h3 {
+  margin: 0;
+  font: 600 17px var(--f-ui);
+}
+
+.meta-banco {
+  margin: 0;
+  color: var(--text-2);
+  font: 400 14px/1.5 var(--f-ui);
+}
+
+.acciones-importar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.lista-errores {
+  font: 400 13px/1.5 var(--f-ui);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.lista-errores summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.lista-errores ul {
+  margin: var(--sp-2) 0 0;
+  padding-left: 20px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+/* Restauración de copia (F5.6): lista de bancos con casilla para elegir cuáles. */
+.lista-restaurar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-height: 260px;
+  overflow: auto;
+}
+
+.fila-restaurar {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font: 400 14px/1.5 var(--f-ui);
+  cursor: pointer;
+}
+
+.fila-restaurar input {
+  flex: none;
+}
+
+.aviso-dup {
+  color: var(--text-2);
+}

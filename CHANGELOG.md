@@ -14,7 +14,9 @@ Primera versión estable de `opios`.
 - Creador de preguntas y gestor de temario por bloques.
 - Fiabilidad: `busy_timeout` y `synchronous = NORMAL`, errores cortos en los CLIs, `ETag`/304 en estáticos, cabeceras de seguridad, `POST /api/sesion` transaccional con contadores incrementales, límite de cuerpo en bytes y relectura de la carga si la sesión cruza la medianoche.
 - Docker: imagen sin banco y `docker-compose.yml` con el banco montado en solo lectura.
-- Sin dependencias externas: solo Bun y SQLite.
+- Sin dependencias externas: solo Bun y SQLite (la app Android añade Capacitor y SQLite WASM).
+- Aplicación Android con biblioteca de bancos, importación/exportación `.opios`, copias completas y «deshacer»; APK de release firmado con clave propia y `sha256`.
+- Aviso de versión nueva (Android y PC con `OPIOS_AVISO_VERSION`) con notas de la release e instalador verificado; migración guiada de catálogo y bancos con instantánea previa (`bun run migrar`); Docker en modo biblioteca con datos persistentes.
 
 ### Requisitos
 

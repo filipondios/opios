@@ -5,8 +5,9 @@ import { join } from "node:path";
 import { abrirDb } from "../src/db.js";
 import { crearApp } from "../src/app.js";
 import { exportarPorBloques } from "../src/exportar.js";
-import { importarDirectorio } from "../src/seed.js";
-import { DIR_EJEMPLO, CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
+import { DIR_EJEMPLO } from "../src/config-servidor.js";
+import { CUPO_NUEVAS, FRENO_ATRASO } from "../src/config.js";
 import { MIGRACIONES } from "../src/db/esquema.js";
 import { hoyIso, sumarDias } from "../src/fechas.js";
 import { copiaSeguridad } from "../src/backup.js";
@@ -788,8 +789,8 @@ describe("estadísticas y simulacros", () => {
         expect(html).toContain('id="btn-reanudar"');
         expect(html).toContain('id="btn-descartar"');
         const js = await (await pet("/js/simulacro.js")).text();
-        expect(js).toContain("opios.simulacro.curso");
-        expect(js).toContain("opios.simulacro.pendiente");
+        expect(js).toContain('claveBanco("simulacro.curso")');
+        expect(js).toContain('claveBanco("simulacro.pendiente")');
         expect(js).toContain("crypto?.randomUUID");
         expect(js).toContain("clave_idempotencia");
     });
@@ -1122,6 +1123,37 @@ describe("registro de respuestas, estadísticas y carga diaria", () => {
         const r = await pet("/api/respuestas", "POST", { respuestas: [{ id: 99999, acierto: true }] });
         expect((await r.json()).registradas).toBe(0);
         expect(repo.db.query("SELECT COUNT(*) n FROM respuestas").get().n).toBe(0);
+    });
+
+    test("una pregunta archivada sale del estudio y las estadísticas, pero conserva su historial", async () => {
+        const [a] = await ids();
+        repo.guardarProgreso([{ id: a, caja: 1, vence: hoyIso(), aciertos: 0, fallos: 2 }]);
+        repo.registrarRespuestas([{ id: a, acierto: 0, ms: null }], hoyIso());
+
+        repo.db.run("UPDATE preguntas SET archivada = 1 WHERE id = ?", a);
+
+        const t = await (await pet("/api/test?temas=1")).json();
+        expect(t.preguntas.map((p) => p.id)).not.toContain(a);
+        expect(t.preguntas).toHaveLength(TOTAL_TEMA_1 - 1);
+        expect(t.progreso[a]).toBeUndefined();
+        expect(repo.estadisticasGlobales(hoyIso(), 4).total).toBe(TOTAL_FIXTURE - 1);
+        expect(repo.estadisticasTemas(hoyIso(), 4).find((x) => x.tema === 1).total).toBe(TOTAL_TEMA_1 - 1);
+        expect(repo.preguntasMasFalladas(20).map((p) => p.id)).not.toContain(a);
+        expect(
+            repo
+                .temario()
+                .flatMap((b) => b.temas)
+                .find((x) => x.id === 1).preguntas,
+        ).toBe(TOTAL_TEMA_1 - 1);
+        expect(repo.previsionRepasos(hoyIso())).toEqual([]);
+        expect((await carga()).repasosPendientes).toBe(0);
+
+        /* El historial, el progreso y la propia pregunta no se borran (se puede desarchivar/exportar). */
+        expect(repo.db.query("SELECT COUNT(*) AS n FROM respuestas WHERE pregunta_id = ?").get(a).n).toBe(1);
+        expect(repo.db.query("SELECT fallos FROM progreso WHERE pregunta_id = ?").get(a).fallos).toBe(2);
+        expect(repo.actividadReciente(sumarDias(hoyIso(), -13)).at(-1)).toMatchObject({ n: 1, fallos: 1 });
+        expect(repo.obtener(a)).not.toBeNull();
+        expect(repo.listar({ tema: 1 }).items.map((p) => p.id)).toContain(a);
     });
 
     test("el cupo de nuevas cuenta primeras respuestas de test y no las de simulacro", async () => {

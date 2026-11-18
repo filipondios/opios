@@ -1,17 +1,13 @@
-import { Database } from "bun:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
-import { DB_PATH } from "../config.js";
-import { migrar, tieneFts5 } from "./esquema.js";
+import { migrar, sincronizarFts } from "./esquema.js";
 import { crearPreguntas } from "./preguntas.js";
 import { crearProgreso } from "./progreso.js";
 import { crearSimulacros } from "./simulacros.js";
 import { crearTemario } from "./temario.js";
 
-/** Abre (y crea/migra si hace falta) la base de datos y devuelve las operaciones que usa la app. */
-export function abrirDb(ruta = DB_PATH) {
-    if (ruta !== ":memory:") mkdirSync(dirname(ruta), { recursive: true });
-    const db = new Database(ruta, { create: true, strict: true });
+/* Construye el repo sobre una conexión ya abierta (task 11): aquí no hay nada de Bun.
+    El driver solo necesita query/run/transaction/close — p. ej. el adaptador SQLite
+    WASM de Android. `abrirDb` (Bun) vive en src/db/bun.js. */
+export function abrirRepo(db) {
     db.run("PRAGMA journal_mode = WAL");
     /* Con WAL, NORMAL es lo habitual: suficiente consistencia y menos esperas al escribir. */
     db.run("PRAGMA synchronous = NORMAL");
@@ -20,7 +16,8 @@ export function abrirDb(ruta = DB_PATH) {
     db.run("PRAGMA busy_timeout = 5000");
     db.run("PRAGMA foreign_keys = ON");
     migrar(db);
-    const ftsDisponible = tieneFts5(db);
+    /* F1.8: el índice FTS5 se adapta al build (PC lo trae; sql.js no). */
+    const ftsDisponible = sincronizarFts(db);
 
     const q = {
         temaPorId: db.query("SELECT id FROM temas WHERE id = ?"),

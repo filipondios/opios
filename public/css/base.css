@@ -61,7 +61,8 @@ body{
   font-variant-numeric:tabular-nums;
   padding-left:max(var(--sp-4),env(safe-area-inset-left,0px));
   padding-right:max(var(--sp-4),env(safe-area-inset-right,0px));
-  padding-block:var(--sp-4) calc(var(--sp-6) + var(--sp-4));
+  padding-block:max(var(--sp-4),env(safe-area-inset-top,0px))
+    calc(var(--sp-6) + var(--sp-4) + env(safe-area-inset-bottom,0px) + var(--teclado,0px));
 }
 .wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-5);min-width:0}
 .wrap.wide{max-width:1120px}
@@ -88,6 +89,8 @@ a{color:inherit}
 .top-right{display:flex;align-items:center;gap:var(--sp-3);margin-left:auto;min-width:0}
 .brand{font:600 15px var(--f-ui);letter-spacing:.02em;color:var(--text);text-decoration:none;white-space:nowrap}
 .brand:hover{color:var(--text-2)}
+.banco-actual{font:600 13px var(--f-ui);color:var(--text-2);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:16ch;border:1px solid var(--line);border-radius:var(--r-pill);padding:2px 10px}
+.banco-actual:hover{color:var(--text);border-color:var(--control)}
 .top-nav{display:flex;align-items:center;gap:2px;flex-wrap:nowrap}
 .top-nav a{
   position:relative;font:500 13px var(--f-ui);color:var(--text-2);text-decoration:none;
@@ -111,6 +114,7 @@ a{color:inherit}
 .status[data-state="warn"]::before{background:var(--bad)}
 .status-text{display:none;max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .status[data-state="busy"] .status-text,.status[data-state="warn"] .status-text{display:inline}
+.status .status-cancelar.btn.small{min-height:0;padding:2px 8px;font-size:11px}
 
 /* --- Controles --- */
 .btn{
@@ -158,6 +162,14 @@ kbd{font:500 11px var(--f-mono);padding:1px 6px;border:1px solid currentColor;bo
 .note li{overflow-wrap:anywhere}
 .pill{display:inline-flex;align-items:center;gap:5px;font:500 11px var(--f-ui);color:var(--text-2);border:1px solid var(--line);border-radius:var(--r-pill);padding:3px 9px}
 
+/* Aviso de versión nueva (7.5). */
+.aviso-version{
+  background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r-card);
+  padding:var(--sp-3) var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-4);
+}
+.aviso-version .notas{font-size:13px;color:var(--text-2);white-space:pre-wrap;max-height:8em;overflow:auto}
+.aviso-version-error{color:var(--bad);font-size:13px}
+
 /* Fichas de tema (inicio, estadísticas y simulacro comparten la barra). */
 .chip{
   all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--line);
@@ -202,6 +214,8 @@ kbd{font:500 11px var(--f-mono);padding:1px 6px;border:1px solid currentColor;bo
 .dlg{
   width:min(460px,calc(100vw - 32px));padding:0;border:1px solid var(--line);border-radius:var(--r-card);
   background:var(--surface);color:var(--text);box-shadow:var(--shadow-2);
+  /* `--teclado` lo mide comun.js (6.3): el diálogo cabe sobre el teclado y se desplaza. */
+  max-height:calc(100dvh - var(--teclado,0px) - var(--sp-5));overflow:auto;
 }
 .dlg::backdrop{background:rgb(0 0 0 / .55)}
 .dlg form{padding:clamp(18px,4vw,24px);display:flex;flex-direction:column;gap:var(--sp-4)}
@@ -231,7 +245,7 @@ kbd{font:500 11px var(--f-mono);padding:1px 6px;border:1px solid currentColor;bo
 @keyframes entrar{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 
 @media (max-width:700px){
-  body{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  body{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px) + var(--teclado,0px))}
   .top{padding-bottom:var(--sp-2)}
   .top-nav{
     position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:repeat(5,1fr);
@@ -242,6 +256,20 @@ kbd{font:500 11px var(--f-mono);padding:1px 6px;border:1px solid currentColor;bo
   .top-nav a[aria-current="page"]{background:var(--accent-soft)}
   .top-nav a[aria-current="page"]::after{left:30%;right:30%;bottom:3px}
   .status-text{max-width:14ch}
+}
+/* Tablet: aprovecha el ancho disponible sin estirar el texto de lectura. */
+@media (min-width:600px) and (max-width:1024px){
+  .wrap{max-width:min(100%,900px)}
+}
+/* Pantallas táctiles: objetivos >=44px. El hover es solo decorativo; el foco ya tiene
+   contorno en :focus-visible, así que ninguna acción depende de pasar el dedo por encima. */
+@media (hover:none) and (pointer:coarse){
+  .btn,.btn.small,.top-nav a,.theme,.chip,.opt,.tema-check,.check-inline,.bub,.x,.pill,
+  details.bloque > summary,.ajustes > summary,.tema-fila > summary,.review summary,
+  .mini-tabla summary,.keys-help > summary,.lista-errores summary,.fila-restaurar{min-height:44px}
+  .bub,.x,.theme,.pill,.keys-help > summary{min-width:44px}
+  .palette{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
+  .palette .pal{width:44px;height:44px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}

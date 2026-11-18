@@ -3,7 +3,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { abrirDb } from "../src/db.js";
-import { DB_PATH } from "../src/config.js";
+import { DB_PATH } from "../src/config-servidor.js";
 import { copiaSeguridad } from "../src/backup.js";
 import { ejecutarCli } from "../src/cli.js";
 

@@ -2,8 +2,8 @@
    Importa los JSON de preguntas/ (u otro directorio) a la DB. Se puede repetir sin duplicar.
    Con --actualizar, las preguntas que traen `id_externo` se actualizan conservando su id y progreso. */
 import { abrirDb } from "../src/db.js";
-import { importarDirectorio } from "../src/seed.js";
-import { DIR_PREGUNTAS } from "../src/config.js";
+import { importarDirectorio } from "../src/seed-directorio.js";
+import { DIR_PREGUNTAS } from "../src/config-servidor.js";
 import { ejecutarCli } from "../src/cli.js";
 
 const args = process.argv.slice(2);

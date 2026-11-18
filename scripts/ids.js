@@ -5,9 +5,9 @@
    app importa; con `--incluir generated` (repetible) se añaden otras carpetas del bloque (2.5).
    Después se puede usar `bun run seed --actualizar` para actualizar preguntas editadas sin duplicarlas. */
 import { join } from "node:path";
-import { DIR_PREGUNTAS } from "../src/config.js";
+import { DIR_PREGUNTAS } from "../src/config-servidor.js";
 import { claveDe } from "../src/validar.js";
-import { archivosDeBanco } from "../src/estructura-banco.js";
+import { archivosDeBanco } from "../src/estructura-banco-directorio.js";
 import { ejecutarCli } from "../src/cli.js";
 
 const args = process.argv.slice(2);

@@ -3,9 +3,9 @@
    Con `--incluir generated` (repetible) se analizan también otras carpetas del bloque que no se
    importan; sin esa opción la app no necesita conocer ningún nombre concreto (Fase 2.5). */
 import { join } from "node:path";
-import { DIR_PREGUNTAS } from "../src/config.js";
+import { DIR_PREGUNTAS } from "../src/config-servidor.js";
 import { analizarPreguntas, MINIMO_SESGO } from "../src/calidad.js";
-import { archivosDeBanco } from "../src/estructura-banco.js";
+import { archivosDeBanco } from "../src/estructura-banco-directorio.js";
 
 const pct = (parte, total) => (total ? (parte / total) * 100 : 0);
 const fmtPct = (parte, total) => (total ? pct(parte, total).toFixed(1) + " %" : "—");

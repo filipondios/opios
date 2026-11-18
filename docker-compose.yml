@@ -9,6 +9,8 @@ services:
     environment:
       OPIOS_PREGUNTAS: /preguntas
       OPIOS_SEED: vacia      # cambia a `auto` para volver a importar en cada arranque (ver 8.2)
+      OPIOS_DATOS: /data     # biblioteca: catálogo y bancos en el volumen
+      # OPIOS_AVISO_VERSION: 0   # desactiva el aviso de versión nueva en la cabecera
     volumes:
       - ./opios-bank:/preguntas:ro
       - opios-data:/data

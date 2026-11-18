@@ -62,7 +62,7 @@ export function crearTemario({ db, q }) {
             db
                 .query(`
       SELECT t.id, t.bloque_id AS bloque, t.numero, t.nombre, COUNT(p.id) AS preguntas
-      FROM temas t LEFT JOIN preguntas p ON p.tema_id = t.id
+      FROM temas t LEFT JOIN preguntas p ON p.tema_id = t.id AND p.archivada = 0
       WHERE t.id = ? GROUP BY t.id`)
                 .get(id) ?? null
         );
@@ -86,7 +86,7 @@ export function crearTemario({ db, q }) {
             const filas = db
                 .query(`
         SELECT t.id, t.bloque_id AS bloque, t.numero, t.nombre, COUNT(p.id) AS preguntas
-        FROM temas t LEFT JOIN preguntas p ON p.tema_id = t.id
+        FROM temas t LEFT JOIN preguntas p ON p.tema_id = t.id AND p.archivada = 0
         GROUP BY t.id ORDER BY COALESCE(t.numero, t.id), t.id`)
                 .all();
             const sinBloque = { id: null, nombre: "Sin bloque", orden: Number.MAX_SAFE_INTEGER, temas: [] };

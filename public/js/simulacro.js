@@ -1,4 +1,5 @@
-import { api, h, LETRAS, msgError } from "./comun.js";
+import * as cliente from "./cliente.js";
+import { claveBanco, h, LETRAS, msgError } from "./comun.js";
 import { calcularResultado } from "./resultado.js";
 import { estadoReloj, mmss, prepararPreguntas, respuestasParaGuardar, temasDebiles } from "./simulacro-logica.js";
 import { etiquetaTema } from "./etiquetas.js";
@@ -6,8 +7,6 @@ import { etiquetaTema } from "./etiquetas.js";
 /* Simulacro (cliente): configuración, examen cronometrado y revisión final.
    Las preguntas se piden a /api/test y el resultado se guarda en /api/simulacros. */
 (() => {
-    "use strict";
-
     const $ = (s) => document.querySelector(s);
     const fmt = (n) => Number(n ?? 0).toLocaleString("es-ES");
     const setStatus = (kind, text) => {
@@ -32,8 +31,8 @@ import { etiquetaTema } from "./etiquetas.js";
         finalizado = false;
 
     /* ---------- Persistencia (localStorage) ---------- */
-    const CLAVE_CURSO = "opios.simulacro.curso";
-    const CLAVE_PENDIENTE = "opios.simulacro.pendiente";
+    const CLAVE_CURSO = claveBanco("simulacro.curso");
+    const CLAVE_PENDIENTE = claveBanco("simulacro.pendiente");
     const leer = (clave) => {
         try {
             return JSON.parse(localStorage.getItem(clave) || "null");
@@ -262,7 +261,8 @@ import { etiquetaTema } from "./etiquetas.js";
         boton.disabled = true;
         setStatus("busy", "Cargando preguntas…");
         try {
-            const d = await api("/api/test?temas=" + seleccion.sort((a, b) => a - b).join(","));
+            seleccion.sort((a, b) => a - b); // el orden se guarda con el simulacro (igual que antes)
+            const d = await cliente.test(seleccion);
             if (!d.preguntas.length) throw new Error("Los temas elegidos no tienen preguntas.");
             preguntas = prepararPreguntas(d.preguntas, { n });
             respuestas = new Array(preguntas.length).fill(null);
@@ -621,7 +621,7 @@ import { etiquetaTema } from "./etiquetas.js";
                 const item = pendientes()[0];
                 if (!item) break;
                 try {
-                    await api("/api/simulacros", { metodo: "POST", cuerpo: item.cuerpo });
+                    await cliente.simulacroGuardar(item.cuerpo);
                     escribir(
                         CLAVE_PENDIENTE,
                         pendientes().filter((x) => x.clave !== item.clave),

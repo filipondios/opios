@@ -10,6 +10,8 @@ COPY ejemplo ./ejemplo
 ENV HOST=0.0.0.0 \
     PORT=10000 \
     OPIOS_DB=/data/opios.db \
+    OPIOS_DATOS=/data \
+    OPIOS_AVISO_VERSION=1 \
     TZ=Europe/Madrid
 # El usuario `bun` debe poder escribir la base de datos en el volumen.
 RUN mkdir -p /data && chown bun:bun /data

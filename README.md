@@ -95,6 +95,8 @@ Se importan únicamente `bloque_N/info.json` y `bloque_N/tema_N.json`, de manera
 | `APP_TZ` | zona horaria del sistema | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`) |
 | `AUTH_USER` + `AUTH_PASS` | - | Autenticación básica HTTP cuando se definen ambas |
 | `ALLOWED_HOSTS` | solo loopback | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
+| `OPIOS_DATOS` | - | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`) |
+| `OPIOS_AVISO_VERSION` | `1` | Aviso de versión nueva en la cabecera; `0` lo desactiva |
 
 Los límites diarios (15 preguntas nuevas al día, el freno de repasos atrasados) y el factor que acorta los intervalos según se acerca el examen son constantes de `src/config.js` (`CUPO_NUEVAS`, `FRENO_ATRASO`, `FACTOR_EXAMEN`).
 
@@ -106,9 +108,56 @@ docker run -d -p 10000:10000 -v opios-data:/data \
   -e AUTH_USER=usuario -e AUTH_PASS=clave opios
 ```
 
-La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback.
+La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback. La imagen arranca en **modo biblioteca** (`OPIOS_DATOS=/data`): el catálogo y los bancos viven en el volumen `opios-data`, así que sobreviven a `docker compose down` y puedes gestionarlos desde la pestaña «Bancos».
+
+Para actualizar la app sobre datos existentes, para el contenedor y ejecuta el script de migración con el mismo volumen montado (guarda antes una instantánea de cada banco):
+
+```bash
+OPIOS_DATOS=/ruta/al/volumen bun run migrar
+```
+
+Si un banco tiene un esquema más nuevo que esta versión, el script lo deja intacto y avisa de que hay que actualizar Opios; no pierdas esa copia.
 
 El contenedor se ejecuta con el usuario `bun` y, por defecto, solo acepta cabeceras `Host` de loopback. Si accedes a él por la LAN, añade tu dirección con `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
+
+## Android
+
+La misma aplicación funciona en Android: el núcleo (servicios, API y páginas) se empaqueta
+para el WebView y el banco se guarda con SQLite WASM en el almacenamiento privado de la app
+(`files/banco/banco.db`). Requisitos en la máquina de desarrollo:
+
+- **JDK 21** con `JAVA_HOME` apuntando a él.
+- **Android SDK** con la **API 36** (compile/target SDK, minSdk 24) y sus *build-tools*; el
+  SDK se localiza por `ANDROID_HOME`/`ANDROID_SDK_ROOT` o por `android/local.properties`.
+- **Bun** y las dependencias ya instaladas (`bun install`).
+
+Con un emulador o un dispositivo conectado por USB (depuración USB activada):
+
+```bash
+bun run android        # empaqueta dist-web/ y sincroniza el proyecto Android
+bun run android:abrir  # abre android/ en Android Studio
+```
+
+En Android Studio, pulsa **Run** (o `cd android && ./gradlew installDebug`) para instalar y
+arrancar la app. Para depurar la interfaz, abre `chrome://inspect` en Chrome con la app en
+marcha. Para extraer el banco guardado en un build de depuración:
+
+```bash
+adb exec-out run-as es.opios.app cat files/banco/banco.db > banco.db
+```
+
+### APK de release
+
+Para publicar actualizaciones, la app debe firmarse **siempre con la misma clave**:
+
+```bash
+keytool -genkeypair -v -keystore android/opios-release.jks -alias opios \
+  -keyalg RSA -keysize 2048 -validity 10000
+cp android/keystore.properties.example android/keystore.properties  # rellena las claves
+bun run release:android   # empaqueta, sincroniza, compila y deja dist/opios-<ver>.apk + .sha256
+```
+
+Guarda `android/opios-release.jks` y `android/keystore.properties` **fuera del repo** (están en `.gitignore`): perderlos impide firmar la siguiente actualización con la misma identidad. `versionName` sale de `package.json` y `versionCode` se calcula a partir de esa versión.
 
 ## Cómo se estudia
 

@@ -6,7 +6,62 @@ export const LETRAS = "ABCDEFGH";
 export const MIN_OPC = 2;
 export const MAX_OPC = 8;
 
+/* Altura que el teclado virtual tapa (6.3): `visualViewport` encoge con el teclado pero el
+   layout no, así que la diferencia se publica como `--teclado` para el CSS. Puro para probarlo. */
+export const altoTeclado = (vv, altoLayout) =>
+    vv ? Math.max(0, Math.round(altoLayout - vv.height - vv.offsetTop)) : 0;
+
+if (globalThis.visualViewport) {
+    const medir = () =>
+        document.documentElement.style.setProperty(
+            "--teclado",
+            `${altoTeclado(visualViewport, document.documentElement.clientHeight)}px`,
+        );
+    visualViewport.addEventListener("resize", medir);
+    visualViewport.addEventListener("scroll", medir);
+    medir();
+}
+
 export const msgError = (e) => (e && e.message ? e.message : String(e));
+
+/* Única lectura externa (7.5): el aviso de versión la usa sin tocar `fetch` en una página. */
+export const leerJsonExterna = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new ErrorHttp(r.status, {});
+    return r.json();
+};
+
+/* Una sola operación larga a la vez (6.4). `api()` toma la señal activa para cancelar sin
+   cambiar la firma de cada función de cliente.js; `__opiosOcupado` bloquea la navegación. */
+let senalActiva = null;
+export const senalOperacion = () => senalActiva;
+export function iniciarOperacion() {
+    const control = new AbortController();
+    senalActiva = control.signal;
+    globalThis.__opiosOcupado = true;
+    return {
+        cancelar: () => control.abort(),
+        fin: () => {
+            senalActiva = null;
+            globalThis.__opiosOcupado = false;
+        },
+    };
+}
+
+/** Clave de localStorage dependiente del banco activo (F1.5): `opios.<idBanco>.<nombre>`.
+    El id lo inyecta el servidor/puente en `globalThis.__opiosBancoId`; sin él queda `opios.<nombre>`. */
+export const claveBanco = (nombre) =>
+    globalThis.__opiosBancoId ? `opios.${globalThis.__opiosBancoId}.${nombre}` : `opios.${nombre}`;
+
+/** ¿Hay un simulacro a mitad? (F2.8) La biblioteca lo consultará antes de cambiar de banco:
+    si lo hay, pedirá confirmación antes del flush -> cerrar -> abrir. */
+export const simulacroEnCurso = () => {
+    try {
+        return localStorage.getItem(claveBanco("simulacro.curso")) != null;
+    } catch {
+        return false;
+    }
+};
 
 /** Error HTTP con el status y el cuerpo que devolvió el servidor. */
 export class ErrorHttp extends Error {
@@ -63,7 +118,13 @@ async function leerError(r) {
  */
 export async function api(url, { metodo = "GET", cuerpo, bruto = false, headers, ...init } = {}) {
     const opciones = { method: metodo, ...init };
-    if (cuerpo !== undefined) {
+    const senal = init.signal ?? senalOperacion();
+    if (senal) opciones.signal = senal;
+    if (cuerpo instanceof Uint8Array) {
+        /* Archivo del asistente de importación (F3.4): bytes crudos, no JSON. */
+        opciones.headers = { ...(headers || {}), "Content-Type": "application/octet-stream" };
+        opciones.body = cuerpo;
+    } else if (cuerpo !== undefined) {
         opciones.headers = { ...(headers || {}), "Content-Type": "application/json" };
         opciones.body = JSON.stringify(cuerpo);
     } else if (headers) {

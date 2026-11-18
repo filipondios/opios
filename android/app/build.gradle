@@ -1,0 +1,83 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+/* Versión y firma de release (7.1/7.2). La versión sale de package.json y el versionCode
+   es monótono: major*10000 + minor*100 + patch. La firma es opcional en debug; el script
+   release:android exige el keystore antes de compilar. */
+def versionApp = new groovy.json.JsonSlurper().parse(file("${rootDir}/../package.json")).version
+def partesVersion = versionApp.tokenize('.').collect { it.tokenize('-')[0].toInteger() }
+def versionCodeApp = partesVersion[0] * 10000 + partesVersion[1] * 100 + partesVersion[2]
+def firma = rootProject.file('keystore.properties')
+def propiedadesFirma = new Properties()
+if (firma.exists()) propiedadesFirma.load(new FileInputStream(firma))
+
+android {
+    namespace = "es.opios.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "es.opios.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode versionCodeApp
+        versionName versionApp
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (firma.exists()) {
+                storeFile rootProject.file(propiedadesFirma['storeFile'])
+                storePassword propiedadesFirma['storePassword']
+                keyAlias propiedadesFirma['keyAlias']
+                keyPassword propiedadesFirma['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (firma.exists()) signingConfig signingConfigs.release
+            minifyEnabled false // activar solo tras probar el APK ofuscado (7.1)
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    kotlinOptions {
+        jvmTarget = "21"
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

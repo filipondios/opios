@@ -1,14 +1,24 @@
-import { join } from "node:path";
+/* Importación de bancos JSON al repo (F2.6): neutra de plataforma — lista y lee a través de
+   una `fuente` (fuente.js), nunca Bun.file ni node:fs. La versión PC (directorio real)
+   vive en seed-directorio.js. */
 import { desdeJsonAntiguo, validarInfoBloque, opcionDependiente } from "./validar.js";
 import { RE_TEMA, recorrerBanco } from "./estructura-banco.js";
 
 const numeroDeTema = (nombre) => Number(RE_TEMA.exec(nombre)?.[1]);
 
+/** Sin `id_externo`, actualizar desde el origen solo puede emparejar por enunciado (menos fiable). */
+function avisoSinIdExterno(validas) {
+    const n = validas.filter((v) => v.id_externo == null).length;
+    return n
+        ? `${n} pregunta(s) sin id_externo: al actualizar desde el origen se emparejarán por enunciado (menos fiable).`
+        : null;
+}
+
 /** Lee un archivo que debe contener una lista de preguntas (o { preguntas: [...] }). */
-async function leerLista(archivo) {
+async function leerLista(fuente, ruta) {
     let datos;
     try {
-        datos = await Bun.file(archivo).json();
+        datos = JSON.parse(await fuente.leerTexto(ruta));
     } catch (e) {
         throw new Error(`JSON no válido (${e.message})`);
     }
@@ -46,8 +56,8 @@ function desdeJsonDeBloque(p, { bloqueNumero, bloqueNombre, temaNumero, archivo 
  * El recorrido lo hace `src/estructura-banco.js`: cualquier otro archivo o carpeta se ignora.
  * `formatoAntiguo` trae los JSON sueltos de la raíz, que siguen funcionando por transición.
  */
-async function importarPorBloques(repo, dir, opciones) {
-    const banco = await recorrerBanco(dir, { soloBloques: true });
+async function importarPorBloques(repo, fuente, opciones) {
+    const banco = await recorrerBanco(fuente, { soloBloques: true });
     const validas = [],
         errores = [],
         avisos = [],
@@ -60,17 +70,18 @@ async function importarPorBloques(repo, dir, opciones) {
             nuevas: 0,
             duplicadas: 0,
             actualizadas: 0,
-            errores: [`No existe el directorio ${dir}`],
+            archivadas: 0,
+            errores: ["No se pudo leer la raíz del banco"],
             avisos: [],
         };
     avisos.push(...banco.avisos);
 
     for (const bloque of banco.bloques) {
-        const { nombre: carpeta, numero: bloqueNumero, ruta, info: archivoInfo } = bloque;
+        const { nombre: carpeta, numero: bloqueNumero, info: archivoInfo } = bloque;
         let info = null;
         if (archivoInfo) {
             try {
-                const datos = await Bun.file(archivoInfo.ruta).json();
+                const datos = JSON.parse(await fuente.leerTexto(archivoInfo.ruta));
                 if (datos?.numero != null && Number(datos.numero) !== bloqueNumero)
                     throw new Error(`el número declarado (${datos.numero}) no coincide con la carpeta ${carpeta}`);
                 info = validarInfoBloque(datos);
@@ -108,7 +119,7 @@ async function importarPorBloques(repo, dir, opciones) {
             archivos++;
             let datos;
             try {
-                datos = await leerLista(tema.ruta);
+                datos = await leerLista(fuente, tema.ruta);
             } catch (e) {
                 errores.push(`${carpeta}/${tema.nombre}: ${e.message}`);
                 continue;
@@ -137,13 +148,12 @@ async function importarPorBloques(repo, dir, opciones) {
     repo.desmarcarGestionadosExcepto(gestionados);
 
     /* Transición: los JSON sueltos de la raíz siguen funcionando, con aviso. */
-    for (const ruta of banco.sueltos) {
-        const nombre = ruta.slice(dir.length + 1);
+    for (const nombre of banco.sueltos) {
         if (/^info\.json$/i.test(nombre)) continue;
         archivos++;
         let datos;
         try {
-            datos = await leerLista(ruta);
+            datos = await leerLista(fuente, nombre);
         } catch (e) {
             errores.push(`${nombre}: ${e.message}`);
             continue;
@@ -165,36 +175,38 @@ async function importarPorBloques(repo, dir, opciones) {
             "Hay JSON sueltos en la raíz del banco: usa bloque_X/tema_N.json (el formato antiguo sigue funcionando por ahora).",
         );
 
-    const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
-    return { archivos, nuevas, duplicadas, actualizadas, errores, avisos };
+    const sinId = avisoSinIdExterno(validas);
+    if (sinId) avisos.push(sinId);
+    const { nuevas, duplicadas, actualizadas, archivadas } = repo.importar(validas, opciones);
+    return { archivos, nuevas, duplicadas, actualizadas, archivadas, errores, avisos };
 }
 
-/** Importa un directorio: detecta `bloque_N/` o cae al formato antiguo de JSON sueltos. */
-export async function importarDirectorio(repo, dir, opciones = {}) {
-    const banco = await recorrerBanco(dir);
+/** Importa una `fuente` (F2.6): detecta `bloque_N/` o cae al formato antiguo de JSON sueltos. */
+export async function importarFuente(repo, fuente, opciones = {}) {
+    const banco = await recorrerBanco(fuente);
     if (!banco)
         return {
             archivos: 0,
             nuevas: 0,
             duplicadas: 0,
             actualizadas: 0,
-            errores: [`No existe el directorio ${dir}`],
+            archivadas: 0,
+            errores: ["No se pudo leer la raíz del banco"],
             avisos: [],
         };
 
-    if (banco.bloques.length) return importarPorBloques(repo, dir, opciones);
+    if (banco.bloques.length) return importarPorBloques(repo, fuente, opciones);
 
     /* Formato antiguo: solo JSON sueltos en la raíz, sin avisos (aquí es el formato normal). */
     const validas = [],
         errores = [];
     let archivos = 0;
-    for (const ruta of banco.sueltos) {
-        const nombre = ruta.slice(dir.length + 1);
+    for (const nombre of banco.sueltos) {
         if (/^info\.json$/i.test(nombre)) continue;
         archivos++;
         let datos;
         try {
-            datos = await leerLista(ruta);
+            datos = await leerLista(fuente, nombre);
         } catch (e) {
             errores.push(`${nombre}: ${e.message}`);
             continue;
@@ -207,13 +219,17 @@ export async function importarDirectorio(repo, dir, opciones = {}) {
             }
         });
     }
-    const { nuevas, duplicadas, actualizadas } = repo.importar(validas, opciones);
+    const { nuevas, duplicadas, actualizadas, archivadas } = repo.importar(validas, opciones);
+    const avisos = [...banco.avisos];
+    const sinId = avisoSinIdExterno(validas);
+    if (sinId) avisos.push(sinId);
     return {
         archivos,
         nuevas,
         duplicadas,
         actualizadas,
+        archivadas,
         errores,
-        avisos: banco.avisos,
+        avisos,
     };
 }
