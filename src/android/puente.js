@@ -7,7 +7,6 @@ import { Directory, Filesystem } from "@capacitor/filesystem";
 import { crearAlmacenCapacitor } from "../almacen-capacitor.js";
 import { idBanco } from "../banco-id.js";
 import { crearDriverWasm } from "../driver-wasm.js";
-import { abrirRepo } from "../db/index.js";
 import { ErrorApi } from "../errores.js";
 import { DatabaseManager } from "../gestor-bancos.js";
 import { crearAppLocal } from "../local.js";
@@ -39,23 +38,18 @@ export async function arrancar() {
     const driver = crearDriverWasm({ onCambios: () => avisar() });
     const gestor = new DatabaseManager({ almacen, driver, rutaCatalogo: CATALOGO });
 
-    /* Sin catálogo: el banco único antiguo (F1.4) pasa a ser un banco del catálogo y, si
-       tampoco existe, se crea uno vacío. Así la app siempre arranca con un banco activo. */
-    if (!(await gestor.idActivo())) {
+    /* Migración legacy (P0): solo si el banco único antiguo existe. Una instalación nueva
+       arranca con catálogo vacío y sin banco activo; la biblioteca será la puerta de entrada. */
+    if (!(await gestor.idActivo()) && (await almacen.existe(LEGACY))) {
         try {
-            if (!(await almacen.existe(LEGACY))) {
-                const repo = abrirRepo(await driver.abrir(almacen, LEGACY));
-                idBanco(repo);
-                await almacen.escribir(LEGACY, driver.instantanea(repo.db));
-                repo.close();
-            }
             const b = await gestor.registrar("Mi banco", LEGACY);
             await gestor.activar(b.id);
             await gestor.persistir();
         } catch (e) {
-            console.error("No se pudo preparar el banco inicial:", e?.message ?? e);
+            console.error("No se pudo migrar el banco antiguo:", e?.message ?? e);
         }
     }
+    globalThis.__opiosSinBanco = !(await gestor.idActivo());
 
     let repoActual = null;
     try {
@@ -108,8 +102,14 @@ export async function arrancar() {
             repoActual = nuevo;
             guardar(); // el banco recién abierto también debe quedar en disco
         },
+        /* Al borrar/desvincular el activo el proxy se queda sin repo: apunta a null para que
+           las páginas pidan otro banco en lugar de seguir sirviendo el archivo borrado. */
+        alBorrar: () => {
+            repoActual = null;
+        },
     });
-    return repo;
+    /* Sin valor de retorno: el repo es un Proxy que falla al acceder sin banco activo y el
+       puente lo expone por globalThis.__opios, no hace falta devolverlo. */
 }
 
 /* Los document.write del shell sustituyen documento y listeners (6.2): se enganchan de nuevo

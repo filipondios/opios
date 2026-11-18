@@ -552,6 +552,37 @@ describe("DatabaseManager neutro (F2.3)", () => {
             }
         });
 
+        test(`${nombre}: borrar/desvincular el activo y el último (P0) limpia el estado`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const uno = await gestor.importarJson("Uno", join(import.meta.dir, "fixtures"));
+                await gestor.activar(uno.id);
+                await gestor.abrirActivo();
+
+                /* Desvincular el activo quita el catálogo pero deja el archivo (banco externo). */
+                await gestor.desvincular(uno.id);
+                expect(await gestor.idActivo()).toBe(null);
+                expect(await ctx.almacen.existe(uno.ruta)).toBe(true);
+                expect(await gestor.listar()).toEqual([]);
+
+                const dos = await gestor.importarJson("Dos", join(import.meta.dir, "fixtures"));
+                await gestor.activar(dos.id);
+                await gestor.abrirActivo();
+                await gestor.borrar(dos.id); // también el último y activo
+                expect(await gestor.idActivo()).toBe(null);
+                expect(await gestor.listar()).toEqual([]);
+                expect(await ctx.almacen.existe(dos.ruta)).toBe(false);
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
+
         test(`${nombre}: exportar sin progreso deja la copia limpia y no toca el banco`, async () => {
             const ctx = preparar();
             const gestor = new DatabaseManager({

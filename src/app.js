@@ -26,11 +26,12 @@ export function crearApp(
         dirPreguntas = null,
         dirEjemplo = null,
         alActivar = null,
+        alBorrar = null,
     } = {},
 ) {
     const servicios = crearServicios(repo, { ahora, zona });
     return crearManejadorHttp({
-        api: crearApi(repo, servicios, { gestor, dirPreguntas, dirEjemplo, alActivar }),
+        api: crearApi(repo, servicios, { gestor, dirPreguntas, dirEjemplo, alActivar, alBorrar }),
         web: crearWeb(repo, servicios, { banco, bancoNombre, version }),
         auth,
     });

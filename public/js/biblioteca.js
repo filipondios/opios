@@ -558,9 +558,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
             accion("Exportar con progreso", () => alExportar(true)),
             accion("Exportar sin progreso", () => alExportar(false)),
             accion("Cambiar nombre", alRenombrar),
-            b.origen === "registrado"
-                ? accion("Quitar de la biblioteca", alDesvincular, { disabled: activo })
-                : accion("Eliminar", alBorrar, { disabled: activo }),
+            b.origen === "registrado" ? accion("Quitar de la biblioteca", alDesvincular) : accion("Eliminar", alBorrar),
         ];
     }
 
@@ -589,11 +587,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         };
         return [
             h("button", { class: "btn small", type: "button", onclick: alLocalizar }, "Localizar"),
-            h(
-                "button",
-                { class: "btn small", type: "button", onclick: alDesvincular, disabled: activo },
-                "Desvincular",
-            ),
+            h("button", { class: "btn small", type: "button", onclick: alDesvincular }, "Desvincular"),
         ];
     }
 

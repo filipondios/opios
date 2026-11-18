@@ -33,9 +33,13 @@ document.addEventListener("click", (e) => {
 window.addEventListener("popstate", () => mostrarRuta(location.pathname, { empujar: false }).catch(() => {}));
 
 if (!globalThis.__opios) await arrancar();
-if (!globalThis.__opiosRuta)
-    await mostrarRuta(location.pathname, { empujar: false }).catch((e) => {
+if (!globalThis.__opiosRuta) {
+    /* Sin banco activo (instalación nueva o tras borrar el último): entra por la biblioteca. */
+    const ruta = globalThis.__opiosSinBanco && location.pathname === "/" ? "/biblioteca" : location.pathname;
+    if (ruta !== location.pathname) history.replaceState({ opios: true }, "", ruta);
+    await mostrarRuta(ruta, { empujar: false }).catch((e) => {
         document.body.textContent = "No se pudo abrir el banco de preguntas: " + (e?.message ?? e);
     });
+}
 /* Cada document.write ejecuta el shell de nuevo: engancha los listeners en el documento vivo. */
 conectarEventos();

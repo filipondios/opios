@@ -79,7 +79,7 @@ function idsDe(cuerpo) {
 export function crearApi(
     repo,
     servicios,
-    { gestor = null, dirPreguntas = null, dirEjemplo = null, alActivar = null } = {},
+    { gestor = null, dirPreguntas = null, dirEjemplo = null, alActivar = null, alBorrar = null } = {},
 ) {
     const { fechaHoy, estadisticas, temarioConProgreso, infoExamen } = servicios;
 
@@ -208,7 +208,9 @@ export function crearApi(
                 return json(r);
             }
             if (mb[2] === "desvincular" && m === "POST") {
+                const eraActivo = (await gestor.idActivo()) === id;
                 await gestor.desvincular(id);
+                if (eraActivo && alBorrar) await alBorrar();
                 return new Response(null, { status: 204 });
             }
             if (mb[2] === "localizar" && m === "POST") {
@@ -227,7 +229,9 @@ export function crearApi(
                     return json(await gestor.renombrar(id, String(cuerpo?.nombre ?? "")));
                 }
                 if (m === "DELETE") {
+                    const eraActivo = (await gestor.idActivo()) === id;
                     await gestor.borrar(id);
+                    if (eraActivo && alBorrar) await alBorrar();
                     return new Response(null, { status: 204 });
                 }
             }
