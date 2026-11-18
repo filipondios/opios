@@ -669,6 +669,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
                 h(
                     "div",
                     { class: "toolbar-biblioteca" },
+                    h("span", { class: "toolbar-etiqueta", text: "Bancos" }),
                     h(
                         "button",
                         { class: "btn small", type: "button", onclick: importarDesdeArchivo },
@@ -682,6 +683,8 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
                               { class: "btn small", type: "button", onclick: usarDondeEsta },
                               "Usar donde está…",
                           ),
+                    h("span", { class: "toolbar-sep", "aria-hidden": "true" }),
+                    h("span", { class: "toolbar-etiqueta", text: "Copias de seguridad" }),
                     h(
                         "button",
                         { class: "btn small", type: "button", onclick: descargarCopia },

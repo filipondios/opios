@@ -38,7 +38,9 @@ ${css.map((c) => html`<link rel="stylesheet" href="/css/${c}">`)}
     </nav>
     <div class="top-right">
       <button class="btn small theme" type="button" id="btn-tema" aria-label="Cambiar a tema oscuro" aria-pressed="false" title="Cambiar tema claro/oscuro">
-        <span aria-hidden="true" id="tema-icono">◐</span><span id="tema-texto">Oscuro</span>
+        <svg aria-hidden="true" id="tema-icono-luna" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+        <svg aria-hidden="true" id="tema-icono-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
+        <span id="tema-texto">Oscuro</span>
       </button>
       <span class="status" id="status" data-state="${estadoTipo}" role="status" title="${estado}"><span class="status-text">${estado}</span></span>
     </div>

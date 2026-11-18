@@ -37,10 +37,10 @@
     function pintar() {
         const oscuro = temaActual() === "dark";
         pintarBarra(oscuro);
-        const icono = document.getElementById("tema-icono");
+        /* Los iconos SVG los elige el CSS según data-theme (mismo markup en PC y Android). */
+        raiz.dataset.theme = oscuro ? "dark" : "light";
         const texto = document.getElementById("tema-texto");
         const destino = oscuro ? "claro" : "oscuro";
-        if (icono) icono.textContent = oscuro ? "☀" : "☾";
         if (texto) texto.textContent = oscuro ? "Claro" : "Oscuro";
         boton.setAttribute("aria-label", "Cambiar a tema " + destino);
         boton.setAttribute("title", "Cambiar a tema " + destino);
