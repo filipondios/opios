@@ -198,7 +198,8 @@ function contrato(nombre, abrir) {
         test("actualizar: un error a mitad revierte el lote entero (F5.4)", async () => {
             const repo = await abrir();
             try {
-                const tema = repo.crearTema({ bloque: repo.temario()[0].id, numero: 1, nombre: "Tema" }).id;
+                const bloque = repo.crearBloque({ nombre: "Bloque 1" });
+                const tema = repo.crearTema({ bloque: bloque.id, numero: 1, nombre: "Tema" }).id;
                 const base = { tema, respuestas: ["a", "b"], correcta: 0, explicacion: "" };
                 repo.crear({ ...base, pregunta: "A" });
                 repo.crear({ ...base, pregunta: "B", id_externo: "ext-b" });

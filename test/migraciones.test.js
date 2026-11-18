@@ -216,4 +216,37 @@ describe("migraciones", () => {
             rmSync(dir, { recursive: true, force: true });
         }
     });
+
+    test("una base nueva no tiene bloques y el primer bloque creado es el 1 (v14)", () => {
+        const dir = mkdtempSync(join(tmpdir(), "opios-sin-bloque-"));
+        const ruta = join(dir, "vacio.db");
+        try {
+            const repo = abrirDb(ruta);
+            try {
+                expect(repo.db.query("SELECT count(*) AS n FROM bloques").get().n).toBe(0);
+                expect(repo.db.query("SELECT count(*) AS n FROM preguntas").get().n).toBe(0);
+                /* El bloque se crea solo cuando se necesita, con id limpio. */
+                expect(repo.crearBloque({ nombre: "Bloque 1" }).id).toBe(1);
+            } finally {
+                repo.close();
+            }
+
+            /* Una base v13 con el bloque automático vacío también lo pierde al migrar. */
+            const vieja = new Database(join(dir, "vieja.db"), { create: true, strict: true });
+            for (let v = 0; v < MIGRACIONES.length - 1; v++) {
+                const m = MIGRACIONES[v];
+                vieja.run(typeof m === "function" ? m(vieja) : m);
+            }
+            vieja.run(`PRAGMA user_version = ${MIGRACIONES.length - 1}`);
+            vieja.close();
+            const migrada = abrirDb(join(dir, "vieja.db"));
+            try {
+                expect(migrada.db.query("SELECT count(*) AS n FROM bloques").get().n).toBe(0);
+            } finally {
+                migrada.close();
+            }
+        } finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
 });

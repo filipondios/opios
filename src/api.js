@@ -109,6 +109,12 @@ export function crearApi(
             return json(await gestor.importarJson(nombre, dir), 201);
         }
 
+        /* Banco vacío explícito (P1): sin preguntas ni bloques, listo para el Maker. */
+        if (ruta === "/api/bancos/crear" && m === "POST") {
+            const cuerpo = await cuerpoJson(req);
+            return json(await gestor.crearVacio(String(cuerpo?.nombre ?? "")), 201);
+        }
+
         /* "Usar donde está" (F4.1): registra una SQLite que ya existe en el disco del PC;
             el archivo sigue en su sitio (el progreso se guarda dentro). */
         if (ruta === "/api/bancos/registrar" && m === "POST") {

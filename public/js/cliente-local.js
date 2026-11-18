@@ -70,6 +70,7 @@ export const temaBorrar = (id) => llamada("/api/temas/" + id, { metodo: "DELETE"
 /* --- Biblioteca (bancos, F3.1) --- */
 export const bancosListar = () => llamada("/api/bancos");
 export const bancoImportar = (cuerpo) => llamada("/api/bancos/importar", { metodo: "POST", cuerpo });
+export const bancoCrear = (nombre) => llamada("/api/bancos/crear", { metodo: "POST", cuerpo: { nombre } });
 export const bancoActivar = (id) => llamada(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
 export const bancoActualizar = (id) => llamada(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
 /* Deshacer última actualización/restauración/migración (5.9). */

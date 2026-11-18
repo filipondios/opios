@@ -176,7 +176,8 @@ describe("task 7: importar JSON y copiar, con validación y de forma atómica", 
         try {
             const original = join(dir, "original.db");
             const repo = abrirDb(original);
-            repo.crearTema({ bloque: 1, numero: 1, nombre: "T1" });
+            const bloque = repo.crearBloque({ nombre: "Bloque 1" });
+            repo.crearTema({ bloque: bloque.id, numero: 1, nombre: "T1" });
             repo.close();
 
             const copia = await gestor.copiar("Copia de seguridad", original);
@@ -577,6 +578,26 @@ describe("DatabaseManager neutro (F2.3)", () => {
                 expect(await gestor.idActivo()).toBe(null);
                 expect(await gestor.listar()).toEqual([]);
                 expect(await ctx.almacen.existe(dos.ruta)).toBe(false);
+            } finally {
+                await gestor.close();
+                ctx.limpiar();
+            }
+        });
+
+        test(`${nombre}: crearVacio registra un banco sin bloques ni preguntas (P1)`, async () => {
+            const ctx = preparar();
+            const gestor = new DatabaseManager({
+                almacen: ctx.almacen,
+                driver: ctx.driver,
+                rutaCatalogo: `${ctx.base}/catalogo.db`,
+            });
+            try {
+                const b = await gestor.crearVacio("Vacio");
+                expect(b).toMatchObject({ nombre: "Vacio", origen: "importado", preguntas: 0 });
+                await gestor.activar(b.id);
+                const repo = await gestor.abrirActivo();
+                expect(repo.temario()).toEqual([]);
+                expect(repo.contarPreguntas()).toBe(0);
             } finally {
                 await gestor.close();
                 ctx.limpiar();

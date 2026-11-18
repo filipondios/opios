@@ -15,7 +15,7 @@ export function crearAppLocal(
 ) {
     const servicios = crearServicios(repo, { zona });
     const api = crearApi(repo, servicios, { gestor, alActivar, alBorrar });
-    const web = crearWeb(repo, servicios, { banco });
+    const web = crearWeb(repo, servicios, { banco, android: true });
 
     return async function manejar(req) {
         const url = new URL(req.url);

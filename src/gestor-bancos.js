@@ -125,6 +125,26 @@ export class DatabaseManager {
         return this.#crearDesdeFuente(nombre, fuenteDirectorio(dirPreguntas), { estricto: true });
     }
 
+    /** Crea un banco nuevo sin preguntas ni bloques (P1): lo construye en un temporal y lo
+        anota como copia gestionada, igual que una importación. El usuario decide cuándo
+        añadir temas: `bloquePorDefecto()` los crea bajo demanda al importar o en el Maker. */
+    async crearVacio(nombre) {
+        await this.#listo;
+        const { nombre: nombreLibre, ruta } = await this.#rutaLibre(nombre || "Nuevo banco");
+        const temporal = ruta + ".tmp";
+        await this.#quitarSiExiste(temporal);
+        const repo = abrirRepo(await this.#driver.abrir(this.#almacen, temporal));
+        let bytes;
+        try {
+            idBanco(repo);
+            bytes = this.#driver.instantanea(repo.db);
+        } finally {
+            repo.close();
+        }
+        await this.#almacen.escribir(temporal, bytes);
+        return await this.#anotar(nombreLibre, temporal, ruta, "importado", bytes.length);
+    }
+
     /* Crea un banco nuevo desde una `fuente` (directorio en PC, JSON en memoria para el
        asistente de importación). Con `estricto` falla si el nombre o la ruta ya existen
        (semántica del CLI); sin él, busca un nombre libre añadiendo « (2)», « (3)»… */

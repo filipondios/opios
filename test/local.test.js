@@ -136,4 +136,19 @@ describe("app local (task 11)", () => {
             delete globalThis.__opios;
         }
     });
+
+    test("la portada vacía de Android no menciona Bun, seed ni el ejemplo (P1)", async () => {
+        const repo = abrirRepo(await abrirAdaptadorSqlite({ rutaWasm: "node_modules/sql.js/dist/sql-wasm.wasm" }));
+        const app = crearAppLocal(repo);
+        try {
+            const html = await (await app(new Request("http://opios.local/"))).text();
+            expect(html).toContain("Todavía no hay preguntas");
+            expect(html).toContain("Importa un banco desde la biblioteca");
+            expect(html).not.toContain("OPIOS_PREGUNTAS");
+            expect(html).not.toContain("bun run seed");
+            expect(html).not.toContain("ejemplo/");
+        } finally {
+            repo.close();
+        }
+    });
 });

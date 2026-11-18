@@ -14,7 +14,7 @@ import { paginaNoEncontrada } from "./views/error.js";
     viaja al cliente para prefijar las claves de localStorage dependientes del banco. En modo
     biblioteca (F3.3) es una función (puede cambiar en caliente) y `bancoNombre` devuelve el
     nombre del activo para la cabecera. */
-export function crearWeb(repo, servicios, { banco = null, bancoNombre = null, version = null } = {}) {
+export function crearWeb(repo, servicios, { banco = null, bancoNombre = null, version = null, android = false } = {}) {
     const { fechaHoy, estadisticas, infoExamen } = servicios;
     const idDeBanco = typeof banco === "function" ? banco : () => banco;
 
@@ -37,7 +37,12 @@ export function crearWeb(repo, servicios, { banco = null, bancoNombre = null, ve
     return async function web(ruta) {
         if (ruta === "/")
             return pagina(
-                paginaHome({ temas: estadisticas(), carga: repo.cargaDiaria(fechaHoy()), examen: infoExamen() }),
+                paginaHome({
+                    temas: estadisticas(),
+                    carga: repo.cargaDiaria(fechaHoy()),
+                    examen: infoExamen(),
+                    android,
+                }),
             );
         if (ruta === "/maker") return pagina(paginaMaker({ temario: repo.temario() }));
         if (ruta === "/temario") return pagina(paginaTemario());

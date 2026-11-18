@@ -622,7 +622,20 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         );
     }
 
-    /* Estado vacío (D6): importar (asistente) o probar con el banco de ejemplo que trae la app. */
+    /* Banco vacío explícito (P1): entra en el catálogo sin bloques ni preguntas. */
+    const alCrear = async () => {
+        const nombre = prompt("Nombre del banco vacío:", "Nuevo banco")?.trim();
+        if (!nombre) return;
+        try {
+            const b = await cliente.bancoCrear(nombre);
+            setStatus("ok", `Banco «${b.nombre}» creado`);
+            await refrescar();
+        } catch (e) {
+            setStatus("warn", msgError(e));
+        }
+    };
+
+    /* Estado vacío (D6/P1): en Android no hay carpeta de ejemplo; se ofrece crear uno vacío. */
     function vacia() {
         const alEjemplo = async () => {
             const b = await importar({ nombre: "Ejemplo", ejemplo: true });
@@ -631,8 +644,13 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         return h(
             "div",
             { class: "vacia" },
-            h("p", { text: "No hay bancos todavía: importa uno o prueba con el ejemplo." }),
+            h("p", {
+                text: nativo()
+                    ? "Todavía no hay bancos. Importa un archivo o crea un banco vacío para empezar."
+                    : "No hay bancos todavía: importa uno, crea uno vacío o prueba con el ejemplo.",
+            }),
             h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar archivo…"),
+            h("button", { class: "btn", type: "button", onclick: alCrear }, "Crear banco vacío"),
             /* "Usar donde está"/"Probar con el ejemplo" son de PC: en Android no hay rutas
                ni carpeta de ejemplo en el WebView (F4.4). */
             nativo() ? null : h("button", { class: "btn", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
@@ -656,6 +674,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
                         { class: "btn small", type: "button", onclick: importarDesdeArchivo },
                         "Importar archivo…",
                     ),
+                    h("button", { class: "btn small", type: "button", onclick: alCrear }, "Crear banco vacío"),
                     nativo()
                         ? null
                         : h(
