@@ -8,8 +8,13 @@
 import { prepararPagina } from "./pagina.js";
 import { arrancar, conectarEventos } from "./puente.js";
 
+/* Sin banco activo, las secciones que consultan el repo responden 503. Entra por la
+   biblioteca (o el temario, que no necesita banco) para no dejar una página sin menú. */
+const SIN_BANCO = ["/biblioteca", "/temario"];
+const segura = (ruta) => (globalThis.__opiosSinBanco && !SIN_BANCO.includes(ruta) ? "/biblioteca" : ruta);
+
 async function mostrarRuta(ruta, { empujar = true } = {}) {
-    const r = await globalThis.__opios(new Request("http://opios.local" + ruta));
+    const r = await globalThis.__opios(new Request("http://opios.local" + segura(ruta)));
     if (!r.ok) throw new Error("Ruta no disponible: " + ruta);
     globalThis.__opiosRuta = ruta; // antes de document.open: si el documento se reemplaza, no se reintenta
     /* Marca las entradas que empujó la app: así el botón Atrás distingue «volver» de
@@ -21,13 +26,24 @@ async function mostrarRuta(ruta, { empujar = true } = {}) {
     document.close();
 }
 
+/* Navegación única de la app: si una sección falla vuelve a la biblioteca (con menú), y se
+   expone para que el botón «Estudiar» espere a activar el banco antes de cambiar de página. */
+function ir(ruta, empujar = true) {
+    const destino = segura(ruta);
+    return mostrarRuta(destino, { empujar })
+        .catch(() => (destino === "/biblioteca" ? null : ir("/biblioteca", empujar)))
+        .catch(() => (location.href = "/biblioteca"));
+}
+globalThis.__opiosIr = ir;
+
 document.addEventListener("click", (e) => {
     const a = e.target.closest?.("a[href^='/']");
-    if (!a || a.target || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!a || e.defaultPrevented || a.target || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.altKey)
+        return;
     const ruta = a.getAttribute("href");
     e.preventDefault();
     if (globalThis.__opiosOcupado) return; // 6.4: no se navega mientras se está escribiendo
-    mostrarRuta(ruta).catch(() => (location.href = ruta)); // sin puente: navegación clásica
+    ir(ruta);
 });
 
 window.addEventListener("popstate", () => mostrarRuta(location.pathname, { empujar: false }).catch(() => {}));
@@ -35,11 +51,9 @@ window.addEventListener("popstate", () => mostrarRuta(location.pathname, { empuj
 if (!globalThis.__opios) await arrancar();
 if (!globalThis.__opiosRuta) {
     /* Sin banco activo (instalación nueva o tras borrar el último): entra por la biblioteca. */
-    const ruta = globalThis.__opiosSinBanco && location.pathname === "/" ? "/biblioteca" : location.pathname;
+    const ruta = segura(location.pathname);
     if (ruta !== location.pathname) history.replaceState({ opios: true }, "", ruta);
-    await mostrarRuta(ruta, { empujar: false }).catch((e) => {
-        document.body.textContent = "No se pudo abrir el banco de preguntas: " + (e?.message ?? e);
-    });
+    await ir(ruta, false);
 }
 /* Cada document.write ejecuta el shell de nuevo: engancha los listeners en el documento vivo. */
 conectarEventos();

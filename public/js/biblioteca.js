@@ -452,9 +452,13 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
     }
 
     function botones(b, activo) {
-        const alEstudiar = async () => {
-            if (activo) return (location.href = "/");
-            if (await cambiar(b.id)) location.href = "/";
+        const alEstudiar = async (e) => {
+            e?.preventDefault();
+            /* Primero activar (y esperar), luego navegar: el shell expone ir() en Android;
+               en PC se hace una carga normal de la portada. */
+            if (!activo && !(await cambiar(b.id))) return;
+            if (globalThis.__opiosIr) await globalThis.__opiosIr("/");
+            else location.href = "/";
         };
         const alActualizar = async () => {
             if (!confirm(`¿Actualizar «${b.nombre}» con las preguntas de la carpeta de Opios?`)) return;
@@ -543,12 +547,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
                     class: "btn small",
                     href: "/",
                     "aria-label": `Estudiar «${b.nombre}»`,
-                    onclick: activo
-                        ? null
-                        : (e) => {
-                              e.preventDefault();
-                              alEstudiar();
-                          },
+                    onclick: alEstudiar,
                 },
                 "Estudiar",
             ),
@@ -666,38 +665,40 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         try {
             const lista = await cliente.bancosListar();
             caja.replaceChildren(
-                h(
-                    "div",
-                    { class: "toolbar-biblioteca" },
-                    h("span", { class: "toolbar-etiqueta", text: "Bancos" }),
+                ...[
                     h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: importarDesdeArchivo },
-                        "Importar archivo…",
+                        "div",
+                        { class: "toolbar-biblioteca" },
+                        h("span", { class: "toolbar-etiqueta", text: "Bancos" }),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: importarDesdeArchivo },
+                            "Importar archivo…",
+                        ),
+                        h("button", { class: "btn small", type: "button", onclick: alCrear }, "Crear banco vacío"),
+                        nativo()
+                            ? null
+                            : h(
+                                  "button",
+                                  { class: "btn small", type: "button", onclick: usarDondeEsta },
+                                  "Usar donde está…",
+                              ),
+                        h("span", { class: "toolbar-sep", "aria-hidden": "true" }),
+                        h("span", { class: "toolbar-etiqueta", text: "Copias de seguridad" }),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: descargarCopia },
+                            "Descargar copia completa",
+                        ),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: restaurarDesdeArchivo },
+                            "Restaurar copia...",
+                        ),
                     ),
-                    h("button", { class: "btn small", type: "button", onclick: alCrear }, "Crear banco vacío"),
-                    nativo()
-                        ? null
-                        : h(
-                              "button",
-                              { class: "btn small", type: "button", onclick: usarDondeEsta },
-                              "Usar donde está…",
-                          ),
-                    h("span", { class: "toolbar-sep", "aria-hidden": "true" }),
-                    h("span", { class: "toolbar-etiqueta", text: "Copias de seguridad" }),
-                    h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: descargarCopia },
-                        "Descargar copia completa",
-                    ),
-                    h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: restaurarDesdeArchivo },
-                        "Restaurar copia...",
-                    ),
-                ),
-                nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
-                lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
+                    nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
+                    lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
+                ].filter(Boolean),
             );
             setStatus("ok", lista.length ? `Bancos: ${lista.length}` : "Biblioteca vacía");
         } catch (e) {

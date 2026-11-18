@@ -100,12 +100,14 @@ export async function arrancar() {
         gestor,
         alActivar: async (nuevo) => {
             repoActual = nuevo;
+            globalThis.__opiosSinBanco = false;
             guardar(); // el banco recién abierto también debe quedar en disco
         },
         /* Al borrar/desvincular el activo el proxy se queda sin repo: apunta a null para que
            las páginas pidan otro banco en lugar de seguir sirviendo el archivo borrado. */
         alBorrar: () => {
             repoActual = null;
+            globalThis.__opiosSinBanco = true;
         },
     });
     /* Sin valor de retorno: el repo es un Proxy que falla al acceder sin banco activo y el
