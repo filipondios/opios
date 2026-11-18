@@ -116,9 +116,11 @@ function tarjetaHoy({ vacio, carga, examen, android }) {
       ${aviso}
       <p class="cupo" id="cupo">${textoCarga(carga)}</p>
       <div class="hoy-accion">
-        <button class="btn primary" type="button" id="btn-start">Empezar <kbd>Enter</kbd></button>
+        <button class="btn primary" type="button" id="btn-start">Empezar · estudio diario <kbd>Enter</kbd></button>
+        <button class="btn" type="button" id="btn-start-free">Práctica libre</button>
         <span class="hint" id="sum"></span>
       </div>
+      <p class="hint modo-ayuda">El estudio diario respeta los repasos y el cupo de preguntas nuevas. La práctica libre recorre todas las preguntas sin límite y no modifica el progreso de repaso.</p>
     </section>`;
 }
 

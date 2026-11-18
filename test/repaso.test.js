@@ -184,7 +184,7 @@ describe("planificador de repaso", () => {
         expect(pregunta.i).toBe(3);
     });
 
-    test("sin nada pendiente entra en práctica libre y evita la última pregunta", () => {
+    test("sin nada pendiente entra en refuerzo y evita la última pregunta", () => {
         const pool = [q(1), q(2)];
         const { sesion } = crear(pool, {
             progreso: { 1: [3, "2026-04-01", 1, 0], 2: [3, "2026-04-01", 1, 0] },
@@ -194,8 +194,50 @@ describe("planificador de repaso", () => {
 
         const [pregunta, tipo] = sesion.siguiente();
 
-        expect(tipo).toBe("Práctica libre");
+        expect(tipo).toBe("Refuerzo");
         expect(pregunta.i).toBe(2);
+    });
+
+    test("la práctica libre recorre preguntas nuevas y conocidas sin repetir hasta completar la ronda", () => {
+        const pool = [q(1), q(2), q(3), q(4)];
+        const progreso = { 1: [3, "2026-04-01", 5, 0] };
+        const { sesion } = crear(pool, { progreso, modo: "libre", nuevasPermitidas: 0, azar: () => 0 });
+        const ronda = [];
+        for (let i = 0; i < pool.length; i++) {
+            const [pregunta, tipo] = sesion.siguiente();
+            expect(tipo).toBe("Práctica libre");
+            ronda.push(pregunta.i);
+            sesion.registrar(pregunta, true);
+        }
+        expect(new Set(ronda).size).toBe(pool.length);
+        expect(ronda).toContain(1);
+        expect(ronda).toContain(2);
+    });
+
+    test("la práctica libre no altera cajas, vencimientos ni contadores de progreso", () => {
+        const pool = [q(1), q(2)];
+        const progreso = { 1: [4, "2026-04-01", 5, 2] };
+        const original = structuredClone(progreso);
+        const { sesion, cambios } = crear(pool, { progreso, modo: "libre" });
+
+        sesion.registrar(pool[0], true);
+        sesion.registrar(pool[1], false);
+
+        expect(progreso).toEqual(original);
+        expect(cambios).toEqual([]);
+        expect(sesion.aciertos).toBe(1);
+        expect(sesion.fallos).toBe(1);
+    });
+
+    test("la práctica libre vuelve a mezclar al completar una ronda y evita repetir la última", () => {
+        const pool = [q(1), q(2)];
+        const { sesion } = crear(pool, { modo: "libre", azar: () => 0 });
+        const primera = sesion.siguiente()[0];
+        sesion.registrar(primera, true);
+        const segunda = sesion.siguiente()[0];
+        sesion.registrar(segunda, true);
+        const tercera = sesion.siguiente()[0];
+        expect(tercera.i).not.toBe(segunda.i);
     });
 
     test("pendientes cuenta repasos vencidos y nuevas", () => {
@@ -228,7 +270,7 @@ describe("planificador de repaso", () => {
         }
 
         expect(tipos.filter((t) => t === "Nueva")).toHaveLength(2);
-        expect(tipos.slice(2).every((t) => t === "Práctica libre")).toBe(true);
+        expect(tipos.slice(2).every((t) => t === "Refuerzo")).toBe(true);
     });
 
     test("con cupo 0 no se introducen nuevas", () => {
@@ -242,7 +284,7 @@ describe("planificador de repaso", () => {
         const pool = [q(1), q(2)];
         const { sesion } = crear(pool, { azar: () => 0, nuevasPermitidas: 0 });
 
-        expect(sesion.siguiente()[1]).toBe("Práctica libre");
+        expect(sesion.siguiente()[1]).toBe("Refuerzo");
         sesion.actualizarCupo(1);
         expect(sesion.siguiente()[1]).toBe("Nueva");
     });
