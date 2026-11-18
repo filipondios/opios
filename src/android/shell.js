@@ -6,7 +6,7 @@
    Reejecutado tras cada escritura (lo inyecta prepararPagina), arranca el banco solo la
    primera vez y no vuelve a pintar la ruta ya pintada. */
 import { prepararPagina } from "./pagina.js";
-import { arrancar } from "./puente.js";
+import { arrancar, conectarEventos } from "./puente.js";
 
 async function mostrarRuta(ruta, { empujar = true } = {}) {
     const r = await globalThis.__opios(new Request("http://opios.local" + ruta));
@@ -37,3 +37,5 @@ if (!globalThis.__opiosRuta)
     await mostrarRuta(location.pathname, { empujar: false }).catch((e) => {
         document.body.textContent = "No se pudo abrir el banco de preguntas: " + (e?.message ?? e);
     });
+/* Cada document.write ejecuta el shell de nuevo: engancha los listeners en el documento vivo. */
+conectarEventos();

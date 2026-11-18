@@ -5,30 +5,34 @@
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { aBase64, deBase64 } from "./adaptador-sqlite-wasm.js";
 
-export function crearAlmacenCapacitor(fs = Filesystem, dir = Directory.Data) {
+/* El proxy ESM de @capacitor/filesystem no resuelve writeFile en este WebView; el que expone
+   Capacitor en global sí. Se resuelve en cada llamada porque el bridge se inyecta después de
+   cargar el módulo. Los tests inyectan `fs`, así que no cambia el contrato. */
+export function crearAlmacenCapacitor(fs, dir = Directory.Data) {
+    const plugin = () => fs ?? globalThis.Capacitor?.Plugins?.Filesystem ?? Filesystem;
     return {
         existe: async (ruta) => {
             try {
-                await fs.stat({ path: ruta, directory: dir });
+                await plugin().stat({ path: ruta, directory: dir });
                 return true;
             } catch {
                 return false;
             }
         },
-        leer: async (ruta) => deBase64((await fs.readFile({ path: ruta, directory: dir })).data),
+        leer: async (ruta) => deBase64((await plugin().readFile({ path: ruta, directory: dir })).data),
         escribir: async (ruta, bytes) => {
-            await fs.writeFile({ path: ruta, directory: dir, data: aBase64(bytes), recursive: true });
+            await plugin().writeFile({ path: ruta, directory: dir, data: aBase64(bytes), recursive: true });
         },
         renombrar: async (de, a) => {
-            await fs.rename({ from: de, to: a, directory: dir });
+            await plugin().rename({ from: de, to: a, directory: dir });
         },
         borrar: async (ruta) => {
             try {
-                await fs.deleteFile({ path: ruta, directory: dir });
+                await plugin().deleteFile({ path: ruta, directory: dir });
             } catch {
                 /* no existía */
             }
         },
-        listar: async (carpeta) => (await fs.readdir({ path: carpeta, directory: dir })).files.map((f) => f.name),
+        listar: async (carpeta) => (await plugin().readdir({ path: carpeta, directory: dir })).files.map((f) => f.name),
     };
 }

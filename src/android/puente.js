@@ -97,24 +97,7 @@ export async function arrancar() {
         },
     );
 
-    /* Al pasar a segundo plano se guarda ya: el debounce esperaría demasiado. */
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") flush();
-    });
-    window.addEventListener("pagehide", () => flush());
-    App.addListener("appStateChange", ({ isActive }) => {
-        if (!isActive) flush();
-    });
-    App.addListener("pause", () => flush());
-
-    /* Botón Atrás (6.2): vuelve dentro de la app; solo desde la portada pide confirmación
-       para salir. `arrancar()` corre una sola vez, así que el listener no se acumula. */
-    App.addListener("backButton", () => {
-        if (globalThis.__opiosOcupado) return; // 6.4
-        if (location.pathname !== "/" && history.state?.opios) history.back();
-        else if (confirm("¿Salir de Opios?")) App.exitApp();
-    });
-
+    globalThis.__opiosVolcar = flush;
     /* El WebView no tiene `process.env`: la zona es la del dispositivo. El id del banco (F1.5)
        se inyecta en las páginas para prefijar las claves de localStorage por banco. */
     globalThis.__opios = crearAppLocal(repo, {
@@ -127,4 +110,23 @@ export async function arrancar() {
         },
     });
     return repo;
+}
+
+/* Los document.write del shell sustituyen documento y listeners (6.2): se enganchan de nuevo
+   tras cada ruta. Los callbacks nativos antiguos quedan mudos, pero no estorban. */
+export function conectarEventos() {
+    const volcar = () => globalThis.__opiosVolcar?.();
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") volcar();
+    });
+    window.addEventListener("pagehide", () => volcar());
+    App.addListener("appStateChange", ({ isActive }) => {
+        if (!isActive) volcar();
+    });
+    App.addListener("pause", () => volcar());
+    App.addListener("backButton", () => {
+        if (globalThis.__opiosOcupado) return; // 6.4
+        if (location.pathname !== "/" && history.state?.opios) history.back();
+        else if (confirm("¿Salir de Opios?")) App.exitApp();
+    });
 }
