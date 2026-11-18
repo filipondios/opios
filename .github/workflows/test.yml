@@ -12,6 +12,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.3
+      - name: Dependencias
+        # bun.lock no se versiona: se resuelve desde package.json.
+        run: bun install
       - name: Linter
         run: bunx @biomejs/biome@2.6.6 lint src test scripts server.js public/js
       - name: Formato
