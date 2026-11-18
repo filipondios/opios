@@ -28,7 +28,7 @@ jobs:
           package.json
           biome.json
           ejemplo
-      - name: Check del bundle (1.2: sin process/Bun)
+      - name: "Check del bundle (1.2: sin process/Bun)"
         run: bun test test/contratos-no-bun.test.js
       - name: Ejecutar tests
         run: bun test
