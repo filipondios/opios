@@ -81,7 +81,7 @@ describe("bundle del WebView (F1.2)", () => {
         expect(bundle).not.toMatch(/["']node:/);
     });
 
-    test("se evalúa sin `process`, arranca la portada y guarda el banco", async () => {
+    test("se evalúa sin `process`, entra por la biblioteca y no crea banco", async () => {
         const wasm = await Bun.file(join(RAIZ, "node_modules/sql.js/dist/sql-wasm.wasm")).arrayBuffer();
         const escritos = [];
         const guardados = [];
@@ -101,7 +101,7 @@ describe("bundle del WebView (F1.2)", () => {
             window: { addEventListener() {} },
             document: documento,
             location: { pathname: "/", href: "http://opios.local/" },
-            history: { pushState() {} },
+            history: { pushState() {}, replaceState() {} },
             Request,
             Response,
             URL,
@@ -150,11 +150,13 @@ describe("bundle del WebView (F1.2)", () => {
         await new Promise((r) => setTimeout(r, 600)); // deja vencer el debounce del guardado (F1.4)
 
         expect(vm.runInContext("typeof globalThis.__opios", contexto)).toBe("function");
-        expect(escritos.some((html) => /<title>Opios/i.test(html))).toBe(true); // portada pintada
+        expect(vm.runInContext("globalThis.__opiosSinBanco", contexto)).toBe(true);
+        expect(escritos.some((html) => /<title>Opios/i.test(html) && /Biblioteca/i.test(html))).toBe(true);
         /* 6.2: el botón Atrás se registra una sola vez aunque el shell se reejecute. */
         expect(escuchas.filter((n) => n === "backButton")).toHaveLength(1);
-        /* El puente persistió: el último guardado es un SQLite válido (base64). */
-        expect(guardados.length).toBeGreaterThan(0);
-        expect(Buffer.from(guardados.at(-1), "base64").subarray(0, 15).toString()).toBe("SQLite format 3");
+        /* P0: una instalación nueva no crea ni persiste un banco vacío. */
+        expect(
+            guardados.some((datos) => Buffer.from(datos, "base64").subarray(0, 15).toString() === "SQLite format 3"),
+        ).toBe(false);
     });
 });

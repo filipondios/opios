@@ -77,12 +77,16 @@ export function temasGrid(temas, carga = null) {
 }
 
 /** Tarjeta «Hoy»: lo que toca hacer, con el cupo diario y el arranque a un clic. */
-function tarjetaHoy({ vacio, carga, examen }) {
+function tarjetaHoy({ vacio, carga, examen, android }) {
     if (vacio) {
         return html`
     <section class="card hoy hoy-vacio">
       <div class="hoy-head"><h1>Hoy</h1></div>
-      <p class="lede">Todavía no hay preguntas. Apunta <code>OPIOS_PREGUNTAS</code> a la carpeta de tu banco y ejecuta <code>bun run seed</code>, o crea preguntas desde el creador. Sin configurar nada, la app usa el banco de ejemplo de <code>ejemplo/</code>.</p>
+      ${
+          android
+              ? html`<p class="lede">Todavía no hay preguntas. Importa un banco desde la biblioteca o crea las tuyas con el creador.</p>`
+              : html`<p class="lede">Todavía no hay preguntas. Apunta <code>OPIOS_PREGUNTAS</code> a la carpeta de tu banco y ejecuta <code>bun run seed</code>, o crea preguntas desde el creador. Sin configurar nada, la app usa el banco de ejemplo de <code>ejemplo/</code>.</p>`
+      }
       <div class="row"><a class="btn primary" href="/maker">Añadir preguntas</a><a class="btn" href="/temario">Organizar temario</a></div>
     </section>`;
     }
@@ -112,20 +116,22 @@ function tarjetaHoy({ vacio, carga, examen }) {
       ${aviso}
       <p class="cupo" id="cupo">${textoCarga(carga)}</p>
       <div class="hoy-accion">
-        <button class="btn primary" type="button" id="btn-start">Empezar <kbd>Enter</kbd></button>
+        <button class="btn primary" type="button" id="btn-start">Empezar · estudio diario <kbd>Enter</kbd></button>
+        <button class="btn" type="button" id="btn-start-free">Práctica libre</button>
         <span class="hint" id="sum"></span>
       </div>
+      <p class="hint modo-ayuda">El estudio diario respeta los repasos y el cupo de preguntas nuevas. La práctica libre recorre todas las preguntas sin límite y no modifica el progreso de repaso.</p>
     </section>`;
 }
 
-export function paginaHome({ temas, carga = null, examen = null }) {
+export function paginaHome({ temas, carga = null, examen = null, android = false }) {
     const vacio = temas.length === 0;
     const cuerpo = html`
   <div id="note" class="note" hidden></div>
 
   <!-- ============ PANTALLA: preparar ============ -->
   <main id="screen-setup" class="stack">
-    ${tarjetaHoy({ vacio, carga, examen })}
+    ${tarjetaHoy({ vacio, carga, examen, android })}
     ${
         vacio
             ? ""

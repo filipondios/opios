@@ -99,9 +99,25 @@
 
 .toolbar-biblioteca {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--sp-2);
   margin-bottom: var(--sp-3);
+}
+
+/* Acciones de bancos a un lado; copias de seguridad al otro. */
+.toolbar-etiqueta {
+  font: 600 11px var(--f-ui);
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.toolbar-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+  margin: 0 var(--sp-2);
 }
 
 .toolbar-biblioteca + .meta-banco {

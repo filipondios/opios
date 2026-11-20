@@ -452,9 +452,13 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
     }
 
     function botones(b, activo) {
-        const alEstudiar = async () => {
-            if (activo) return (location.href = "/");
-            if (await cambiar(b.id)) location.href = "/";
+        const alEstudiar = async (e) => {
+            e?.preventDefault();
+            /* Primero activar (y esperar), luego navegar: el shell expone ir() en Android;
+               en PC se hace una carga normal de la portada. */
+            if (!activo && !(await cambiar(b.id))) return;
+            if (globalThis.__opiosIr) await globalThis.__opiosIr("/");
+            else location.href = "/";
         };
         const alActualizar = async () => {
             if (!confirm(`¿Actualizar «${b.nombre}» con las preguntas de la carpeta de Opios?`)) return;
@@ -543,12 +547,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
                     class: "btn small",
                     href: "/",
                     "aria-label": `Estudiar «${b.nombre}»`,
-                    onclick: activo
-                        ? null
-                        : (e) => {
-                              e.preventDefault();
-                              alEstudiar();
-                          },
+                    onclick: alEstudiar,
                 },
                 "Estudiar",
             ),
@@ -558,9 +557,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
             accion("Exportar con progreso", () => alExportar(true)),
             accion("Exportar sin progreso", () => alExportar(false)),
             accion("Cambiar nombre", alRenombrar),
-            b.origen === "registrado"
-                ? accion("Quitar de la biblioteca", alDesvincular, { disabled: activo })
-                : accion("Eliminar", alBorrar, { disabled: activo }),
+            b.origen === "registrado" ? accion("Quitar de la biblioteca", alDesvincular) : accion("Eliminar", alBorrar),
         ];
     }
 
@@ -589,11 +586,7 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         };
         return [
             h("button", { class: "btn small", type: "button", onclick: alLocalizar }, "Localizar"),
-            h(
-                "button",
-                { class: "btn small", type: "button", onclick: alDesvincular, disabled: activo },
-                "Desvincular",
-            ),
+            h("button", { class: "btn small", type: "button", onclick: alDesvincular }, "Desvincular"),
         ];
     }
 
@@ -628,7 +621,20 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         );
     }
 
-    /* Estado vacío (D6): importar (asistente) o probar con el banco de ejemplo que trae la app. */
+    /* Banco vacío explícito (P1): entra en el catálogo sin bloques ni preguntas. */
+    const alCrear = async () => {
+        const nombre = prompt("Nombre del banco vacío:", "Nuevo banco")?.trim();
+        if (!nombre) return;
+        try {
+            const b = await cliente.bancoCrear(nombre);
+            setStatus("ok", `Banco «${b.nombre}» creado`);
+            await refrescar();
+        } catch (e) {
+            setStatus("warn", msgError(e));
+        }
+    };
+
+    /* Estado vacío (D6/P1): en Android no hay carpeta de ejemplo; se ofrece crear uno vacío. */
     function vacia() {
         const alEjemplo = async () => {
             const b = await importar({ nombre: "Ejemplo", ejemplo: true });
@@ -637,8 +643,13 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         return h(
             "div",
             { class: "vacia" },
-            h("p", { text: "No hay bancos todavía: importa uno o prueba con el ejemplo." }),
+            h("p", {
+                text: nativo()
+                    ? "Todavía no hay bancos. Importa un archivo o crea un banco vacío para empezar."
+                    : "No hay bancos todavía: importa uno, crea uno vacío o prueba con el ejemplo.",
+            }),
             h("button", { class: "btn", type: "button", onclick: importarDesdeArchivo }, "Importar archivo…"),
+            h("button", { class: "btn", type: "button", onclick: alCrear }, "Crear banco vacío"),
             /* "Usar donde está"/"Probar con el ejemplo" son de PC: en Android no hay rutas
                ni carpeta de ejemplo en el WebView (F4.4). */
             nativo() ? null : h("button", { class: "btn", type: "button", onclick: usarDondeEsta }, "Usar donde está…"),
@@ -654,34 +665,40 @@ import { h, iniciarOperacion, msgError, senalOperacion, simulacroEnCurso } from 
         try {
             const lista = await cliente.bancosListar();
             caja.replaceChildren(
-                h(
-                    "div",
-                    { class: "toolbar-biblioteca" },
+                ...[
                     h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: importarDesdeArchivo },
-                        "Importar archivo…",
+                        "div",
+                        { class: "toolbar-biblioteca" },
+                        h("span", { class: "toolbar-etiqueta", text: "Bancos" }),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: importarDesdeArchivo },
+                            "Importar archivo…",
+                        ),
+                        h("button", { class: "btn small", type: "button", onclick: alCrear }, "Crear banco vacío"),
+                        nativo()
+                            ? null
+                            : h(
+                                  "button",
+                                  { class: "btn small", type: "button", onclick: usarDondeEsta },
+                                  "Usar donde está…",
+                              ),
+                        h("span", { class: "toolbar-sep", "aria-hidden": "true" }),
+                        h("span", { class: "toolbar-etiqueta", text: "Copias de seguridad" }),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: descargarCopia },
+                            "Descargar copia completa",
+                        ),
+                        h(
+                            "button",
+                            { class: "btn small", type: "button", onclick: restaurarDesdeArchivo },
+                            "Restaurar copia...",
+                        ),
                     ),
-                    nativo()
-                        ? null
-                        : h(
-                              "button",
-                              { class: "btn small", type: "button", onclick: usarDondeEsta },
-                              "Usar donde está…",
-                          ),
-                    h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: descargarCopia },
-                        "Descargar copia completa",
-                    ),
-                    h(
-                        "button",
-                        { class: "btn small", type: "button", onclick: restaurarDesdeArchivo },
-                        "Restaurar copia...",
-                    ),
-                ),
-                nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
-                lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
+                    nativo() ? null : h("p", { class: "meta-banco", text: EXPLICACION }),
+                    lista.length ? h("div", { class: "rejilla-bancos" }, ...lista.map(tarjeta)) : vacia(),
+                ].filter(Boolean),
             );
             setStatus("ok", lista.length ? `Bancos: ${lista.length}` : "Biblioteca vacía");
         } catch (e) {

@@ -125,6 +125,26 @@ export class DatabaseManager {
         return this.#crearDesdeFuente(nombre, fuenteDirectorio(dirPreguntas), { estricto: true });
     }
 
+    /** Crea un banco nuevo sin preguntas ni bloques (P1): lo construye en un temporal y lo
+        anota como copia gestionada, igual que una importación. El usuario decide cuándo
+        añadir temas: `bloquePorDefecto()` los crea bajo demanda al importar o en el Maker. */
+    async crearVacio(nombre) {
+        await this.#listo;
+        const { nombre: nombreLibre, ruta } = await this.#rutaLibre(nombre || "Nuevo banco");
+        const temporal = ruta + ".tmp";
+        await this.#quitarSiExiste(temporal);
+        const repo = abrirRepo(await this.#driver.abrir(this.#almacen, temporal));
+        let bytes;
+        try {
+            idBanco(repo);
+            bytes = this.#driver.instantanea(repo.db);
+        } finally {
+            repo.close();
+        }
+        await this.#almacen.escribir(temporal, bytes);
+        return await this.#anotar(nombreLibre, temporal, ruta, "importado", bytes.length);
+    }
+
     /* Crea un banco nuevo desde una `fuente` (directorio en PC, JSON en memoria para el
        asistente de importación). Con `estricto` falla si el nombre o la ruta ya existen
        (semántica del CLI); sin él, busca un nombre libre añadiendo « (2)», « (3)»… */
@@ -539,18 +559,21 @@ export class DatabaseManager {
     }
 
     /** Elimina una copia gestionada (importada/copiada: el archivo es de Opios) del catálogo
-        y borra su archivo y sidecars. Nunca el activo: quien quiera borrarlo debe activar
-        otro primero (nunca se queda sin banco). Los registrados van con `desvincular`. */
+        y borra su archivo y sidecars. Si es el activo se cierra primero y se limpia el estado:
+        la biblioteca puede quedar vacía (no se crea un banco fantasma). Los registrados van
+        con `desvincular`. */
     async borrar(id) {
         await this.#listo;
-        if (id === (await this.idActivo()))
-            throw new Error("No se puede borrar el banco activo: activa otro banco primero.");
         const fila = this.#catalogo.query("SELECT nombre, ruta, origen FROM bancos WHERE id = ?").get(id);
         if (!fila) throw new Error(`El banco ${id} no está en el catálogo.`);
         if (fila.origen === "registrado")
             throw new Error(
                 `«${fila.nombre}» está registrado (su archivo está fuera de Opios): desvincúlalo en vez de eliminarlo.`,
             );
+        if (id === (await this.idActivo())) {
+            await this.cerrar(); // vuelca el estado pendiente antes de borrar el archivo
+            this.#catalogo.query("DELETE FROM estado WHERE clave = 'activo'").run();
+        }
         this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
         for (const lado of ["", "-wal", "-shm", ".prev", ".tmp", ".snap.1", ".snap.2", ".snap.3"])
             await this.#almacen.borrar(fila.ruta + lado);
@@ -558,13 +581,16 @@ export class DatabaseManager {
     }
 
     /** Quita un banco del catálogo SIN borrar su archivo (F3.7): para bancos registrados en
-        PC, cuyo archivo vive fuera de Opios y jamás se toca. Nunca el activo. */
+        PC, cuyo archivo vive fuera de Opios y jamás se toca. Si es el activo se cierra y se
+        limpia el estado, sin tocar el archivo externo. */
     async desvincular(id) {
         await this.#listo;
-        if (id === (await this.idActivo()))
-            throw new Error("No se puede desvincular el banco activo: activa otro banco primero.");
         if (!this.#catalogo.query("SELECT 1 FROM bancos WHERE id = ?").get(id))
             throw new Error(`El banco ${id} no está en el catálogo.`);
+        if (id === (await this.idActivo())) {
+            await this.cerrar();
+            this.#catalogo.query("DELETE FROM estado WHERE clave = 'activo'").run();
+        }
         this.#catalogo.query("DELETE FROM bancos WHERE id = ?").run(id);
         return true;
     }

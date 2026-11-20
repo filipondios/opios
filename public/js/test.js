@@ -246,6 +246,7 @@ import { etiquetaTema } from "./etiquetas.js";
                 " nuevas",
             );
         $("#btn-start").disabled = !seleccion.size;
+        $("#btn-start-free").disabled = !seleccion.size;
         document.querySelectorAll("#grid .bloque").forEach((b) => {
             const cs = [...b.querySelectorAll(".chip")];
             const n = cs.filter((c) => seleccion.has(Number(c.dataset.tema))).length;
@@ -356,7 +357,8 @@ import { etiquetaTema } from "./etiquetas.js";
     );
     $("#btn-all").addEventListener("click", () => fijarSeleccion(true));
     $("#btn-none").addEventListener("click", () => fijarSeleccion(false));
-    $("#btn-start").addEventListener("click", empezar);
+    $("#btn-start").addEventListener("click", () => empezar("diario"));
+    $("#btn-start-free").addEventListener("click", () => empezar("libre"));
     $("#buscar-temas")?.addEventListener("input", filtrarTemas);
 
     /* ---------- Fecha de examen (Fase 3.6): acorta los intervalos de repaso ---------- */
@@ -394,9 +396,9 @@ import { etiquetaTema } from "./etiquetas.js";
     const ICO_BAD =
         '<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5.5 5.5l11 11M16.5 5.5l-11 11"/></svg>';
 
-    async function empezar() {
+    async function empezar(modo = "diario") {
         if (!seleccion.size || pantalla !== "setup") return;
-        const boton = $("#btn-start");
+        const boton = modo === "libre" ? $("#btn-start-free") : $("#btn-start");
         boton.disabled = true;
         setStatus("busy", "Cargando preguntas…");
         try {
@@ -434,8 +436,9 @@ import { etiquetaTema } from "./etiquetas.js";
         sesion = new Sesion(bank, {
             progreso: progress,
             alCambiar: marcarSucio,
-            nuevasPermitidas: nuevasPermitidas(),
-            topeIntervalo: examenInfo?.topeDias ?? 0,
+            nuevasPermitidas: modo === "diario" ? nuevasPermitidas() : Infinity,
+            topeIntervalo: modo === "diario" ? (examenInfo?.topeDias ?? 0) : 0,
+            modo,
         });
         pantalla = "quiz";
         $("#screen-setup").hidden = true;
@@ -675,7 +678,7 @@ import { etiquetaTema } from "./etiquetas.js";
         ) {
             if (!$("#ready").hidden && !$("#btn-start").disabled) {
                 e.preventDefault();
-                empezar();
+                empezar("diario");
             }
         }
     });

@@ -210,6 +210,15 @@ export const MIGRACIONES = [
     /* v13: borrado lógico (`archivada=1`) al actualizar desde el origen. La pregunta desaparece
      del estudio y las estadísticas, pero su progreso y sus respuestas se conservan (historial). */
     `ALTER TABLE preguntas ADD COLUMN archivada INTEGER NOT NULL DEFAULT 0;`,
+
+    /* v14: quita el "Bloque 1" que las migraciones antiguas creaban en bancos vacíos.
+       Si hay temas o preguntas se conserva: las claves ajenas lo necesitan. */
+    `DELETE FROM bloques
+       WHERE nombre = 'Bloque 1' AND gestionado = 0 AND numero = 1
+         AND NOT EXISTS (SELECT 1 FROM temas)
+         AND NOT EXISTS (SELECT 1 FROM preguntas);
+     DELETE FROM sqlite_sequence
+       WHERE name = 'bloques' AND NOT EXISTS (SELECT 1 FROM bloques);`,
 ];
 
 /** Comprueba si el SQLite de este build incluye FTS5. */

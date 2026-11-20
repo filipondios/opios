@@ -174,11 +174,13 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         await gestor.activar(vacio.id);
         repoActual = await gestor.abrirActivo();
         ids = Object.fromEntries((await gestor.listar()).map((b) => [b.nombre, b.id]));
+        let borrados = 0;
         app = crearApp(repoActual, {
             gestor,
             dirPreguntas: DIR_EJEMPLO,
             dirEjemplo: DIR_FIXTURE,
             alActivar: (r) => (repoActual = r),
+            alBorrar: () => borrados++,
             banco: () => "uuid-test",
             bancoNombre: () => "Fixtures",
         });
@@ -270,10 +272,13 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
         r = await pet("/api/bancos/999", "PUT", { nombre: "Nadie" });
         expect(r.status).toBe(400);
 
-        /* DELETE (F3.7): el activo no se toca; un registrado exige desvincular; una copia
-           gestionada se elimina con su archivo. */
+        /* DELETE (P0): se puede borrar el activo y el último; se limpia el estado, se avisa
+           al adaptador y desaparece el archivo. Un registrado exige desvincular. */
         r = await pet(`/api/bancos/${creado.id}`, "DELETE");
-        expect(r.status).toBe(400);
+        expect(r.status).toBe(204);
+        expect(await gestor.idActivo()).toBe(null);
+        expect(borrados).toBe(1);
+        expect(existsSync(creado.ruta)).toBe(false);
         r = await pet(`/api/bancos/${ids.Vacio}`, "DELETE");
         expect(r.status).toBe(400); // registrado: no se puede borrar su archivo externo
         expect((await r.json()).error).toMatch(/desvinc/);
@@ -326,7 +331,7 @@ describe("biblioteca: modo biblioteca (con gestor)", () => {
                 }),
             );
 
-        let r = await petBytes("/api/bancos/inspeccionar?nombre=Ejemplo%20Renombrado", bytesJson);
+        let r = await petBytes("/api/bancos/inspeccionar?nombre=DondeEsta", bytesJson);
         expect(r.status).toBe(200);
         const pre = await r.json();
         expect(pre).toMatchObject({ tipo: "json", preguntas: 1, duplicado: { por: "nombre" } });

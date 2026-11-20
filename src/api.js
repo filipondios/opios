@@ -79,7 +79,7 @@ function idsDe(cuerpo) {
 export function crearApi(
     repo,
     servicios,
-    { gestor = null, dirPreguntas = null, dirEjemplo = null, alActivar = null } = {},
+    { gestor = null, dirPreguntas = null, dirEjemplo = null, alActivar = null, alBorrar = null } = {},
 ) {
     const { fechaHoy, estadisticas, temarioConProgreso, infoExamen } = servicios;
 
@@ -107,6 +107,12 @@ export function crearApi(
             const dir = cuerpo.ejemplo ? dirEjemplo : cuerpo.ruta?.trim() || dirPreguntas;
             if (!dir) throw new ErrorApi(400, "Indica la ruta del directorio de preguntas.");
             return json(await gestor.importarJson(nombre, dir), 201);
+        }
+
+        /* Banco vacío explícito (P1): sin preguntas ni bloques, listo para el Maker. */
+        if (ruta === "/api/bancos/crear" && m === "POST") {
+            const cuerpo = await cuerpoJson(req);
+            return json(await gestor.crearVacio(String(cuerpo?.nombre ?? "")), 201);
         }
 
         /* "Usar donde está" (F4.1): registra una SQLite que ya existe en el disco del PC;
@@ -208,7 +214,9 @@ export function crearApi(
                 return json(r);
             }
             if (mb[2] === "desvincular" && m === "POST") {
+                const eraActivo = (await gestor.idActivo()) === id;
                 await gestor.desvincular(id);
+                if (eraActivo && alBorrar) await alBorrar();
                 return new Response(null, { status: 204 });
             }
             if (mb[2] === "localizar" && m === "POST") {
@@ -227,7 +235,9 @@ export function crearApi(
                     return json(await gestor.renombrar(id, String(cuerpo?.nombre ?? "")));
                 }
                 if (m === "DELETE") {
+                    const eraActivo = (await gestor.idActivo()) === id;
                     await gestor.borrar(id);
+                    if (eraActivo && alBorrar) await alBorrar();
                     return new Response(null, { status: 204 });
                 }
             }

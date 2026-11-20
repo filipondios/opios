@@ -1397,6 +1397,8 @@ describe("rediseño de la interfaz (Fase 1)", () => {
         expect(html).toContain('id="hoy-repasos"');
         expect(html).toContain('id="hoy-nuevas"');
         expect(html).toContain('id="btn-start"');
+        expect(html).toContain('id="btn-start-free"');
+        expect(html).toContain("Práctica libre");
         expect(html).toContain("Empezar");
         const cupo = html.match(/data-cupo-nuevas="(\d+)"/);
         expect(cupo).not.toBeNull();

@@ -14,7 +14,9 @@
 .hoy .cupo:empty{display:none}
 .hoy-accion{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center}
 .hoy-accion .btn.primary{padding:11px 18px;font-size:15px}
+.hoy-accion #btn-start-free{padding:11px 16px;font-size:15px}
 .hoy-vacio .lede{max-width:60ch}
+.modo-ayuda{max-width:76ch;margin:0;color:var(--text-2)}
 .hoy-aviso{border:1px solid var(--bad);background:var(--bad-soft);color:var(--bad);padding:9px 12px;border-radius:var(--r-control);font-size:13px}
 
 /* --- Selección de temas --- */

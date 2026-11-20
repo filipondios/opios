@@ -49,6 +49,7 @@ export const temaBorrar = (id) => api("/api/temas/" + id, { metodo: "DELETE" });
 /* --- Biblioteca (bancos, F3.1) --- */
 export const bancosListar = () => api("/api/bancos");
 export const bancoImportar = (cuerpo) => api("/api/bancos/importar", { metodo: "POST", cuerpo });
+export const bancoCrear = (nombre) => api("/api/bancos/crear", { metodo: "POST", cuerpo: { nombre } });
 export const bancoActivar = (id) => api(`/api/bancos/${id}/activar`, { metodo: "POST", cuerpo: {} });
 export const bancoActualizar = (id) => api(`/api/bancos/${id}/actualizar`, { metodo: "POST", cuerpo: {} });
 /* Deshacer última actualización/restauración/migración (5.9). */

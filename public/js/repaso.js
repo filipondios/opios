@@ -35,6 +35,7 @@ export class Sesion {
      * @param {(id:number) => void} opciones.alCambiar callback tras registrar una respuesta
      * @param {number} opciones.nuevasPermitidas cupo de preguntas nuevas que aún se pueden introducir hoy
      * @param {number} opciones.topeIntervalo días máximos hasta el próximo repaso (0 = sin tope; Fase 3.6)
+     * @param {"diario"|"libre"} opciones.modo modalidad de estudio; libre no modifica el progreso espaciado
      */
     constructor(
         pool,
@@ -45,6 +46,7 @@ export class Sesion {
             alCambiar = () => {},
             nuevasPermitidas = Infinity,
             topeIntervalo = 0,
+            modo = "diario",
         } = {},
     ) {
         this.pool = pool;
@@ -54,11 +56,13 @@ export class Sesion {
         this.alCambiar = alCambiar;
         this.nuevasPermitidas = nuevasPermitidas;
         this.topeIntervalo = topeIntervalo;
+        this.modo = modo;
         this.porId = new Map(pool.map((q) => [q.i, q]));
         this.n = 0;
         this.aprendizaje = new Map();
         this.ultima = null;
         this.introducidas = new Set();
+        this.vistasLibres = new Set();
         this.aciertos = 0;
         this.fallos = 0;
     }
@@ -76,6 +80,20 @@ export class Sesion {
 
     siguiente() {
         const hoyIso = this.hoy();
+        // Práctica libre: recorre todo el conjunto sin cupo ni prioridad de repasos.
+        // No repite preguntas hasta completar una ronda y evita repetir la última al reiniciar.
+        if (this.modo === "libre") {
+            if (!this.pool.length) return [null, "Práctica libre"];
+            let candidatas = this.pool.filter((q) => !this.vistasLibres.has(q.i));
+            if (!candidatas.length) {
+                this.vistasLibres.clear();
+                candidatas = this.pool.filter((q) => q.i !== this.ultima);
+                if (!candidatas.length) candidatas = this.pool;
+            }
+            const q = elegir(candidatas, this.azar);
+            this.vistasLibres.add(q.i);
+            return [q, "Práctica libre"];
+        }
         // 1) preguntas falladas cuyo turno ya llegó
         let mejor = null;
         for (const [id, [, v]] of this.aprendizaje) if (v <= this.n && (!mejor || v < mejor.v)) mejor = { id, v };
@@ -113,7 +131,7 @@ export class Sesion {
             for (const [id, [, v]] of this.aprendizaje) if (!m || v < m.v) m = { id, v };
             return [this.porId.get(m.id), "Reintento"];
         }
-        // 5) modo libre infinito: más peso a las cajas bajas y a las más falladas
+        // 5) refuerzo diario: más peso a las cajas bajas y a las más falladas
         let cand = this.pool.filter((q) => this.progreso[q.i] && q.i !== this.ultima);
         if (!cand.length) cand = this.pool.filter((q) => this.progreso[q.i]);
         if (!cand.length) cand = this.pool;
@@ -124,17 +142,22 @@ export class Sesion {
         let r = this.azar() * pesos.reduce((a, b) => a + b, 0);
         for (let k = 0; k < cand.length; k++) {
             r -= pesos[k];
-            if (r <= 0) return [cand[k], "Práctica libre"];
+            if (r <= 0) return [cand[k], "Refuerzo"];
         }
-        return [cand[cand.length - 1], "Práctica libre"];
+        return [cand[cand.length - 1], "Refuerzo"];
     }
 
     registrar(q, acierto) {
-        const id = q.i,
-            existia = !!this.progreso[id];
-        const p = this.progreso[id] || (this.progreso[id] = [0, this.hoy(), 0, 0]);
+        const id = q.i;
         this.n++;
         this.ultima = id;
+        if (this.modo === "libre") {
+            if (acierto) this.aciertos++;
+            else this.fallos++;
+            return; // Las respuestas se registran aparte; la práctica libre no toca cajas ni vencimientos.
+        }
+        const existia = !!this.progreso[id];
+        const p = this.progreso[id] || (this.progreso[id] = [0, this.hoy(), 0, 0]);
         if (acierto) {
             this.aciertos++;
             p[2]++;
