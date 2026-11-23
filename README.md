@@ -7,9 +7,9 @@
 <p align="center"><em>Un entrenador en local para exámenes tipo test, con repaso espaciado.</em></p>
 
 <p align="center">
-  <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/multiplataforma?label=tests&style=flat-square" alt="Estado de los tests"></a>
-  <a href="https://github.com/filipondios/opios/blob/multiplataforma/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
-  <img src="https://badgen.net/badge/Bun/1.4.3%2B?icon=bun&style=flat-square" alt="Bun 1.4.3 o superior">
+  <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/main?label=tests&style=flat-square" alt="Estado de los tests"></a>
+  <a href="https://github.com/filipondios/opios/blob/main/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
+  <img src="https://badgen.net/badge/Bun/1.4.3?icon=bun&style=flat-square" alt="Bun 1.4.3">
 </p>
 
 **Opios** es una aplicación para estudiar bancos de preguntas de tipo test: organizas las preguntas por bloques y temas, y practicas con tests libres, simulacros cronometrados y repasos programados. Funciona en tu ordenador y en Android. Todo se guarda en tu dispositivo: sin cuentas, sin nube y sin enviar tus datos a ningún servidor.
