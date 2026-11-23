@@ -31,7 +31,7 @@ bun install    # instala las dependencias (la primera vez)
 bun start      # abre http://127.0.0.1:8000
 ```
 
-Si no tienes un banco propio, la app usa automáticamente el de ejemplo (`./ejemplo/`). Para importar un banco nuevo desde cero, ejecuta `bun run seed`. El progreso se guarda en `data/opios.db` y se conserva entre arranques. `bun run dev` arranca el servidor en modo vigilancia (para desarrollar).
+Si no tienes un banco propio, la app usa automáticamente el de ejemplo (`./ejemplo/`). Para importar un banco nuevo desde cero, ejecuta `bun run seed`. El progreso se guarda en `data/opios.db` por defecto y se conserva entre arranques.
 
 Comandos útiles para gestionar tus bancos:
 
@@ -47,9 +47,7 @@ bun run seed --actualizar       # actualiza preguntas editadas conservando su id
 
 ## Usa tu propio banco (en el ordenador)
 
-Tu banco es un directorio de archivos JSON, separado del código de la app. Puede estar en cualquier carpeta o incluso en un repositorio propio. Si no indicas ninguno, se usa el de ejemplo `./ejemplo/`.
-
-Para usar el tuyo:
+Un banco es un directorio de archivos JSON, separado del código de la app. Puede estar en cualquier carpeta o incluso en un repositorio propio. Si no indicas ninguno, se usa el de ejemplo `./ejemplo/`. Para usar el tuyo:
 
 ```bash
 cp .env.example .env
@@ -58,10 +56,36 @@ bun run seed   # importa tu banco
 bun start      # arranca la app
 ```
 
-- **`OPIOS_PREGUNTAS`**: ruta de tu banco. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
-- **`OPIOS_SEED`**: `vacia` (por defecto) importa solo si la base está vacía; `auto` vuelve a importar en cada arranque actualizando por `id_externo` (sin duplicar); `no` nunca importa.
+- **`OPIOS_PREGUNTAS`**: ruta de tu banco. Si la defines y la carpeta no existe, la app avisa y no arranca.
+- **`OPIOS_SEED`**: `vacia` (por defecto) importa solo si la base está vacía, `auto` vuelve a importar en cada arranque actualizando por `id_externo` (sin duplicar) y `no` nunca importa.
 
-En la interfaz puedes además gestionar varios bancos desde la pestaña **Bancos**: importar un archivo `.opios`, SQLite, JSON o zip, crear un banco vacío, cambiar entre ellos, renombrarlos, actualizarlos y exportarlos.
+Esto es el **modo directo**: `bun start` trabaja con un único banco en `data/opios.db` y la pestaña **Bancos** no está disponible (la app lo indica con un mensaje). Si quieres varios bancos y gestionarlos desde la interfaz, usa el modo biblioteca (sección siguiente).
+
+## Modo directo y modo biblioteca (en el ordenador)
+
+|                | Modo directo                 | Modo biblioteca                                                                        |
+| -------------- | ---------------------------- | -------------------------------------------------------------------------------------- |
+| Cómo se activa | `bun start` sin variables    | `OPIOS_DATOS=./mis-datos bun start` (o `OPIOS_CATALOGO=<archivo>`)                     |
+| Bancos         | Uno solo, en `data/opios.db` | Varios, en la carpeta de datos, con un catálogo `catalogo.db`                          |
+| Pestaña Bancos | No disponible                | Importar, crear, activar, renombrar, actualizar, exportar, eliminar, copias y deshacer |
+
+Para arrancar en modo biblioteca desde cero:
+
+```bash
+mkdir -p mis-datos
+OPIOS_DATOS=./mis-datos bun run bancos importar "Mi banco" ./ejemplo
+OPIOS_DATOS=./mis-datos bun run bancos activar 1
+OPIOS_DATOS=./mis-datos bun start   # abre http://127.0.0.1:8000
+```
+
+El servidor se niega a arrancar si el catálogo no tiene un banco activo: usa `bun run bancos listar` para ver los bancos y `bun run bancos activar <id>` para elegir uno. Todos los comandos `bun run bancos` necesitan la misma variable `OPIOS_DATOS`/`OPIOS_CATALOGO` que el servidor. En la interfaz, la pestaña **Bancos** permite hacer lo mismo sin terminal: importar `.opios`/SQLite/JSON/zip, crear un banco vacío, alternar entre bancos, renombrarlos, actualizarlos y exportarlos.
+
+Tiene estos significados, que conviene conocer:
+
+- **Estudiar** activa ese banco y abre la portada; el progreso de cada banco se guarda por separado.
+- **Usar donde está** (PC) registra un archivo `.db` externo sin copiarlo: el progreso se guarda en ese archivo. Si luego no está disponible, la tarjeta ofrece **Localizar** o **Quitar de la biblioteca** (sin borrar el archivo). **Importar archivo…**, en cambio, hace una copia gestionada por Opios.
+- **Actualizar** vuelve a importar desde el directorio JSON y fusiona por `id_externo`: conserva los ids y el progreso, actualiza los enunciados cambiados y **archiva** (no borra) las preguntas que ya no están en el origen; se pueden recuperar si vuelven. **Deshacer última actualización** revierte el cambio usando las instantáneas rotativas (últimas 3).
+- **Exportar con/sin progreso**: la segunda opción vacía progreso, respuestas y simulacros de la copia, ideal para compartir un banco sin datos personales. El banco original nunca se toca.
 
 ## Formato y estructura del banco
 
@@ -110,14 +134,14 @@ Cada `tema_N.json` es una lista de preguntas (o un objeto `{ "preguntas": [...] 
 Además del directorio JSON, la app trabaja con bancos empaquetados:
 
 - **`.opios`**: un archivo gzip con una cabecera `opios-banco\0`, un manifest JSON (`formato: 1`, nombre, versión, número de preguntas y `incluye_progreso`) y la base SQLite. Se exporta desde la pestaña Bancos, con o sin progreso.
-- **`.opios-backup`**: un zip con un `.opios` por banco y su manifest; es la copia completa que descarga «Descargar copia completa».
+- **`.opios-backup`**: un zip con un `.opios` por banco y su manifest; es la copia completa que descarga "Descargar copia completa".
 - **SQLite (`.db`)** y **zip de carpetas JSON**: también se pueden importar desde el asistente.
 
 Puedes validar un directorio antes de importarlo con `bun run validar`.
 
 ## Copias de seguridad
 
-En la pestaña **Bancos** puedes descargar una copia completa (todos tus bancos, `.opios-backup`), exportar cada banco con o sin progreso, restaurar copias y deshacer la última actualización. Las instantáneas se rotan (últimas 3).
+En modo biblioteca (o en Android), la pestaña **Bancos** permite descargar una copia completa (todos tus bancos, `.opios-backup`), exportar cada banco con o sin progreso, restaurar copias y deshacer la última actualización. Las instantáneas se rotan (últimas 3). En modo directo, usa los comandos de abajo.
 
 Desde la terminal:
 
@@ -150,30 +174,31 @@ El contenedor corre con el usuario `bun` y solo acepta cabeceras `Host` de loopb
 | `OPIOS_SEED`              | `vacia`                                 | Cuándo importar al arrancar: `vacia`, `auto` o `no`                                                          |
 | `PORT`                    | `8000`                                  | Puerto                                                                                                       |
 | `HOST`                    | `127.0.0.1`                             | Interfaz en la que escuchar                                                                                  |
-| `OPIOS_DB`                | `data/opios.db`                         | Ruta de la base de datos                                                                                     |
+| `OPIOS_DB`                | `data/opios.db`                         | Ruta de la base de datos (solo modo directo)                                                                 |
 | `APP_TZ`                  | zona horaria del sistema                | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`)                                         |
 | `AUTH_USER` + `AUTH_PASS` | -                                       | Autenticación básica HTTP cuando se definen ambas                                                            |
 | `ALLOWED_HOSTS`           | solo loopback                           | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
 | `OPIOS_DATOS`             | -                                       | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`)                        |
+| `OPIOS_CATALOGO`          | -                                       | Modo biblioteca con ruta exacta al archivo de catálogo (alternativa antigua a `OPIOS_DATOS`)                 |
 | `OPIOS_AVISO_VERSION`     | `1`                                     | Aviso de versión nueva en la cabecera; `0` lo desactiva                                                      |
 
 Los límites diarios (15 preguntas nuevas al día, el freno de repasos atrasados) y el factor que acorta los intervalos según se acerca el examen son constantes de `src/config.js` (`CUPO_NUEVAS`, `FRENO_ATRASO`, `FACTOR_EXAMEN`).
 
 ## Opios en Android
 
-La app funciona también en Android (Android 7 o superior). Descarga el APK de la sección [Releases](https://github.com/filipondios/opios/releases) e instálalo; el sistema te pedirá permiso para instalar apps de fuentes desconocidas la primera vez.
+La app funciona también en Android (Android 7 o superior). Descarga el APK de la sección [Releases](https://github.com/filipondios/opios/releases) e instálalo. El sistema te pedirá permiso para instalar apps de fuentes desconocidas la primera vez. Podrás ver que en el primer arranque no hay ningún banco, ya que la app abre directamente la pestaña **Bancos** y no trae banco de ejemplo en Android, así que añade el tuyo.
 
-**Primer arranque.** No hay ningún banco: la app abre directamente la pestaña **Bancos**. No trae banco de ejemplo en Android, así que añade el tuyo.
+**¿Cómo añado un banco?**: En la pestaña **Bancos**, pulsa "Importar archivo..." y elige en el selector de archivos del sistema un `.opios`, una base SQLite (`.db`), un `.zip` con carpetas `bloque_N/`, o un `.json` con preguntas. Revisa la previsualización y confirma. El archivo elegido se copia al almacenamiento privado de la app: el original no se toca y no hace falta permiso de acceso a archivos. También puedes crear un banco vacío con "Crear banco vacío" y después añadir preguntas desde el creador.
 
-**¿Cómo añado un banco?** En la pestaña **Bancos**, pulsa **Importar archivo…** y elige en el selector de archivos del sistema un `.opios`, una base SQLite (`.db`), un `.zip` con carpetas `bloque_N/`, o un `.json` con preguntas. Revisa la previsualización y confirma. El archivo elegido se copia al almacenamiento privado de la app: el original no se toca y no hace falta permiso de acceso a archivos. También puedes crear un banco vacío con **Crear banco vacío** y después añadir preguntas desde el creador.
+**¿Cómo uso varios bancos?**: Cada banco listado tiene un botón **Estudiar** (lo activa y abre la portada), **Exportar** (con o sin progreso), **Cambiar nombre** y **Eliminar**. Puedes alternar entre ellos cuando quieras y el progreso de cada uno se conserva. Las copias de seguridad y restauraciones están en la misma sección, bajo "Copias de seguridad".
 
-**¿Cómo uso varios bancos?** Cada tarjeta tiene **Estudiar** (lo activa y abre la portada), **Exportar** (con o sin progreso), **Cambiar nombre** y **Eliminar**. El banco activo sale marcado. Puedes alternar entre ellos cuando quieras; el progreso de cada uno se conserva. Las copias de seguridad y restauraciones están en la misma pantalla, bajo «Copias de seguridad».
+**¿Dónde se guarda todo?**: En el almacenamiento privado de la app (`files/banco/`). No se sube a ningún servidor. Si desinstalas la app, Android borra esos datos, así que exporta antes una copia desde **Bancos > Descargar copia completa** si quieres conservarlos. Los avisos de versiones nuevas se comprueban en segundo plano y funcionan igual sin conexión.
 
-**¿Dónde se guarda todo?** En el almacenamiento privado de la app (`files/banco/`). No se sube a ningún servidor. Si desinstalas la app, Android borra esos datos: exporta antes una copia desde **Bancos → Descargar copia completa** si quieres conservarlos. Los avisos de versiones nuevas se comprueban en segundo plano y funcionan igual sin conexión.
-
-**Actualizaciones.** Al abrir una versión nueva se migra la base de datos automáticamente; si un banco fuera de una versión más nueva, se deja intacto y se pide actualizar la app.
+**Actualizaciones**: Al abrir una versión nueva se migra la base de datos automáticamente. Si un banco fuera de una versión más nueva, se deja intacto y se pide actualizar la app.
 
 ## Cómo se estudia
+
+La barra de navegación tiene seis secciones: **Test** (la portada, con el resumen de hoy y la selección de temas), **Simulacro**, **Estadísticas**, **Maker** (crear y editar preguntas), **Temario** (organizar bloques y temas) y **Bancos** (solo en modo biblioteca o Android). El tema claro/oscuro se cambia con el botón de la esquina superior; la preferencia se guarda en el dispositivo.
 
 Los repasos usan un **sistema Leitner simplificado de dos capas**: cada pregunta tiene una caja (0-6) y una fecha de vencimiento.
 
