@@ -7,33 +7,33 @@
 <p align="center"><em>Un entrenador en local para exámenes tipo test, con repaso espaciado.</em></p>
 
 <p align="center">
-  <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/main?label=tests&style=flat-square" alt="Estado de los tests"></a>
-  <a href="https://github.com/filipondios/opios/blob/main/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
-  <img src="https://badgen.net/badge/Bun/1.4.3?icon=bun&style=flat-square" alt="Bun 1.4.3">
-  <a href="https://github.com/filipondios/opios/blob/main/package.json"><img src="https://badgen.net/badge/dependencias/0/green?style=flat-square" alt="Sin dependencias"></a>
+  <a href="https://github.com/filipondios/opios/actions/workflows/test.yml"><img src="https://badgen.net/github/checks/filipondios/opios/multiplataforma?label=tests&style=flat-square" alt="Estado de los tests"></a>
+  <a href="https://github.com/filipondios/opios/blob/multiplataforma/LICENSE"><img src="https://badgen.net/github/license/filipondios/opios?label=licencia&style=flat-square" alt="Licencia"></a>
+  <img src="https://badgen.net/badge/Bun/1.4.3%2B?icon=bun&style=flat-square" alt="Bun 1.4.3 o superior">
 </p>
 
-**Opios** es una pequeña aplicación autoalojada para estudiar bancos de preguntas. Organizas las preguntas por bloques y temas, y luego practicas con tests libres, simulacros cronometrados y repasos programados en tu máquina con [Bun](https://bun.com/) y [SQLite](https://www.sqlite.org/): sin cuentas, sin nube y sin dependencias externas.
+**Opios** es una aplicación para estudiar bancos de preguntas de tipo test: organizas las preguntas por bloques y temas, y practicas con tests libres, simulacros cronometrados y repasos programados. Funciona en tu ordenador y en Android. Todo se guarda en tu dispositivo: sin cuentas, sin nube y sin enviar tus datos a ningún servidor.
 
-La aplicación es una herramienta genérica: no incluye ningún banco de preguntas, aunque esta app la creé para prepararme las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España). Lee un directorio configurable (por defecto `./preguntas`, o el banco de ejemplo `./ejemplo/` si no existe) y trae ese ejemplo para que puedas probarla nada más clonarla. Algunas de las funcionalidades de esta app son:
+La herramienta es genérica: no incluye ningún banco propio, aunque la creé para preparar las oposiciones al [Cuerpo de Técnicos Auxiliares de Informática de la Administración del Estado](https://www.inap.es/es/seleccion/procesos-selectivos-de-cuerposescalas-generales/cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado/que-es-el-cuerpo-de-tecnicos-auxiliares-de-informatica-de-la-administracion-del-estado) (España). Incluye un **banco de ejemplo** para que puedas probarla nada más instalarla. Algunas de sus funcionalidades:
 
 - Tests libres que combinan preguntas nuevas con repasos pendientes.
 - Simulacros cronometrados con penalización opcional y posibilidad de reanudarlos.
-- Programación con repaso espaciado y un cupo diario de preguntas nuevas.
+- Repaso espaciado con un cupo diario de preguntas nuevas.
 - Estadísticas: progreso por tema, previsión de repasos, acierto semanal, racha, tiempo medio y preguntas más falladas.
-- Todo en local: tu banco y tu progreso se almancenan en un único archivo SQLite.
+- Varios bancos a la vez, con importación, exportación, copias de seguridad y actualización sin perder el progreso.
 
-## Inicio rápido
+## Inicio rápido en el ordenador
 
-Solo necesitas [Bun](https://bun.sh); no hay paquetes que instalar.
+Necesitas [Bun](https://bun.sh) 1.4.3 o superior.
 
 ```bash
-bun run seed   # importa el banco (./preguntas si existe; si no, ./ejemplo) en data/opios.db
+bun install    # instala las dependencias (la primera vez)
 bun start      # abre http://127.0.0.1:8000
-bun test
 ```
 
-En el primer arranque, si la base de datos está vacía, el banco se importa automáticamente. `bun run dev` arranca el servidor en modo vigilancia. Para realizar mantenimiento en del banco de preguntas, hay disponibles algunos comandos útiles:
+Si no tienes un banco propio, la app usa automáticamente el de ejemplo (`./ejemplo/`). Para importar un banco nuevo desde cero, ejecuta `bun run seed`. El progreso se guarda en `data/opios.db` y se conserva entre arranques. `bun run dev` arranca el servidor en modo vigilancia (para desarrollar).
+
+Comandos útiles para gestionar tus bancos:
 
 ```bash
 bun run validar                 # comprueba un banco (formato, avisos, sesgo) sin tocar tu base de datos
@@ -45,30 +45,81 @@ bun run seed --actualizar       # actualiza preguntas editadas conservando su id
 
 `bun run calidad` analiza solo lo que la app importa. Con `--incluir <carpeta>` (repetible) añade otras carpetas del bloque. Usa `--umbral N` para cambiar el umbral (30 % por defecto) y `--fallar` para que el comando salga con error si algún archivo lo supera.
 
-## Usa tu propio banco
+## Usa tu propio banco (en el ordenador)
 
-La app lee las preguntas de un directorio externo, así que tu banco puede estar almacenado en cualquier otro lugar sin arrastrar el código de la aplicación. Para ello, has de conocer algunas variables que te ayudarán a definir tu banco de preguntas persinalizado:
+Tu banco es un directorio de archivos JSON, separado del código de la app. Puede estar en cualquier carpeta o incluso en un repositorio propio. Si no indicas ninguno, se usa el de ejemplo `./ejemplo/`.
 
-- **`OPIOS_PREGUNTAS`**: ruta del banco. Si no la defines, se usa `./preguntas` cuando existe y, si no, el ejemplo `./ejemplo/`. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
-- **`OPIOS_SEED`**: cuándo importar al arrancar. `vacia` (por defecto) solo importa si la base de datos no tiene preguntas; `auto` importa en cada arranque (actualizando por `id_externo` para no duplicar); `no` no importa nunca.
-- **`.env`**: Bun lo carga automáticamente. Copia [`.env.example`](.env.example) y ajusta la ruta, por ejemplo `OPIOS_PREGUNTAS=./mi-banco`.
-
-Flujo típico:
+Para usar el tuyo:
 
 ```bash
-git clone https://github.com/tu-usuario/tu-banco tu-banco
-echo "OPIOS_PREGUNTAS=./tu-banco" > .env
-bun run seed # importa tu banco
-bun start    # arranca la aplicación
+cp .env.example .env
+# edita .env y descomenta/ajusta: OPIOS_PREGUNTAS=./tu-banco
+bun run seed   # importa tu banco
+bun start      # arranca la app
 ```
 
-Con Docker, `docker-compose.yml` monta el banco como volumen de solo lectura y publica el puerto solo en loopback:
+- **`OPIOS_PREGUNTAS`**: ruta de tu banco. Si la defines y la carpeta no existe, la app avisa y no arranca (no cae al ejemplo en silencio).
+- **`OPIOS_SEED`**: `vacia` (por defecto) importa solo si la base está vacía; `auto` vuelve a importar en cada arranque actualizando por `id_externo` (sin duplicar); `no` nunca importa.
 
-```bash
-docker compose up --build
+En la interfaz puedes además gestionar varios bancos desde la pestaña **Bancos**: importar un archivo `.opios`, SQLite, JSON o zip, crear un banco vacío, cambiar entre ellos, renombrarlos, actualizarlos y exportarlos.
+
+## Formato y estructura del banco
+
+Un banco es una carpeta con sub carpetas `bloque_N/` que contienen:
+
+```text
+mi-banco/
+├── bloque_1/
+│   ├── info.json      # nombre del bloque y títulos de sus temas
+│   ├── tema_1.json    # lista de preguntas del tema 1
+│   └── tema_2.json
+└── bloque_2/
+    ├── info.json
+    └── tema_1.json
 ```
+
+Solo se importan `bloque_N/info.json` y `bloque_N/tema_N.json`; cualquier otro archivo se ignora. Los nombres son estrictos: `Bloque_1/`, `bloque_01/`, `TEMA_1.json` o `tema_01.json` se ignoran con un aviso.
+
+`info.json` describe el bloque:
+
+```json
+{
+    "nombre": "Bloque 1. Geografía",
+    "temas": [{ "numero": 1, "titulo": "Geografía física" }]
+}
+```
+
+Cada `tema_N.json` es una lista de preguntas (o un objeto `{ "preguntas": [...] }`). Cada pregunta:
+
+```json
+{
+    "pregunta": "¿Cuál es el río más caudaloso del mundo?",
+    "respuestas": ["El Amazonas", "El Misisipi", "El Nilo", "El Volga"],
+    "respuesta_correcta": "a",
+    "explicacion": "El Amazonas es el río con mayor caudal.",
+    "id_externo": "geografia-01"
+}
+```
+
+- `pregunta`: el enunciado.
+- `respuestas`: entre 2 y 8 opciones.
+- `respuesta_correcta`: la letra de la correcta (`a`, `b`, `c`...).
+- `explicacion`: texto que se muestra al responder (opcional).
+- `id_externo`: identificador estable; al actualizar el banco permite conservar el progreso de cada pregunta aunque cambie de sitio o de enunciado. Es opcional, pero muy recomendable (`bun run ids` lo añade).
+
+Además del directorio JSON, la app trabaja con bancos empaquetados:
+
+- **`.opios`**: un archivo gzip con una cabecera `opios-banco\0`, un manifest JSON (`formato: 1`, nombre, versión, número de preguntas y `incluye_progreso`) y la base SQLite. Se exporta desde la pestaña Bancos, con o sin progreso.
+- **`.opios-backup`**: un zip con un `.opios` por banco y su manifest; es la copia completa que descarga «Descargar copia completa».
+- **SQLite (`.db`)** y **zip de carpetas JSON**: también se pueden importar desde el asistente.
+
+Puedes validar un directorio antes de importarlo con `bun run validar`.
 
 ## Copias de seguridad
+
+En la pestaña **Bancos** puedes descargar una copia completa (todos tus bancos, `.opios-backup`), exportar cada banco con o sin progreso, restaurar copias y deshacer la última actualización. Las instantáneas se rotan (últimas 3).
+
+Desde la terminal:
 
 ```bash
 bun run backup                      # data/opios-YYYYMMDD-HHMMSS.db (incluye el progreso)
@@ -77,87 +128,50 @@ bun run export copia.json           # formato JSON antiguo (solo preguntas)
 bun run export --por-bloques copia/ # bloque_X/info.json + tema_N.json
 ```
 
-Para restaurar una copia, para la aplicación y copia el archivo sobre `data/opios.db`, o arranca con `OPIOS_DB=copia.db`.
+Para restaurar una copia desde la terminal, para la app y copia el archivo sobre `data/opios.db`, o arranca con `OPIOS_DB=copia.db`.
 
-## Formato y estructura del banco
+## Docker
 
-Se importan únicamente `bloque_N/info.json` y `bloque_N/tema_N.json`, de manera que cualquier otro archivo o carpeta se ignora. Los nombres son estrictos, ya que por ejemplo `Bloque_1/`, `bloque_01/`, `TEMA_1.json` y `tema_01.json` se ignoran con un aviso. Para conocer el formato de las preguntas, la estructura del banco de preguntas y otras cuestiones relacionadas, consulta la [wiki del proyecto](https://github.com/filipondios/opios/wiki).
+```bash
+docker compose up --build
+```
+
+`docker-compose.yml` monta el banco como volumen de solo lectura y publica el puerto solo en loopback. La imagen trae el banco de ejemplo; monta el tuyo con `OPIOS_PREGUNTAS` para importarlo.
+
+La imagen arranca en **modo biblioteca** (`OPIOS_DATOS=/data`): el catálogo y los bancos viven en el volumen `opios-data`, así que sobreviven a `docker compose down` y se gestionan desde la pestaña «Bancos». Para actualizar sobre datos existentes, para el contenedor y ejecuta `OPIOS_DATOS=/ruta/al/volumen bun run migrar` (guarda antes una instantánea de cada banco). Si un banco tiene un esquema más nuevo, se deja intacto y avisa de que hay que actualizar Opios.
+
+El contenedor corre con el usuario `bun` y solo acepta cabeceras `Host` de loopback. Para acceder desde la LAN, añade `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
 
 ## Configuración
 
-| Variable | Por defecto | Para qué sirve |
-|---|---|---|
-| `OPIOS_PREGUNTAS` | `./preguntas` si existe, si no `./ejemplo` | Directorio del banco de preguntas |
-| `OPIOS_SEED` | `vacia` | Cuándo importar al arrancar: `vacia`, `auto` o `no` |
-| `PORT` | `8000` | Puerto |
-| `HOST` | `127.0.0.1` | Interfaz en la que escuchar |
-| `OPIOS_DB` | `data/opios.db` | Ruta de la base de datos |
-| `APP_TZ` | zona horaria del sistema | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`) |
-| `AUTH_USER` + `AUTH_PASS` | - | Autenticación básica HTTP cuando se definen ambas |
-| `ALLOWED_HOSTS` | solo loopback | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
-| `OPIOS_DATOS` | - | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`) |
-| `OPIOS_AVISO_VERSION` | `1` | Aviso de versión nueva en la cabecera; `0` lo desactiva |
+| Variable                  | Por defecto                             | Para qué sirve                                                                                               |
+| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `OPIOS_PREGUNTAS`         | `./ejemplo` (o `./preguntas` si existe) | Directorio del banco de preguntas                                                                            |
+| `OPIOS_SEED`              | `vacia`                                 | Cuándo importar al arrancar: `vacia`, `auto` o `no`                                                          |
+| `PORT`                    | `8000`                                  | Puerto                                                                                                       |
+| `HOST`                    | `127.0.0.1`                             | Interfaz en la que escuchar                                                                                  |
+| `OPIOS_DB`                | `data/opios.db`                         | Ruta de la base de datos                                                                                     |
+| `APP_TZ`                  | zona horaria del sistema                | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`)                                         |
+| `AUTH_USER` + `AUTH_PASS` | -                                       | Autenticación básica HTTP cuando se definen ambas                                                            |
+| `ALLOWED_HOSTS`           | solo loopback                           | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
+| `OPIOS_DATOS`             | -                                       | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`)                        |
+| `OPIOS_AVISO_VERSION`     | `1`                                     | Aviso de versión nueva en la cabecera; `0` lo desactiva                                                      |
 
 Los límites diarios (15 preguntas nuevas al día, el freno de repasos atrasados) y el factor que acorta los intervalos según se acerca el examen son constantes de `src/config.js` (`CUPO_NUEVAS`, `FRENO_ATRASO`, `FACTOR_EXAMEN`).
 
-### Docker
+## Opios en Android
 
-```bash
-docker build -t opios .
-docker run -d -p 10000:10000 -v opios-data:/data \
-  -e AUTH_USER=usuario -e AUTH_PASS=clave opios
-```
+La app funciona también en Android (Android 7 o superior). Descarga el APK de la sección [Releases](https://github.com/filipondios/opios/releases) e instálalo; el sistema te pedirá permiso para instalar apps de fuentes desconocidas la primera vez.
 
-La imagen no incluye tu banco: trae el de ejemplo y, si montas el tuyo con `OPIOS_PREGUNTAS`, lo importa. [`docker-compose.yml`](docker-compose.yml) deja listo el montaje del banco como volumen de solo lectura y el puerto publicado únicamente en loopback. La imagen arranca en **modo biblioteca** (`OPIOS_DATOS=/data`): el catálogo y los bancos viven en el volumen `opios-data`, así que sobreviven a `docker compose down` y puedes gestionarlos desde la pestaña «Bancos».
+**Primer arranque.** No hay ningún banco: la app abre directamente la pestaña **Bancos**. No trae banco de ejemplo en Android, así que añade el tuyo.
 
-Para actualizar la app sobre datos existentes, para el contenedor y ejecuta el script de migración con el mismo volumen montado (guarda antes una instantánea de cada banco):
+**¿Cómo añado un banco?** En la pestaña **Bancos**, pulsa **Importar archivo…** y elige en el selector de archivos del sistema un `.opios`, una base SQLite (`.db`), un `.zip` con carpetas `bloque_N/`, o un `.json` con preguntas. Revisa la previsualización y confirma. El archivo elegido se copia al almacenamiento privado de la app: el original no se toca y no hace falta permiso de acceso a archivos. También puedes crear un banco vacío con **Crear banco vacío** y después añadir preguntas desde el creador.
 
-```bash
-OPIOS_DATOS=/ruta/al/volumen bun run migrar
-```
+**¿Cómo uso varios bancos?** Cada tarjeta tiene **Estudiar** (lo activa y abre la portada), **Exportar** (con o sin progreso), **Cambiar nombre** y **Eliminar**. El banco activo sale marcado. Puedes alternar entre ellos cuando quieras; el progreso de cada uno se conserva. Las copias de seguridad y restauraciones están en la misma pantalla, bajo «Copias de seguridad».
 
-Si un banco tiene un esquema más nuevo que esta versión, el script lo deja intacto y avisa de que hay que actualizar Opios; no pierdas esa copia.
+**¿Dónde se guarda todo?** En el almacenamiento privado de la app (`files/banco/`). No se sube a ningún servidor. Si desinstalas la app, Android borra esos datos: exporta antes una copia desde **Bancos → Descargar copia completa** si quieres conservarlos. Los avisos de versiones nuevas se comprueban en segundo plano y funcionan igual sin conexión.
 
-El contenedor se ejecuta con el usuario `bun` y, por defecto, solo acepta cabeceras `Host` de loopback. Si accedes a él por la LAN, añade tu dirección con `-e ALLOWED_HOSTS=192.168.1.50` (o el nombre que uses).
-
-## Android
-
-La misma aplicación funciona en Android: el núcleo (servicios, API y páginas) se empaqueta
-para el WebView y el banco se guarda con SQLite WASM en el almacenamiento privado de la app
-(`files/banco/banco.db`). Requisitos en la máquina de desarrollo:
-
-- **JDK 21** con `JAVA_HOME` apuntando a él.
-- **Android SDK** con la **API 36** (compile/target SDK, minSdk 24) y sus *build-tools*; el
-  SDK se localiza por `ANDROID_HOME`/`ANDROID_SDK_ROOT` o por `android/local.properties`.
-- **Bun** y las dependencias ya instaladas (`bun install`).
-
-Con un emulador o un dispositivo conectado por USB (depuración USB activada):
-
-```bash
-bun run android        # empaqueta dist-web/ y sincroniza el proyecto Android
-bun run android:abrir  # abre android/ en Android Studio
-```
-
-En Android Studio, pulsa **Run** (o `cd android && ./gradlew installDebug`) para instalar y
-arrancar la app. Para depurar la interfaz, abre `chrome://inspect` en Chrome con la app en
-marcha. Para extraer el banco guardado en un build de depuración:
-
-```bash
-adb exec-out run-as es.opios.app cat files/banco/banco.db > banco.db
-```
-
-### APK de release
-
-Para publicar actualizaciones, la app debe firmarse **siempre con la misma clave**:
-
-```bash
-keytool -genkeypair -v -keystore android/opios-release.jks -alias opios \
-  -keyalg RSA -keysize 2048 -validity 10000
-cp android/keystore.properties.example android/keystore.properties  # rellena las claves
-bun run release:android   # empaqueta, sincroniza, compila y deja dist/opios-<ver>.apk + .sha256
-```
-
-Guarda `android/opios-release.jks` y `android/keystore.properties` **fuera del repo** (están en `.gitignore`): perderlos impide firmar la siguiente actualización con la misma identidad. `versionName` sale de `package.json` y `versionCode` se calcula a partir de esa versión.
+**Actualizaciones.** Al abrir una versión nueva se migra la base de datos automáticamente; si un banco fuera de una versión más nueva, se deja intacto y se pide actualizar la app.
 
 ## Cómo se estudia
 
@@ -177,22 +191,22 @@ La estrategia se apoya en el efecto de espaciado y en el recuerdo activo (testin
 
 **Fundamentos**
 
-1. Butler, A. C., & Roediger, H. L. (2008). Feedback enhances the positive effects and reduces the negative effects of multiple-choice testing. *Memory & Cognition, 36*(3), 604-616. https://doi.org/10.3758/MC.36.3.604
-2. Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin, 132*(3), 354-380. https://doi.org/10.1037/0033-2909.132.3.354
-3. Cepeda, N. J., Vul, E., Rohrer, D., Wixted, J. T., & Pashler, H. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. *Psychological Science, 19*(11), 1095-1102. https://doi.org/10.1111/j.1467-9280.2008.02209.x
-4. Ebbinghaus, H. (1885). *Über das Gedächtnis: Untersuchungen zur experimentellen Psychologie*. Duncker & Humblot.
-5. Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. *Psychological Science, 17*(3), 249-255. https://doi.org/10.1111/j.1467-9280.2006.01693.x
+1. Butler, A. C., & Roediger, H. L. (2008). Feedback enhances the positive effects and reduces the negative effects of multiple-choice testing. _Memory & Cognition, 36_(3), 604-616. https://doi.org/10.3758/MC.36.3.604
+2. Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. _Psychological Bulletin, 132_(3), 354-380. https://doi.org/10.1037/0033-2909.132.3.354
+3. Cepeda, N. J., Vul, E., Rohrer, D., Wixted, J. T., & Pashler, H. (2008). Spacing effects in learning: A temporal ridgeline of optimal retention. _Psychological Science, 19_(11), 1095-1102. https://doi.org/10.1111/j.1467-9280.2008.02209.x
+4. Ebbinghaus, H. (1885). _Über das Gedächtnis: Untersuchungen zur experimentellen Psychologie_. Duncker & Humblot.
+5. Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning: Taking memory tests improves long-term retention. _Psychological Science, 17_(3), 249-255. https://doi.org/10.1111/j.1467-9280.2006.01693.x
 
 **Algoritmos**
 
-6. Leitner, S. (1972). *So lernt man lernen*. Herder.
-7. Wozniak, P. A. (1990). *Optimization of learning: A new approach and computer application* [Tesis de máster, Universidad de Tecnología de Poznań]. https://www.supermemo.com/en/blog/optimization-of-learning
-8. Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. En *KDD '22: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining* (pp. 4381-4390). Association for Computing Machinery. https://doi.org/10.1145/3534678.3539081
+6. Leitner, S. (1972). _So lernt man lernen_. Herder.
+7. Wozniak, P. A. (1990). _Optimization of learning: A new approach and computer application_ [Tesis de máster, Universidad de Tecnología de Poznań]. https://www.supermemo.com/en/blog/optimization-of-learning
+8. Ye, J., Su, J., & Cao, Y. (2022). A stochastic shortest path algorithm for optimizing spaced repetition scheduling. En _KDD '22: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining_ (pp. 4381-4390). Association for Computing Machinery. https://doi.org/10.1145/3534678.3539081
 
 **Fuentes prácticas**
 
-9. Anki. (s.f.). *Deck options*. Manual de Anki. https://docs.ankiweb.net/deck-options.html
-10. *Which guideline should I follow: FSRS simulation results or the new card/review limit ratio rule?* (s.f.). [Hilo de foro]. Anki Forums. https://forums.ankiweb.net/t/which-guideline-should-i-follow-fsrs-simulation-results-or-the-new-card-review-limit-ratio-rule/70470
+9. Anki. (s.f.). _Deck options_. Manual de Anki. https://docs.ankiweb.net/deck-options.html
+10. _Which guideline should I follow: FSRS simulation results or the new card/review limit ratio rule?_ (s.f.). [Hilo de foro]. Anki Forums. https://forums.ankiweb.net/t/which-guideline-should-i-follow-fsrs-simulation-results-or-the-new-card-review-limit-ratio-rule/70470
 
 ## Licencia
 
