@@ -55,24 +55,24 @@ cp .env.example .env
 
 Las variables principales son:
 
-- **`OPIOS_PREGUNTAS`**: ruta de tu banco de preguntas (un directorio de JSON). Si no la defines, se usa `./ejemplo/` (o `./preguntas/` si existe). Si la defines y la carpeta no existe, la app avisa y no arranca.
+- **`OPIOS_PREGUNTAS`**: ruta de tu banco de preguntas (un directorio de JSON). Si no la defines, se usa `./ejemplo/`. Si la defines y la carpeta no existe, la app avisa y no arranca.
 - **`OPIOS_SEED`**: `vacia` (por defecto) importa solo si la base está vacía; `auto` vuelve a importar en cada arranque actualizando por `id_externo` (sin duplicar); `no` nunca importa.
 - **`OPIOS_DATOS` / `OPIOS_CATALOGO`**: eligen el modo de la app (ver abajo). `OPIOS_DB` indica la base en modo directo.
 - El resto está comentado y explicado en [`.env.example`](.env.example). Referencia rápida:
 
-| Variable                  | Por defecto                             | Para qué sirve                                                                                               |
-| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `OPIOS_PREGUNTAS`         | `./ejemplo` (o `./preguntas` si existe) | Directorio del banco de preguntas                                                                            |
-| `OPIOS_SEED`              | `vacia`                                 | Cuándo importar al arrancar: `vacia`, `auto` o `no`                                                          |
-| `OPIOS_DB`                | `data/opios.db`                         | Base de datos en modo directo                                                                                |
-| `OPIOS_DATOS`             | -                                       | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`)                        |
-| `OPIOS_CATALOGO`          | -                                       | Modo biblioteca con ruta exacta al catálogo (alternativa antigua a `OPIOS_DATOS`)                            |
-| `APP_TZ`                  | zona horaria del sistema                | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`)                                         |
-| `PORT`                    | `8000`                                  | Puerto                                                                                                       |
-| `HOST`                    | `127.0.0.1`                             | Interfaz en la que escuchar                                                                                  |
-| `AUTH_USER` + `AUTH_PASS` | -                                       | Autenticación básica HTTP cuando se definen ambas                                                            |
-| `ALLOWED_HOSTS`           | solo loopback                           | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
-| `OPIOS_AVISO_VERSION`     | `1`                                     | Aviso de versión nueva en la cabecera; `0` lo desactiva                                                      |
+| Variable                  | Por defecto              | Para qué sirve                                                                                               |
+| ------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `OPIOS_PREGUNTAS`         | `./ejemplo`              | Directorio del banco de preguntas                                                                            |
+| `OPIOS_SEED`              | `vacia`                  | Cuándo importar al arrancar: `vacia`, `auto` o `no`                                                          |
+| `OPIOS_DB`                | `data/opios.db`          | Base de datos en modo directo                                                                                |
+| `OPIOS_DATOS`             | -                        | Modo biblioteca: carpeta con `catalogo.db` y los bancos de Opios (en Docker, `/data`)                        |
+| `OPIOS_CATALOGO`          | -                        | Modo biblioteca con ruta exacta al catálogo (alternativa antigua a `OPIOS_DATOS`)                            |
+| `APP_TZ`                  | zona horaria del sistema | Zona horaria usada para calcular "hoy" (por ejemplo `Europe/Madrid`)                                         |
+| `PORT`                    | `8000`                   | Puerto                                                                                                       |
+| `HOST`                    | `127.0.0.1`              | Interfaz en la que escuchar                                                                                  |
+| `AUTH_USER` + `AUTH_PASS` | -                        | Autenticación básica HTTP cuando se definen ambas                                                            |
+| `ALLOWED_HOSTS`           | solo loopback            | Valores de `Host` adicionales que aceptar, separados por comas (`localhost` y `127.0.0.1` siempre funcionan) |
+| `OPIOS_AVISO_VERSION`     | `1`                      | Aviso de versión nueva en la cabecera; `0` lo desactiva                                                      |
 
 Los límites diarios (15 preguntas nuevas al día, el freno de repasos atrasados) y el factor que acorta los intervalos según se acerca el examen son constantes de `src/config.js` (`CUPO_NUEVAS`, `FRENO_ATRASO`, `FACTOR_EXAMEN`).
 
@@ -100,7 +100,18 @@ bun run bancos activar 1                       # elige el banco activo
 bun start                                      # abre http://127.0.0.1:8000
 ```
 
-El catálogo (`catalogo.db`) y los bancos viven en esa carpeta. El servidor se niega a arrancar si no hay un banco activo: usa `bun run bancos listar` para ver los bancos y `bun run bancos activar <id>` para elegir uno. `OPIOS_CATALOGO` es la forma antigua (ruta exacta al archivo de catálogo) y manda si ambas están definidas. No hace falta pasar estas variables en cada comando: Bun carga `.env` tanto para el servidor como para `bun run bancos`.
+El catálogo (`catalogo.db`) y los bancos viven en esa carpeta. `bun run bancos listar` muestra los bancos; si está vacío dice `Catálogo vacío: registra un banco con «bun run bancos registrar»`. Los comandos disponibles son:
+
+```bash
+bun run bancos listar
+bun run bancos registrar <nombre> <ruta.db>     # usa un archivo SQLite que ya exista
+bun run bancos importar <nombre> <directorio>   # crea un banco desde JSON (como ./ejemplo)
+bun run bancos copiar <nombre> <ruta.db>        # copia un SQLite al almacén de Opios
+bun run bancos activar <id>
+bun run bancos actualizar <directorio>
+```
+
+El servidor se niega a arrancar si el catálogo no tiene un banco activo: elige uno con `bun run bancos activar <id>`. `OPIOS_CATALOGO` es la forma antigua (ruta exacta al archivo de catálogo) y manda si ambas están definidas. No hace falta pasar estas variables en cada comando: Bun carga `.env` tanto para el servidor como para `bun run bancos`.
 
 En este modo la pestaña **Bancos** permite importar `.opios`/SQLite/JSON/zip, crear un banco vacío, alternar entre bancos, renombrarlos, actualizarlos, exportarlos, gestionar copias y deshacer cambios:
 
